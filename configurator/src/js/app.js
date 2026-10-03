@@ -6,6 +6,7 @@ import { HOST_BASE_URLS, HOST_LABEL_MAP, HOST_META, MIN_AIOSTREAMS_VERSION } fro
 import { DEVICE_AUDIO_DEFAULTS, DEVICE_FORCE_LIMITED_AUDIO, DEVICE_AV1_SAFE, DEVICE_DV_SAFE, POPULAR_DEVICE_IDS, DEVICE_PROFILES } from '../data/devices.js';
 import { CAROUSEL_SVCS } from '../data/services.js';
 import { PROVIDER_CREDENTIALS } from '../data/credentials.js';
+import { serviceCredentialKeys, serviceCredentials } from '../data/credentials.js';
 import { initErrorLogger, logError, errorLogHtml, formatErrorLog, clearErrorLog, exportErrorLog } from './error-logger.js';
 import { initContactWidget } from './contact-widget.js';
 import { AGE_RATINGS, generateAgeRatingESE } from '../data/agerating.js';
@@ -16,8 +17,9 @@ import { sortPolicy } from '../core/sort-policy.js';
 import { rankedSelPolicy } from '../core/ranked-sel-policy.js';
 import { sizePolicy, bitratePolicy } from '../core/filter-policy.js';
 import { addonPolicy, assertAddonPolicy } from '../core/addon-policy.js';
-import { generateTemplate } from '../core/generate-template.js';
-import { assembleTemplate } from '../core/assemble-template.js';
+import { assembleTemplate, ALLOWED_MIGRATION_FIELDS } from '../core/assemble-template.js';
+import { CONFIG_UPDATE_SECTIONS, diffConfigSections, migrationSelection } from '../core/config-diff.js';
+import { normalizeUpdateTemplate, importedSourceState, mergeImportedPresets, cloneUpdateValue, inheritUpdateCredentials } from '../core/template-update-policy.js';
 import { sanitizeTemplateForRemoteImport } from '../core/import-template.js';
 import { nonWhitelistedPatterns, stripNonWhitelisted } from '../core/regex-whitelist.js';
 import { resolveHostCapabilities, parseHostStatus, hostOptionGate, gateTemplateForHost, describeRemovals, describeWarnings } from '../core/host-capability-policy.js';
@@ -30,7 +32,7 @@ import { createUpdateSession, commitUpdate, cancelUpdate } from '../core/update-
 import { scoreStream, scoreFormattedStream } from '../core/core-score-policy.js';
 import { isNewer, parseChangelogRange, shouldCheck, normalizeTemplateMeta } from '../core/update-check.js';
 import { AIOSTREAMS_COMPATIBILITY_TARGETS, DEFAULT_AIOSTREAMS_VERSION, OUTPUT_PROFILES, OUTPUT_PROFILE_INFO, resolveOutputProfile, applyOutputProfile } from '../core/output-profile-policy.js';
-import { hasLibraryCapableService, hasTorrentDebridService, missingDirectInstallCredentials } from '../core/install-policy.js';
+import { hasLibraryCapableService, hasTorrentDebridService, hasEnabledService, USENET_INDEXER_SERVICE_IDS, DEBRIDIO_SERVICE_IDS, missingDirectInstallCredentials } from '../core/install-policy.js';
 import { hostRoutingDecision, autoRoutableHostKeys, hostPickerLabel } from '../core/host-routing.js';
 import { collectRegexPatternSet, regexAccessDecision } from '../core/regex-access-policy.js';
 import { inspectTemplateComplexity, findFeatureConflicts, validateOutputProfileBudget } from '../core/feature-conflict-policy.js';
@@ -67,6 +69,8 @@ let _disabledAddons = new Set();
 let _lastInstall = { target: 'app', pwd: '' };
 let _lastAddonKey = '';
 let _pendingUpdate = null;
+let _preUpdateState = null;
+let _preUpdateMeta = null;
 function storeTemplateMeta(tpl) {
   try {
     const meta = normalizeTemplateMeta((tpl && tpl.metadata) || {});
@@ -449,6 +453,48 @@ async function selectHealthyHost(timeout=4000) {
 // Set to '' to disable and fall back to direct-only fetches.
 const CORS_PROXY = 'https://core-builds-cors-proxy.tlorenzato26.workers.dev';
 const S = { service:null, device:null, resolution:null, audio:'limited', bandwidthMbps:0, content:null, name:'', multiServices:[], sizeLimit:'unlimited', formatter:'family-v4', p2pEnabled:false, qualityFirst:false, resolutionFirst:false, foreignLangKill:true, matchMode:'balanced', exclude4K:false, excludeDV:false, tmdbToken:'', tmdbApiKey:'', creds:{torbox:'',realdebrid:'',alldebrid:'',premiumize:'',debridlink:'',offcloud:'',easynews:'',easynewsPass:'',nzbgeek:'',debridio:'',debrider:'',nzbnoob:'',althub:'',usenetcrawler:'',drunkenslug:'',nzbfinder:'',jackett:'',prowlarr:'',subdl:''}, instanceHost:'elfhosted', instanceUrl:'', instanceUuid:'', instancePassword:'', baseUuid:'', basePassword:'', quickStart:false, langs: ['English'], langExclusive: false, cacheMode: 'mixed', streamPool: 'normal', pseArch: 'standard', telemetryOk: false, simpleMode: false, outputProfile:'auto', aiostreamsVersion:DEFAULT_AIOSTREAMS_VERSION, installMode: 'direct', stremioEmail: '', stremioPassword: '', subtitleLangs: ['en'], subtitleAddons: ['aiosubtitle'], proxyEnabled: false, proxiedServices: [], catalogs: ['tmdb-addon'], dedupMerge: false, optionalScrapers: [], cleanInstall: false, quickProfile: 'balanced', preloadEnabled:true, autoPlayMethod:'matchingFile', addonTimeout:6000, patchCinemeta:false, installAIOMeta:false, ageLimit:'none', libraryBoost:'default', nzbFailover:false, nzbFailoverPosition:'after-torrents', maxFailoverNzbs:3 };
+// A clean template update must not inherit unrelated wizard/experimental flags.
+const INITIAL_STATE = cloneUpdateValue(S);
+function replaceState(nextState) {
+  for (const key of Object.keys(S)) delete S[key];
+  Object.assign(S, cloneUpdateValue(nextState));
+}
+function releaseMigrationFields(fields) {
+  for (const field of fields) if (S._migrationKeep) delete S._migrationKeep[field];
+  S._migrationRemove = (S._migrationRemove || []).filter(field => !fields.includes(field));
+}
+function releaseMigrationForControl(action, element) {
+  if (action === 'set-output-profile') { S._migrationKeep = null; S._migrationRemove = []; return; }
+  const key = element.dataset.key;
+  if (['set-formatter', 'set-simple-fmt', 'fmt-scroll-pick', 'fmt-dropdown-change', 'clear-custom-formatter'].includes(action)) releaseMigrationFields(['formatter']);
+  if (['set-simple-quality', 'set-simple-resfirst', 'set-library-boost'].includes(action)
+    || (action === 'toggle-pref' && ['qualityFirst', 'resolutionFirst'].includes(key))) {
+    releaseMigrationFields(CONFIG_UPDATE_SECTIONS.find(section => section.key === 'sort').fields);
+  }
+  if (['toggle-service', 'toggle-carousel-service', 'toggle-optional-scraper', 'add-optional-scraper', 'remove-optional-scraper', 'toggle-catalog'].includes(action)) releaseMigrationFields(['services', 'presets', 'groups']);
+  if (action === 'update-radio' && key === 'resolution') releaseMigrationFields(['sortCriteria', 'preferredResolutions', 'excludedResolutions', 'requiredResolutions', 'includedResolutions']);
+  if (['set-simple-cache', 'set-cache-mode'].includes(action)) releaseMigrationFields(['excludeCached', 'excludeUncached']);
+  if (['set-simple-match', 'set-match-mode'].includes(action)) releaseMigrationFields(['deduplicator', 'sortCriteria']);
+  if (['toggle-lang', 'toggle-lang-exclusive'].includes(action)) releaseMigrationFields(['preferredLanguages', 'requiredLanguages']);
+  if (['set-audio', 'device-scroll-pick', 'dev-more-select'].includes(action) || (action === 'update-radio' && ['audio', 'device'].includes(key))) releaseMigrationFields(['excludedAudioTags', 'preferredAudioTags', 'preferredAudioChannels', 'excludedEncodes', 'preferredEncodes', 'preferredVisualTags']);
+  const expressionFields = CONFIG_UPDATE_SECTIONS.filter(section => ['pses', 'eses', 'ises'].includes(section.key)).flatMap(section => section.fields);
+  if (['set-audio', 'device-scroll-pick', 'dev-more-select', 'set-pse-arch', 'toggle-lang', 'toggle-lang-exclusive'].includes(action)
+    || (action === 'update-radio' && ['audio', 'device', 'resolution', 'content'].includes(key))) releaseMigrationFields(expressionFields);
+  if (['set-pool', 'set-simple-pool'].includes(action)) releaseMigrationFields(['resultLimits', 'groups', 'dynamicAddonFetching']);
+  if (action === 'set-size-limit') releaseMigrationFields(['size']);
+  if (action === 'set-addon-timeout') releaseMigrationFields(['presets']);
+  if (action === 'set-autoplay-method') releaseMigrationFields(['autoPlay']);
+
+  if (action === 'toggle-proxy-svc') releaseMigrationFields(['proxy']);
+  if (['toggle-foreign-kill', 'set-age-limit', 'update-bandwidth'].includes(action)) releaseMigrationFields(['excludedStreamExpressions', 'bitrate']);
+  if (action === 'toggle-p2p') releaseMigrationFields(['excludedStreamExpressions']);
+  if (action === 'toggle-pref') {
+    if (['exclude4K', 'excludeDV', 'foreignLangKill', 'p2pEnabled'].includes(key)) releaseMigrationFields(['excludedStreamExpressions']);
+    if (key === 'proxyEnabled') releaseMigrationFields(['proxy']);
+    if (key === 'dedupMerge') releaseMigrationFields(['deduplicator']);
+    if (key === 'preloadEnabled') releaseMigrationFields(['preloadStreams']);
+  }
+}
 const SENSITIVE_TOP_LEVEL_KEYS = new Set(['instancePassword', 'basePassword', 'stremioPassword']);
 const SENSITIVE_KEY_TOKENS = ['password', 'apikey', 'api_key', 'token', 'secret', 'credential', 'auth'];
 
@@ -502,11 +548,11 @@ const DEFS = [
       { v:'alldebrid',    icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><path d="M22 6L38 34H6Z" stroke="#f97316" stroke-width="1.5" fill="#f97316" fill-opacity=".06" stroke-linejoin="round"/><path d="M22 16v10M22 30v.5" stroke="#f97316" stroke-width="2" stroke-linecap="round"/><text x="22" y="41" text-anchor="middle" fill="#f97316" font-size="4.5" font-weight="800" letter-spacing=".3">AD</text></svg>', name:'AllDebrid', desc:'AllDebrid subscribers<br><span style="color:#ea580c;font-size:.8em">e.g. Core Nexus AllDebrid · 4K AllDebrid</span>' },
       { v:'easynews',    icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="6" y="10" width="32" height="24" rx="4" stroke="#06b6d4" stroke-width="1.5" fill="#06b6d4" fill-opacity=".06"/><path d="M12 18l10 6 10-6" stroke="#06b6d4" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 28l6-4M32 28l-6-4" stroke="#06b6d4" stroke-width="1.2" stroke-linecap="round"/><text x="22" y="9" text-anchor="middle" fill="#06b6d4" font-size="4" font-weight="700" letter-spacing=".3">EN</text></svg>', name:'EasyNews', desc:'Usenet — username &amp; password<br><span style="color:#0ea5e9;font-size:.8em">e.g. Speed EasyNews · Speed 4K+</span>' },
       { v:'premiumize',   icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="7" y="7" width="30" height="30" rx="8" stroke="#a78bfa" stroke-width="1.5" fill="#a78bfa" fill-opacity=".06"/><path d="M16 22l4 4 8-8" stroke="#a78bfa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="22" cy="14" r="2" fill="#a78bfa" fill-opacity=".4"/></svg>', name:'Premiumize', desc:'Premiumize subscribers<br><span style="color:#d97706;font-size:.8em">e.g. Core Nexus Premiumize</span>' },
-      { v:'easydebrid',  icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="7" y="8" width="30" height="28" rx="5" stroke="#10b981" stroke-width="1.5" fill="#10b981" fill-opacity=".06"/><text x="22" y="24" text-anchor="middle" fill="#10b981" font-size="11" font-weight="900" font-family="system-ui,sans-serif">ED</text><path d="M13 30h18" stroke="#10b981" stroke-width="1" stroke-linecap="round" stroke-opacity=".4"/><text x="22" y="7" text-anchor="middle" fill="#10b981" font-size="4.5" font-weight="700" letter-spacing=".3">EASY</text></svg>', name:'EasyDebrid', desc:'EasyDebrid subscribers · API key<br><span style="color:#10b981;font-size:.8em">multi-debrid aggregator service</span>' },
+      { v:'easydebrid',  icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="7" y="8" width="30" height="28" rx="5" stroke="#10b981" stroke-width="1.5" fill="#10b981" fill-opacity=".06"/><text x="22" y="24" text-anchor="middle" fill="#10b981" font-size="11" font-weight="900" font-family="system-ui,sans-serif">ED</text><path d="M13 30h18" stroke="#10b981" stroke-width="1" stroke-linecap="round" stroke-opacity=".4"/><text x="22" y="7" text-anchor="middle" fill="#10b981" font-size="4.5" font-weight="700" letter-spacing=".3">EASY</text></svg>', name:'EasyDebrid', desc:'EasyDebrid subscribers · API key<br><span style="color:#10b981;font-size:.8em">cached torrent streaming</span>' },
       { v:'debridlink',   icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><path d="M18 18l-4 4a5.66 5.66 0 008 8l4-4" stroke="#3b82f6" stroke-width="1.8" stroke-linecap="round" fill="none"/><path d="M26 26l4-4a5.66 5.66 0 00-8-8l-4 4" stroke="#3b82f6" stroke-width="1.8" stroke-linecap="round" fill="none"/><circle cx="22" cy="22" r="14" stroke="#3b82f6" stroke-width="1" fill="#3b82f6" fill-opacity=".04" stroke-dasharray="3 3"/></svg>', name:'Debrid-Link', desc:'Debrid-Link subscribers<br><span style="color:#0284c7;font-size:.8em">e.g. Core Nexus Debrid-Link</span>' },
-      { v:'offcloud',    icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><path d="M12 28a8 8 0 0114-6.5A6 6 0 0134 24a5 5 0 01-2 9.5H14a6 6 0 01-2-5.5z" stroke="#94a3b8" stroke-width="1.5" fill="#94a3b8" fill-opacity=".06"/><path d="M18 24h8M18 28h5" stroke="#94a3b8" stroke-width="1.2" stroke-linecap="round"/></svg>', name:'Offcloud', desc:'Cloud debrid — API key required<br><span style="color:#06b6d4;font-size:.8em">torrent + HTTP download caching</span>' },
-      { v:'pikpak',      icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="7" y="8" width="30" height="28" rx="5" stroke="#38bdf8" stroke-width="1.5" fill="#38bdf8" fill-opacity=".06"/><path d="M17 16l10 6-10 6z" fill="#38bdf8" fill-opacity=".6" stroke="#38bdf8" stroke-width="1.2" stroke-linejoin="round"/><text x="22" y="7" text-anchor="middle" fill="#38bdf8" font-size="4" font-weight="800" letter-spacing=".3">PIKPAK</text></svg>', name:'PikPak', desc:'PikPak cloud storage · API key<br><span style="color:#38bdf8;font-size:.8em">cloud torrent + download caching</span>' },
-      { v:'seedr',       icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><circle cx="22" cy="22" r="15" stroke="#a3e635" stroke-width="1.5" fill="#a3e635" fill-opacity=".05"/><circle cx="22" cy="22" r="6" fill="none" stroke="#a3e635" stroke-width="1.5"/><path d="M22 16v-4M19 17l-3-3M25 17l3-3" stroke="#a3e635" stroke-width="1.3" stroke-linecap="round"/><path d="M22 28v3" stroke="#a3e635" stroke-width="1.2" stroke-linecap="round" stroke-opacity=".4"/><text x="22" y="42" text-anchor="middle" fill="#a3e635" font-size="4.5" font-weight="800" letter-spacing=".3">SEEDR</text></svg>', name:'Seedr', desc:'Seedr cloud torrent · API key<br><span style="color:#a3e635;font-size:.8em">torrent to cloud streaming</span>' },
+      { v:'offcloud',    icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><path d="M12 28a8 8 0 0114-6.5A6 6 0 0134 24a5 5 0 01-2 9.5H14a6 6 0 01-2-5.5z" stroke="#94a3b8" stroke-width="1.5" fill="#94a3b8" fill-opacity=".06"/><path d="M18 24h8M18 28h5" stroke="#94a3b8" stroke-width="1.2" stroke-linecap="round"/></svg>', name:'Offcloud', desc:'Cloud debrid — API key, email &amp; password<br><span style="color:#06b6d4;font-size:.8em">torrent + HTTP download caching</span>' },
+      { v:'pikpak',      icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="7" y="8" width="30" height="28" rx="5" stroke="#38bdf8" stroke-width="1.5" fill="#38bdf8" fill-opacity=".06"/><path d="M17 16l10 6-10 6z" fill="#38bdf8" fill-opacity=".6" stroke="#38bdf8" stroke-width="1.2" stroke-linejoin="round"/><text x="22" y="7" text-anchor="middle" fill="#38bdf8" font-size="4" font-weight="800" letter-spacing=".3">PIKPAK</text></svg>', name:'PikPak', desc:'PikPak cloud storage · email &amp; password<br><span style="color:#38bdf8;font-size:.8em">cloud torrent + download caching</span>' },
+      { v:'seedr',       icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><circle cx="22" cy="22" r="15" stroke="#a3e635" stroke-width="1.5" fill="#a3e635" fill-opacity=".05"/><circle cx="22" cy="22" r="6" fill="none" stroke="#a3e635" stroke-width="1.5"/><path d="M22 16v-4M19 17l-3-3M25 17l3-3" stroke="#a3e635" stroke-width="1.3" stroke-linecap="round"/><path d="M22 28v3" stroke="#a3e635" stroke-width="1.2" stroke-linecap="round" stroke-opacity=".4"/><text x="22" y="42" text-anchor="middle" fill="#a3e635" font-size="4.5" font-weight="800" letter-spacing=".3">SEEDR</text></svg>', name:'Seedr', desc:'Seedr cloud torrent · token from MediaFusion<br><span style="color:#a3e635;font-size:.8em">results via MediaFusion only</span>' },
       { v:'debridio',     icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><circle cx="22" cy="22" r="15" stroke="#14b8a6" stroke-width="1.5" fill="#14b8a6" fill-opacity=".06"/><circle cx="19" cy="19" r="5.5" fill="none" stroke="#14b8a6" stroke-width="1.5"/><line x1="23" y1="23" x2="29" y2="29" stroke="#14b8a6" stroke-width="2" stroke-linecap="round"/><text x="22" y="42" text-anchor="middle" fill="#14b8a6" font-size="4" font-weight="800" letter-spacing=".3">DEBRIDIO</text></svg>', name:'Debridio', desc:'Debridio scraper · API key required<br><span style="color:#14b8a6;font-size:.8em">search + caching via Debridio</span>' },
       { v:'debrider',    icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="7" y="8" width="30" height="28" rx="5" stroke="#06b6d4" stroke-width="1.5" fill="#06b6d4" fill-opacity=".06"/><text x="22" y="22" text-anchor="middle" fill="#06b6d4" font-size="7" font-weight="900" font-family="system-ui,sans-serif">DBR</text><path d="M13 30h18" stroke="#06b6d4" stroke-width="1" stroke-linecap="round" stroke-opacity=".4"/><text x="22" y="34" text-anchor="middle" fill="#06b6d4" font-size="4.5" font-weight="700" letter-spacing=".3">DEBRIDER</text></svg>', name:'Debrider', desc:'Multi-debrid aggregator · API key<br><span style="color:#06b6d4;font-size:.8em">one API for multiple debrid services</span>' },
       { v:'usenet',      icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="7" y="8" width="30" height="28" rx="5" stroke="#10b981" stroke-width="1.5" fill="#10b981" fill-opacity=".06"/><text x="22" y="26" text-anchor="middle" fill="#10b981" font-size="11" font-weight="900" font-family="system-ui,sans-serif">U</text><path d="M13 30h18" stroke="#10b981" stroke-width="1" stroke-linecap="round" stroke-opacity=".4"/><text x="22" y="38" text-anchor="middle" fill="#10b981" font-size="4.5" font-weight="700" letter-spacing=".3">USENET</text></svg>', name:'Usenet Only', desc:'Pure usenet — no debrid, no torrents<br><span style="color:#10b981;font-size:.8em">NNTP + indexers · EasyNews optional</span>' },
@@ -520,7 +566,7 @@ const DEFS = [
     featured:['generic','onn','shield','firestick-4kmax','googletv','samsung'],
     opts:[
       { v:'generic',         icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><defs><filter id="dg1"><feDropShadow dx="0" dy="0" stdDeviation="1.5" flood-color="#a78bfa" flood-opacity=".4"/></filter></defs><rect x="4" y="12" width="36" height="22" rx="2.5" stroke="#a78bfa" stroke-width="1.5" filter="url(#dg1)"/><rect x="7" y="14.5" width="30" height="17" rx="1" fill="#00d4ff" opacity=".06"/><line x1="17" y1="34" x2="14" y2="40" stroke="#a78bfa" stroke-width="1.5" stroke-linecap="round"/><line x1="27" y1="34" x2="30" y2="40" stroke="#a78bfa" stroke-width="1.5" stroke-linecap="round"/><line x1="12" y1="40" x2="32" y2="40" stroke="#a78bfa" stroke-width="1.5" stroke-linecap="round"/><circle cx="22" cy="7" r="2" stroke="#a78bfa" stroke-width="1.5" fill="none" filter="url(#dg1)"/><line x1="22" y1="9" x2="22" y2="12" stroke="#a78bfa" stroke-width="1.5"/></svg>', name:'Standard / Not Sure', desc:'Conservative video · DD+/AAC audio · broad compatibility', help:'Safe default when the exact playback hardware is unknown. Prioritises HEVC/AVC and streaming-grade DD+/AAC audio instead of assuming AV1 or lossless passthrough support.' },
-      { v:'samsung',         icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><defs><filter id="dg2"><feDropShadow dx="0" dy="0" stdDeviation="1.5" flood-color="#3b82f6" flood-opacity=".4"/></filter></defs><rect x="3" y="10" width="38" height="22" rx="2" stroke="#3b82f6" stroke-width="1.5" filter="url(#dg2)"/><rect x="6" y="12.5" width="32" height="17" rx="1" fill="#00d4ff" opacity=".06"/><rect x="19" y="32" width="6" height="3" rx="1" fill="#3b82f6" opacity=".5"/><path d="M13 39 Q22 36 31 39" stroke="#3b82f6" stroke-width="1.5" stroke-linecap="round" fill="none"/><path d="M28 19 Q26 17.5 24 19 Q22 20.5 20 19 Q18 17.5 16 19" stroke="#3b82f6" stroke-width="1.5" stroke-linecap="round" fill="none" opacity=".5"/></svg>', name:'Samsung TV',           desc:'DV-Only Kill · AV1/VC-1 excluded · HDR10+', help:'<b>DV-Only Kill</b>: Samsung TVs have no Dolby Vision support — DV streams without an HDR10 fallback show a purple/green tint, so they are removed. <b>AV1 / VC-1 excluded</b>: 2018–2022 Samsung models lack these video decoders. <b>HDR10+</b> is Samsung&#39;s own HDR format and is prioritised.' },
+      { v:'samsung',         icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><defs><filter id="dg2"><feDropShadow dx="0" dy="0" stdDeviation="1.5" flood-color="#3b82f6" flood-opacity=".4"/></filter></defs><rect x="3" y="10" width="38" height="22" rx="2" stroke="#3b82f6" stroke-width="1.5" filter="url(#dg2)"/><rect x="6" y="12.5" width="32" height="17" rx="1" fill="#00d4ff" opacity=".06"/><rect x="19" y="32" width="6" height="3" rx="1" fill="#3b82f6" opacity=".5"/><path d="M13 39 Q22 36 31 39" stroke="#3b82f6" stroke-width="1.5" stroke-linecap="round" fill="none"/><path d="M28 19 Q26 17.5 24 19 Q22 20.5 20 19 Q18 17.5 16 19" stroke="#3b82f6" stroke-width="1.5" stroke-linecap="round" fill="none" opacity=".5"/></svg>', name:'Samsung TV',           desc:'DV-Only Kill · AV1/VC-1 excluded · HDR10+', help:'<b>DV-Only Kill</b>: Samsung TVs have no Dolby Vision support — DV streams without an HDR10 fallback show a purple/green tint, so they are removed. <b>AV1 / VC-1 excluded</b>: Samsung models before 2020 have no AV1 decoder and VC-1 support varies, so both are excluded for safety. <b>HDR10+</b> is Samsung&#39;s own HDR format and is prioritised.' },
       { v:'appletv-old',     icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><defs><filter id="dg3"><feDropShadow dx="0" dy="0" stdDeviation="1.5" flood-color="#9ca3af" flood-opacity=".4"/></filter></defs><rect x="10" y="12" width="24" height="18" rx="5.5" stroke="#9ca3af" stroke-width="1.5" filter="url(#dg3)"/><rect x="10" y="12" width="24" height="18" rx="5.5" fill="#00d4ff" opacity=".05"/><path d="M20 20.5 C20 18.5 21.5 17.5 22.5 17.5 C23 17.5 23.3 17.7 23.8 17.9 C24.3 17.7 24.6 17.5 25 17.5 C26.5 17.5 28 18.5 28 20.5 C28 22.5 26.5 24 25 24 C24.6 24 24.3 23.8 23.8 23.6 C23.3 23.8 23 24 22.5 24 C21 24 20 22.5 20 20.5Z" fill="#9ca3af" filter="url(#dg3)"/><line x1="23.5" y1="16" x2="25" y2="13.5" stroke="#9ca3af" stroke-width="1.2" stroke-linecap="round"/><circle cx="22" cy="35" r="2.5" stroke="#9ca3af" stroke-width="1.5" fill="none"/><circle cx="22" cy="35" r="1" fill="#f59e0b"/></svg>', name:'Apple TV 4K Gen 1–2', desc:'DV · no AV1 · DD+/Atmos · multichannel PCM', help:'Dolby Vision is supported. Apple TV does not bitstream TrueHD or DTS-HD; compatible apps may decode them to multichannel PCM, but lossless Atmos metadata is not preserved. AV1 is excluded for reliable high-bitrate playback.' },
       { v:'appletv-new',     icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><defs><filter id="dg4"><feDropShadow dx="0" dy="0" stdDeviation="1.5" flood-color="#60a5fa" flood-opacity=".4"/></filter></defs><rect x="10" y="12" width="24" height="18" rx="5.5" stroke="#60a5fa" stroke-width="1.5" filter="url(#dg4)"/><rect x="10" y="12" width="24" height="18" rx="5.5" fill="#00d4ff" opacity=".05"/><path d="M20 20.5 C20 18.5 21.5 17.5 22.5 17.5 C23 17.5 23.3 17.7 23.8 17.9 C24.3 17.7 24.6 17.5 25 17.5 C26.5 17.5 28 18.5 28 20.5 C28 22.5 26.5 24 25 24 C24.6 24 24.3 23.8 23.8 23.6 C23.3 23.8 23 24 22.5 24 C21 24 20 22.5 20 20.5Z" fill="#60a5fa" filter="url(#dg4)"/><line x1="23.5" y1="16" x2="25" y2="13.5" stroke="#60a5fa" stroke-width="1.2" stroke-linecap="round"/><circle cx="22" cy="35" r="2.5" stroke="#60a5fa" stroke-width="1.5" fill="none" filter="url(#dg4)"/></svg>', name:'Apple TV 4K Gen 3',   desc:'DV · HDR10+ · no hardware AV1 · DD+/Atmos', help:'Apple TV 4K Gen 3 adds HDR10+ but the A15 does not include an AV1 hardware decoder. TrueHD/DTS-HD are not bitstreamed; compatible apps may decode to multichannel PCM.' },
       { v:'lgtv',            icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><defs><filter id="dg5"><feDropShadow dx="0" dy="0" stdDeviation="1.5" flood-color="#ef4444" flood-opacity=".4"/></filter></defs><rect x="3" y="8" width="38" height="24" rx="2" stroke="#ef4444" stroke-width="1.5" filter="url(#dg5)"/><rect x="6" y="10.5" width="32" height="19" rx="1" fill="#00d4ff" opacity=".06"/><rect x="18" y="32" width="8" height="3" rx="1" fill="#ef4444" opacity=".4"/><line x1="13" y1="39" x2="31" y2="39" stroke="#ef4444" stroke-width="1.5" stroke-linecap="round"/><path d="M19 20 L19 23 L24 23" stroke="#ef4444" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>', name:'LG TV webOS',          desc:'DV · AV1 varies · DD+/Atmos · no internal-app TrueHD', help:'LG webOS supports Dolby Vision. AV1 depends on model year. Internal TV apps generally do not pass TrueHD/DTS-HD over eARC, so the profile uses streaming-grade audio; external HDMI devices are a separate path.' },
@@ -558,7 +604,7 @@ const DEFS = [
       { v:'all',   icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><circle cx="22" cy="22" r="18" stroke="#64748b" stroke-width="2" fill="#0f172a"/><circle cx="15" cy="16" r="4.5" fill="#ef4444" opacity="0.85"/><circle cx="29" cy="16" r="4.5" fill="#3b82f6" opacity="0.85"/><circle cx="15" cy="28" r="4.5" fill="#f9a8d4" opacity="0.85"/><circle cx="29" cy="28" r="4.5" fill="#94a3b8" opacity="0.6"/></svg>', name:'Everything',       desc:'Movies · TV · anime · safe default' },
       { v:'live',  icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="5" y="17" width="34" height="22" rx="2" fill="#1a0808" stroke="#ef4444" stroke-width="2"/><rect x="5" y="9" width="34" height="10" rx="2" fill="#ef4444"/><line x1="13" y1="9" x2="9" y2="19" stroke="#1a0808" stroke-width="3" stroke-linecap="round"/><line x1="21" y1="9" x2="17" y2="19" stroke="#1a0808" stroke-width="3" stroke-linecap="round"/><line x1="29" y1="9" x2="25" y2="19" stroke="#1a0808" stroke-width="3" stroke-linecap="round"/><line x1="37" y1="9" x2="33" y2="19" stroke="#1a0808" stroke-width="3" stroke-linecap="round"/><line x1="9" y1="25" x2="35" y2="25" stroke="#ef4444" stroke-width="1" opacity="0.5"/><line x1="9" y1="31" x2="35" y2="31" stroke="#ef4444" stroke-width="1" opacity="0.5"/></svg>', name:'Movies & TV',      desc:'Films &amp; series · no anime scrapers' },
       { v:'mixed', icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="3" y="15" width="18" height="22" rx="2" fill="#1a0808" stroke="#ef4444" stroke-width="1.5"/><rect x="3" y="8" width="18" height="9" rx="2" fill="#ef4444"/><line x1="9" y1="8" x2="6" y2="17" stroke="#1a0808" stroke-width="2" stroke-linecap="round"/><line x1="15" y1="8" x2="12" y2="17" stroke="#1a0808" stroke-width="2" stroke-linecap="round"/><line x1="21" y1="8" x2="18" y2="17" stroke="#1a0808" stroke-width="2" stroke-linecap="round"/><circle cx="33" cy="13" r="4" fill="#f9a8d4"/><circle cx="39" cy="19" r="4" fill="#f9a8d4"/><circle cx="37" cy="27" r="4" fill="#f9a8d4"/><circle cx="27" cy="27" r="4" fill="#f9a8d4"/><circle cx="25" cy="19" r="4" fill="#f9a8d4"/><circle cx="33" cy="22" r="5" fill="#fce7f3"/></svg>', name:'Movies + Anime',   desc:'Movies &amp; TV + SeaDex anime releases' },
-      { v:'anime', icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><circle cx="22" cy="13" r="5.5" fill="#f9a8d4"/><circle cx="31" cy="18" r="5.5" fill="#f9a8d4"/><circle cx="28" cy="29" r="5.5" fill="#f9a8d4"/><circle cx="16" cy="29" r="5.5" fill="#f9a8d4"/><circle cx="13" cy="18" r="5.5" fill="#f9a8d4"/><circle cx="22" cy="22" r="5.5" fill="#fce7f3"/><circle cx="22" cy="22" r="2" fill="#f472b6"/><line x1="37" y1="5" x2="37" y2="10" stroke="#f9a8d4" stroke-width="1.5" stroke-linecap="round"/><line x1="34.5" y1="7.5" x2="39.5" y2="7.5" stroke="#f9a8d4" stroke-width="1.5" stroke-linecap="round"/></svg>', name:'Anime',            desc:'SeaDex Best-Only · confirmed best releases' },
+      { v:'anime', icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><circle cx="22" cy="13" r="5.5" fill="#f9a8d4"/><circle cx="31" cy="18" r="5.5" fill="#f9a8d4"/><circle cx="28" cy="29" r="5.5" fill="#f9a8d4"/><circle cx="16" cy="29" r="5.5" fill="#f9a8d4"/><circle cx="13" cy="18" r="5.5" fill="#f9a8d4"/><circle cx="22" cy="22" r="5.5" fill="#fce7f3"/><circle cx="22" cy="22" r="2" fill="#f472b6"/><line x1="37" y1="5" x2="37" y2="10" stroke="#f9a8d4" stroke-width="1.5" stroke-linecap="round"/><line x1="34.5" y1="7.5" x2="39.5" y2="7.5" stroke="#f9a8d4" stroke-width="1.5" stroke-linecap="round"/></svg>', name:'Anime',            desc:'SeaDex picks ranked first · keeps dual-audio and original-language releases' },
     ]
   },
   { id:'apis', title:'Accounts & Keys', desc:'Optional — add credentials for selected providers. <strong style="color:#3fb950">Export JSON</strong> keeps the generated file local; <strong style="color:#fbbf24">Direct Install</strong> sends it to the AIOStreams host you choose.', key:null, cols:'c1', opts:[] },
@@ -697,6 +743,11 @@ function restoreBackup(idx) {
   if (!list[idx]) return;
   const snap = list[idx];
   const safe = sanitizeSharedConfig(snap);
+  // Settings-only backups must not accidentally retain overrides from a newer
+  // import. Full local Undo uses the in-memory transaction snapshot instead.
+  delete S._importedPresets;
+  S._migrationKeep = null;
+  S._migrationRemove = [];
   Object.assign(S, safe);
   S.service = deriveService();
   saveState();
@@ -784,6 +835,13 @@ function loadState() {
         if (parsed.basePassword) S.basePassword = parsed.basePassword;
         if (parsed.stremioEmail) S.stremioEmail = parsed.stremioEmail;
         if (parsed.stremioPassword) S.stremioPassword = parsed.stremioPassword;
+        if (Array.isArray(parsed._importedPresets)) {
+          S._importedPresets = normalizeUpdateTemplate({ presets: parsed._importedPresets }).config.presets;
+        }
+        if (parsed._migrationKeep && typeof parsed._migrationKeep === 'object' && !Array.isArray(parsed._migrationKeep)) {
+          S._migrationKeep = Object.fromEntries(Object.entries(parsed._migrationKeep).filter(([key]) => ALLOWED_MIGRATION_FIELDS.has(key)));
+        }
+        if (Array.isArray(parsed._migrationRemove)) S._migrationRemove = parsed._migrationRemove.filter(key => ALLOWED_MIGRATION_FIELDS.has(key));
         if (typeof parsed.cleanInstall === 'boolean') S.cleanInstall = parsed.cleanInstall;
         if (['fast','balanced','maximum'].includes(parsed.quickProfile)) S.quickProfile = parsed.quickProfile;
         const savedCustomFormatter = sanitizeCustomFormatter(parsed.customFormatter);
@@ -975,7 +1033,7 @@ function renderOpts(def) {
       'http':       'Streaming sites · no debrid required',
       'debridio':   'Debridio scraper',
       'debrider':   'Multi-debrid aggregator — one API for all',
-      'easydebrid': 'Multi-debrid aggregator',
+      'easydebrid': 'Cached torrent streaming',
       'pikpak':     'Cloud torrent + download caching',
       'seedr':      'Cloud torrent streaming',
       'nzbgeek':    'Usenet indexer',
@@ -983,8 +1041,8 @@ function renderOpts(def) {
     };
     const SVC_AUTH = {
       'torbox-pro':'API key','torbox-ess':'API key','alldebrid':'API key','realdebrid':'API key',
-      'premiumize':'API key','debridlink':'API key','offcloud':'API key','debridio':'API key',
-      'debrider':'API key','easydebrid':'API key','pikpak':'API key','seedr':'API key',
+      'premiumize':'API key','debridlink':'API key','offcloud':'Key + email + pass','debridio':'API key',
+      'debrider':'API key','easydebrid':'API key','pikpak':'Email + pass','seedr':'MediaFusion token',
       'easynews':'User + pass','nzbgeek':'API key','streamnzb':'Manifest URL',
       'p2p':'Free','http':'Free',
     };
@@ -1051,7 +1109,7 @@ function renderOpts(def) {
       // nothing for some of these on some routes, so an ungated card lets you tick it,
       // keeps it ticked, and exports a config without it. The reasons mirror the
       // emission matrix in presets() exactly — change one and change the other.
-      const why = active ? '' : optionalScraperLaneBlock(d.id);
+      const why = active ? '' : (optionalScraperHostBlock(d.id) || optionalScraperLaneBlock(d.id));
       return `<div class="opt-scraper-card${why ? ' opt-host-blocked' : ''}" data-active="${active}" ${why ? `aria-disabled="true" title="${escHtml(why)}"` : `data-action="toggle-optional-scraper" tabindex="0"`} data-scraper-id="${d.id}" role="checkbox" aria-checked="${active}">
         <div class="opt-scraper-card-ck">${ckIcon}</div>
         <div class="opt-scraper-card-head"><div class="opt-scraper-icon" style="background:${d.color}15;color:${d.color}">${d.label.substring(0,2).toUpperCase()}</div><span class="opt-scraper-name">${d.label}</span></div>
@@ -1383,7 +1441,35 @@ function outputProfileContext() {
     qualityFirst: Boolean(S.qualityFirst),
     resolutionFirst: Boolean(S.resolutionFirst),
     aiostreamsVersion: AIOSTREAMS_COMPATIBILITY_TARGETS.includes(S.aiostreamsVersion) ? S.aiostreamsVersion : DEFAULT_AIOSTREAMS_VERSION,
+    preservedPresetIds: (S._importedPresets || []).map(preset => preset.instanceId),
+    preserveFields: Object.keys(S._migrationKeep || {}),
+    removeFields: S._migrationRemove || [],
   };
+}
+
+// Dynamic-fetch exit targets, mirroring the dynamicAddonFetching builder in
+// buildConfig(): every result threshold that ends the wait (any one is enough)
+// plus the time limit. Counts are cached results except on P2P/HTTP builds.
+function streamPoolTargets(pool) {
+  const p = pool || 'normal', ms = p === 'max' ? 10000 : p === 'large' ? 8000 : 6000;
+  if (S.resolution === '4k') return { counts: [[p === 'max' ? 25 : p === 'large' ? 15 : 8, '2160p']], ms };
+  if (S.resolution === 'ultrawide') return { counts: [[15, '1080p'], [5, '2160p']], ms };
+  if (S.resolution === 'mixed' || S.pseArch === 'apex-mixed') {
+    return { counts: [[p === 'max' ? 35 : p === 'large' ? 22 : 12, '1080p'], [p === 'max' ? 20 : p === 'large' ? 12 : 6, '2160p']], ms };
+  }
+  return { counts: [[p === 'max' ? 45 : p === 'large' ? 30 : 20, '1080p']], ms };
+}
+function streamPoolChoices() {
+  return [['normal','Normal'],['large','Large'],['max','Maximum']].map(([v, l]) => {
+    const { counts, ms } = streamPoolTargets(v);
+    return [v, l, `${counts.map(([n, r]) => `${n}×${r}`).join(' / ')} · ${ms / 1000}s`];
+  });
+}
+function streamPoolSummary() {
+  if (['stable', 'balanced'].includes(activeOutputProfile())) return 'Not used on this profile';
+  const { counts, ms } = streamPoolTargets(S.streamPool);
+  const cached = (S.service === 'p2p' || S.service === 'http') ? '' : 'cached ';
+  return `stops at ${counts.map(([n, r]) => `${n} ${cached}${r}`).join(' or ')}, or after ${ms / 1000}s`;
 }
 
 function activeOutputProfile() {
@@ -1414,9 +1500,9 @@ function renderOutputProfilePicker({ compact=false } = {}) {
   const TARGET_NOTES = {
     '2.31.1': 'v2.31.1 legacy lane: Advanced/Labs may retain the old TorBox Search preset. Stable and Balanced do not emit it.',
     '2.32.0': 'v2.32 lane: the old TorBox Search preset is removed. A Newznab replacement is not auto-added until endpoint/import tests pass.',
-    '2.33.2': 'v2.33.2 lane: config variants with path-param selector variants supported. Matches Omni\u2019s host — the last 2.33.2 holdout; every other public host runs 2.34.1.',
-    '2.34.0': 'v2.34.0 lane: the previous pinned release. No host in the registry still runs it — kept so saved sessions keep resolving.',
-    '2.34.1': 'v2.34.1 lane: the release this configurator is pinned against (schema pin c1d044c). Default — matches the live fleet except Omni.',
+    '2.33.2': 'v2.33.2 lane: config variants with path-param selector variants supported. No public host runs it any more — kept so saved sessions keep resolving.',
+    '2.34.0': 'v2.34.0 lane: an earlier pinned release. No public host runs it any more — kept so saved sessions keep resolving.',
+    '2.34.1': 'v2.34.1 lane (default): the release this configurator\u2019s schema is pinned to (c1d044c). Every public host now runs a newer 2.35.x build.',
     'unknown': 'Unknown target: old TorBox Search is removed rather than assumed portable.',
   };
   const targetNote = TARGET_NOTES[target] || TARGET_NOTES.unknown;
@@ -1428,6 +1514,7 @@ function renderOutputProfilePicker({ compact=false } = {}) {
     <div style="display:flex;align-items:center;gap:7px"><span style="font-size:.76rem;font-weight:800;color:#9ca3af;letter-spacing:.04em;text-transform:uppercase">Output profile</span><span style="font-size:.62rem;font-weight:700;color:${palette[active][0]};padding:2px 6px;border-radius:4px;background:${palette[active][1]};border:1px solid ${palette[active][2]}">${OUTPUT_PROFILE_INFO[active].shortLabel}</span></div>
     <div style="display:grid;grid-template-columns:repeat(${compact ? 2 : 2},minmax(0,1fr));gap:6px">${cards}</div>
     ${active === 'stable' ? `<div style="font-size:.66rem;line-height:1.45;color:#8b949e">No remote scoring or synced rules. Groups, dynamic fetch exit, background prefetch, and autoplay are disabled so import and stream problems are easier to reproduce. Stream-pool and quality-first tuning are not exported in this profile.</div>` : ''}
+    ${active === 'balanced' ? `<div style="font-size:.66rem;line-height:1.45;color:#8b949e">Waits for every source before returning: groups, dynamic fetch exit (Stream Pool), stream preloading, next-episode precache and cache-and-play are turned off. Pick Advanced to use them.</div>` : ''}
     ${active === 'labs' ? `<div style="font-size:.66rem;line-height:1.45;color:#fbbf24">Labs uses experimental behaviour. Review every warning before installing.</div>` : ''}
     ${targetControl}
     ${reset}
@@ -1476,6 +1563,18 @@ function outputProfileAuditHtml() {
 // carousel happily accepts a toggle that the export then drops in silence — the
 // same class of bug as an extra being filtered back out by the output profile.
 // Keep in step with presets() and with configurator/tests/optional-extras-toggles.mjs.
+/**
+ * Reason the selected host refuses this optional scraper's preset (for example
+ * Bitmagnet on hosts that never configured it), or ''. buildFinal() would strip
+ * it anyway; gating the card keeps the picker from offering a dead choice.
+ */
+function optionalScraperHostBlock(id) {
+  const def = OPTIONAL_SCRAPER_DEFS.find(x => x.id === id);
+  if (!def) return '';
+  const entry = hostGateEntries().find(e => e.option === `preset:${def.presetType}` && e.action !== 'confirm');
+  return entry ? (entry.reason || `not available on this host`) : '';
+}
+
 function optionalScraperLaneBlock(id) {
   const svc = S.service;
   const usenetAllowed = ['nzbnoob','althub','usenetcrawler','drunkenslug','nzbfinder','nzbhydra','easynews','easynewsPlus'];
@@ -1485,8 +1584,12 @@ function optionalScraperLaneBlock(id) {
   if (id === 'sootio' && (svc === 'p2p' || svc === 'http')) {
     return 'AIOStreams v2.33+ accepts Sootio only with a debrid or usenet service behind it';
   }
-  if (id === 'neko-bt' && svc === 'http') {
+  if ((id === 'neko-bt' || id === 'brazuca-torrents') && svc === 'http') {
     return 'the HTTP route carries no torrent scrapers';
+  }
+  // EasyNews / EasyNews+ read the EasyNews service's login.
+  if (['easynews','easynewsPlus'].includes(id) && !(svc === 'easynews' || svc === 'usenet' || (S.multiServices || []).includes('easynews'))) {
+    return 'needs EasyNews selected as a service first — it uses that login';
   }
   // Usenet indexers need a Usenet service.
   const usenetCat = ['nzbnoob','althub','usenetcrawler','drunkenslug','nzbfinder','nzbhydra'];
@@ -1496,9 +1599,15 @@ function optionalScraperLaneBlock(id) {
   // New debrid-only toggles (require a debrid service) — block on P2P/HTTP.
   // Existing exceptions that work without debrid: webstreamr, yastream, knaben, zilean, neko-bt (p2p only).
   // torbox-search removed in v2.32 — never emitted, so not listed (avoids literal that would break v232-compat test if copied).
-  const debridOnly = ['bitmagnet','brazuca-torrents','debridio-watchtower','jackettio','torbox'];
-  if (debridOnly.includes(id) && (svc === 'p2p' || svc === 'http')) {
-    return `this scraper needs a debrid service — not available on the ${svc.toUpperCase()} route`;
+  // Jackett, Prowlarr and NekoBT resolve through a torrent debrid service too. Check every
+  // selected service, not just the primary: a Multi build of HTTP alone has none either.
+  const debridOnly = ['bitmagnet','jackettio','jackett','prowlarr','neko-bt'];
+  const TORRENT_DEBRID_PICKS = ['torbox-pro','torbox-ess','hybrid','realdebrid','alldebrid','premiumize','debridlink','easydebrid','debrider','offcloud','pikpak'];
+  const picked = svc === 'multi' ? (S.multiServices || []) : [svc];
+  if (debridOnly.includes(id) && !picked.some(p => TORRENT_DEBRID_PICKS.includes(p))) {
+    return (svc === 'p2p' || svc === 'http')
+      ? `this scraper needs a debrid service — not available on the ${svc.toUpperCase()} route`
+      : 'this scraper needs a torrent debrid service (TorBox, Real-Debrid, AllDebrid…) selected above';
   }
   return '';
 }
@@ -1551,7 +1660,7 @@ function renderAdvancedPanel() {
       ${renderOutputProfilePicker()}
 
       <div>
-        <div style="font-size:.72rem;font-weight:700;color:#4b5563;letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:6px">${ICO.speaker(16,'#f59e0b')} Sound Profile ${ftTip('Controls which <strong>audio codecs</strong> are allowed in your streams. <strong>Limited</strong> excludes lossless formats (TrueHD, DTS-HD MA) that need high bandwidth. <strong>Full</strong> includes everything for home theater setups with proper receivers.')}</div>
+        <div style="font-size:.72rem;font-weight:700;color:#4b5563;letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:6px">${ICO.speaker(16,'#f59e0b')} Sound Profile ${ftTip('Controls which <strong>audio codecs</strong> are allowed in your streams. <strong>Auto</strong> lets the device profile decide and drops lossless formats (TrueHD, DTS-HD MA) on devices that cannot pass them through. <strong>Full Lossless</strong> keeps everything, for home-theatre setups with a capable receiver.')}</div>
         <div style="display:flex;flex-direction:column;gap:7px">${audioRows}</div>
       </div>
 
@@ -1565,22 +1674,14 @@ function renderAdvancedPanel() {
         ${prefCard('resolutionFirst','Resolution First','Higher resolution always ranks above lower, even if lower-res is cached.')}
         ${prefCard('exclude4K','Exclude 4K / UHD','Removes 2160p streams. Good for bandwidth saving.')}
         ${prefCard('excludeDV','Exclude Dolby Vision','Fixes purple/green tint on unsupported screens.')}
-        <div style="background:#111720;border:1.5px solid rgba(255,255,255,.08);border-radius:10px;padding:14px 16px;margin-top:8px">
-          <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
-            <span style="font-size:.78rem;font-weight:600;color:#6b7280">Age Rating Limit</span> ${ftTip('Filter content by age certification (MPAA/TV). <strong>None</strong> shows everything. Lower ratings restrict to age-appropriate content. Requires <strong>certification()</strong> SEL support in AIOStreams.')}
-          </div>
-          <div style="font-size:.65rem;color:#4b5563;margin-bottom:10px;line-height:1.4">Restrict streams by age rating — useful for shared/family setups</div>
-          <div style="display:flex;gap:5px;flex-wrap:wrap">
-            ${AGE_RATINGS.map(r => { const on = S.ageLimit === r.v; return `<button data-action="set-age-limit" data-val="${r.v}" style="padding:6px 10px;border-radius:6px;font-size:.72rem;font-weight:700;cursor:pointer;transition:all .15s;border:1px solid ${on?'rgba(0,212,255,.4)':'rgba(255,255,255,.08)'};background:${on?'rgba(0,212,255,.1)':'transparent'};color:${on?'#00d4ff':'#6b7280'}">${r.label.split(' — ')[0]}</button>`; }).join('')}
-          </div>
-        </div>
+        <!-- Age Rating Limit removed 2026-10-02: AIOStreams SEL has no certification() function, so the filter either failed the save (Advanced/Labs) or was silently dropped (Stable/Balanced). -->
         <div style="background:#111720;border:1.5px solid rgba(255,255,255,.08);border-radius:10px;padding:14px 16px;margin-top:8px">
           <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px">
-            <span style="font-size:.78rem;font-weight:600;color:#6b7280">Stream Pool</span> ${ftTip('How many streams AIOStreams collects before sorting and filtering. <strong>More streams = better quality picks</strong> but slower load times. Normal is good for most users. Increase if you want the absolute best quality match.')}
-            <span style="font-size:.65rem;color:#4b5563">${{normal:'30–35 results',large:'50 results',max:'75 results'}[S.streamPool||'normal']}</span>
+            <span style="font-size:.78rem;font-weight:600;color:#6b7280">Stream Pool</span> ${ftTip('When AIOStreams may stop waiting for slower sources: it returns once this many cached results at your target resolution have arrived, or after the time limit. <strong>Larger = more choice</strong>, slower loads. Only the Advanced and Labs profiles use it; Stable and Balanced always wait for every source.')}
+            <span style="font-size:.65rem;color:#4b5563">${streamPoolSummary()}</span>
           </div>
           <div style="display:flex;gap:5px">
-            ${[['normal','Normal','20'],['large','Large','30–35'],['max','Maximum','50']].map(([v,l,c]) => `<button data-action="set-pool" data-val="${v}" style="flex:1;padding:8px 8px 6px;border-radius:6px;font-size:.72rem;font-weight:700;cursor:pointer;transition:all .15s;border:1px solid ${(S.streamPool||'normal')===v?'rgba(0,212,255,.4)':'rgba(255,255,255,.08)'};background:${(S.streamPool||'normal')===v?'rgba(0,212,255,.1)':'transparent'};color:${(S.streamPool||'normal')===v?'#00d4ff':'#6b7280'};line-height:1.3">${l}<br><span style="font-size:.6rem;font-weight:600;opacity:.7">${c} results</span></button>`).join('')}
+            ${streamPoolChoices().map(([v,l,c]) => `<button data-action="set-pool" data-val="${v}" style="flex:1;padding:8px 8px 6px;border-radius:6px;font-size:.72rem;font-weight:700;cursor:pointer;transition:all .15s;border:1px solid ${(S.streamPool||'normal')===v?'rgba(0,212,255,.4)':'rgba(255,255,255,.08)'};background:${(S.streamPool||'normal')===v?'rgba(0,212,255,.1)':'transparent'};color:${(S.streamPool||'normal')===v?'#00d4ff':'#6b7280'};line-height:1.3">${l}<br><span style="font-size:.6rem;font-weight:600;opacity:.7">${c}</span></button>`).join('')}
           </div>
           <div style="font-size:.65rem;color:#4b5563;margin-top:6px;line-height:1.4">More streams = better quality picks but slower load times</div>
         </div>
@@ -2504,7 +2605,7 @@ function render() {
             <div class="srh-num">${S.simpleMode ? ({1:1,2:2,3:3}[step]||step) : step}</div>
           </div>
           <div>
-            <div class="srh-title">${def.title}${S.simpleMode ? ` <span style="font-size:.62rem;font-weight:600;color:#4b5563;margin-left:4px">${Math.min({1:1,2:2,3:3}[step]||step, 3)} of 3</span>` : ''}${step===1&&((S.resolution==='4k'&&S.audio==='lossless')||(S.resolution==='1080p'&&S.audio==='standard'))&&S.content==='all'?` <span style="font-size:.65rem;font-weight:700;color:#00d4ff;letter-spacing:.05em;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.2);border-radius:4px;padding:1px 5px">${ICO.bolt(11,'#00d4ff')} QUICK START</span>`:''}${step===1&&S.multiServices.length>=2?` <span style="font-size:.62rem;font-weight:800;color:#a855f7;background:rgba(168,85,247,.1);border:1px solid rgba(168,85,247,.25);border-radius:12px;padding:1px 7px">${S.multiServices.filter(s=>['torbox-pro','torbox-ess','alldebrid','realdebrid','premiumize','debridlink','easynews','offcloud','hybrid','debridio','debrider','easydebrid','pikpak','seedr'].includes(s)).length} selected</span>`:''}
+            <div class="srh-title">${def.title}${S.simpleMode ? ` <span style="font-size:.62rem;font-weight:600;color:#4b5563;margin-left:4px">${Math.min({1:1,2:2,3:3}[step]||step, 3)} of 3</span>` : ''}${step===1&&((S.resolution==='4k'&&S.audio==='lossless')||(S.resolution==='1080p'&&S.audio==='standard'))&&S.content==='all'?` <span style="font-size:.65rem;font-weight:700;color:#00d4ff;letter-spacing:.05em;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.2);border-radius:4px;padding:1px 5px">${ICO.bolt(11,'#00d4ff')} QUICK START</span>`:''}${step===1&&S.multiServices.length>=2?` <span style="font-size:.62rem;font-weight:800;color:#a855f7;background:rgba(168,85,247,.1);border:1px solid rgba(168,85,247,.25);border-radius:12px;padding:1px 7px">${S.multiServices.filter(s=>['torbox-pro','torbox-ess','alldebrid','realdebrid','premiumize','debridlink','easynews','offcloud','hybrid','debridio','debrider','easydebrid','pikpak'].includes(s)).length} selected</span>`:''}
             </div>
             <div class="srh-sub">${def.desc}</div>
           </div>
@@ -2903,6 +3004,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Handle all clicks
   document.addEventListener('change', (e) => {
+    if (e.target.dataset.action) releaseMigrationForControl(e.target.dataset.action, e.target);
     if (e.target.matches('[data-action="fmt-dropdown-change"]')) {
       S.formatter = e.target.value;
       saveState();
@@ -2975,6 +3077,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const el = e.target.dataset.action ? e.target : e.target.closest('[data-action]');
     const action = el?.dataset.action;
     if(!action) return;
+    releaseMigrationForControl(action, el);
 
     if (action === 'fmt-scroll-pick') {
       S.formatter = el.dataset.fmt;
@@ -3108,7 +3211,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if (action === 'set-simple-quality') { S.qualityFirst = !S.qualityFirst; saveState(); render(); }
     if (action === 'set-simple-resfirst') { S.resolutionFirst = !S.resolutionFirst; saveState(); render(); }
     if (action === 'set-autoplay-method') { S.autoPlayMethod=el.dataset.val; saveState(); render(); }
-    if (action === 'set-addon-timeout') { S.addonTimeout=Number(el.dataset.val); saveState(); render(); }
+    if (action === 'set-addon-timeout') {
+      S.addonTimeout = Number(el.dataset.val);
+      if (S._importedPresets) S._importedPresets.forEach(preset => { preset.options.timeout = S.addonTimeout; });
+      saveState(); render();
+    }
     if (action === 'save-without-addon') { if (_lastAddonKey) _disabledAddons.add(_lastAddonKey); simpleInstall(_lastInstall.target || el.dataset.target || 'app'); }
     if (action === 'simple-install') simpleInstall(el.dataset.target || 'app');
     if (action === 'set-install-mode') {
@@ -3362,16 +3469,6 @@ document.addEventListener('DOMContentLoaded', () => {
       S.maxFailoverNzbs = Number((e.target.closest('[data-action="set-max-failover-nzbs"]') || e.target).dataset.val);
       saveState(); render();
     }
-    if (action === 'set-age-limit') {
-      S.ageLimit = (e.target.closest('[data-action="set-age-limit"]') || e.target).dataset.val;
-      saveState();
-      document.querySelectorAll('[data-action="set-age-limit"]').forEach(btn => {
-        const on = btn.dataset.val === S.ageLimit;
-        btn.style.borderColor = on ? 'rgba(0,212,255,.4)' : 'rgba(255,255,255,.08)';
-        btn.style.background  = on ? 'rgba(0,212,255,.1)' : 'transparent';
-        btn.style.color       = on ? '#00d4ff' : '#6b7280';
-      });
-    }
     if (action === 'set-pse-arch') {
       S.pseArch = (e.target.closest('[data-action="set-pse-arch"]') || e.target).dataset.val;
       saveState();
@@ -3388,6 +3485,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const row = e.target.closest('[data-action="toggle-sub-addon"]') || e.target;
       const val = row.dataset.val;
       if (!S.subtitleAddons) S.subtitleAddons = ['aiosubtitle'];
+      const previousSourceCount = S.subtitleAddons.length;
       const idx = S.subtitleAddons.indexOf(val);
       if (idx >= 0) { if (S.subtitleAddons.length > 1) S.subtitleAddons.splice(idx, 1); }
       else {
@@ -3397,6 +3495,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         S.subtitleAddons.push(val);
       }
+      if (S.subtitleAddons.length !== previousSourceCount) releaseMigrationFields(['presets', 'groups']);
       const on = S.subtitleAddons.includes(val);
       row.style.borderColor = on ? 'rgba(6,182,212,.35)' : 'rgba(255,255,255,.06)';
       row.style.background = on ? 'rgba(6,182,212,.05)' : 'transparent';
@@ -3419,6 +3518,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const btn = e.target.closest('[data-action="toggle-sub-lang"]') || e.target;
       const val = btn.dataset.val;
       if (!S.subtitleLangs) S.subtitleLangs = ['en'];
+      const previousLanguageCount = S.subtitleLangs.length;
       const idx = S.subtitleLangs.indexOf(val);
       if (idx >= 0) { if (S.subtitleLangs.length > 1) S.subtitleLangs.splice(idx, 1); }
       else {
@@ -3427,6 +3527,14 @@ document.addEventListener('DOMContentLoaded', () => {
           return;
         }
         S.subtitleLangs.push(val);
+      }
+      if (S.subtitleLangs.length !== previousLanguageCount) {
+        releaseMigrationFields(['presets']);
+        for (const preset of S._importedPresets || []) {
+          if (preset.type === 'aiosubtitle') preset.options.languages = [...S.subtitleLangs];
+          else if (preset.type === 'opensubtitles-v3-plus') preset.options.language = [...S.subtitleLangs];
+          else if (preset.type === 'subdl') preset.options.language = S.subtitleLangs.map(language => language.toUpperCase()).slice(0, 5);
+        }
       }
       const on = S.subtitleLangs.includes(val);
       btn.style.borderColor = on ? 'rgba(6,182,212,.4)' : 'rgba(255,255,255,.07)';
@@ -3577,6 +3685,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Handle inputs and changes
   document.addEventListener('change', (e) => {
+    if (e.target.dataset.action) releaseMigrationForControl(e.target.dataset.action, e.target);
     if (e.target.dataset.action === 'set-aiostreams-target') {
       const target = e.target.value;
       if (!AIOSTREAMS_COMPATIBILITY_TARGETS.includes(target)) return;
@@ -3690,6 +3799,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.addEventListener('input', (e) => {
     const a = e.target.dataset.action;
+    if (a) releaseMigrationForControl(a, e.target);
+    if (a === 'update-cred') releaseMigrationFields(['services', 'presets']);
+    if (['update-tmdb', 'update-tmdb-key'].includes(a)) releaseMigrationFields(['tmdbAccessToken', 'tmdbApiKey', 'titleMatching', 'yearMatching', 'digitalReleaseFilter', 'bitrate']);
     if (a === 'update-name') S.name = sanitizeDisplayName(e.target.value);
     else if (a === 'update-cred') {
       S.creds[e.target.dataset.service] = e.target.value;
@@ -3817,14 +3929,14 @@ function getDebridInputs() {
   if (m.includes('alldebrid'))  ids.push('alldebrid');
   if (m.includes('premiumize')) ids.push('premiumize');
   if (m.includes('debridlink')) ids.push('debridlink');
-  if (m.includes('offcloud'))   ids.push('offcloud');
+  if (m.includes('offcloud'))   ids.push(...serviceCredentialKeys('offcloud'));
   if (m.includes('easynews') || m.includes('usenet'))   { ids.push('easynews'); ids.push('easynewsPass'); }
   if (m.includes('nzbgeek') || m.includes('usenet')) ids.push('nzbgeek');
   if (m.includes('debridio'))   ids.push('debridio');
   if (m.includes('debrider'))   ids.push('debrider');
   if (m.includes('easydebrid')) ids.push('easydebrid');
-  if (m.includes('pikpak'))     ids.push('pikpak');
-  if (m.includes('seedr'))      ids.push('seedr');
+  if (m.includes('pikpak'))     ids.push(...serviceCredentialKeys('pikpak'));
+  if (m.includes('seedr'))      ids.push(...serviceCredentialKeys('seedr'));
   if (m.includes('nzbgeek'))    ids.push('nzbgeek');
   if (m.includes('streamnzb'))  ids.push('streamnzb');
   S.optionalScrapers.forEach(sid => {
@@ -3891,12 +4003,18 @@ function presets() {
   // EZTV / Torrent Galaxy / Knaben / Zilean throw on save without a torrent debrid
   // service, rejecting the whole config (P2P and EasyNews-only routes): ship them off there.
   const torrentCapable = hasTorrentDebridService(services());
+  // Same rule for the other service-bound presets: each fails the WHOLE save
+  // ("requires at least one usable service") when nothing enabled can back it.
+  const enabledServices = services();
+  const usenetCapable = hasEnabledService(enabledServices, USENET_INDEXER_SERVICE_IDS);
+  const debridioCapable = hasEnabledService(enabledServices, DEBRIDIO_SERVICE_IDS);
+  const easynewsEnabled = hasEnabledService(enabledServices, 'easynews');
   const hasDebridio = isDebridio || (isMulti && S.multiServices.includes('debridio'));
   const multiHasEasynews = isMulti && S.multiServices.includes('easynews');
   const hasExtraHttp = isMulti && S.multiServices.includes('http') && !isHttp;
   const isNzbgeek = isMulti && S.multiServices.includes('nzbgeek');
   const isStreamnzb = isMulti && S.multiServices.includes('streamnzb');
-  const useStore = ['alldebrid','realdebrid','premiumize','debridlink','offcloud','easydebrid','pikpak','seedr'].includes(svc) || (isMulti && S.multiServices.some(s => ['alldebrid','realdebrid','premiumize','debridlink','offcloud','easydebrid','pikpak','seedr'].includes(s)));
+  const useStore = ['alldebrid','realdebrid','premiumize','debridlink','offcloud','easydebrid','pikpak'].includes(svc) || (isMulti && S.multiServices.some(s => ['alldebrid','realdebrid','premiumize','debridlink','offcloud','easydebrid','pikpak'].includes(s)));
   // Optional-extras toggles: exactly one emission site per preset. All four are *also*
   // advertised disabled on lanes that cannot satisfy them, so a toggle flips that advert's
   // `enabled` instead of emitting a second instanceId, and the keyless branch below emits only
@@ -3912,13 +4030,13 @@ function presets() {
       // loses the library preset automatically via `libCapable`.
       ...(libCapable ? [{ type:'library', instanceId:'lib-1', enabled:true, options:{ name:'Library', timeout:3000, resources:['stream','catalog','meta'], mediaTypes:[], showRefreshActions:['catalog'], skipProcessing:false, hideStreams:false, useMultipleInstances:false } }] : []),
       { type:'easynewsPlusPlus', instanceId:'en-ppp-1', enabled:true, options:{ name:'EasyNews++', timeout:6000, strictTitleMatching:true }, resources:['stream'] },
-      { type:'easynews-search', instanceId:'en-srch-1', enabled:true, options:{ name:'EasyNews Search', timeout:5000, apiVersion:'3.0' }, resources:['stream'] },
+      { type:'easynews-search', instanceId:'en-srch-1', enabled:true, options:{ name:'EasyNews Search', timeout:5000, apiVersion:'3.0', services:['easynews'] }, resources:['stream'] },
       ...(S.creds.nzbgeek ? [{ type:'newznab', instanceId:'nzbgeek-1', enabled:true, options:{ name:'NZBGeek', api:{ url:'https://api.nzbgeek.info/api', apiKey:S.creds.nzbgeek }, timeout:6000, mediaTypes:['movie','series','anime'], searchMode:'auto', seasonEpisodeStrategy:'episode', paginate:true, useMultipleInstances:false } }] : []),
-      ...S.optionalScrapers.filter(sid => OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid && x.presetType === 'newznab')).map(sid => {
+      ...S.optionalScrapers.filter(sid => usenetCapable && OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid && x.presetType === 'newznab')).map(sid => {
         const d = OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid);
         return { type:'newznab', instanceId:`${d.id}-1`, enabled:true, options:{ name:d.label, api:{ url:d.apiUrl, apiKey:S.creds[d.credKey] || '' }, timeout:6000, mediaTypes:['movie','series','anime'], searchMode:'auto', seasonEpisodeStrategy:'episode', paginate:true, useMultipleInstances:false } };
       }),
-      ...S.optionalScrapers.filter(sid => OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid && x.presetType === 'nzbhydra')).map(sid => {
+      ...S.optionalScrapers.filter(sid => usenetCapable && OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid && x.presetType === 'nzbhydra')).map(sid => {
         return { type:'nzbhydra', instanceId:'nzbhydra-1', enabled:true, options:{ name:'NZBHydra2', api:{ url:S.creds.nzbhydra || '', apiKey:S.creds.nzbhydraApiKey || '' }, timeout:8000, mediaTypes:['movie','series','anime'], searchMode:'auto', seasonEpisodeStrategy:'episode', paginate:true, useMultipleInstances:false } };
       }),
       ...S.optionalScrapers.filter(sid => OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid && ['easynews','easynewsPlus'].includes(x.id))).map(sid => {
@@ -3954,13 +4072,16 @@ function presets() {
     ...catalogPresets()
   ];
   const storeLabels = {'alldebrid':'StremThru AllDebrid','realdebrid':'StremThru RD','premiumize':'StremThru Premiumize','debridlink':'StremThru Debrid-Link','offcloud':'StremThru Offcloud','easydebrid':'StremThru EasyDebrid','pikpak':'StremThru PikPak','seedr':'StremThru Seedr'};
-  const debridServices = ['alldebrid','realdebrid','premiumize','debridlink','offcloud','easydebrid','pikpak','seedr'];
+  const debridServices = ['alldebrid','realdebrid','premiumize','debridlink','offcloud','easydebrid','pikpak'];
   const multiHasTorbox = isMulti && (S.multiServices.includes('torbox-pro') || S.multiServices.includes('torbox-ess'));
   const storeSlot = isMulti
     ? [...(multiHasTorbox ? [{ type:'stremthruTorz', instanceId:'67c', enabled:true, options:{ name:'StremThru Torz', timeout:5000, includeP2P:false, useMultipleInstances:false }, resources:['stream'] }] : []), ...S.multiServices.filter(s => debridServices.includes(s)).map((s, i) => ({ type:'stremthruStore', instanceId:`68${String.fromCharCode(97+i)}`, enabled:true, options:{ name:storeLabels[s] || 'StremThru Store', timeout:5000, useMultipleInstances:false }, resources:['stream'] }))]
     : useStore ? [{ type:'stremthruStore', instanceId:'68a', enabled:true, options:{ name:storeLabels[svc] || 'StremThru Store', timeout:5000, useMultipleInstances:false }, resources:['stream'] }]
     : svc === 'hybrid' ? [{ type:'stremthruTorz', instanceId:'67c', enabled:true, options:{ name:'StremThru Torz', timeout:5000, includeP2P:false, useMultipleInstances:false }, resources:['stream'] }, { type:'stremthruStore', instanceId:'68a', enabled:true, options:{ name:'StremThru RD', timeout:5000, useMultipleInstances:false }, resources:['stream'] }]
-    : isP2P || isEasynews || isDebridio || isUsenet ? []
+    : isP2P && S._nuvioInstant ? [{ type:'stremthruTorz', instanceId:'67c', enabled:true, options:{ name:'StremThru Torz', timeout:5000, includeP2P:true, useMultipleInstances:false }, resources:['stream'] }]
+    // Seedr: no StremThru preset supports it (only MediaFusion does), and a Store/Torz
+    // instance with no usable service fails the whole save.
+    : isP2P || isEasynews || isDebridio || isUsenet || svc === 'seedr' ? []
     : [{ type:'stremthruTorz', instanceId:'67c', enabled:true, options:{ name:'StremThru Torz', timeout:5000, includeP2P:false, useMultipleInstances:false }, resources:['stream'] }];
 
   const list = [
@@ -3969,19 +4090,19 @@ function presets() {
     ...(libCapable ? [{ type:'library', instanceId:'lib-1', enabled:!isP2P, options:{ name:'Library', timeout:3000, resources:['stream','catalog','meta'], mediaTypes:[], showRefreshActions:['catalog'], skipProcessing:false, hideStreams:false, useMultipleInstances:false } }] : []),
     ...(isP2P ? [{ type:'torrentio', instanceId:'tio-p2p-1', enabled:true, options:{ name:'Torrentio', timeout:7000, useMultipleInstances:false }, resources:['stream'] }] : []),
     { type:'zilean', instanceId:'nx-fix-04', enabled:torrentCapable, options:{ name:'Zilean', timeout:4000, resources:['stream'] } },
-    { type:'seadex', instanceId:'tam-seadex', enabled:S.content !== 'live' && !isP2P, options:{ name:'SeaDex', timeout:4000, mediaTypes:['anime'] }, resources:['stream'] },  // p2p-only: v2.33 rejects "requires at least one usable service",
+    { type:'seadex', instanceId:'tam-seadex', enabled:S.content !== 'live' && torrentCapable, options:{ name:'SeaDex', timeout:4000, mediaTypes:['anime'] }, resources:['stream'] },  // p2p-only: v2.33 rejects "requires at least one usable service",
     ...storeSlot,
     ...(isEasynews || multiHasEasynews || isUsenet ? [
       { type:'easynewsPlusPlus', instanceId:'en-ppp-1', enabled:true, options:{ name:'EasyNews++', timeout:6000, strictTitleMatching:true }, resources:['stream'] },
-      { type:'easynews-search', instanceId:'en-srch-1', enabled:true, options:{ name:'EasyNews Search', timeout:5000, apiVersion:'3.0' }, resources:['stream'] },
+      { type:'easynews-search', instanceId:'en-srch-1', enabled:true, options:{ name:'EasyNews Search', timeout:5000, apiVersion:'3.0', services:['easynews'] }, resources:['stream'] },
     ] : []),
-    ...(isNzbgeek && S.creds.nzbgeek ? [
+    ...(isNzbgeek && S.creds.nzbgeek && usenetCapable ? [
       { type:'newznab', instanceId:'nzbgeek-1', enabled:true, options:{ name:'NZBGeek', api:{ url:'https://api.nzbgeek.info/api', apiKey:S.creds.nzbgeek }, timeout:6000, mediaTypes:['movie','series','anime'], searchMode:'auto', seasonEpisodeStrategy:'episode', paginate:true, useMultipleInstances:false } },
     ] : []),
     ...(isStreamnzb ? [
       { type:'streamnzb', instanceId:'nx-snzb-01', enabled:true, options:{ name:'StreamNZB', timeout:5000, ...(S.creds.streamnzb ? { url:S.creds.streamnzb } : { url:'' }), mediaTypes:['movie','series','anime'] } },
     ] : []),
-    ...(hasDebridio && S.creds.debridio ? [
+    ...(hasDebridio && S.creds.debridio && debridioCapable ? [
       // AIOStreams names this option `debridioApiKey`, not a bare `apiKey` (field report
       // 2026-08-14: "Option debridioApiKey is required, got undefined" fired even WITH a key
       // entered, because we set an option the preset never reads). Confirmed against the
@@ -4003,21 +4124,27 @@ function presets() {
       if (d.id === 'knaben') return null;  // emitted unconditionally below as tam-knaben; a second emission duplicates the source
       if (d.id === 'zilean') return null;
       if (d.id === 'yastream') return { type:'yastream', instanceId:'yas-1', enabled:true, options:{ name:'YaStream', timeout:7000 }, resources:['stream'] };
-      if (d.id === 'neko-bt') return animeContent ? null : { type:'neko-bt', instanceId:'neko-bt-core-builds', enabled:true, options:{ name:'NekoBT', timeout:5000, mediaTypes:['anime'] }, resources:['stream'] };
+      if (d.id === 'neko-bt') return (animeContent || !torrentCapable) ? null : { type:'neko-bt', instanceId:'neko-bt-core-builds', enabled:true, options:{ name:'NekoBT', timeout:5000, mediaTypes:['anime'] }, resources:['stream'] };
       if (d.id === 'webstreamr') return (hasExtraHttp || isHttp) ? null : { type:'webstreamr', instanceId:'wsr-1', enabled:true, options:{ name:'WebStreamr', timeout:7000 }, resources:['stream'] };
       if (d.id === 'sootio') return null;  // the debrid/multi lanes advertise it at the tail — that advert carries the toggle
       // Lane gates for new safe add-ons: usenet indexers need usenet service, debrid-only need debrid.
       // torbox-search removed in v2.32 — never emitted.
       const usenetCatIds = ['nzbnoob','althub','usenetcrawler','drunkenslug','nzbfinder','nzbhydra'];
-      const debridOnlyIds = ['bitmagnet','brazuca-torrents','debridio-watchtower','jackettio','torbox'];
+      const debridOnlyIds = ['bitmagnet','jackettio'];
       if ((isP2P || isHttp) && usenetCatIds.includes(d.id)) return null;
-      if ((isP2P || isHttp) && debridOnlyIds.includes(d.id)) return null;
+      if (!torrentCapable && debridOnlyIds.includes(d.id)) return null;
+      // EasyNews / EasyNews+ read the EasyNews service's login; without it enabled the
+      // host refuses the save with "No credentials found for service easynews".
+      if (['easynews','easynewsPlus'].includes(d.id) && !easynewsEnabled) return null;
       const safeCats = { catalog: { resources:['catalog','meta'], category:'meta_catalogs' }, live: { resources:['stream'] }, subtitles: { resources:['subtitles'] }, debrid: { resources:['stream'] }, usenet: { resources:['stream'] } };
       const meta = safeCats[d.cat] || { resources:['stream'] };
       return { type: d.presetType, instanceId: `${d.id}-opt`, enabled:true, options:{ name: d.label, timeout:5000 }, ...meta };
     }).filter(Boolean),
     ...S.optionalScrapers.filter(sid => OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid && x.credKey && !x.apiUrl && x.presetType !== 'nzbhydra')).map(sid => {
       const d = OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid);
+      // Jackett and Prowlarr resolve through a torrent debrid service; without one the
+      // host refuses the whole save.
+      if (['jackett','prowlarr'].includes(d.id) && !torrentCapable) return null;
       // Per-preset option names, same contract as Debridio's `debridioApiKey`: AIOStreams
       // declares `jackettApiKey` / `prowlarrApiKey`, NOT a bare `apiKey`. Emitting `apiKey`
       // set an option the preset never reads, so the host saw its required key as undefined
@@ -4051,10 +4178,10 @@ function presets() {
       }
       return null;
     }).filter(Boolean),
-    ...S.optionalScrapers.filter(sid => OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid && x.presetType === 'nzbhydra')).map(sid => {
+    ...S.optionalScrapers.filter(sid => usenetCapable && OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid && x.presetType === 'nzbhydra')).map(sid => {
       return { type:'nzbhydra', instanceId:'nzbhydra-1', enabled:true, options:{ name:'NZBHydra2', api:{ url:S.creds.nzbhydra || '', apiKey:S.creds.nzbhydraApiKey || '' }, timeout:8000, mediaTypes:['movie','series','anime'], searchMode:'auto', seasonEpisodeStrategy:'episode', paginate:true, useMultipleInstances:false } };
     }),
-    ...S.optionalScrapers.filter(sid => OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid && x.presetType === 'newznab')).map(sid => {
+    ...S.optionalScrapers.filter(sid => usenetCapable && OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid && x.presetType === 'newznab')).map(sid => {
       const d = OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid);
       return { type:'newznab', instanceId:`${d.id}-1`, enabled:true, options:{ name:d.label, api:{ url:d.apiUrl, apiKey:S.creds[d.credKey] || '' }, timeout:6000, mediaTypes:['movie','series','anime'], searchMode:'auto', seasonEpisodeStrategy:'episode', paginate:true, useMultipleInstances:false } };
     }),
@@ -4064,7 +4191,7 @@ function presets() {
       { type:'flix-streams', instanceId:'flx-1', enabled:false, options:{ name:'Flix-Streams', timeout:7000 }, resources:['stream'] },
     ] : []),
     { type:'meteor', instanceId:'nx-fix-02', enabled:true, options:{ name:'Meteor', timeout:6000, yourMedia:{ sources:['torrent','webdl','usenet'], showStreams:true, enabled:true }, usenet:{ enabled:true, customSearchEngines:true }, url:'https://meteorfortheweebs.midnightignite.me', resources:['stream'] } },
-    { type:'comet', instanceId:'nx-fix-01', enabled:true, options:{ name:'Comet', timeout:7000, resources:['stream'], mediaTypes:['movie','series','anime'], scrapeDebridAccountTorrents:true } },
+    { type:'comet', instanceId:'nx-fix-01', enabled:true, options:{ name:'Comet', timeout:7000, resources:['stream'], mediaTypes:['movie','series','anime'], scrapeDebridAccountTorrents:!S._nuvioInstant } },
     { type:'mediafusion', instanceId:'nx-mf-01', enabled:true, options:{ name:'MediaFusion', timeout:7000, resources:['stream'], mediaTypes:['movie','series','anime'] } },
     { type:'hdhub', instanceId:'hdhub-1', enabled:isP2P, options:{ name:'HdHub', timeout:5000, resources:['stream'], mediaTypes:['movie','series','anime'], ...(!isP2P && (multiHasTorbox || svc === 'torbox-pro' || svc === 'torbox-ess') ? {tb_only:true} : {}) } },
     { type:'eztv', instanceId:'nx-ez-01', enabled:torrentCapable, options:{ name:'EZTV', timeout:5000 }, resources:['stream'] },
@@ -4072,8 +4199,8 @@ function presets() {
     { type:'knaben', instanceId:'tam-knaben', enabled:torrentCapable, options:{ name:'Knaben', timeout:6000, mediaTypes:[], useMultipleInstances:false }, resources:['stream'] },
     { type:'torrents-db', instanceId:'nx-tdb-1', enabled:false, options:{ name:'TorrentsDB', timeout:5000, useMultipleInstances:false }, resources:['stream'] },
     ...(animeContent ? [
-      { type:'animetosho', instanceId:'nx-at-01', enabled:S.content === 'anime', options:{ name:'AnimeTosho', timeout:5000, mediaTypes:['anime'] }, resources:['stream'] },
-      { type:'neko-bt', instanceId:'neko-bt-core-builds', enabled:extrasOn('neko-bt'), options:{ name:'NekoBT', timeout:5000, mediaTypes:['anime'] }, resources:['stream'] },
+      { type:'animetosho', instanceId:'nx-at-01', enabled:(S.content === 'anime' || S.content === 'mixed') && torrentCapable, options:{ name:'AnimeTosho', timeout:5000, mediaTypes:['anime'] }, resources:['stream'] },
+      { type:'neko-bt', instanceId:'neko-bt-core-builds', enabled:extrasOn('neko-bt') && torrentCapable, options:{ name:'NekoBT', timeout:5000, mediaTypes:['anime'] }, resources:['stream'] },
     ] : []),
     // p2p: v2.33 rejects Sootio outright (no usable service/HTTP provider), so the toggle
     // cannot reach it there. Neither can the HTTP branch (hardcoded false above) nor the
@@ -4084,13 +4211,19 @@ function presets() {
     ...subtitlePresets(),
     ...catalogPresets()
   ];
+  if (S._nuvioInstant) {
+    const types = new Set(['torrentio', 'comet', 'mediafusion', 'meteor', 'stremthruTorz', 'aiosubtitle', 'tmdb-addon']);
+    return list.filter(preset => types.has(preset.type));
+  }
   // The legacy built-in torbox-search preset was removed in AIOStreams v2.32
   // (TorBox Search API shut down). Emitting it — even disabled — makes the
   // config fail to save on v2.32+ hosts, so it is never generated here.
   return list;
 }
 
-function cred(id) { return S.creds[id] ? {apiKey: S.creds[id]} : {}; }
+// Most services take one apiKey; Offcloud, PikPak and Seedr need other/extra fields
+// (SERVICE_CREDENTIAL_FIELDS), and a missing required one fails the whole save.
+function cred(id) { return serviceCredentials(id, S.creds); }
 function services() {
   const svc = S.service, isMulti = svc === 'multi', m = S.multiServices;
   return [
@@ -4311,9 +4444,12 @@ function build() {
   const hasTmdb = hasTmdbCredentials(input);
   const useBase = !!(S.baseUuid && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(S.baseUuid.trim()));
 
-  const globalTimeout = Number(input.addonTimeout)||6000;
+  const globalTimeout = Number(S.addonTimeout)||6000;
   const normalizedPresets = assertAddonPolicy(addonPolicy(input, presets(), { defaultTimeout: globalTimeout }));
-  const activePresets = normalizedPresets.presets;
+  const activePresets = mergeImportedPresets(normalizedPresets.presets, S._importedPresets, {
+    optionalScrapers: S.optionalScrapers || [], creds: S.creds || {},
+    multiServices: S.multiServices, catalogs: S.catalogs, subtitleAddons: S.subtitleAddons,
+  }).filter(preset => preset.enabled !== false);
   // Fields only included when NOT using a base config (inherited via misc/sorting/formatter/services)
   const standaloneOnly = useBase ? {} : {
     preferredQualities: ['BluRay REMUX','BluRay','WEB-DL','WEBRip','HDRip','HDTV'],
@@ -4689,6 +4825,7 @@ function buildFinal() {
       disabledAddons: _disabledAddons,
       presetMatchesAddon,
       migrationKeep: S._migrationKeep,
+      migrationRemove: S._migrationRemove,
     });
     const profiled = applyOutputProfile(assembled, activeOutputProfile(), outputProfileContext());
     // Last stop before anything leaves the app: strip every key, preset and
@@ -4704,6 +4841,59 @@ function buildFinal() {
     logError('build', err.message, { service: S.service, device: S.device, resolution: S.resolution, stack: err.stack?.slice(0, 300) });
     throw err;
   }
+}
+
+// Build previews and specialised routes through the SAME final pipeline as
+// downloads/direct installs, without changing the active wizard or its cache.
+function buildFromState(nextState) {
+  const savedState = cloneUpdateValue(S);
+  const previousBuild = _cachedBuildResult;
+  const previousRemovals = _lastHostGateRemovals;
+  const previousWarnings = _lastHostGateWarnings;
+  try {
+    replaceState(nextState);
+    return buildFinal();
+  } finally {
+    replaceState(savedState);
+    _cachedBuildResult = previousBuild;
+    _lastHostGateRemovals = previousRemovals;
+    _lastHostGateWarnings = previousWarnings;
+  }
+}
+
+/**
+ * The host a Nuvio-instant template targets. An explicit pick is never silently
+ * overridden: a pick that cannot serve Nuvio instant returns an error instead
+ * of a different host. With no pick (or Auto), the first compatible host wins.
+ * Returns { host } or { error } (error is HTML-safe).
+ */
+function pickNuvioHost() {
+  const pickedId = (S.instanceHost && S.instanceHost !== 'auto') ? S.instanceHost : null;
+  const pickedMeta = pickedId ? HOST_META[pickedId] : null;
+  if (pickedMeta && pickedMeta.supportsNuvioInstant && pickedMeta.supportsP2P) return { host: { id: pickedId, ...pickedMeta } };
+  if (pickedId) return { error: `${escHtml(HOST_LABEL_MAP[pickedId] || pickedId)} can't do instant Nuvio imports (needs Nuvio-instant + P2P support on the host). Pick a compatible host above, or choose the Nuvio target again after switching.` };
+  const host = Object.entries(HOST_META).filter(([,m])=>m.supportsNuvioInstant&&m.supportsP2P).map(([k])=>({id:k,...HOST_META[k]}))[0];
+  return host ? { host } : { error: 'No compatible Nuvio host found.' };
+}
+
+function buildNuvioTemplate(host, device = 'generic', resolution = '1080p') {
+  if (!host?.supportsNuvioInstant || !host?.supportsP2P) throw new Error('Host does not support Nuvio TorBox Instant');
+  const nextState = {
+    ...cloneUpdateValue(INITIAL_STATE),
+    service: 'p2p', multiServices: ['p2p'], p2pEnabled: true, _nuvioInstant: true,
+    device, resolution, audio: DEVICE_AUDIO_DEFAULTS[device] || 'limited', content: 'all',
+    name: 'Core Builds — Nuvio TorBox Instant', instanceHost: host.id,
+    outputProfile: 'advanced', aiostreamsVersion: S.aiostreamsVersion,
+    langs: [...(S.langs || ['English'])], foreignLangKill: S.foreignLangKill !== false,
+    tmdbToken: S.tmdbToken || '', tmdbApiKey: S.tmdbApiKey || '',
+    // These are native, schema-allowlisted preferences. All final safety and
+    // compatibility gates still run after assembly. Never inherit debrid keys,
+    // custom imported sources, or unrelated migration overrides on this route.
+    _migrationKeep: { preferredStreamTypes: ['p2p'], excludedStreamTypes: ['debrid'] },
+  };
+  const template = buildFromState(nextState);
+  template.metadata.description = 'Connect TorBox in Nuvio Connected Services. Import into AIOStreams, save, then copy its manifest URL into Nuvio. Do not enter a TorBox API key in AIOStreams.';
+  return template;
 }
 
 const PARTIAL_EXPORT_FIELDS = {
@@ -4725,7 +4915,7 @@ function exportPartial(kind) {
   const fields = PARTIAL_EXPORT_FIELDS[kind];
   if (!fields) { showToast('Unknown partial export', true); return; }
   const full = buildFinal().config, config = {};
-  for (const field of fields) if (field in full) config[field] = structuredClone(full[field]);
+  for (const field of fields) if (field in full) config[field] = cloneUpdateValue(full[field]);
   if (Array.isArray(config.services)) config.services = config.services.map(service => ({...service, credentials:{}}));
   const payload = {
     metadata: { id:`core-partial-${kind}-${sid()}`, name:`Core Builds — ${kind} only`, description:`Partial Core Builds export containing ${kind} settings only.`, author:'Branding-Brevity', version:'1.0.0', category:'Utility', source:'external' },
@@ -4990,6 +5180,7 @@ function showFormatterImport() {
       const obj = JSON.parse(raw);
       if (!obj.name || typeof obj.name !== 'string') { errEl.textContent = 'Missing or invalid "name" field'; errEl.style.display = ''; return; }
       if (!obj.description || typeof obj.description !== 'string') { errEl.textContent = 'Missing or invalid "description" field'; errEl.style.display = ''; return; }
+      releaseMigrationFields(['formatter']);
       S.customFormatter = { name: obj.name, d: obj.description, label: obj._label || obj.label || 'Custom' };
       S.formatter = 'custom';
       saveState();
@@ -5015,7 +5206,7 @@ function showFormatterImport() {
 function parseTemplateToState(tpl) {
   const c = tpl.config || tpl;
   const st = {
-    service: null, device: null, resolution: null, audio: 'limited', content: null,
+    service: null, device: 'generic', resolution: null, audio: 'limited', content: 'all',
     name: '', multiServices: [], sizeLimit: 'unlimited', formatter: 'family-v4',
     p2pEnabled: false, qualityFirst: false, resolutionFirst: false, foreignLangKill: true, matchMode: 'balanced',
     exclude4K: false, excludeDV: false, langs: ['English'], langExclusive: false,
@@ -5025,26 +5216,18 @@ function parseTemplateToState(tpl) {
   if (AIOSTREAMS_COMPATIBILITY_TARGETS.includes(tpl?.metadata?.coreBuildsAIOStreamsTarget)) st.aiostreamsVersion = tpl.metadata.coreBuildsAIOStreamsTarget;
 
   const presets = c.presets || [];
-  const enabledPresets = presets.filter(p => p.enabled);
+  const enabledPresets = presets.filter(p => p.enabled !== false);
   const presetTypes = new Set(enabledPresets.map(p => p.type));
 
   // Service detection: use presets + services together for accuracy
-  const svcs = (c.services || []).filter(s => s.enabled);
+  const svcs = (c.services || []).filter(s => s.enabled !== false);
   const svcIds = new Set(svcs.map(s => s.id));
   const hasTB = svcIds.has('torbox'), hasRD = svcIds.has('realdebrid'), hasAD = svcIds.has('alldebrid');
   const hasEN = svcIds.has('easynews'), hasPM = svcIds.has('premiumize'), hasDL = svcIds.has('debridlink');
   const hasOC = svcIds.has('offcloud'), hasED = svcIds.has('easydebrid'), hasPP = svcIds.has('pikpak'), hasSR = svcIds.has('seedr');
 
-  const hasStremthruStore = presetTypes.has('stremthruStore');
-  const hasStremthruTorz = presetTypes.has('stremthruTorz');
   const hasEasyNewsPreset = presetTypes.has('easynews') || presetTypes.has('easynewsPlusPlus') || presetTypes.has('easynews-search') || presetTypes.has('easynewsPlus');
-  const hasSvcSortKey = ((c.sortCriteria && c.sortCriteria.global) || []).some(k => k.key === 'service');
-  const hasSvcPSEs = (c.preferredStreamExpressions || []).some(e => e.expression && /service\(/.test(e.expression));
-  const isHybrid = (hasTB && hasRD) || (hasTB && (hasSvcSortKey || hasSvcPSEs) && hasStremthruTorz);
-
-  if (isHybrid) { st.service = 'multi'; st.multiServices = ['torbox-pro','realdebrid']; }
-  else if (hasStremthruStore && hasTB) st.service = 'alldebrid';
-  else if (hasEN && hasEasyNewsPreset) st.service = 'easynews';
+  if (hasEN && hasEasyNewsPreset) st.service = 'easynews';
   else if (hasTB) st.service = 'torbox-pro';
   else if (hasRD) st.service = 'realdebrid';
   else if (hasAD) st.service = 'alldebrid';
@@ -5067,6 +5250,19 @@ function parseTemplateToState(tpl) {
   if (hasED) st.multiServices.push('easydebrid');
   if (hasPP) st.multiServices.push('pikpak');
   if (hasSR) st.multiServices.push('seedr');
+  if (svcIds.has('aiostreams') && !st.multiServices.length) st.multiServices.push('usenet');
+  for (const type of ['debridio', 'debrider']) {
+    if (presetTypes.has(type) && !st.multiServices.includes(type)) st.multiServices.push(type);
+  }
+  if (st.multiServices.length > 1) st.service = 'multi';
+  else if (!st.service && st.multiServices.length) st.service = st.multiServices[0];
+  if (!st.service) {
+    if (presetTypes.has('debridio')) st.service = 'debridio';
+    else if (presetTypes.has('debrider')) st.service = 'debrider';
+    else if (['torrentio', 'comet', 'jackettio', 'knaben', 'torrent-galaxy'].some(type => presetTypes.has(type))) st.service = 'p2p';
+    else if (['peerflix', 'webstreamr', 'hdhub', 'yastream'].some(type => presetTypes.has(type))) st.service = 'http';
+    if (st.service) st.multiServices = [st.service];
+  }
 
   // Credentials
   const creds = {};
@@ -5077,17 +5273,20 @@ function parseTemplateToState(tpl) {
     if (s.id === 'alldebrid' && k.apiKey) creds.alldebrid = k.apiKey;
     if (s.id === 'premiumize' && k.apiKey) creds.premiumize = k.apiKey;
     if (s.id === 'debridlink' && k.apiKey) creds.debridlink = k.apiKey;
-    if (s.id === 'offcloud' && k.apiKey) creds.offcloud = k.apiKey;
+    if (s.id === 'offcloud') { if (k.apiKey) creds.offcloud = k.apiKey; if (k.email) creds.offcloudEmail = k.email; if (k.password) creds.offcloudPass = k.password; }
     if (s.id === 'easydebrid' && k.apiKey) creds.easydebrid = k.apiKey;
-    if (s.id === 'pikpak' && k.apiKey) creds.pikpak = k.apiKey;
-    if (s.id === 'seedr' && k.apiKey) creds.seedr = k.apiKey;
+    if (s.id === 'pikpak') { if (k.email) creds.pikpak = k.email; if (k.password) creds.pikpakPass = k.password; }
+    if (s.id === 'seedr' && k.encodedToken) creds.seedr = k.encodedToken;
     if (s.id === 'easynews') { if (k.username) creds.easynews = k.username; if (k.password) creds.easynewsPass = k.password; }
   });
   st.creds = creds;
 
-  // NZBGeek from presets (v2.32 api shape)
-  const nzbg = presets.find(p => p.type === 'newznab' && p.options && (p.options.api?.url||'').includes('nzbgeek'));
-  if (nzbg && nzbg.options && nzbg.options.api && nzbg.options.api.apiKey) creds.nzbgeek = nzbg.options.api.apiKey;
+  const sources = importedSourceState(c);
+  Object.assign(creds, sources.creds);
+  st._importedPresets = sources._importedPresets;
+  st.optionalScrapers = sources.optionalScrapers;
+  st.tmdbToken = typeof c.tmdbAccessToken === 'string' ? c.tmdbAccessToken : '';
+  st.tmdbApiKey = typeof c.tmdbApiKey === 'string' ? c.tmdbApiKey : '';
 
   // Resolution: check requiredResolutions, excludedResolutions, and ESEs
   const req = c.requiredResolutions || [];
@@ -5149,11 +5348,12 @@ function parseTemplateToState(tpl) {
   }
 
   // Cache mode
-  const hasP2P = presets.some(p => ['torrentio','comet','jackettio','knaben','torrent-galaxy'].includes(p.type) && p.enabled);
+  const hasP2P = enabledPresets.some(p => ['torrentio','comet','jackettio','knaben','torrent-galaxy'].includes(p.type));
   st.p2pEnabled = hasP2P;
+  st.cacheMode = c.excludeUncached === true ? 'cached' : c.excludeCached === true ? 'uncached' : 'mixed';
 
   // Max results → stream pool
-  const mr = c.maxResults || 20;
+  const mr = c.resultLimits?.global || c.maxResults || 20;
   if (mr >= 50) st.streamPool = 'max';
   else if (mr >= 30) st.streamPool = 'large';
   else st.streamPool = 'normal';
@@ -5170,7 +5370,7 @@ function parseTemplateToState(tpl) {
 
   // Foreign language kill
   const eseList = c.excludedStreamExpressions || [];
-  st.foreignLangKill = eseList.some(e => e.enabled && e.expression && e.expression.includes('Foreign Language Kill'));
+  st.foreignLangKill = eseList.some(e => e.enabled !== false && e.expression && e.expression.includes('Foreign Language Kill'));
 
   // Languages
   if (c.requiredLanguages && c.requiredLanguages.length > 0) {
@@ -5179,11 +5379,10 @@ function parseTemplateToState(tpl) {
   }
 
   // Name from metadata
-  if (tpl.metadata && tpl.metadata.name) st.name = tpl.metadata.name;
-  else if (c.addonName) st.name = c.addonName;
+  st.name = sanitizeDisplayName(tpl.metadata?.name || c.addonName || '');
 
   // Content type from presets
-  const mTypes = presets.filter(p => p.enabled && p.options && p.options.mediaTypes);
+  const mTypes = presets.filter(p => p.enabled !== false && p.options && Array.isArray(p.options.mediaTypes));
   if (mTypes.length > 0) {
     const allMt = new Set();
     mTypes.forEach(p => (p.options.mediaTypes||[]).forEach(t => allMt.add(t)));
@@ -5194,30 +5393,27 @@ function parseTemplateToState(tpl) {
   }
 
   // Exclude DV/4K from ESEs
-  st.excludeDV = eses.some(e => e.expression && /DV-Only Kill|visualTag.*DV/.test(e.expression));
+  st.excludeDV = eses.some(e => e.enabled !== false && e.expression && /DV-Only Kill|visualTag.*DV/.test(e.expression));
   st.exclude4K = has4kESEKill;
 
   // Subtitle addons & languages
   const subAddons = enabledPresets.filter(p => ['aiosubtitle', 'opensubtitles-v3-plus', 'subdl'].includes(p.type)).map(p => p.type);
-  st.subtitleAddons = subAddons.length > 0 ? subAddons : ['aiosubtitle'];
+  st.subtitleAddons = subAddons;
 
   const subPreset = enabledPresets.find(p => ['aiosubtitle', 'opensubtitles-v3-plus', 'subdl'].includes(p.type));
   if (subPreset && subPreset.options) {
     const l = subPreset.options.languages || subPreset.options.language;
-    if (Array.isArray(l) && l.length > 0) {
-      st.subtitleLangs = l;
-    } else if (typeof l === 'string' && l.trim()) {
-      st.subtitleLangs = [l.trim()];
-    } else {
-      st.subtitleLangs = ['en'];
-    }
+    const languages = Array.isArray(l) ? l : typeof l === 'string' ? [l] : [];
+    st.subtitleLangs = [...new Set(languages.filter(language => typeof language === 'string')
+      .map(language => language.trim().toLowerCase()).filter(Boolean))];
+    if (!st.subtitleLangs.length) st.subtitleLangs = ['en'];
   } else {
     st.subtitleLangs = ['en'];
   }
 
   // Catalogs
   const cats = enabledPresets.filter(p => ['tmdb-addon', 'streaming-catalogs', 'anime-catalogs', 'rpdb-catalogs', 'torrent-catalogs'].includes(p.type)).map(p => p.type);
-  st.catalogs = cats.length > 0 ? cats : ['tmdb-addon'];
+  st.catalogs = cats;
 
   // Deduplicator Merge
   if (c.deduplicator && c.deduplicator.merge) {
@@ -5235,103 +5431,21 @@ function parseTemplateToState(tpl) {
     st.proxiedServices = [];
   }
 
-  // Optional Scrapers (v2.32 api shape)
-  const optScrapers = enabledPresets.filter(p => p.type === 'newznab' && p.options && p.options.api?.url).map(p => {
-    const d = OPTIONAL_SCRAPER_DEFS.find(x => x.apiUrl && p.options.api.url.toLowerCase().includes(x.apiUrl.toLowerCase()));
-    return d ? d.id : null;
-  }).filter(Boolean);
-  st.optionalScrapers = optScrapers;
 
   return st;
 }
 
 function diffConfigs(oldCfg, newCfg) {
-  const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  const sections = [];
-  const extractLabel = expr => { const m = (expr||'').match(/\/\*\s*(.+?)\s*\*\//); return m ? m[1] : expr.slice(0,60); };
-
-  function diffExprArray(oldArr, newArr, label, icon, key) {
-    const oldLabels = (oldArr||[]).filter(e=>e.enabled!==false).map(e => extractLabel(e.expression));
-    const newLabels = (newArr||[]).filter(e=>e.enabled!==false).map(e => extractLabel(e.expression));
-    const added = newLabels.filter(l => !oldLabels.includes(l));
-    const removed = oldLabels.filter(l => !newLabels.includes(l));
-    const rows = [];
-    added.forEach(l => rows.push({type:'add', text:esc(l)}));
-    removed.forEach(l => rows.push({type:'rem', text:esc(l)}));
-    if (rows.length) sections.push({label, icon, rows, added:added.length, removed:removed.length, changed:0, key});
-  }
-
-  function diffRegexArray(oldArr, newArr, label, icon, hasScore, key) {
-    const toMap = arr => { const m = new Map(); (arr||[]).forEach((r,i) => { const n = typeof r === 'string' ? 'Pattern #'+(i+1) : (r.name||'unnamed'); m.set(n, r); }); return m; };
-    const oldMap = toMap(oldArr), newMap = toMap(newArr);
-    const rows = [];
-    for (const [name, entry] of newMap) {
-      if (!oldMap.has(name)) { rows.push({type:'add', text:esc(name) + (hasScore && entry.score != null ? ' <span style="opacity:.5">(score '+esc(entry.score)+')</span>' : '')}); }
-      else if (hasScore && entry.score != null && oldMap.get(name).score != null && entry.score !== oldMap.get(name).score) {
-        rows.push({type:'chg', text:esc(name) + ' <span style="opacity:.5">score '+esc(oldMap.get(name).score)+' &rarr; '+esc(entry.score)+'</span>'});
-      }
-    }
-    for (const [name] of oldMap) { if (!newMap.has(name)) rows.push({type:'rem', text:esc(name)}); }
-    if (rows.length) { const a = rows.filter(r=>r.type==='add').length, r = rows.filter(r=>r.type==='rem').length, c = rows.filter(r=>r.type==='chg').length; sections.push({label, icon, rows, added:a, removed:r, changed:c, key}); }
-  }
-
-  function diffSortCriteria(oldSort, newSort) {
-    const allKeys = new Set([...Object.keys(oldSort||{}), ...Object.keys(newSort||{})]);
-    const rows = [];
-    for (const sec of allKeys) {
-      const oldKeys = ((oldSort||{})[sec]||[]).map(k => k.key);
-      const newKeys = ((newSort||{})[sec]||[]).map(k => k.key);
-      if (JSON.stringify(oldKeys) !== JSON.stringify(newKeys)) {
-        const added = newKeys.filter(k => !oldKeys.includes(k));
-        const removed = oldKeys.filter(k => !newKeys.includes(k));
-        const reordered = added.length === 0 && removed.length === 0;
-        let detail = '';
-        if (added.length) detail += '+' + added.join(', ');
-        if (removed.length) detail += (detail ? ' ' : '') + '-' + removed.join(', ');
-        if (reordered) detail = 'key order changed';
-        rows.push({type: removed.length && !added.length ? 'rem' : added.length ? 'add' : 'chg', text: esc(sec) + (detail ? ' <span style="opacity:.5">('+esc(detail)+')</span>' : '')});
-      }
-    }
-    if (rows.length) sections.push({label:'Sort Criteria', icon:ICO.shuffle(14,'#a78bfa'), rows, added:rows.filter(r=>r.type==='add').length, removed:rows.filter(r=>r.type==='rem').length, changed:rows.filter(r=>r.type==='chg').length, key:'sort'});
-  }
-
-  diffExprArray(oldCfg.preferredStreamExpressions, newCfg.preferredStreamExpressions, 'PSE Tiers', ICO.crown(14,'#fbbf24'), 'pses');
-  diffExprArray(oldCfg.excludedStreamExpressions, newCfg.excludedStreamExpressions, 'Excluded Stream Expressions', ICO.bolt(14,'#f87171'), 'eses');
-  diffExprArray(oldCfg.includedStreamExpressions, newCfg.includedStreamExpressions, 'Included Stream Expressions', ICO.check(14,'#34d399'), 'ises');
-  diffRegexArray(oldCfg.rankedRegexPatterns, newCfg.rankedRegexPatterns, 'Ranked Regex Patterns', ICO.search(14,'#a78bfa'), true, 'ranked_regex');
-  diffRegexArray(oldCfg.preferredRegexPatterns, newCfg.preferredRegexPatterns, 'Preferred Regex Patterns', ICO.diamond(14,'#00d4ff'), false, 'pref_regex');
-  diffRegexArray(oldCfg.excludedRegexPatterns, newCfg.excludedRegexPatterns, 'Excluded Regex Patterns', ICO.bolt(14,'#f87171'), false, 'excl_regex');
-  diffSortCriteria(oldCfg.sortCriteria, newCfg.sortCriteria);
-
-  const miscRows = [];
-  const ddOld = oldCfg.deduplicator || {}, ddNew = newCfg.deduplicator || {};
-  if (JSON.stringify(ddOld) !== JSON.stringify(ddNew)) {
-    if (ddOld.multiGroupBehaviour !== ddNew.multiGroupBehaviour) miscRows.push({type:'chg', text:'Dedup mode: <span style="opacity:.5">'+esc(ddOld.multiGroupBehaviour||'(none)')+' &rarr; '+esc(ddNew.multiGroupBehaviour||'(none)')+'</span>'});
-    if (ddOld.smartDetectRounding !== ddNew.smartDetectRounding) miscRows.push({type:'chg', text:'Dedup rounding: <span style="opacity:.5">'+esc(ddOld.smartDetectRounding||'(none)')+' &rarr; '+esc(ddNew.smartDetectRounding||'(none)')+'</span>'});
-    if (ddOld.cached !== ddNew.cached) miscRows.push({type:'chg', text:'Dedup cached: <span style="opacity:.5">'+esc(ddOld.cached||'(none)')+' &rarr; '+esc(ddNew.cached||'(none)')+'</span>'});
-    if (JSON.stringify(ddOld.tiebreakers) !== JSON.stringify(ddNew.tiebreakers)) miscRows.push({type:'add', text:'Dedup tiebreakers updated'});
-    if (ddOld.libraryBehaviour !== ddNew.libraryBehaviour) miscRows.push({type:'chg', text:'Library behaviour: <span style="opacity:.5">'+esc(ddOld.libraryBehaviour||'ignore')+' &rarr; '+esc(ddNew.libraryBehaviour||'ignore')+'</span>'});
-  }
-  const fmtOld = oldCfg.formatter, fmtNew = newCfg.formatter;
-  if (fmtOld && fmtNew) {
-    const ovOld = fmtOld.definitions && fmtOld.definitions.overrides && fmtOld.definitions.overrides[Object.keys(fmtOld.definitions.overrides)[0]];
-    const ovNew = fmtNew.definitions && fmtNew.definitions.overrides && fmtNew.definitions.overrides[Object.keys(fmtNew.definitions.overrides)[0]];
-    if (ovOld && ovNew && ovOld.name !== ovNew.name) miscRows.push({type:'chg', text:'Formatter: <span style="opacity:.5">'+esc(ovOld.name||'unknown')+' &rarr; '+esc(ovNew.name||'unknown')+'</span>'});
-  }
-  const dafOld = oldCfg.dynamicAddonFetching, dafNew = newCfg.dynamicAddonFetching;
-  if (dafOld && dafNew && dafOld.condition !== dafNew.condition) miscRows.push({type:'chg', text:'Dynamic addon fetching condition updated'});
-  if ((oldCfg.maxResults||20) !== (newCfg.maxResults||20)) miscRows.push({type:'chg', text:'Max results: <span style="opacity:.5">'+esc(oldCfg.maxResults||20)+' &rarr; '+esc(newCfg.maxResults||20)+'</span>'});
-
-  const syncFields = ['syncedRankedRegexUrls','syncedExcludedRegexUrls','syncedIncludedStreamExpressionUrls','syncedPreferredStreamExpressionUrls','syncedExcludedStreamExpressionUrls'];
-  const syncOld = syncFields.flatMap(f => oldCfg[f]||[]);
-  const syncNew = syncFields.flatMap(f => newCfg[f]||[]);
-  const addedUrls = syncNew.filter(u => !syncOld.includes(u)), removedUrls = syncOld.filter(u => !syncNew.includes(u));
-  addedUrls.forEach(u => miscRows.push({type:'add', text:'Synced URL: ' + esc(u.split('/').pop())}));
-  removedUrls.forEach(u => miscRows.push({type:'rem', text:'Synced URL: ' + esc(u.split('/').pop())}));
-
-  if (miscRows.length) sections.push({label:'Settings & Config', icon:ICO.gear(14,'#8b949e'), rows:miscRows, added:miscRows.filter(r=>r.type==='add').length, removed:miscRows.filter(r=>r.type==='rem').length, changed:miscRows.filter(r=>r.type==='chg').length, key:'settings'});
-
-  return sections;
+  const icons = {
+    pses: ICO.crown(14, '#fbbf24'), eses: ICO.bolt(14, '#f87171'),
+    ises: ICO.check(14, '#34d399'), ranked_regex: ICO.search(14, '#a78bfa'),
+    pref_regex: ICO.diamond(14, 'var(--th-accent)'), excl_regex: ICO.bolt(14, '#f87171'),
+    sort: ICO.shuffle(14, '#a78bfa'), sources: ICO.refresh(14, 'var(--th-accent)'),
+  };
+  return diffConfigSections(oldCfg, newCfg).map(section => ({
+    ...section, icon: icons[section.key] || ICO.gear(14, '#8b949e'),
+    rows: section.rows.map(row => ({ ...row, text: escHtml(row.text) })),
+  }));
 }
 
 function showDiffModal(oldCfg, newCfg, parsed, onApply, onCancel, importedConflicts = []) {
@@ -5349,7 +5463,7 @@ function showDiffModal(oldCfg, newCfg, parsed, onApply, onCancel, importedConfli
   overlay.className = 'df-overlay';
 
   const selectAllId = 'dfSelAll';
-  const selectAllHtml = sections.length > 1 ? '<div style="display:flex;align-items:center;gap:6px;margin-bottom:10px;padding:6px 10px;background:rgba(0,212,255,.04);border:1px solid rgba(0,212,255,.1);border-radius:8px"><label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:.72rem;color:#8b949e;user-select:none;flex:1"><input type="checkbox" id="'+selectAllId+'" checked style="accent-color:#00d4ff;width:14px;height:14px;cursor:pointer"> Select all sections</label><span style="font-size:.65rem;color:#4b5563">Uncheck to keep your existing values</span></div>' : '';
+  const selectAllHtml = sections.length > 1 ? '<div style="display:flex;align-items:center;gap:6px;margin-bottom:10px;padding:6px 10px;background:rgba(0,212,255,.04);border:1px solid rgba(0,212,255,.1);border-radius:8px"><label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:.72rem;color:#8b949e;user-select:none;flex:1"><input type="checkbox" id="'+selectAllId+'" checked style="accent-color:#00d4ff;width:14px;height:14px;cursor:pointer"> Select all sections</label><span style="font-size:.65rem;color:#4b5563">Uncheck to keep existing values; host and compatibility limits still apply</span></div>' : '';
 
   const sectionsHtml = sections.length ? sections.map((sec, si) => {
     const countHtml = [];
@@ -5363,7 +5477,7 @@ function showDiffModal(oldCfg, newCfg, parsed, onApply, onCancel, importedConfli
     }).join('');
     const cbId = 'dfSec'+si;
     return '<div class="df-section" data-sec-key="'+(sec.key||'')+'"><div class="df-sec-hdr"><label style="display:flex;align-items:center;gap:6px;cursor:pointer;flex:1;min-width:0" onclick="event.stopPropagation()"><input type="checkbox" class="df-sec-cb" id="'+cbId+'" data-sec-idx="'+si+'" checked style="accent-color:#00d4ff;width:14px;height:14px;cursor:pointer;flex-shrink:0">'+sec.icon+' '+esc(sec.label)+'</label><span class="df-sec-count" style="cursor:pointer" onclick="const b=this.closest(\'.df-section\').querySelector(\'.df-sec-body\');b.style.display=b.style.display===\'none\'?\'\':\'none\'">'+countHtml.join(' ')+' <span style="font-size:.6rem;opacity:.5">&#9660;</span></span></div><div class="df-sec-body">'+rowsHtml+'</div></div>';
-  }).join('') : '<div class="df-empty">'+ICO.check(18,'#34d399')+'<br>Your template is already up to date.</div>';
+  }).join('') : '<div class="df-empty">'+ICO.check(18,'#34d399')+'<br>No configuration changes for this setup. App updates do not always change template output.</div>';
 
   const detected = [];
   if (parsed.service) detected.push(esc(parsed.service));
@@ -5407,7 +5521,8 @@ function showDiffModal(oldCfg, newCfg, parsed, onApply, onCancel, importedConfli
     });
   });
 
-  const close = (cb) => { overlay.style.opacity = '0'; overlay.style.transition = 'opacity .15s'; setTimeout(() => { overlay.remove(); if (cb) cb(); }, 160); };
+  let closing = false;
+  const close = (cb) => { if (closing) return; closing = true; overlay.style.opacity = '0'; overlay.style.transition = 'opacity .15s'; setTimeout(() => { overlay.remove(); if (cb) cb(); }, 160); };
   document.getElementById('dfClose').addEventListener('click', () => close(onCancel));
   document.getElementById('dfCancel').addEventListener('click', () => close(onCancel));
   document.getElementById('dfApply').addEventListener('click', () => {
@@ -5424,79 +5539,60 @@ function showDiffModal(oldCfg, newCfg, parsed, onApply, onCancel, importedConfli
   overlay.addEventListener('click', e => { if (e.target === overlay) close(onCancel); });
 }
 
-function upgradeToTemplate(tpl, opts = {}) {
-  // Shared apply core: parse -> preview -> diff -> commit (used by the Update
-  // modal and by one-click remote updates). Never touches credentials beyond
-  // what the template itself carries; pre-update state is backed up for Revert.
-  storeTemplateMeta(tpl);
-  savePreUpdateSnapshot();
-  const oldCfg = tpl.config || tpl;
+function upgradeToTemplate(input, opts = {}) {
+  const tpl = normalizeUpdateTemplate(input);
+  const oldCfg = tpl.config;
   const importedConflicts = findFeatureConflicts(tpl);
-  const savedState = JSON.parse(JSON.stringify(S));
-  const session = createUpdateSession(S, parseTemplateToState(tpl));
+  const savedState = cloneUpdateValue(S);
   const parsed = parseTemplateToState(tpl);
-  S.service = null; S.device = null; S.resolution = null; S.audio = 'limited';
-  S.content = null; S.name = ''; S.multiServices = []; S.sizeLimit = 'unlimited';
-  S.formatter = 'family-v4'; S.p2pEnabled = false; S.qualityFirst = false; S.resolutionFirst = false; S.foreignLangKill = true;
-  S.matchMode = 'balanced'; S.exclude4K = false; S.excludeDV = false;
-  S.langs = ['English']; S.langExclusive = false; S.cacheMode = 'mixed';
-  S.streamPool = 'normal'; S.outputProfile = 'auto';
-  S.subtitleAddons = ['aiosubtitle']; S.subtitleLangs = ['en']; S.catalogs = ['tmdb-addon'];
-  S.dedupMerge = false; S.proxyEnabled = false; S.proxiedServices = []; S.optionalScrapers = [];
-  const defaultCreds = {torbox:'',realdebrid:'',alldebrid:'',premiumize:'',debridlink:'',offcloud:'',easynews:'',easynewsPass:'',nzbgeek:'',debridio:'',subdl:''};
-  Object.assign(S, parsed);
-  S.creds = Object.assign(defaultCreds, parsed.creds || {});
-  S.simpleMode = false;
-  let newTpl, newCfg;
+  const nextState = { ...cloneUpdateValue(INITIAL_STATE), ...parsed };
+  // Keep the user's delivery destination/account, not unrelated wizard flags.
+  for (const key of ['instanceHost', 'instanceUrl', 'instanceUuid', 'instancePassword', 'installMode', 'stremioEmail', 'stremioPassword', 'telemetryOk']) {
+    nextState[key] = savedState[key];
+  }
+  nextState.creds = { ...INITIAL_STATE.creds, ...inheritUpdateCredentials(savedState.creds || {}, parsed.creds || {}) };
+  nextState._migrationKeep = null;
+  nextState._migrationRemove = [];
+
+  // Preview the actual download/install pipeline, then restore every temporary
+  // field and build cache even if generation fails. No storage writes here.
+  let newTpl;
   try {
-    newTpl = build();
-    newCfg = newTpl.config || newTpl;
-  } catch(buildErr) {
-    Object.assign(S, savedState);
+    newTpl = buildFromState(nextState);
+  } catch (buildErr) {
     showToast('Preview generation failed: ' + buildErr.message, true);
     return;
   }
-  Object.assign(S, savedState);
+  let session = createUpdateSession(savedState, nextState, newTpl);
   if (typeof opts.onClose === 'function') opts.onClose();
-  showDiffModal(oldCfg, newCfg, parsed, (selectedKeys, offeredKeys = new Set()) => {
-    const SECTION_FIELDS = {
-      pses: ['preferredStreamExpressions'],
-      eses: ['excludedStreamExpressions'],
-      ises: ['includedStreamExpressions'],
-      ranked_regex: ['rankedRegexPatterns'],
-      pref_regex: ['preferredRegexPatterns'],
-      excl_regex: ['excludedRegexPatterns'],
-      sort: ['sortCriteria'],
-      settings: ['deduplicator','formatter','dynamicAddonFetching','maxResults','syncedRankedRegexUrls','syncedExcludedRegexUrls','syncedIncludedStreamExpressionUrls','syncedPreferredStreamExpressionUrls','syncedExcludedStreamExpressionUrls']
-    };
-    const keep = {};
-    for (const [key, fields] of Object.entries(SECTION_FIELDS)) {
-      if (offeredKeys.has(key) && !selectedKeys.has(key)) {
-        fields.forEach(f => { if (oldCfg[f] !== undefined) keep[f] = oldCfg[f]; });
-      }
-    }
-    commitUpdate(session, parsed);
-    Object.assign(S, parsed);
-    S._migrationKeep = Object.keys(keep).length ? keep : null;
-    saveState();
+  showDiffModal(oldCfg, newTpl.config, parsed, (selectedKeys, offeredKeys = new Set()) => {
+    const selection = migrationSelection(oldCfg, newTpl.config, selectedKeys, offeredKeys);
+    nextState._migrationKeep = Object.keys(selection.keep).length ? selection.keep : null;
+    nextState._migrationRemove = selection.remove;
+    session = commitUpdate(session, nextState);
+    _preUpdateState = cloneUpdateValue(S);
+    _preUpdateMeta = getStoredTemplateMeta();
+    savePreUpdateSnapshot();
+    replaceState(session.nextState);
+    storeTemplateMeta(tpl);
     _pendingUpdate = null;
-    const m = getStoredTemplateMeta();
-    if (m && tpl.metadata && tpl.metadata.sourceUrl && tpl.metadata.sourceUrl === m.sourceUrl && tpl.metadata.version) {
-      m.version = String(tpl.metadata.version); m.ts = Date.now();
-      try { localStorage.setItem('coreBuildLastTemplate', JSON.stringify(m)); } catch(e) {}
-    }
-    const skipped = Object.keys(SECTION_FIELDS).filter(k => offeredKeys.has(k) && !selectedKeys.has(k)).length;
+    const skipped = [...offeredKeys].filter(key => !selectedKeys.has(key)).length;
     step = STEPS;
-    pushStep(); render(); window.scrollTo(0,0);
-    showToast(skipped ? 'Template upgraded — '+selectedKeys.size+' section'+(selectedKeys.size!==1?'s':'')+' applied, '+skipped+' kept from original' : 'Template upgraded — review settings and generate your new template');
+    pushStep(); saveState(); render(); window.scrollTo(0,0);
+    showToast(skipped
+      ? 'Updated locally — '+skipped+' section'+(skipped !== 1 ? 's' : '')+' kept. Download and re-import to change AIOStreams.'
+      : 'Updated locally — download and re-import the JSON to change AIOStreams.');
   }, () => {
-    cancelUpdate(session);
+    session = cancelUpdate(session);
     showToast('Migration cancelled — no changes applied', true);
   }, importedConflicts);
 }
 
 function remoteUpdateBannerHtml() {
-  if (!_pendingUpdate) return '';
+  if (!_pendingUpdate) {
+    if (!_preUpdateState) return '';
+    return '<div style="padding:10px 14px;border-radius:10px;background:rgba(0,212,255,.06);border:1px solid rgba(0,212,255,.18);margin-bottom:12px;font-size:.72rem;color:#8b949e">Updated in this browser only. Download and re-import the JSON to apply it in AIOStreams. <button data-action="revert-update" style="margin-left:8px;background:none;border:0;color:var(--th-accent);cursor:pointer;font:inherit;text-decoration:underline">Undo local update</button></div>';
+  }
   const p = _pendingUpdate;
   const ch = p.changelog && p.changelog.length ? `<ul style="margin:6px 0 0;padding-left:16px">${p.changelog.map(e=>`<li style="font-size:.7rem;color:#8b949e;margin:2px 0"><b style="color:#00d4ff">v${escH(e.version)}</b>${e.body.length?` — ${escH(e.body.slice(0,3).join(' · '))}`:''}</li>`).join('')}</ul>` : '';
   return `<div style="padding:10px 14px;border-radius:10px;background:rgba(0,212,255,.06);border:1px solid rgba(0,212,255,.18);margin-bottom:12px">
@@ -5557,7 +5653,14 @@ async function applyRemoteUpdate() {
 
 function revertToPrevious() {
   _pendingUpdate = null;
-  restoreBackup(0);
+  if (!_preUpdateState) { restoreBackup(0); return; }
+  replaceState(_preUpdateState);
+  _preUpdateState = null;
+  if (_preUpdateMeta) localStorage.setItem('coreBuildLastTemplate', JSON.stringify(_preUpdateMeta));
+  else localStorage.removeItem('coreBuildLastTemplate');
+  _preUpdateMeta = null;
+  saveState(); render();
+  showToast('Local update undone. This does not change your installed AIOStreams config.');
 }
 
 function showUpdateTemplateModal() {
@@ -5572,8 +5675,8 @@ function showUpdateTemplateModal() {
       <div class="modal-title" style="font-size:1.05rem">${ICO.refresh(18,'#00d4ff')} Update Existing Setup</div>
       <div class="modal-sub" style="margin-bottom:8px">Paste your existing template JSON below. We'll show you exactly what changes before upgrading to the latest sort logic, regex patterns, and formatters, and flag safe rule conflicts before you apply anything.</div>
       <div style="background:rgba(0,212,255,.06);border:1px solid rgba(0,212,255,.12);border-radius:8px;padding:10px 12px;margin-bottom:12px;font-size:.72rem;color:#8b949e;line-height:1.5">
-        <strong style="color:#00d4ff">What gets updated:</strong> Sort criteria, regex patterns, PSE tiers, formatter, deduplicator settings, and filter expressions — all rebuilt with the latest configurator logic.<br>
-        <strong style="color:#00d4ff">What's preserved:</strong> Your service, credentials, resolution, audio, and content preferences are detected and kept.
+        <strong style="color:#00d4ff">What gets updated:</strong> Sort criteria, regex patterns, PSE tiers, formatter, deduplicator settings, and filter expressions — rebuilt with the latest configurator logic. App-only updates may produce no configuration changes.<br>
+        <strong style="color:#00d4ff">What's preserved:</strong> Your existing scraper instances, options and local credentials are retained. Service, resolution, audio and content preferences are detected; unsupported host options are still removed.
       </div>
       <textarea id="updTplInput" rows="8" placeholder='Paste your full template JSON here...' style="width:100%;box-sizing:border-box;background:#111720;border:1.5px solid rgba(255,255,255,.08);border-radius:8px;padding:10px 12px;color:#e6edf3;font-family:monospace;font-size:.72rem;resize:vertical;outline:none;line-height:1.4"></textarea>
       <div style="display:flex;gap:8px;margin-top:10px">
@@ -5596,9 +5699,7 @@ function showUpdateTemplateModal() {
     errEl.style.display = 'none';
     infoEl.style.display = 'none';
     try {
-      const obj = JSON.parse(raw);
-      if (!obj.config && !obj.services && !obj.presets) { errEl.textContent = 'Not a valid AIOStreams template — missing config object'; errEl.style.display = ''; return; }
-      const tpl = obj.config ? obj : { config: obj };
+      const tpl = normalizeUpdateTemplate(JSON.parse(raw));
       const cfg = tpl.config || tpl;
       // XS/S: warn about unknown top-level keys that AIOStreams strips silently
       try {
@@ -5610,23 +5711,12 @@ function showUpdateTemplateModal() {
         }
       } catch(e) {}
       const parsed = parseTemplateToState(tpl);
-      if (!parsed.service) { errEl.textContent = 'Could not detect a debrid service — no enabled services found in template'; errEl.style.display = ''; return; }
-
-      // Honesty note (Patch 33): keyed presets from the imported config (e.g. a Debridio
-      // scraper) are not regenerated by the rebuild — say so before the user wonders.
-      const keyedPresets = ((tpl.config && tpl.config.presets) || []).filter(p => p?.enabled === true && p?.options
-        && Object.keys(p.options).some(k => /api.?key|access.?token|secret|password|token/i.test(k) && (typeof p.options[k] !== 'string' || p.options[k].trim() === '' || p.options[k] === '<template_placeholder>')));
-      if (keyedPresets.length && infoEl) {
-        const prev = infoEl.innerHTML;
-        const msg = 'Heads-up: ' + keyedPresets.map(p => `“${(p.options && p.options.name) || p.type}”`).join(', ') + ' ' + (keyedPresets.length > 1 ? 'need' : 'needs') + ' their own API key — the rebuilt config ships them disabled. Add the key in AIOStreams and re-enable if you use them.';
-        infoEl.innerHTML = prev ? prev + '<br><br>' + msg : msg;
-        infoEl.style.display = '';
-      }
+      if (!parsed.service) { errEl.textContent = 'Could not detect a supported source — choose a service or free-streaming setup before updating'; errEl.style.display = ''; return; }
 
       // Build a preview from temporary state; do not commit until the user confirms.
       upgradeToTemplate(tpl, { onClose: () => { overlay.style.opacity = '0'; overlay.style.transition = 'opacity .15s'; setTimeout(() => overlay.remove(), 150); } });
       return;
-    } catch(e) { errEl.textContent = 'Invalid JSON: ' + e.message; errEl.style.display = ''; }
+    } catch(e) { errEl.textContent = (e instanceof SyntaxError ? 'Invalid JSON: ' : 'Cannot update: ') + e.message; errEl.style.display = ''; }
   }
 
   document.getElementById('updTplApply').addEventListener('click', () => parseAndApply(textarea.value));
@@ -5682,38 +5772,26 @@ function showRecommendedStackModal() {
     <div class="modal-box" role="dialog" aria-modal="true" aria-label="Recommended add-on stack" style="max-width:560px;max-height:85vh;overflow-y:auto">
       <button class="modal-close" id="rsClose" aria-label="Close">×</button>
       <div class="modal-title" style="font-size:1.05rem">⭐ Recommended Stack</div>
-      <div class="modal-sub" style="margin-bottom:12px">Best add-ons per r/StremioAddons 2025-2026 + Viren070 guides</div>
+      <div class="modal-sub" style="margin-bottom:12px">What Core Builds sets up for you, and what it leaves out</div>
       <div style="font-size:.78rem;line-height:1.6;color:#8b949e">
         <div style="background:rgba(0,212,255,.06);border:1px solid rgba(0,212,255,.12);border-radius:8px;padding:10px 12px;margin-bottom:12px">
-          <strong style="color:#00d4ff">Forks picker skipped:</strong> Viren070/AIOStreams is canonical. Known hosts (elfhosted, fortheweak, etc.) run same code v2.34.1 pinned c1d044c — policy differs, not code. Pick host in Advanced → Hosts, Auto = fastest healthy.
+          <strong style="color:#00d4ff">Hosts:</strong> every public host runs the same upstream AIOStreams (2.35.x when last checked, Oct 2026). They differ in policy, not code: ElfHosted disables Torrentio, P2P and HTTP streams; Viren's nightly disables Torrentio. Pick yours in Advanced → Hosts.
         </div>
-        <div style="margin-bottom:10px"><strong style="color:#e6edf3">Debrid — pick ONE primary</strong><br>
-        • <b>TorBox</b> — fastest API, usenet+p2p, 1TB cache<br>
-        • <b>Real-Debrid</b> — largest cached catalog, cheapest<br>
-        • <b>AllDebrid</b> — balanced, 15+ hosters<br>
-        • <b>Premiumize</b> — private trackers via Jackettio</div>
-        <div style="margin-bottom:10px"><strong style="color:#e6edf3">Torrent scrapers (Core Builds wires 17 safe)</strong><br>
-        • <code>comet</code> — Comet + CometNet P2P metadata (no files shared)<br>
-        • <code>mediafusion</code> — universal torrent+live<br>
-        • <code>torz</code> — StremThru Torz usenet aggregator (needs TorBox/usenet creds)<br>
-        • <code>zilean</code> — DMM via Zilean<br>
-        • <code>knaben</code> — Knaben usenet (no account)<br>
-        • <code>debridio</code> — Debridio (needs key, shipped disabled)<br>
-        • <code>easynews++</code> — EasyNews++ usenet (catalog+meta, needs creds)<br>
-        • <code>jackettio</code> — Jackettio bridge to Jackett/Prowlarr (8-12 indexers)<br>
-        • HTTP fallbacks <code>hdhub</code>/<code>webstreamrmbg</code>/<code>flix-streams</code> — unreliable, fallback only, gated behind OPTIONAL_EXTRAS</div>
-        <div style="margin-bottom:10px"><strong style="color:#e6edf3">Best practice</strong><br>
-        Primary: Torrentio + Comet + MediaFusion + StremThru Torz + Debridio. HTTP only if no-debrid. EasyNews++ for reality TV. Groups fetch sequentially to avoid rate limits. Regex: Vidhin + Tamtaro SEL.</div>
-        <div style="margin-bottom:10px"><strong style="color:#e6edf3">Self-hosted</strong><br>
-        PG tuned shared_buffers 128MB, effective_cache_size 384MB, &lt;3s cache. CometNet on. Zilean + DMM ingester. FlareSolverr for CF Jackett. Jackett 8-12 indexers.</div>
-        <div style="margin-bottom:10px"><strong style="color:#e6edf3">Configurator webtools (this patch)</strong><br>
-        • svc-filter 200ms debounce + requestIdleCallback<br>
-        • host status 5-min cache + background refresh<br>
-        • live byte counter in Review (payloadSizeGuard)<br>
-        • content-visibility:auto for 31-card carousel<br>
-        • unknownConfigKeys warning on import<br>
-        • cb-flags: webVitals=1, sentryDsn=https://..., hostCache=0<br>
-        • Web Vitals beacon, Sentry optional, Ctrl+/ help, Lighthouse CI</div>
+        <div style="margin-bottom:10px"><strong style="color:#e6edf3">Debrid — pick one primary</strong><br>
+        TorBox, Real-Debrid, AllDebrid, Premiumize, Debrid-Link, EasyDebrid, Debrider, Offcloud and PikPak are all supported (Meteor has no PikPak support). Seedr works through MediaFusion only. No subscription? Choose P2P Free or HTTP Streams.</div>
+        <div style="margin-bottom:10px"><strong style="color:#e6edf3">Added automatically with a torrent debrid service</strong><br>
+        • <code>StremThru Torz</code> (TorBox) or <code>StremThru Store</code> (other debrids)<br>
+        • <code>Comet</code>, <code>Meteor</code>, <code>MediaFusion</code> — torrent scrapers with debrid cache checks<br>
+        • <code>Zilean</code> — DMM hashlists<br>
+        • <code>Knaben</code> — indexer proxy for TPB, 1337x, YTS and Nyaa<br>
+        • <code>EZTV</code>, <code>Torrent Galaxy</code> — TV and general torrent indexes<br>
+        • <code>SeaDex</code> — best anime releases, ranked first for anime</div>
+        <div style="margin-bottom:10px"><strong style="color:#e6edf3">Optional</strong><br>
+        Jackettio, Debridio (needs a key), EasyNews (usenet), Newznab indexers, and HTTP sources such as WebStreamr, Nuvio and Flix-Streams for setups without debrid.</div>
+        <div style="margin-bottom:10px"><strong style="color:#e6edf3">Left out on purpose</strong><br>
+        Torrentio — blocked on ElfHosted and Viren's nightly at its developer's request. TorBox (addon), USA TV and Debridio Watchtower — retired upstream; AIOStreams refuses any config that contains them.</div>
+        <div style="margin-bottom:10px"><strong style="color:#e6edf3">Release filtering</strong><br>
+        Ranked and excluded release patterns come from Vidhin05's Releases-Regex list, scored inline so every public host accepts them.</div>
       </div>
       <div style="margin-top:14px;display:flex;gap:8px">
         <a href="https://github.com/brevityA/Core-Builds/blob/main/configurator/docs/best-addons.md" target="_blank" rel="noopener noreferrer" style="flex:1;padding:9px;border-radius:8px;border:1px solid rgba(0,212,255,.25);background:rgba(0,212,255,.06);color:#00d4ff;text-align:center;font-size:.78rem;font-weight:700;text-decoration:none">Full docs</a>
@@ -6438,10 +6516,10 @@ function simpleFinishHtml() {
           <div>
             <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px">
               <span style="font-size:.72rem;font-weight:700;color:#8b949e">Stream pool</span>
-              <span style="font-size:.6rem;color:#4b5563;font-weight:600">${{normal:'30–35 results',large:'50 results',max:'75 results'}[S.streamPool||'normal']}</span>
+              <span style="font-size:.6rem;color:#4b5563;font-weight:600">${streamPoolSummary()}</span>
             </div>
             <div style="display:flex;gap:6px">
-              ${[['normal','Normal','20'],['large','Large','30–35'],['max','Maximum','50']].map(([v,l,c]) => `<button data-action="set-simple-pool" data-val="${v}" data-active="${(S.streamPool||'normal')===v}" style="flex:1;padding:7px 10px 5px;border-radius:7px;font-size:.72rem;font-weight:700;cursor:pointer;transition:all .15s;border:1px solid ${(S.streamPool||'normal')===v?'rgba(0,212,255,.4)':'rgba(255,255,255,.08)'};background:${(S.streamPool||'normal')===v?'rgba(0,212,255,.1)':'transparent'};color:${(S.streamPool||'normal')===v?'#00d4ff':'#6b7280'};line-height:1.3">${l}<br><span style="font-size:.6rem;font-weight:600;opacity:.7">${c} results</span></button>`).join('')}
+              ${streamPoolChoices().map(([v,l,c]) => `<button data-action="set-simple-pool" data-val="${v}" data-active="${(S.streamPool||'normal')===v}" style="flex:1;padding:7px 10px 5px;border-radius:7px;font-size:.72rem;font-weight:700;cursor:pointer;transition:all .15s;border:1px solid ${(S.streamPool||'normal')===v?'rgba(0,212,255,.4)':'rgba(255,255,255,.08)'};background:${(S.streamPool||'normal')===v?'rgba(0,212,255,.1)':'transparent'};color:${(S.streamPool||'normal')===v?'#00d4ff':'#6b7280'};line-height:1.3">${l}<br><span style="font-size:.6rem;font-weight:600;opacity:.7">${c}</span></button>`).join('')}
             </div>
             <div style="font-size:.65rem;color:#4b5563;margin-top:4px;line-height:1.4">More streams = better quality picks but slower load</div>
           </div>
@@ -6940,7 +7018,7 @@ const TROUBLESHOOT_TREE = {
   fewStreams: {
     q: 'Fewer streams usually means filters are too aggressive:',
     tips: [
-      '🚫 <b>Excluded regex too strict</b> — The 8 default excluded regex patterns filter known-bad groups. If you added custom exclusions, try removing them.',
+      '🚫 <b>Excluded regex too strict</b> — The default excluded regex patterns (3 on Balanced) filter known-bad releases. If you added custom exclusions, try removing them.',
       '📏 <b>Size limit too low</b> — A 10GB limit will exclude most 4K content. Try 30GB or unlimited.',
       '🎯 <b>Match mode too strict</b> — "Strict" mode filters aggressively. Try "Balanced" or "Relaxed".',
       '🔍 <b>ESE killing valid streams</b> — Score IQR Guard or resolution kill ESEs may be excluding streams. Check the ESE section in your template.',
@@ -7001,7 +7079,7 @@ const TROUBLESHOOT_TREE = {
     q: 'Low quality streams appearing above better ones:',
     tips: [
       '⚖️ <b>PSE architecture</b> — Standard mode uses simple quality tiers. Switch to "Apex IQR" for statistical bitrate filtering that pushes low-quality outliers down.',
-      '📊 <b>Regex scoring inactive</b> — If rankedRegexPatterns is empty, the regexScore sort key is a no-op. Re-generate to get the 107-entry scored set.',
+      '📊 <b>Regex scoring inactive</b> — If rankedRegexPatterns is empty, the regexScore sort key is a no-op. Re-generate to get the scored set (about 80 patterns on Balanced, Advanced and Labs).',
       '🎯 <b>Sort order matters</b> — seScore should be early in sort criteria (position 3-4). If it\'s too low, quality signals are ignored.',
     ],
     action: { label: 'Enable Apex IQR mode', key: 'pseArch', val: 'iqr', desc: 'Statistical bitrate filtering for better quality ranking' }
@@ -7294,7 +7372,7 @@ function showAdditionalServicesPicker(options={}) {
   // serve is offered disabled, with the reason in place of the usual hint.
   const extraBlocked = (() => { const m={}; for (const e of hostGateEntries()) if (e.scope==='service') m[e.option.slice('service:'.length)] = e.reason; return m; })();
   const serviceCards=CAROUSEL_SVCS.map(id=>{const o=serviceDef?.opts.find(x=>x.v===id);if(!o)return'';const why=selectedServices.has(id)?'':extraBlocked[id]||'';return `<button type="button" class="fastlane-choice${selectedServices.has(id)?' active':''}${why?' opt-host-blocked':''}"${why?` disabled aria-disabled="true" title="${escHtml(why)}"`:''} data-extra-service="${id}"><b>${o.name}</b><span${why?' class="opt-host-note"':''}>${why?`Unavailable — ${escHtml(why)}`:(id==='p2p'||id==='http'?'No account required':'Credentials may be required')}</span></button>`;}).join('');
-  const scraperCards=OPTIONAL_SCRAPER_DEFS.map(d=>`<button type="button" class="fastlane-choice${selectedScrapers.has(d.id)?' active':''}" data-extra-scraper="${d.id}"><b>${d.label}</b><span>${d.desc}</span></button>`).join('');
+  const scraperCards=OPTIONAL_SCRAPER_DEFS.map(d=>{const why=selectedScrapers.has(d.id)?'':optionalScraperHostBlock(d.id);return `<button type="button" class="fastlane-choice${selectedScrapers.has(d.id)?' active':''}" data-extra-scraper="${d.id}"${why?` disabled aria-disabled="true" title="${escHtml(why)}"`:''}><b>${d.label}</b><span>${d.desc}${why?` · Unavailable — ${escHtml(why)}`:''}</span></button>`;}).join('');
   const overlay=document.createElement('div');overlay.id='additionalServicesModal';overlay.className='fastlane-overlay';
   overlay.innerHTML=`<div class="fastlane-panel" role="dialog" aria-modal="true" aria-labelledby="extraTitle" style="max-width:700px"><div class="fastlane-head"><div class="fastlane-head-copy"><div class="fastlane-kicker">Optional sources</div><div class="fastlane-title" id="extraTitle">Additional services &amp; scrapers</div><div class="fastlane-sub">Choose any extras you use. ${typeof options.onApply==='function'?'Required credential fields will appear when you return to Quick Install.':'Credentials for selected paid sources appear later under Accounts &amp; Keys.'}</div></div><button class="fastlane-close" id="extraClose" aria-label="Close">✕</button></div><div class="fastlane-section"><div class="fastlane-label">Additional services</div><div class="fastlane-grid services">${serviceCards}</div></div><div class="fastlane-section"><div class="fastlane-label">Optional Usenet indexers</div><div class="fastlane-grid services">${scraperCards}</div></div><button class="fastlane-go" id="extraApply">Apply selections</button></div>`;
   document.body.appendChild(overlay);
@@ -7304,7 +7382,7 @@ function showAdditionalServicesPicker(options={}) {
     const svc=e.target.closest('[data-extra-service]');if(svc){const id=svc.dataset.extraService;selectedServices.has(id)?selectedServices.delete(id):selectedServices.add(id);svc.classList.toggle('active',selectedServices.has(id));return;}
     const scr=e.target.closest('[data-extra-scraper]');if(scr){const id=scr.dataset.extraScraper;selectedScrapers.has(id)?selectedScrapers.delete(id):selectedScrapers.add(id);scr.classList.toggle('active',selectedScrapers.has(id));return;}
     if(e.target===overlay||e.target.closest('#extraClose')){overlay.remove();return;}
-    if(e.target.closest('#extraApply')){const sv=[...selectedServices],sc=[...selectedScrapers];if(typeof options.onApply==='function'){options.onApply(sv,sc);overlay.remove();return;}S.multiServices=S.multiServices.filter(v=>!CAROUSEL_SVCS.includes(v));sv.forEach(v=>S.multiServices.push(v));S.optionalScrapers=sc;S.p2pEnabled=S.multiServices.includes('p2p');S.service=deriveService();saveState();overlay.remove();render();}
+    if(e.target.closest('#extraApply')){const sv=[...selectedServices],sc=[...selectedScrapers];if(typeof options.onApply==='function'){options.onApply(sv,sc);overlay.remove();return;}releaseMigrationFields(['services', 'presets', 'groups']);S.multiServices=S.multiServices.filter(v=>!CAROUSEL_SVCS.includes(v));sv.forEach(v=>S.multiServices.push(v));S.optionalScrapers=sc;S.p2pEnabled=S.multiServices.includes('p2p');S.service=deriveService();saveState();overlay.remove();render();}
   });
   document.getElementById('extraClose').focus();
 }
@@ -7348,7 +7426,7 @@ function showExpressLane() {
     if (service === 'p2p') return `<div style="margin:10px 2px 4px;font-size:.78rem;color:#8b949e;line-height:1.5">No key needed — Core Builds uses free P2P scrapers. Results depend on public torrent availability.</div>`;
     if (service === 'easynews') return credInput('easynews') + credInput('easynewsPass');
     if (service === 'usenet') return credInput('easynews') + credInput('easynewsPass') + credInput('nzbgeek');
-    return credInput(service === 'torbox-pro' ? 'torbox' : service);
+    return serviceCredentialKeys(service === 'torbox-pro' ? 'torbox' : service).map(credInput).join('');
   };
   // Extra services that need a credential when added via the popout.
   const EXTRA_CRED = { debridio:'debridio', debrider:'debrider', nzbgeek:'nzbgeek', streamnzb:'streamnzb' };
@@ -7580,33 +7658,18 @@ async function runExpressInstall(p) {
     try {
       // Patch 14 contract: an explicit host pick is never silently overridden — even by the
       // Nuvio-instant route. If the pick can't do Nuvio instant, say so instead of swapping.
-      const pickedId = (S.instanceHost && S.instanceHost !== 'auto' && S.instanceHost !== 'custom') ? S.instanceHost : null;
-      const pickedMeta = pickedId ? HOST_META[pickedId] : null;
-      let nuvioHost;
-      if (pickedMeta && pickedMeta.supportsNuvioInstant && pickedMeta.supportsP2P) {
-        nuvioHost = { id: pickedId, ...pickedMeta };
-      } else if (pickedId) {
-        result.innerHTML = `<div class="td-error">${escHtml(HOST_LABEL_MAP[pickedId] || pickedId)} can't do instant Nuvio imports (needs Nuvio-instant + P2P support on the host). Pick a compatible host above, or choose the Nuvio target again after switching.</div>`;
-        return;
-      } else {
-        nuvioHost = Object.entries(HOST_META).filter(([,m])=>m.supportsNuvioInstant&&m.supportsP2P).map(([k])=>({id:k,...HOST_META[k]}))[0];
-      }
-      if (!nuvioHost) { result.innerHTML='<div class="td-error">No compatible Nuvio host found.</div>'; return; }
-      const tmpl = generateTemplate({
-        route: 'nuvio-torbox-instant', device: p.device || 'generic', resolution: p.resolution || '1080p',
-        host: nuvioHost, formatter: 'family-v4', langs: S.langs || ['English'], foreignLangKill: S.foreignLangKill !== false,
-        tmdbToken: S.tmdbToken || '', tmdbApiKey: S.tmdbApiKey || '',
-      }, {
-        host: nuvioHost,
-        deviceAv1Safe: DEVICE_AV1_SAFE, deviceDvSafe: DEVICE_DV_SAFE, deviceForceLimitedAudio: DEVICE_FORCE_LIMITED_AUDIO,
-      });
-      const manifestUrl = await uploadTemplateForImport(JSON.stringify(tmpl));
-      if (manifestUrl) {
+      const picked = pickNuvioHost();
+      if (picked.error) { result.innerHTML = `<div class="td-error">${picked.error}</div>`; return; }
+      const nuvioHost = picked.host;
+      const tmpl = buildNuvioTemplate(nuvioHost, p.device || 'generic', p.resolution || '1080p');
+      const importUrl = await uploadTemplateForImport(tmpl);
+      if (importUrl) {
         saveLastGen();
-        const safeUrl = manifestUrl.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-        result.innerHTML = `<div class="import-success" style="margin-top:12px"><strong style="color:#e6edf3">Nuvio template ready — host: ${escHtml(nuvioHost.label || HOST_LABEL_MAP[nuvioHost.id] || nuvioHost.id)}</strong><div style="color:#6b7280;font-size:.78rem;margin:6px 0 10px">Add this manifest URL in Nuvio (or tap an instance to import it):</div><div class="manifest-url" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.72rem;padding:8px 10px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:6px;color:#8b949e;cursor:pointer" data-action="copy-manifest" data-url="${safeUrl}">${safeUrl}</div>${instanceChips(manifestUrl)}</div>`;
+        const configureUrl = HOST_BASE_URLS[nuvioHost.id] + '/stremio/configure?template=' + encodeURIComponent(importUrl);
+        result.innerHTML = `<div class="import-success" style="margin-top:12px"><strong>Nuvio template ready — host: ${escHtml(nuvioHost.label || HOST_LABEL_MAP[nuvioHost.id] || nuvioHost.id)}</strong><div style="font-size:.78rem;margin:8px 0;line-height:1.6">Connect TorBox in <strong>Nuvio → Connected Services</strong>, not with a key in AIOStreams.<br>Import this template into AIOStreams, set a password and save. Then copy its <strong>manifest URL</strong> into Nuvio. The link below is a public template import link, not a manifest; credentials including TMDB are removed.</div><div class="inst-chips"><a href="${escH(configureUrl)}" target="_blank" rel="noopener noreferrer" class="inst-chip inst-chip-import">▶ ${escHtml(HOST_LABEL_MAP[nuvioHost.id] || nuvioHost.id)}</a></div><div class="manifest-url" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.72rem;padding:8px 10px;cursor:pointer" data-action="copy-manifest" data-url="${escH(importUrl)}">${escHtml(importUrl)}</div></div>`;
       } else {
-        result.innerHTML = '<div class="import-success import-error" style="margin-top:12px"><strong style="color:#f87171">Could not create a Nuvio import link</strong><div style="color:#6b7280;font-size:.78rem;margin:6px 0 2px">Export the JSON and import it manually.</div><button data-action="generate-dl" style="margin-top:8px;padding:8px 16px;border-radius:8px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.03);color:#9ca3af;font-size:.8rem;font-weight:700;cursor:pointer">Export JSON</button></div>';
+        result.innerHTML = '<div class="import-success import-error" style="margin-top:12px"><strong>Could not create a Nuvio import link</strong><div style="font-size:.78rem;margin:6px 0">Download this Nuvio template and import it manually into AIOStreams.</div><button type="button" id="downloadNuvioJson" class="df-btn df-btn-secondary">Export Nuvio JSON</button></div>';
+        document.getElementById('downloadNuvioJson')?.addEventListener('click', () => downloadJsonFile(tmpl, 'core-nuvio-torbox-instant.json'));
       }
     } catch (err) {
       const errDiv = document.createElement('div');
@@ -7767,19 +7830,11 @@ function showFastLane() {
         btn.disabled=true;
         btn.innerHTML = `<span class="dot-spin"><span></span><span></span><span></span></span> Generating Nuvio template…`;
         try {
-          const nuvioHost = Object.entries(HOST_META).filter(([,m])=>m.supportsNuvioInstant&&m.supportsP2P).map(([k])=>({id:k,...HOST_META[k]}))[0];
-          if (!nuvioHost) { result.innerHTML='<div class="td-error">No compatible Nuvio host found.</div>'; return; }
-          const tmpl = generateTemplate({
-            route: 'nuvio-torbox-instant', device: state.nuvioDevice, resolution: state.nuvioResolution,
-            host: nuvioHost, formatter: 'family-v4', langs: S.langs || ['English'], foreignLangKill: S.foreignLangKill !== false,
-            tmdbToken: S.tmdbToken || '', tmdbApiKey: S.tmdbApiKey || '',
-          }, {
-            host: nuvioHost,
-            deviceAv1Safe: DEVICE_AV1_SAFE, deviceDvSafe: DEVICE_DV_SAFE, deviceForceLimitedAudio: DEVICE_FORCE_LIMITED_AUDIO,
-            formatters: FORMATTERS,
-            metadata: { coreBuildsVersion: CONFIGURATOR_VERSION, generatedAt: new Date().toISOString() },
-          });
-          if (tmpl.metadata) { delete tmpl.metadata.generatedAt; }
+          // Same rule as runExpressInstall: an explicit host pick is never swapped.
+          const picked = pickNuvioHost();
+          if (picked.error) { btn.disabled=false; btn.innerHTML='Create &amp; Install →'; result.innerHTML = `<div class="td-error">${picked.error}</div>`; return; }
+          const nuvioHost = picked.host;
+          const tmpl = buildNuvioTemplate(nuvioHost, state.nuvioDevice, state.nuvioResolution);
           // Nuvio uses the same public import-link transport as other routes;
           // TMDB values carried from a previous setup must not be uploaded.
           const jsonStr = JSON.stringify(sanitizeTemplateForRemoteImport(tmpl), null, 2);
@@ -8435,8 +8490,8 @@ async function uploadJsonForImport(jsonStr) {
   return url;
 }
 
-async function uploadTemplateForImport() {
-  const template = sanitizeTemplateForRemoteImport(buildFinal());
+async function uploadTemplateForImport(rawTemplate = buildFinal()) {
+  const template = sanitizeTemplateForRemoteImport(rawTemplate);
   return uploadJsonForImport(JSON.stringify(template, null, 2));
 }
 
@@ -8635,21 +8690,7 @@ if (new URLSearchParams(location.search).get('cb-e2e') === '1') {
   window.__coreBuilds = {
     generate(overrides) {
       Object.assign(S, overrides || {});
-      // Transitional adapter: policy composition is now routed through the pure
-      // facade; legacy assembly remains the injected adapter until Part 8's
-      // full config assembly migration is complete.
-      const out = generateTemplate(S, {
-        deviceAv1Safe: DEVICE_AV1_SAFE,
-        deviceForceLimitedAudio: DEVICE_FORCE_LIMITED_AUDIO,
-        presets: presets(),
-        defaultTimeout: Number(S.addonTimeout) || 6000,
-        assemble: () => gateTemplateForHost(applyOutputProfile(assembleTemplate(build(), {
-          metadata: { coreBuildsVersion: TEMPLATE_VERSION, generatedAt: new Date().toISOString() },
-          disabledAddons: _disabledAddons,
-          presetMatchesAddon,
-          migrationKeep: S._migrationKeep,
-        }), activeOutputProfile(), outputProfileContext()), currentHostCapabilities()).template,
-      });
+      const out = buildFinal();
       if (out && out.metadata) {
         delete out.metadata.generatedAt;                    // volatile timestamp
         out.metadata.id = 'core-custom-golden';             // sid() is random per build

@@ -9,7 +9,7 @@
  */
 
 import { templateInput, hasTmdbCredentials } from './input.js';
-import { hasLibraryCapableService, hasTorrentDebridService } from './library-policy.js';
+import { hasLibraryCapableService, hasTorrentDebridService, hasEnabledService, USENET_INDEXER_SERVICE_IDS, DEBRIDIO_SERVICE_IDS } from './library-policy.js';
 import { resolutionPolicy, encodePolicy, audioPolicy } from './device-policy.js';
 import { sortPolicy } from './sort-policy.js';
 import { sizePolicy, bitratePolicy } from './filter-policy.js';
@@ -150,7 +150,7 @@ function buildPresets(input) {
   const hasExtraHttp = isMulti && multiServices.includes('http') && !isHttp;
   const isNzbgeek = isMulti && multiServices.includes('nzbgeek');
   const isStreamnzb = isMulti && multiServices.includes('streamnzb');
-  const useStore = ['alldebrid','realdebrid','premiumize','debridlink','offcloud','easydebrid','pikpak','seedr'].includes(svc) || (isMulti && multiServices.some(s => ['alldebrid','realdebrid','premiumize','debridlink','offcloud','easydebrid','pikpak','seedr'].includes(s)));
+  const useStore = ['alldebrid','realdebrid','premiumize','debridlink','offcloud','easydebrid','pikpak'].includes(svc) || (isMulti && multiServices.some(s => ['alldebrid','realdebrid','premiumize','debridlink','offcloud','easydebrid','pikpak'].includes(s)));
   // Optional-extras toggles: exactly one emission site per preset. All four are *also*
   // advertised disabled on lanes that cannot satisfy them, so a toggle flips that advert's
   // `enabled` instead of emitting a second instanceId, and the keyless branch below emits only
@@ -190,6 +190,12 @@ function buildPresets(input) {
   // EZTV / Torrent Galaxy / Knaben / Zilean throw on save without a torrent debrid
   // service, rejecting the whole config (P2P and EasyNews-only routes): ship them off there.
   const torrentCapable = hasTorrentDebridService(buildServices(input));
+  // Same rule for the other service-bound presets: each fails the WHOLE save
+  // ("requires at least one usable service") when nothing enabled can back it.
+  const enabledServices = buildServices(input);
+  const usenetCapable = hasEnabledService(enabledServices, USENET_INDEXER_SERVICE_IDS);
+  const debridioCapable = hasEnabledService(enabledServices, DEBRIDIO_SERVICE_IDS);
+  const easynewsEnabled = hasEnabledService(enabledServices, 'easynews');
   if (isUsenet) {
     const usenetList = [
       // The usenet route enables the `aiostreams` service, which IS
@@ -197,13 +203,13 @@ function buildPresets(input) {
       // loses the library preset automatically.
       ...(libCapable ? [{ type:'library', instanceId:'lib-1', enabled:true, options:{ name:'Library', timeout:3000, resources:['stream','catalog','meta'], mediaTypes:[], showRefreshActions:['catalog'], skipProcessing:false, hideStreams:false, useMultipleInstances:false } }] : []),
       { type:'easynewsPlusPlus', instanceId:'en-ppp-1', enabled:true, options:{ name:'EasyNews++', timeout:6000, strictTitleMatching:true }, resources:['stream'] },
-      { type:'easynews-search', instanceId:'en-srch-1', enabled:true, options:{ name:'EasyNews Search', timeout:5000, apiVersion:'3.0' }, resources:['stream'] },
+      { type:'easynews-search', instanceId:'en-srch-1', enabled:true, options:{ name:'EasyNews Search', timeout:5000, apiVersion:'3.0', services:['easynews'] }, resources:['stream'] },
       ...(creds.nzbgeek ? [{ type:'newznab', instanceId:'nzbgeek-1', enabled:true, options:{ name:'NZBGeek', api:{ url:'https://api.nzbgeek.info/api', apiKey:creds.nzbgeek }, timeout:6000, mediaTypes:['movie','series','anime'], searchMode:'auto', seasonEpisodeStrategy:'episode', paginate:true, useMultipleInstances:false } }] : []),
-      ...optionalScrapers.filter(sid => OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid && x.presetType === 'newznab')).map(sid => {
+      ...optionalScrapers.filter(sid => usenetCapable && OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid && x.presetType === 'newznab')).map(sid => {
         const d = OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid);
         return { type:'newznab', instanceId:`${d.id}-1`, enabled:true, options:{ name:d.label, api:{ url:d.apiUrl, apiKey:creds[d.credKey] || '' }, timeout:6000, mediaTypes:['movie','series','anime'], searchMode:'auto', seasonEpisodeStrategy:'episode', paginate:true, useMultipleInstances:false } };
       }),
-      ...optionalScrapers.filter(sid => OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid && x.presetType === 'nzbhydra')).map(sid => {
+      ...optionalScrapers.filter(sid => usenetCapable && OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid && x.presetType === 'nzbhydra')).map(sid => {
         const d = OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid);
         return { type:'nzbhydra', instanceId:'nzbhydra-1', enabled:true, options:{ name:'NZBHydra2', api:{ url:creds.nzbhydra || '', apiKey:creds.nzbhydraApiKey || '' }, timeout:8000, mediaTypes:['movie','series','anime'], searchMode:'auto', seasonEpisodeStrategy:'episode', paginate:true, useMultipleInstances:false } };
       }),
@@ -219,32 +225,34 @@ function buildPresets(input) {
   }
 
   const storeLabels = {'alldebrid':'StremThru AllDebrid','realdebrid':'StremThru RD','premiumize':'StremThru Premiumize','debridlink':'StremThru Debrid-Link','offcloud':'StremThru Offcloud','easydebrid':'StremThru EasyDebrid','pikpak':'StremThru PikPak','seedr':'StremThru Seedr'};
-  const debridServices = ['alldebrid','realdebrid','premiumize','debridlink','offcloud','easydebrid','pikpak','seedr'];
+  const debridServices = ['alldebrid','realdebrid','premiumize','debridlink','offcloud','easydebrid','pikpak'];
   const multiHasTorbox = isMulti && (multiServices.includes('torbox-pro') || multiServices.includes('torbox-ess'));
   const storeSlot = isMulti
     ? [...(multiHasTorbox ? [{ type:'stremthruTorz', instanceId:'67c', enabled:true, options:{ name:'StremThru Torz', timeout:5000, includeP2P:false, useMultipleInstances:false }, resources:['stream'] }] : []), ...multiServices.filter(s => debridServices.includes(s)).map((s, i) => ({ type:'stremthruStore', instanceId:`68${String.fromCharCode(97+i)}`, enabled:true, options:{ name:storeLabels[s] || 'StremThru Store', timeout:5000, useMultipleInstances:false }, resources:['stream'] }))]
     : useStore ? [{ type:'stremthruStore', instanceId:'68a', enabled:true, options:{ name:storeLabels[svc] || 'StremThru Store', timeout:5000, useMultipleInstances:false }, resources:['stream'] }]
     : svc === 'hybrid' ? [{ type:'stremthruTorz', instanceId:'67c', enabled:true, options:{ name:'StremThru Torz', timeout:5000, includeP2P:false, useMultipleInstances:false }, resources:['stream'] }, { type:'stremthruStore', instanceId:'68a', enabled:true, options:{ name:'StremThru RD', timeout:5000, useMultipleInstances:false }, resources:['stream'] }]
-    : isP2P || isEasynews || isDebridio || isUsenet ? []
+    // Seedr: no StremThru preset supports it (only MediaFusion does), and a Store/Torz
+    // instance with no usable service fails the whole save.
+    : isP2P || isEasynews || isDebridio || isUsenet || svc === 'seedr' ? []
     : [{ type:'stremthruTorz', instanceId:'67c', enabled:true, options:{ name:'StremThru Torz', timeout:5000, includeP2P:false, useMultipleInstances:false }, resources:['stream'] }];
 
   const list = [
     ...(libCapable ? [{ type:'library', instanceId:'lib-1', enabled:!isP2P, options:{ name:'Library', timeout:3000, resources:['stream','catalog','meta'], mediaTypes:[], showRefreshActions:['catalog'], skipProcessing:false, hideStreams:false, useMultipleInstances:false } }] : []),
     ...(isP2P ? [{ type:'torrentio', instanceId:'tio-p2p-1', enabled:true, options:{ name:'Torrentio', timeout:7000, useMultipleInstances:false }, resources:['stream'] }] : []),
     { type:'zilean', instanceId:'nx-fix-04', enabled:torrentCapable, options:{ name:'Zilean', timeout:4000, resources:['stream'] } },
-    { type:'seadex', instanceId:'tam-seadex', enabled:content !== 'live' && !isP2P, options:{ name:'SeaDex', timeout:4000, mediaTypes:['anime'] }, resources:['stream'] },  // p2p-only: v2.33 hard-rejects "SeaDex requires at least one usable service",
+    { type:'seadex', instanceId:'tam-seadex', enabled:content !== 'live' && torrentCapable, options:{ name:'SeaDex', timeout:4000, mediaTypes:['anime'] }, resources:['stream'] },  // p2p-only: v2.33 hard-rejects "SeaDex requires at least one usable service",
     ...storeSlot,
     ...(isEasynews || multiHasEasynews || isUsenet ? [
       { type:'easynewsPlusPlus', instanceId:'en-ppp-1', enabled:true, options:{ name:'EasyNews++', timeout:6000, strictTitleMatching:true }, resources:['stream'] },
-      { type:'easynews-search', instanceId:'en-srch-1', enabled:true, options:{ name:'EasyNews Search', timeout:5000, apiVersion:'3.0' }, resources:['stream'] },
+      { type:'easynews-search', instanceId:'en-srch-1', enabled:true, options:{ name:'EasyNews Search', timeout:5000, apiVersion:'3.0', services:['easynews'] }, resources:['stream'] },
     ] : []),
-    ...(isNzbgeek && creds.nzbgeek ? [
+    ...(isNzbgeek && creds.nzbgeek && usenetCapable ? [
       { type:'newznab', instanceId:'nzbgeek-1', enabled:true, options:{ name:'NZBGeek', api:{ url:'https://api.nzbgeek.info/api', apiKey:creds.nzbgeek }, timeout:6000, mediaTypes:['movie','series','anime'], searchMode:'auto', seasonEpisodeStrategy:'episode', paginate:true, useMultipleInstances:false } },
     ] : []),
     ...(isStreamnzb ? [
       { type:'streamnzb', instanceId:'nx-snzb-01', enabled:true, options:{ name:'StreamNZB', timeout:5000, ...(creds.streamnzb ? { url:creds.streamnzb } : { url:'' }), mediaTypes:['movie','series','anime'] } },
     ] : []),
-    ...(hasDebridio && creds.debridio ? [
+    ...(hasDebridio && creds.debridio && debridioCapable ? [
       // `debridioApiKey`, not a bare `apiKey`: that is the option AIOStreams declares and
       // requires, so a bare apiKey left the required option undefined and the host rejected
       // the whole config. app.js already emitted the prefixed name — this mirror did not, so
@@ -260,17 +268,20 @@ function buildPresets(input) {
       if (d.id === 'knaben') return null;  // emitted unconditionally below
       if (d.id === 'zilean') return null;
       if (d.id === 'yastream') return { type:'yastream', instanceId:'yas-1', enabled:true, options:{ name:'YaStream', timeout:7000 }, resources:['stream'] };
-      if (d.id === 'neko-bt') return animeContent ? null : { type:'neko-bt', instanceId:'neko-bt-core-builds', enabled:true, options:{ name:'NekoBT', timeout:5000, mediaTypes:['anime'] }, resources:['stream'] };
+      if (d.id === 'neko-bt') return (animeContent || !torrentCapable) ? null : { type:'neko-bt', instanceId:'neko-bt-core-builds', enabled:true, options:{ name:'NekoBT', timeout:5000, mediaTypes:['anime'] }, resources:['stream'] };
       if (d.id === 'webstreamr') return (hasExtraHttp || isHttp) ? null : { type:'webstreamr', instanceId:'wsr-1', enabled:true, options:{ name:'WebStreamr', timeout:7000 }, resources:['stream'] };
       if (d.id === 'sootio') return null;  // the debrid/multi lanes advertise it at the tail — that advert carries the toggle
       // Lane gates for new safe add-ons: usenet indexers need usenet service, debrid-only need debrid.
       // torbox-search removed in v2.32 — never emitted, so not listed here (avoids literal that breaks v232-compat test).
       const usenetCatIds = ['nzbnoob','althub','usenetcrawler','drunkenslug','nzbfinder','nzbhydra'];
-      const debridOnlyIds = ['bitmagnet','brazuca-torrents','debridio-watchtower','jackettio','torbox'];
+      const debridOnlyIds = ['bitmagnet','jackettio'];
       if ((isP2P || isHttp) && usenetCatIds.includes(d.id)) return null;
-      if ((isP2P || isHttp) && debridOnlyIds.includes(d.id)) return null;
+      if (!torrentCapable && debridOnlyIds.includes(d.id)) return null;
       // 18 safe add-ons (v2.34.1 audit — all simple toggles). Generic emission: {name,timeout}
       // resources chosen from cat so Stable/Balanced filtering keeps them via OPTIONAL_EXTRAS_STREAM_TYPES.
+      // EasyNews / EasyNews+ read the EasyNews service's login; without it enabled the
+      // host refuses the save with "No credentials found for service easynews".
+      if (['easynews','easynewsPlus'].includes(d.id) && !easynewsEnabled) return null;
       const safeCats = { catalog: { resources:['catalog','meta'], category:'meta_catalogs' }, live: { resources:['stream'] }, subtitles: { resources:['subtitles'] }, debrid: { resources:['stream'] }, usenet: { resources:['stream'] } };
       const meta = safeCats[d.cat] || { resources:['stream'] };
       // Preserve existing special-case for anime-kitsu etc — generic is fine.
@@ -278,6 +289,9 @@ function buildPresets(input) {
     }).filter(Boolean),
     ...optionalScrapers.filter(sid => OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid && x.credKey && !x.apiUrl && x.presetType !== 'nzbhydra')).map(sid => {
       const d = OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid);
+      // Jackett and Prowlarr resolve through a torrent debrid service; without one the
+      // host refuses the whole save.
+      if (['jackett','prowlarr'].includes(d.id) && !torrentCapable) return null;
       if (d.id === 'jackett') return creds.jackettUrl ? { type:'jackett', instanceId:'jackett-1', enabled:true, options:{ name:'Jackett', jackettUrl:creds.jackettUrl, timeout:10000, ...(creds.jackett ? { apiKey:creds.jackett } : {}) }, resources:['stream'] } : null;  // v2.33: jackettUrl is REQUIRED — no URL, no preset
       if (d.id === 'prowlarr') return creds.prowlarrUrl ? { type:'prowlarr', instanceId:'prowlarr-1', enabled:true, options:{ name:'Prowlarr', prowlarrUrl:creds.prowlarrUrl, timeout:10000, ...(creds.prowlarr ? { apiKey:creds.prowlarr } : {}) }, resources:['stream'] } : null;  // v2.33: prowlarrUrl REQUIRED
       // debridioApiKey is required with no upstream default, so the same rule as
@@ -292,10 +306,10 @@ function buildPresets(input) {
       }
       return null;
     }).filter(Boolean),
-    ...optionalScrapers.filter(sid => OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid && x.presetType === 'nzbhydra')).map(sid => {
+    ...optionalScrapers.filter(sid => usenetCapable && OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid && x.presetType === 'nzbhydra')).map(sid => {
       return { type:'nzbhydra', instanceId:'nzbhydra-1', enabled:true, options:{ name:'NZBHydra2', api:{ url:creds.nzbhydra || '', apiKey:creds.nzbhydraApiKey || '' }, timeout:8000, mediaTypes:['movie','series','anime'], searchMode:'auto', seasonEpisodeStrategy:'episode', paginate:true, useMultipleInstances:false } };
     }),
-    ...optionalScrapers.filter(sid => OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid && x.presetType === 'newznab')).map(sid => {
+    ...optionalScrapers.filter(sid => usenetCapable && OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid && x.presetType === 'newznab')).map(sid => {
       const d = OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid);
       return { type:'newznab', instanceId:`${d.id}-1`, enabled:true, options:{ name:d.label, api:{ url:d.apiUrl, apiKey:creds[d.credKey] || '' }, timeout:6000, mediaTypes:['movie','series','anime'], searchMode:'auto', seasonEpisodeStrategy:'episode', paginate:true, useMultipleInstances:false } };
     }),
@@ -313,8 +327,8 @@ function buildPresets(input) {
     { type:'knaben', instanceId:'tam-knaben', enabled:torrentCapable, options:{ name:'Knaben', timeout:6000, mediaTypes:[], useMultipleInstances:false }, resources:['stream'] },
     { type:'torrents-db', instanceId:'nx-tdb-1', enabled:false, options:{ name:'TorrentsDB', timeout:5000, useMultipleInstances:false }, resources:['stream'] },
     ...(animeContent ? [
-      { type:'animetosho', instanceId:'nx-at-01', enabled:content === 'anime', options:{ name:'AnimeTosho', timeout:5000, mediaTypes:['anime'] }, resources:['stream'] },
-      { type:'neko-bt', instanceId:'neko-bt-core-builds', enabled:extrasOn('neko-bt'), options:{ name:'NekoBT', timeout:5000, mediaTypes:['anime'] }, resources:['stream'] },
+      { type:'animetosho', instanceId:'nx-at-01', enabled:(content === 'anime' || content === 'mixed') && torrentCapable, options:{ name:'AnimeTosho', timeout:5000, mediaTypes:['anime'] }, resources:['stream'] },
+      { type:'neko-bt', instanceId:'neko-bt-core-builds', enabled:extrasOn('neko-bt') && torrentCapable, options:{ name:'NekoBT', timeout:5000, mediaTypes:['anime'] }, resources:['stream'] },
     ] : []),
     // p2p: v2.33 rejects Sootio outright (no usable service/HTTP provider), so the toggle
     // cannot reach it there. Neither can the HTTP branch (hardcoded false above) nor the
@@ -333,7 +347,15 @@ function buildPresets(input) {
 function buildServices(input) {
   const svc = input.service, isMulti = svc === 'multi', m = input.multiServices || [];
   const creds = input.credentials || {};
-  const cred = id => creds[id] ? {apiKey: creds[id]} : {};
+  // Mirrors configurator SERVICE_CREDENTIAL_FIELDS: these services do not take a lone
+  // apiKey, and every listed field is required upstream.
+  const MULTI = { offcloud:[['offcloud','apiKey'],['offcloudEmail','email'],['offcloudPass','password']], pikpak:[['pikpak','email'],['pikpakPass','password']], seedr:[['seedr','encodedToken']] };
+  const cred = id => {
+    if (!MULTI[id]) return creds[id] ? {apiKey: creds[id]} : {};
+    const out = {};
+    for (const [key, field] of MULTI[id]) if (creds[key]) out[field] = creds[key];
+    return out;
+  };
   return [
     {id:'realdebrid', enabled: svc==='realdebrid' || svc==='hybrid' || (isMulti && m.includes('realdebrid')), credentials:cred('realdebrid')},
     {id:'alldebrid', enabled: svc==='alldebrid' || (isMulti && m.includes('alldebrid')), credentials:cred('alldebrid')},

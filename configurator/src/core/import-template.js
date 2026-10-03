@@ -10,8 +10,20 @@
 function isSensitiveKey(key) {
   // Do not use a bare `auth` match: it would also remove harmless metadata
   // fields such as `author`.
-  return /(?:api.?key|access.?token|authorization|auth.?key|password|secret|token)/i.test(key)
+  return /(?:api.?key|access.?key|access.?token|authorization|auth.?key|password|secret|token)/i.test(key)
     || /^auth$/i.test(key);
+}
+
+// These URLs identify user-owned addon installations and can carry credentials
+// in opaque path segments that cannot be recognised by key-name matching.
+const PRIVATE_URL_KEYS = new Set(['manifestUrl', 'installationUrl']);
+function hasUrlCredential(value) {
+  if (typeof value !== 'string') return false;
+  try {
+    const url = new URL(value);
+    return Boolean(url.username || url.password)
+      || [...url.searchParams.keys()].some(isSensitiveKey);
+  } catch { return false; }
 }
 
 function clone(value) {
@@ -21,6 +33,7 @@ function clone(value) {
 
 function sanitizeValue(value) {
   if (Array.isArray(value)) return value.map(sanitizeValue);
+  if (hasUrlCredential(value)) return '';
   if (!value || typeof value !== 'object') return value;
 
   const out = {};
@@ -34,6 +47,7 @@ function sanitizeValue(value) {
     // tmdbApiKey, password, and future credential-shaped option names. The
     // built-in RPDB free-tier identifier is public configuration, not a user
     // credential, and must remain for poster redirects to keep working.
+    if (PRIVATE_URL_KEYS.has(key)) { out[key] = ''; continue; }
     if (isSensitiveKey(key) && !(key === 'rpdbApiKey' && rawValue === 't0-free-rpdb')) continue;
     out[key] = sanitizeValue(rawValue);
   }
@@ -56,8 +70,12 @@ function sanitizePreset(preset) {
 function hasCredentialOption(o) {
   if (!o || typeof o !== 'object') return false;
   for (const [k, v] of Object.entries(o)) {
-    if (k === 'credentials') continue;   // service rows are capability records, handled generically
-    if (isSensitiveKey(k) && typeof v === 'string' && v.trim() !== '') return true;
+    // This helper is called on PRESET options, not service capability rows.
+    // A preset's non-empty credentials object is an auth requirement too.
+    if (k === 'credentials' && v && (typeof v !== 'object' || Object.values(v).some(value => value !== '' && value != null))) return true;
+    if ((isSensitiveKey(k) || PRIVATE_URL_KEYS.has(k)) && typeof v === 'string' && v.trim() !== ''
+      && !(k === 'rpdbApiKey' && v === 't0-free-rpdb')) return true;
+    if (hasUrlCredential(v)) return true;
     if (v && typeof v === 'object' && hasCredentialOption(v)) return true;
   }
   return false;
@@ -78,7 +96,8 @@ export function sanitizeTemplateForRemoteImport(template) {
   const rawPresets = template?.config?.presets;
   if (Array.isArray(rawPresets)) {
     rawPresets.forEach((p, i) => {
-      if (p?.enabled === true && p?.options && hasCredentialOption(p.options)) keyedEnabled.add(i);
+      if (p?.enabled !== false && p?.options
+        && (hasCredentialOption(p.options) || (p.type === 'streamnzb' && p.options.url))) keyedEnabled.add(i);
     });
   }
   const result = sanitizeValue(clone(template || {}));
@@ -90,6 +109,13 @@ export function sanitizeTemplateForRemoteImport(template) {
       if (keyedEnabled.has(i)) clean.enabled = false;
       return clean;
     });
+    if (config.groups && Array.isArray(config.groups.groupings)) {
+      const active = new Set(config.presets.filter(p => p.enabled !== false).map(p => p.instanceId));
+      config.groups.groupings = config.groups.groupings
+        .map(group => ({ ...group, addons: (group.addons || []).filter(id => active.has(id)) }))
+        .filter(group => group.addons.length);
+      if (!config.groups.groupings.length) config.groups = { enabled: false, groupings: [] };
+    }
   }
 
   // `parentConfig` is emitted at the template root by the current assembly
