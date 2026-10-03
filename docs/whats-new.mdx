@@ -49,7 +49,13 @@ For the template-suite release log, see the [Changelog](https://corebuilds-docs.
   <Card title="Descriptions checked against AIOStreams and the live hosts" icon="sliders">
     every host now shows the version it actually runs (2.35.4 to 2.35.7; the picker still said 2.34.1, and Omni's is no longer behind, so it drops 'legacy'). The Recommended Stack panel is rewritten: it called StremThru Torz and Knaben usenet sources, recommended Torrentio, and listed developer notes. Also corrected: Brazuca Torrents is P2P, not debrid (and is now selectable on P2P builds); EasyDebrid is a debrid service, not an aggregator; Samsung TVs gained AV1 in 2020; the Fire TV Stick HD plays HDR10 and HLG; the Anime option keeps dual-audio releases rather than filtering to SeaDex only; the troubleshooter quoted 8 excluded and 107 ranked patterns where Balanced ships 3 and about 80; and Stream Pool showed two contradictory sets of counts and now shows the stop count the build uses, saying plainly that Stable and Balanced ignore it.
   </Card>
-  <Card title="Release notes now say when generated output is unchanged" icon="gauge">
+  <Card title="Updating keeps your setup" icon="gauge">
+    applying a template update rebuilt every source from defaults, so scrapers you had added, custom endpoints, per-instance keys and timeouts disappeared, and sections you chose to keep were overwritten. Updates now merge into what you have: imported sources, IDs, endpoints, credentials and timeouts are kept, declined changes stay declined, and the preview compares the actual output you would install. Preview and Cancel change nothing, Undo restores the previous setup, and the update screen says plainly that confirming here does not change an addon already installed in AIOStreams until you reinstall. A saved NZBHydra, Jackett or Prowlarr key is reused only when the imported preset points at the same address, so a key is never sent to an indexer it was not entered for.
+  </Card>
+  <Card title="First-time Nuvio setup" icon="wand">
+    the Nuvio route now builds through the same pipeline as every other install, honours the host you picked instead of swapping in another one, separates import links from manifests, and offers the JSON as a download if every paste service fails. Public import links strip access keys and private URLs and disable any source that needed them.
+  </Card>
+  <Card title="Release notes now say when generated output is unchanged" icon="layers">
     3.12 to 3.13 produced byte-identical configs, and default-profile users saw none of 3.9 through 3.11 either, yet each release read as a config change: re-importing showed no changes in AIOStreams and looked broken. A new check blocks any release that changes no generated config unless its notes say so, and blocks the opposite claim when output did change.
   </Card>
 </CardGroup>

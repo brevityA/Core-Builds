@@ -8,6 +8,7 @@
  */
 
 import { resolutionTierFirst } from './sort-policy.js';
+import { ALLOWED_MIGRATION_FIELDS } from './assemble-template.js';
 
 export const OUTPUT_PROFILES = Object.freeze(['stable', 'balanced', 'advanced', 'labs']);
 
@@ -179,6 +180,9 @@ function isStreamPreset(preset) {
 }
 
 function isExplicitPreset(preset, context) {
+  // An imported, already-selected source is explicit too. Updating the rules
+  // must not silently turn a working custom/indexer setup into a canned stack.
+  if (values(context.preservedPresetIds).includes(preset?.instanceId)) return true;
   const type = String(preset?.type || '').toLowerCase();
   if (EXPLICIT_STREAM_TYPES.has(type)) return true;
   const services = new Set([context.service, ...values(context.multiServices)]);
@@ -577,8 +581,22 @@ export function applyOutputProfile(rawTemplate, requestedProfile = 'auto', conte
     ? requestedProfile
     : resolveOutputProfile({ ...context, outputProfile: requestedProfile });
 
+  const beforeProfile = values(context.preserveFields).length ? clone(template.config) : {};
   if (profile === 'stable') applyStableProfile(template, context);
   else if (profile === 'balanced') applyBalancedProfile(template, context);
+
+  // Cherry-picked values were assembled before the profile reducers. Restore
+  // them AFTER those reducers, otherwise Stable overwrites a kept sort list or
+  // formatter and the export contradicts the user's confirmation. Safety and
+  // compatibility gates below still apply, including the no-synced-SEL policy.
+  for (const key of values(context.preserveFields)) {
+    if (!ALLOWED_MIGRATION_FIELDS.has(key) || key === 'parentConfig') continue;
+    if (Object.hasOwn(beforeProfile, key)) template.config[key] = clone(beforeProfile[key]);
+    else delete template.config[key];
+  }
+  for (const key of values(context.removeFields)) {
+    if (ALLOWED_MIGRATION_FIELDS.has(key) && key !== 'parentConfig') delete template.config[key];
+  }
 
   enforceLocalExpressionPolicy(template.config);
   preventStackedFetchExits(template.config);
