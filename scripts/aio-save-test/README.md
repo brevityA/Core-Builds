@@ -23,7 +23,8 @@ AIOStreams itself.
 ```bash
 npm run build --prefix configurator
 node scripts/aio-save-test/stub-addons.mjs &
-ENVS=$(grep -o "envBase: '[A-Z_]*'" <aiostreams-src>/packages/core/src/config/schema/presets.ts | ...)  # see spike notes
+# Point every external addon at the stub (list from AIOStreams 2.35.7, presets.ts envBase).
+ENVS=$(while read v; do printf -- '-e %s=http://127.0.0.1:4100/%s ' "$v" "$(echo "$v" | tr 'A-Z_' 'a-z-')"; done < scripts/aio-save-test/preset-url-envs.txt)
 docker run -d --network host -e PORT=3999 -e BASE_URL=http://127.0.0.1:3999 \
   -e INTERNAL_URL=http://127.0.0.1:3999 -e SECRET_KEY=$(openssl rand -hex 32) \
   -e REGEX_FILTER_ACCESS=all -e SEL_SYNC_ACCESS=all -e DISABLE_RATE_LIMITS=true \
@@ -42,7 +43,7 @@ AIO_URL=http://127.0.0.1:3999 node scripts/aio-save-test/matrix.mjs
 
 ## Still to do before this gates PRs
 
-- Commit the `*_URL` env list (generated from the pinned contract, not grepped).
+- Generate `preset-url-envs.txt` from the pinned contract instead of a one-off grep.
 - Stub Bitmagnet (`BITMAGNET_URL`) and fix the USA TV Next stub path.
 - A host-restricted variant (`REGEX_FILTER_ACCESS=trusted` + ElfHosted's
   allowlist) so regex allowlist failures are caught too.
