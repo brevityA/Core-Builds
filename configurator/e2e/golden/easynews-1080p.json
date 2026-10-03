@@ -1284,21 +1284,6 @@
     "autoRemoveDownloads": false,
     "presets": [
       {
-        "type": "seadex",
-        "instanceId": "tam-seadex",
-        "enabled": true,
-        "options": {
-          "name": "SeaDex",
-          "timeout": 6000,
-          "mediaTypes": [
-            "anime"
-          ]
-        },
-        "resources": [
-          "stream"
-        ]
-      },
-      {
         "type": "easynewsPlusPlus",
         "instanceId": "en-ppp-1",
         "enabled": true,
@@ -1318,7 +1303,10 @@
         "options": {
           "name": "EasyNews Search",
           "timeout": 6000,
-          "apiVersion": "3.0"
+          "apiVersion": "3.0",
+          "services": [
+            "easynews"
+          ]
         },
         "resources": [
           "stream"
