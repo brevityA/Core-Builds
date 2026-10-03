@@ -55,6 +55,7 @@ export function optionalScraperForPreset(preset) {
 const PRESET_CREDENTIALS = Object.freeze({
   debridio: ['debridio', 'debridioApiKey'],
   debrider: ['debrider', 'apiKey'],
+  subdl: ['subdl', 'subDlApiKey'],
   jackett: ['jackett', 'jackettApiKey'],
   prowlarr: ['prowlarr', 'prowlarrApiKey'],
   streamnzb: ['streamnzb', 'url'],
@@ -158,6 +159,9 @@ export function mergeImportedPresets(generated = [], imported, { optionalScraper
       // required-key preset that the target host cannot save.
       if (!creds[credential[0]].trim()) preset.enabled = false;
     }
+    // AIOStreams refuses the whole save for a SubDL preset with no key, and an imported
+    // one survives the generator's own key gate, so apply the same rule here.
+    if (preset.type === 'subdl' && preset.enabled !== false && !String(options?.subDlApiKey || '').trim()) preset.enabled = false;
     if (preset.type === 'nzbhydra' && object(options.api)) {
       for (const [key, field] of [['nzbhydra', 'url'], ['nzbhydraApiKey', 'apiKey']]) {
         // The URL is applied first, so a key is written only next to the URL it was entered for.

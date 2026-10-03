@@ -11,7 +11,7 @@
     "setToSaveInstallMenu": true,
     "sourceUrl": "https://github.com/brevityA/Core-Builds",
     "changelogUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md",
-    "coreBuildsVersion": "3.15",
+    "coreBuildsVersion": "3.16",
     "coreBuildsAIOStreamsTarget": "2.35.7",
     "coreBuildsProfile": "balanced",
     "coreBuildsProfileVersion": "1"
@@ -1374,15 +1374,18 @@
         }
       },
       {
-        "type": "aiosubtitle",
-        "instanceId": "aio-sub-1",
+        "type": "opensubtitles-v3-plus",
+        "instanceId": "osub-v3-1",
         "enabled": true,
         "options": {
-          "name": "AIOSubtitle",
+          "name": "OpenSubtitles v3+",
           "timeout": 6000,
-          "languages": [
+          "language": [
             "en"
-          ]
+          ],
+          "sources": "all",
+          "includeAiTranslated": false,
+          "movieHashPlusAutoAdjustment": false
         }
       },
       {

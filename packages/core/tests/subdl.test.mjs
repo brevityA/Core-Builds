@@ -32,6 +32,8 @@ test('SubDL output caps legacy/crafted language selections at the provider maxim
     architecture: 'standard',
     subtitleAddons: ['subdl'],
     subtitleLangs: ['en', 'it', 'fr', 'de', 'es', 'pt'],
+    // SubDL is only emitted with its required API key.
+    credentials: { subdl: 'test-subdl-key' },
   });
   const subdl = template.config.presets.find(preset => preset.type === 'subdl');
   assert.deepEqual(subdl.options.language, ['EN', 'IT', 'FR', 'DE', 'ES']);

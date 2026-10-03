@@ -48,7 +48,7 @@ const STEPS = 6;
 // workflow) the raw x.y here expands to x.y.0 in package.json / versions.json and
 // the release tag; the built badge drops the trailing .0. At the 2026-09-06
 // audit the release tag was v3.7.0 while this said 3.1 — they must move together.
-const CONFIGURATOR_VERSION = '3.15';
+const CONFIGURATOR_VERSION = '3.16';
 // Set to a collector endpoint to enable the opt-in anonymous usage ping (service+device+resolution only).
 // Leave empty to keep the feature fully disabled and hidden.
 const USAGE_BEACON_URL = '';
@@ -452,7 +452,7 @@ async function selectHealthyHost(timeout=4000) {
 // Cloudflare Worker CORS proxy — see cloudflare-worker/README.md for deployment.
 // Set to '' to disable and fall back to direct-only fetches.
 const CORS_PROXY = 'https://core-builds-cors-proxy.tlorenzato26.workers.dev';
-const S = { service:null, device:null, resolution:null, audio:'limited', bandwidthMbps:0, content:null, name:'', multiServices:[], sizeLimit:'unlimited', formatter:'family-v4', p2pEnabled:false, qualityFirst:false, resolutionFirst:false, foreignLangKill:true, matchMode:'balanced', exclude4K:false, excludeDV:false, tmdbToken:'', tmdbApiKey:'', creds:{torbox:'',realdebrid:'',alldebrid:'',premiumize:'',debridlink:'',offcloud:'',easynews:'',easynewsPass:'',nzbgeek:'',debridio:'',debrider:'',nzbnoob:'',althub:'',usenetcrawler:'',drunkenslug:'',nzbfinder:'',jackett:'',prowlarr:'',subdl:''}, instanceHost:'elfhosted', instanceUrl:'', instanceUuid:'', instancePassword:'', baseUuid:'', basePassword:'', quickStart:false, langs: ['English'], langExclusive: false, cacheMode: 'mixed', streamPool: 'normal', pseArch: 'standard', telemetryOk: false, simpleMode: false, outputProfile:'auto', aiostreamsVersion:DEFAULT_AIOSTREAMS_VERSION, installMode: 'direct', stremioEmail: '', stremioPassword: '', subtitleLangs: ['en'], subtitleAddons: ['aiosubtitle'], proxyEnabled: false, proxiedServices: [], catalogs: ['tmdb-addon'], dedupMerge: false, optionalScrapers: [], cleanInstall: false, quickProfile: 'balanced', preloadEnabled:true, autoPlayMethod:'matchingFile', addonTimeout:6000, patchCinemeta:false, installAIOMeta:false, ageLimit:'none', libraryBoost:'default', nzbFailover:false, nzbFailoverPosition:'after-torrents', maxFailoverNzbs:3 };
+const S = { service:null, device:null, resolution:null, audio:'limited', bandwidthMbps:0, content:null, name:'', multiServices:[], sizeLimit:'unlimited', formatter:'family-v4', p2pEnabled:false, qualityFirst:false, resolutionFirst:false, foreignLangKill:true, matchMode:'balanced', exclude4K:false, excludeDV:false, tmdbToken:'', tmdbApiKey:'', creds:{torbox:'',realdebrid:'',alldebrid:'',premiumize:'',debridlink:'',offcloud:'',easynews:'',easynewsPass:'',nzbgeek:'',debridio:'',debrider:'',nzbnoob:'',althub:'',usenetcrawler:'',drunkenslug:'',nzbfinder:'',jackett:'',prowlarr:'',subdl:''}, instanceHost:'elfhosted', instanceUrl:'', instanceUuid:'', instancePassword:'', baseUuid:'', basePassword:'', quickStart:false, langs: ['English'], langExclusive: false, cacheMode: 'mixed', streamPool: 'normal', pseArch: 'standard', telemetryOk: false, simpleMode: false, outputProfile:'auto', aiostreamsVersion:DEFAULT_AIOSTREAMS_VERSION, installMode: 'direct', stremioEmail: '', stremioPassword: '', subtitleLangs: ['en'], subtitleAddons: ['opensubtitles-v3-plus'], proxyEnabled: false, proxiedServices: [], catalogs: ['tmdb-addon'], dedupMerge: false, optionalScrapers: [], cleanInstall: false, quickProfile: 'balanced', preloadEnabled:true, autoPlayMethod:'matchingFile', addonTimeout:6000, patchCinemeta:false, installAIOMeta:false, ageLimit:'none', libraryBoost:'default', nzbFailover:false, nzbFailoverPosition:'after-torrents', maxFailoverNzbs:3 };
 // A clean template update must not inherit unrelated wizard/experimental flags.
 const INITIAL_STATE = cloneUpdateValue(S);
 function replaceState(nextState) {
@@ -620,7 +620,7 @@ const RADIO_ALLOWED = (() => {
 })();
 
 /* STATE MANAGEMENT */
-const STATE_SCHEMA = 4;
+const STATE_SCHEMA = 5;
 function migrateState(input) {
   const d={...(input||{})}, schema=Number(d._schema||0);
   if(schema<1){
@@ -640,6 +640,12 @@ function migrateState(input) {
   }
   if(schema<4){
     if(!AIOSTREAMS_COMPATIBILITY_TARGETS.includes(d.aiostreamsVersion)) d.aiostreamsVersion=DEFAULT_AIOSTREAMS_VERSION;
+  }
+  if(schema<5){
+    // AIOSubtitle was the default until 3.16. Its server now takes ~12 s per manifest,
+    // past AIOStreams' fetch limit, so hosts refuse the whole save. Sessions still on
+    // that untouched default move to OpenSubtitles v3+; an explicit mix is kept.
+    if(Array.isArray(d.subtitleAddons) && d.subtitleAddons.length===1 && d.subtitleAddons[0]==='aiosubtitle') d.subtitleAddons=['opensubtitles-v3-plus'];
   }
   d._schema=STATE_SCHEMA; return d;
 }
@@ -1742,12 +1748,12 @@ function renderAdvancedPanel() {
       </div>
 
       <div>
-        <div style="font-size:.72rem;font-weight:700;color:#4b5563;letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:6px">${ICO.globe(16,'#06b6d4')} Subtitles ${ftTip('Choose subtitle providers and languages. <strong>AIOSubtitle</strong> is built-in and fast. <strong>OpenSubtitles v3+</strong> has the largest database. <strong>SubDL</strong> is a fast alternative (requires a free API key from subdl.com). Select languages your household needs &mdash; this affects which subtitles are fetched.')}</div>
+        <div style="font-size:.72rem;font-weight:700;color:#4b5563;letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:6px">${ICO.globe(16,'#06b6d4')} Subtitles ${ftTip('Choose subtitle providers and languages. <strong>OpenSubtitles v3+</strong> (the default) has the largest database. <strong>AIOSubtitle</strong> is currently slow to respond, and hosts may refuse the save while it is enabled. <strong>SubDL</strong> is a fast alternative (requires a free API key from subdl.com). Select languages your household needs &mdash; this affects which subtitles are fetched.')}</div>
         <div style="background:#111720;border:1.5px solid rgba(255,255,255,.08);border-radius:10px;padding:14px 16px">
           <div style="font-size:.78rem;font-weight:600;color:#6b7280;margin-bottom:8px">Subtitle Sources</div>
           <div style="display:flex;flex-direction:column;gap:5px">
-            ${[['aiosubtitle','AIOSubtitle','Built-in, fast'],['opensubtitles-v3-plus','OpenSubtitles v3+','Largest database'],['subdl','SubDL','Fast alternative']].map(([id,name,desc])=>{
-              const on=(S.subtitleAddons||['aiosubtitle']).includes(id);
+            ${[['opensubtitles-v3-plus','OpenSubtitles v3+','Largest database · default'],['subdl','SubDL','Needs a free SubDL API key'],['aiosubtitle','AIOSubtitle','Slow server: hosts may refuse the save']].map(([id,name,desc])=>{
+              const on=(S.subtitleAddons||['opensubtitles-v3-plus']).includes(id);
               return `<div data-action="toggle-sub-addon" data-val="${id}" style="cursor:pointer;display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;border:1px solid ${on?'rgba(6,182,212,.35)':'rgba(255,255,255,.06)'};background:${on?'rgba(6,182,212,.05)':'transparent'};transition:all .15s">
                 <div class="chk-box" style="width:16px;height:16px;border-radius:4px;border:1.5px solid ${on?'#06b6d4':'#374151'};display:flex;align-items:center;justify-content:center;flex-shrink:0;background:${on?'#06b6d4':'transparent'}">${on?'<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#0d1117" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>':''}</div>
                 <div style="flex:1"><div class="opt-nm" style="font-size:.8rem;font-weight:600;color:${on?'#06b6d4':'#9ca3af'}">${name}</div><div style="font-size:.65rem;color:#4b5563">${desc}</div></div>
@@ -3497,7 +3503,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (action === 'toggle-sub-addon') {
       const row = e.target.closest('[data-action="toggle-sub-addon"]') || e.target;
       const val = row.dataset.val;
-      if (!S.subtitleAddons) S.subtitleAddons = ['aiosubtitle'];
+      if (!S.subtitleAddons) S.subtitleAddons = ['opensubtitles-v3-plus'];
       const previousSourceCount = S.subtitleAddons.length;
       const idx = S.subtitleAddons.indexOf(val);
       if (idx >= 0) { if (S.subtitleAddons.length > 1) S.subtitleAddons.splice(idx, 1); }
@@ -3961,16 +3967,19 @@ function getDebridInputs() {
 }
 
 function subtitlePresets() {
-  const addons = S.subtitleAddons || ['aiosubtitle'];
+  const addons = S.subtitleAddons || ['opensubtitles-v3-plus'];
   const langs = S.subtitleLangs || ['en'];
   const out = [];
   if (addons.includes('aiosubtitle')) out.push({ type:'aiosubtitle', instanceId:'aio-sub-1', enabled:true, options:{ name:'AIOSubtitle', timeout:4000, languages:langs } });
   if (addons.includes('opensubtitles-v3-plus')) out.push({ type:'opensubtitles-v3-plus', instanceId:'osub-v3-1', enabled:true, options:{ name:'OpenSubtitles v3+', timeout:5000, language:langs, sources:'all', includeAiTranslated:false, movieHashPlusAutoAdjustment:false } });
-  if (addons.includes('subdl')) {
+  // SubDL refuses the save without an API key (AIOStreams marks subDlApiKey required).
+  if (addons.includes('subdl') && S.creds.subdl) {
     // AIOStreams SubDL accepts up to five uppercase provider language codes.
     const subdlLanguages = [...new Set(langs.map(lang => String(lang).trim().toUpperCase()).filter(Boolean))].slice(0, 5);
     out.push({ type:'subdl', instanceId:'subdl-1', enabled:true, options:{ name:'SubDL', timeout:5000, resources:['subtitles'], language:subdlLanguages, hearingImpairment:'hiInclude', ...(S.creds.subdl ? { subDlApiKey:S.creds.subdl } : {}) } });
   }
+  // Nothing usable left (SubDL picked with no key): keep subtitles working.
+  if (!out.length && addons.length) out.push({ type:'opensubtitles-v3-plus', instanceId:'osub-v3-1', enabled:true, options:{ name:'OpenSubtitles v3+', timeout:5000, language:langs, sources:'all', includeAiTranslated:false, movieHashPlusAutoAdjustment:false } });
   return out;
 }
 
@@ -4225,7 +4234,7 @@ function presets() {
     ...catalogPresets()
   ];
   if (S._nuvioInstant) {
-    const types = new Set(['torrentio', 'comet', 'mediafusion', 'meteor', 'stremthruTorz', 'aiosubtitle', 'tmdb-addon']);
+    const types = new Set(['torrentio', 'comet', 'mediafusion', 'meteor', 'stremthruTorz', 'aiosubtitle', 'opensubtitles-v3-plus', 'tmdb-addon']);
     return list.filter(preset => types.has(preset.type));
   }
   // The legacy built-in torbox-search preset was removed in AIOStreams v2.32
