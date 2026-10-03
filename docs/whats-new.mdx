@@ -19,7 +19,10 @@ For the template-suite release log, see the [Changelog](https://corebuilds-docs.
   <Card title="Generated configs now say they target 2.35.7" icon="bolt">
     the only change in generated output is the compatibility-target stamp in the template metadata, which moves from 2.34.1 to 2.35.7. Filters, sorting, scrapers and formatting are byte-for-byte the same, so re-importing changes nothing AIOStreams acts on. Saved sessions that picked a target keep it.
   </Card>
-  <Card title="Upstream watch re-pinned" icon="shield-check">
+  <Card title="Names and settings from links can no longer inject page markup" icon="shield-check">
+    a template name, a custom formatter label, an unrecognised setting from a shared link or imported config, and entries in the local backup history were written into the page as HTML. A crafted link could have run script in the configurator. They are now escaped wherever they are shown, and help tooltips keep their text out of the page attributes. Found by CodeQL; all 11 of its 'DOM text reinterpreted as HTML' alerts are fixed.
+  </Card>
+  <Card title="Upstream watch re-pinned" icon="sliders">
     the AIOStreams contract watcher had flagged additive drift since September 26 (#770). It is re-pinned, and its source extraction no longer depends on GitHub’s API, which some networks refuse.
   </Card>
 </CardGroup>
