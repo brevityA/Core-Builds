@@ -1,0 +1,27 @@
+{
+  "name": "Core Builds Nuvio Providers",
+  "version": "0.2.0",
+  "scrapers": [
+    {
+      "id": "core-aiostreams-proxy",
+      "name": "Core Builds AIOStreams Proxy",
+      "description": "Fetch AIOStreams stream results through the Core Builds Cloudflare Worker.",
+      "version": "0.2.0",
+      "author": "Core Builds",
+      "supportedTypes": [
+        "movie",
+        "tv"
+      ],
+      "filename": "providers/core-aiostreams-proxy.js",
+      "enabled": true,
+      "hasSettings": true,
+      "formats": [
+        "mp4",
+        "m3u8",
+        "mpd",
+        "mkv",
+        "webm"
+      ]
+    }
+  ]
+}
