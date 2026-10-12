@@ -6,11 +6,13 @@ on:
       - 'validate_templates.py'
       - 'tests/**'
       - 'tools/benchmark/**'
+      - 'NuvioPlugins/**'
   pull_request:
     paths:
       - 'validate_templates.py'
       - 'tests/**'
       - 'tools/benchmark/**'
+      - 'NuvioPlugins/**'
       - 'Templates/**/*.json'
       - 'Formatters/**/*.json'
       - '**/*.md'
@@ -22,15 +24,23 @@ permissions:
 
 jobs:
   test:
-    name: Run pytest suite
+    name: Run Python and Nuvio tests
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+
       - name: Install pytest
         run: pip install pytest --quiet
 
-      - name: Run tests
+      - name: Run Python tests
         run: pytest tests/ -v --tb=short
+
+      - name: Run Nuvio provider tests
+        run: npm test --prefix NuvioPlugins
