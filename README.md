@@ -354,6 +354,7 @@ Full docs at **[corebuilds-docs.docsalot.dev](https://corebuilds-docs.docsalot.d
 
 | | |
 |---|---|
+| **GitHub Sponsors** | [github.com/sponsors/brevityA](https://github.com/sponsors/brevityA) — no fee on sponsorships from personal accounts |
 | **Ko-fi** | [ko-fi.com/branding_brevity](https://ko-fi.com/branding_brevity) |
 | **TorBox referral** | Code `d1ccddb0-f094-45ca-b52b-942a2635855e` — [15 days free →](https://torbox.app/subscription?referral=d1ccddb0-f094-45ca-b52b-942a2635855e) |
 
