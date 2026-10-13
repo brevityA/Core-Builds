@@ -609,6 +609,24 @@ def validate_template(fpath):
     if sem.get('strict'):
         warn(name, "seasonEpisodeMatching.strict=True — drops BluRay/REMUX without S/E metadata")
 
+    # Silent no-results regression gate (audit 2026-09-29): the exact/strict
+    # trio individually degrades recall, but together they reproduce the
+    # "install works, search returns nothing" failure class that shipped in
+    # the deprecated dual-core lane. Active Core-owned templates may never
+    # combine them; archived lanes keep their warnings-only treatment.
+    if (
+        tm.get('mode') == 'exact'
+        and ym.get('strict')
+        and sem.get('strict')
+        and is_core
+        and not is_legacy
+        and not is_deprecated
+        and not is_community
+    ):
+        err(name, "titleMatching exact + yearMatching.strict + seasonEpisodeMatching.strict together — silent zero-result failure mode; relax at least one")
+    if c.get('onlyShowCachedStreams') is True and is_core and not is_legacy and not is_deprecated and not is_community:
+        err(name, "onlyShowCachedStreams=True hides every uncached stream — new content returns nothing (v2.4.0 regression class)")
+
     required_languages = tuple(c.get('requiredLanguages', []))
     if required_languages and required_languages not in REVIEWED_REQUIRED_LANGUAGES:
         warn(name, f"requiredLanguages is set {list(required_languages)[:3]} — hard-blocks untagged streams")
