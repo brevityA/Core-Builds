@@ -24,7 +24,8 @@ name: Deploy icon-request broker (CoreBuildsApps)
 #   secrets - pushes the worker's filing secrets from this repo's Actions
 #             secrets (below), so nobody runs `wrangler secret put` by hand
 #   smoke   - the broker's smoke.mjs --strict, which never files a request;
-#             with --require-sink once any filing secret is set
+#             with --require-sink once any filing secret is set, and
+#             --require-plus once the Plus service account is
 #
 # Filing secrets, each optional, repository- or environment-level. Actions
 # secret names cannot start with GITHUB_, hence the ICONREQ_ prefix:
@@ -38,6 +39,15 @@ name: Deploy icon-request broker (CoreBuildsApps)
 # Unset ones are left alone on the worker, so a secret set earlier with
 # wrangler survives a deploy. With none set anywhere the worker deploys and
 # passes smoke but answers every press with a 503.
+#
+# Core Builds Plus (optional, not a filing secret): the Google Play build's
+# one-time purchase marks a request priority once the broker has confirmed
+# it with the Play Developer API:
+#   ICONREQ_GOOGLE_SERVICE_ACCOUNT_JSON -> GOOGLE_SERVICE_ACCOUNT_JSON (the
+#                                          whole JSON key file of a service
+#                                          account Play Console granted
+#                                          "View financial data")
+# See CoreBuildsApps tools/icon_request_broker/README.md, "Core Builds Plus".
 
 on:
   workflow_dispatch:
@@ -221,35 +231,45 @@ jobs:
           ICONREQ_GITHUB_APP_INSTALLATION_ID: ${{ secrets.ICONREQ_GITHUB_APP_INSTALLATION_ID }}
           ICONREQ_GITHUB_APP_PRIVATE_KEY: ${{ secrets.ICONREQ_GITHUB_APP_PRIVATE_KEY }}
           ICONREQ_DISCORD_WEBHOOK_URL: ${{ secrets.ICONREQ_DISCORD_WEBHOOK_URL }}
+          ICONREQ_GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.ICONREQ_GOOGLE_SERVICE_ACCOUNT_JSON }}
         run: |
           # Values travel on stdin only: never as arguments (visible in the
           # process list), never echoed, never written to disk.
           ENV_FLAG=""
           [ "$ENV_NAME" = "staging" ] && ENV_FLAG="--env staging"
           set_count=0
+          plus=0
           while read -r SRC DEST; do
             VALUE=${!SRC}
             [ -z "$VALUE" ] && continue
             printf '%s' "$VALUE" | npx --yes wrangler@4 secret put "$DEST" $ENV_FLAG >/dev/null
             echo "Set $DEST from $SRC."
-            set_count=$((set_count + 1))
+            # The Plus key files nothing, so it must not arm --require-sink.
+            if [ "$DEST" = "GOOGLE_SERVICE_ACCOUNT_JSON" ]; then
+              plus=1
+            else
+              set_count=$((set_count + 1))
+            fi
           done <<'MAP'
           ICONREQ_GITHUB_TOKEN GITHUB_TOKEN
           ICONREQ_GITHUB_APP_ID GITHUB_APP_ID
           ICONREQ_GITHUB_APP_INSTALLATION_ID GITHUB_APP_INSTALLATION_ID
           ICONREQ_GITHUB_APP_PRIVATE_KEY GITHUB_APP_PRIVATE_KEY
           ICONREQ_DISCORD_WEBHOOK_URL ICON_REQUEST_DISCORD_WEBHOOK_URL
+          ICONREQ_GOOGLE_SERVICE_ACCOUNT_JSON GOOGLE_SERVICE_ACCOUNT_JSON
           MAP
           if [ "$set_count" -eq 0 ]; then
-            echo "::warning::No ICONREQ_* secret is set, so no filing secret was pushed. The worker keeps whatever it already had; with nothing, it answers every request with a 503."
+            echo "::warning::No filing secret (ICONREQ_GITHUB_*, ICONREQ_DISCORD_WEBHOOK_URL) is set, so none was pushed. The worker keeps whatever it already had; with nothing, it answers every request with a 503."
           fi
           echo "count=$set_count" >> "$GITHUB_OUTPUT"
+          echo "plus=$plus" >> "$GITHUB_OUTPUT"
 
       - name: Smoke (strict; never files a request)
         working-directory: ${{ env.BROKER }}
         env:
           SUBDOMAIN: ${{ vars.WORKERS_DEV_SUBDOMAIN || 'tlorenzato26' }}
           PUSHED: ${{ steps.secrets.outputs.count }}
+          PLUS: ${{ steps.secrets.outputs.plus }}
         run: |
           if [ "$ENV_NAME" = "staging" ]; then
             URL="https://corebuilds-icon-request-staging.${SUBDOMAIN}.workers.dev"
@@ -261,6 +281,7 @@ jobs:
           # Secrets were just pushed: /healthz must then report a sink.
           FLAGS="--strict"
           [ "${PUSHED:-0}" -gt 0 ] && FLAGS="$FLAGS --require-sink"
+          [ "${PLUS:-0}" = "1" ] && FLAGS="$FLAGS --require-plus"
           for i in 1 2 3 4 5 6; do
             node smoke.mjs $FLAGS "$URL" && exit 0
             echo "attempt $i failed; retrying in 5s"
