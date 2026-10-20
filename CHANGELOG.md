@@ -1,5 +1,15 @@
 # Changelog
 
+## 3.10.0 (2026-10-13)
+
+### Changed
+- **Host-preload collection drops the nested Deprecated lane** — `sync_template_collection.py` checked only the first path part against `Legacy`/`Deprecated`, while the deprecated lanes nest under a service dir (`Templates/Torbox/Deprecated/…`). The collection therefore carried 15 deprecated templates (65 entries, including the strict-matching dual-core builds and a duplicated `core-nexus-4k-dual-core` id) that hosts pinning `TEMPLATE_URLS` were serving to users. The lane check now reads every path part; the regenerated collection has 50 entries and no duplicate ids.
+
+### Fixed
+- **`core-nexus-usenet-4k` 0.1.1 → 0.1.2 — 0Cached fallback** — when nothing was cached the usenet 4K build had no passthrough, so a query with zero cached results returned an empty list instead of a degraded one. Gained the same `/*0Cached*/` ISE the Apex/Mixed profiles ship.
+- **`validate_templates.py` hard-fails the silent no-results class in active Core lanes** — the exact `titleMatching` + strict `yearMatching` + strict `seasonEpisodeMatching` trio (the "install works, search returns nothing" failure that shipped in the deprecated dual-core lane) and `onlyShowCachedStreams: true` are now errors for active Core-owned templates; archived and community lanes keep their warnings-only treatment.
+- **`sync_template_collection.py --check` gate extended** — the collection sync test now asserts excluded-lane templates never appear in the collection and that template ids are unique, so the 1.2-g regression cannot return.
+
 ## 3.9.0 (2026-09-26)
 
 ### Changed
