@@ -282,6 +282,12 @@ jobs:
           FLAGS="--strict"
           [ "${PUSHED:-0}" -gt 0 ] && FLAGS="$FLAGS --require-sink"
           [ "${PLUS:-0}" = "1" ] && FLAGS="$FLAGS --require-plus"
+          # An older CoreBuildsApps ref's smoke.mjs ignores flags it does not
+          # know, so --require-plus would pass without checking anything.
+          if [ "${PLUS:-0}" = "1" ] && ! grep -Fq -- '--require-plus' smoke.mjs; then
+            echo "::error::The Plus key is set, but smoke.mjs at this CoreBuildsApps ref cannot check it (no --require-plus). Deploy a ref that includes the broker's Plus check."
+            exit 1
+          fi
           for i in 1 2 3 4 5 6; do
             node smoke.mjs $FLAGS "$URL" && exit 0
             echo "attempt $i failed; retrying in 5s"
