@@ -58,7 +58,10 @@ def collect():
     entries = []
     for f in sorted(TEMPLATES.rglob('*.json')):
         parts = f.relative_to(TEMPLATES).parts
-        if parts[0] in EXCLUDED_TOP or 'Nightly' in parts:
+        # Excluded lanes can nest below a service dir (e.g.
+        # Templates/Torbox/Deprecated/Dual/), so check every path part —
+        # a top-level-only check shipped 15 deprecated templates to hosts.
+        if any(p in EXCLUDED_TOP for p in parts) or 'Nightly' in parts:
             continue
         # Parent/base configs are inherited by children, not imported directly.
         if parts[0] == 'Base' or f.name == 'Core-Builds-Base-Config.json':

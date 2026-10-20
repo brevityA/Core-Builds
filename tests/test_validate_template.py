@@ -527,6 +527,61 @@ class TestMatching:
         assert not any("requiredLanguages" in w for w in warnings)
 
 
+# ── Silent no-results gate (audit 2026-09-29) ────────────────
+# The exact/strict trio and onlyShowCachedStreams are path-dependent gates:
+# they error in active Core-owned lanes and stay warnings-only in archived or
+# community lanes, so these tests write under explicit lane directories.
+
+def _write_at_lane(tmp_path, data, lane):
+    d = tmp_path / lane
+    d.mkdir(parents=True, exist_ok=True)
+    p = d / "lane-gate-test.json"
+    p.write_text(json.dumps(data))
+    return str(p)
+
+
+class TestSilentNoResultsGate:
+    TRIO = dict(
+        titleMatching={"mode": "exact"},
+        yearMatching={"strict": True},
+        seasonEpisodeMatching={"strict": True},
+    )
+
+    def test_active_core_lane_errors_on_exact_strict_trio(self, tmp_path, base_template):
+        path = _write_at_lane(tmp_path, base_template(**self.TRIO), "Templates/Torbox")
+        errors, _, _ = validate_template(path)
+        assert any("silent zero-result failure mode" in e for e in errors)
+
+    def test_releasing_one_axis_keeps_the_trio_warning_only(self, tmp_path, base_template):
+        t = base_template(titleMatching={"mode": "exact"}, yearMatching={"strict": True})
+        path = _write_at_lane(tmp_path, t, "Templates/Usenet")
+        errors, warnings, _ = validate_template(path)
+        assert not errors
+        assert any("titleMatching.mode is 'exact'" in w for w in warnings)
+        assert any("yearMatching.strict" in w for w in warnings)
+
+    def test_deprecated_lane_keeps_warning_only_treatment(self, tmp_path, base_template):
+        path = _write_at_lane(tmp_path, base_template(**self.TRIO), "Templates/Torbox/Deprecated/Dual")
+        errors, warnings, _ = validate_template(path)
+        assert not errors
+        assert any("titleMatching.mode is 'exact'" in w for w in warnings)
+
+    def test_community_lane_not_gated(self, tmp_path, base_template):
+        path = _write_at_lane(tmp_path, base_template(**self.TRIO), "Community-Templates")
+        errors, _, _ = validate_template(path)
+        assert not errors
+
+    def test_active_core_lane_errors_on_only_show_cached(self, tmp_path, base_template):
+        path = _write_at_lane(tmp_path, base_template(onlyShowCachedStreams=True), "Templates/Torbox")
+        errors, _, _ = validate_template(path)
+        assert any("onlyShowCachedStreams" in e for e in errors)
+
+    def test_legacy_lane_not_gated_on_only_show_cached(self, tmp_path, base_template):
+        path = _write_at_lane(tmp_path, base_template(onlyShowCachedStreams=True), "Templates/Legacy/v2.31.1")
+        errors, _, _ = validate_template(path)
+        assert not any("onlyShowCachedStreams" in e for e in errors)
+
+
 # ── Size Limits ───────────────────────────────────────────────
 
 class TestSizeLimits:
