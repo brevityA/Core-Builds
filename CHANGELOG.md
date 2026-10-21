@@ -1,5 +1,12 @@
 # Changelog
 
+## 3.11.0 (2026-10-18)
+
+### Fixed
+- **Inline regex re-synced after Vidhin05 added SumVision to Generated Dynamic HDR (43 templates)** — hosts accept a regex only on an exact string match with their allowlist, and ElfHosted's now holds only the new text, so every template and generated config carrying the old copy was refused on save ("1 / N regexes are not allowed"). Re-derived with `check_upstream_drift.mjs --update` + `sync_ranked_regex.py`, which also carried SiCFoI into `LQ (Release Title) (Radarr)`. The new upstream `IMF` entry is reported for review and not adopted (list membership is human-gated). Each affected template bumps a patch version with a changelog entry so the update banner offers it.
+- **`check_upstream_drift.mjs` reports changes to repeated names** — upstream names both Generated Dynamic HDR patterns identically and the checker keyed entries by name, so a change to the first was invisible; #790 listed two other changes and missed the one breaking saves. Repeats are keyed `Name [B]`, `Name [C]` (the ranked list's convention), and a changed pattern still present in the configurator's shipped consts is flagged as refusing saves. Covered by `tests/test_upstream_drift.py`.
+- **Save-test allowlist snapshot refreshed** — `scripts/aio-save-test/allowlist.elfhosted.json` (from 2026-10-03) still held the old literal, so the restricted CI run passed while ElfHosted refused every save. Now captured from ElfHosted 2.36.0.
+
 ## 3.10.0 (2026-10-13)
 
 ### Changed

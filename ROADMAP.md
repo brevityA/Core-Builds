@@ -11,6 +11,7 @@ Auto-generated from [`CHANGELOG.md`](https://github.com/brevityA/Core-Builds/blo
 
 | Version | Date | Highlights |
 | --- | --- | --- |
+| v3.11.0 | 2026-10-18 | Inline regex re-synced after Vidhin05 added SumVision to Generated Dynamic HDR (43 templates) — hosts accept a regex onl… |
 | v3.10.0 | 2026-10-13 | Host-preload collection drops the nested Deprecated lane — sync_template_collection.py checked only the first path part … |
 | v3.9.0 | 2026-09-26 | nzbFailover → failover across all 60 active templates — AIOStreams renamed the key and migrates the old spelling before … |
 | v3.8.0 | 2026-09-22 | Dead-key purge across all 55 active templates — maxResults, maxResultsPerResolution, seadexBestOnly, excludedStreamSourc… |
@@ -24,7 +25,6 @@ Auto-generated from [`CHANGELOG.md`](https://github.com/brevityA/Core-Builds/blo
 | v3.5.0 | 2026-07-29 | SEL Engine v2 (Configurator v2.86 + all 72 templates via synced expressions) — perGroup() QR balance replaces 8 verbose … |
 | v3.4.0 | 2026-07-26 | Core Nexus Mixed template (Templates/Torbox/Single/core-nexus-mixed.json) — adaptive multi-resolution build for niche an… |
 | v3.3.2 | 2026-07-17 | Subtitle Picker (Configurator v2.57) — choose subtitle sources (AIOSubtitle, OpenSubtitles v3+, SubDL) and select from 3… |
-| v3.3.1 | 2026-07-17 | Free Tier Overhaul (Configurator v2.56) — comprehensive improvements to P2P and HTTP template generation: |
 <!-- AUTO:ROOT_COMPLETED:END -->
 
 > **Shipped-then-removed:** Audio Pinnacle PSE and HDR/DV Priority PSE shipped at v2.84 and were **removed in v3.2.8** (REMUX-ranking fix). Do not re-implement.
