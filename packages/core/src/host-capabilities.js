@@ -153,6 +153,15 @@ export const FEATURE_MIN_VERSIONS = Object.freeze({
 });
 
 /**
+ * Preset types an older AIOStreams refuses as emitted. anime-tosho-new needs an
+ * API key before 2.36.0 and the generators send it without one (2.36 dropped the
+ * option), so an older host would refuse the whole save.
+ */
+export const PRESET_MIN_VERSIONS = Object.freeze({
+  'anime-tosho-new': '2.36.0',
+});
+
+/**
  * Legacy keys that are NOT in the current UserDataSchema but that AIOStreams
  * still rewrites into current keys before validation
  * (`packages/core/src/utils/config.ts`, the migration pass that runs ahead of

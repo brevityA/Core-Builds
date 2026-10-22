@@ -17,7 +17,7 @@
  */
 
 import { HOST_BASE_URLS, HOST_LABEL_MAP, HOST_META } from '../data/hosts.js';
-import { FEATURE_MIN_VERSIONS } from '../data/host-capabilities.js';
+import { FEATURE_MIN_VERSIONS, PRESET_MIN_VERSIONS } from '../data/host-capabilities.js';
 import { isVersionAtLeast } from './host-capability-policy.js';
 
 /**
@@ -53,16 +53,23 @@ export function hostPickerLabel(hostKey) {
 }
 
 /**
- * The oldest AIOStreams that understands every version-gated key in `config`
- * (see FEATURE_MIN_VERSIONS). null when the config uses none — the common case.
+ * The oldest AIOStreams that understands every version-gated key and enabled
+ * preset type in `config` (FEATURE_MIN_VERSIONS, PRESET_MIN_VERSIONS). null when
+ * the config uses none — the common case.
  * `minVersions` is injectable so tests can prove the rule against a
  * hypothetical future key without inventing schema entries.
  */
-export function configRequiredAIOStreamsVersion(config, minVersions = FEATURE_MIN_VERSIONS) {
+export function configRequiredAIOStreamsVersion(config, minVersions = FEATURE_MIN_VERSIONS, presetMinVersions = PRESET_MIN_VERSIONS) {
   let required = null;
+  const need = minimum => { if (required === null || !isVersionAtLeast(required, minimum)) required = minimum; };
   for (const [key, minimum] of Object.entries(minVersions || {})) {
-    if (!config || !(key in config)) continue;
-    if (required === null || !isVersionAtLeast(required, minimum)) required = minimum;
+    if (config && key in config) need(minimum);
+  }
+  // Enabled presets count too: an Anime build carrying anime-tosho-new must not
+  // auto-route to, or be sent to, a host older than 2.36.0.
+  for (const preset of Array.isArray(config?.presets) ? config.presets : []) {
+    const minimum = preset && preset.enabled !== false && presetMinVersions?.[String(preset.type).toLowerCase()];
+    if (minimum) need(minimum);
   }
   return required;
 }
@@ -95,7 +102,8 @@ export function hostRoutingDecision(request, capabilities, options = {}) {
     return { status: 'blocked', reasons };
   }
 
-  // Feature keys older hosts drop or reject (FEATURE_MIN_VERSIONS).
+  // Feature keys and preset types older hosts drop or reject
+  // (FEATURE_MIN_VERSIONS, PRESET_MIN_VERSIONS).
   const required = configRequiredAIOStreamsVersion(request?.config, options.minVersions);
   if (required && capabilities?.version && !isVersionAtLeast(capabilities.version, required)) {
     reasons.push(`${label} runs AIOStreams ${capabilities.version}; this config needs ${required}+ and would be rejected or degraded`);

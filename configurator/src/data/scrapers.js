@@ -21,10 +21,10 @@ export const OPTIONAL_SCRAPER_DEFS = [
   { id:'argentina-tv', label:'Argentina TV', desc:'Live Argentine channels · live streams', presetType:'argentina-tv', cat:'live', color:'#38bdf8' },
   { id:'bitmagnet', label:'Bitmagnet', desc:'Self-hosted BitTorrent DHT indexer · only on hosts that configure it (not ElfHosted, ATBP, Omni, Wizaardd)', presetType:'bitmagnet', cat:'debrid', color:'#a3e635' },
   { id:'brazuca-torrents', label:'Brazuca Torrents', desc:'Dubbed movies & series (Brazilian Portuguese) · direct P2P torrents', presetType:'brazuca-torrents', cat:'p2p', color:'#fb923c' },
-  { id:'content-deep-dive', label:'Content Deep Dive', desc:'Cast, reviews, production insights · stream companion', presetType:'content-deep-dive', cat:'catalog', color:'#c4b5fd' },
+  { id:'content-deep-dive', label:'Content Deep Dive', desc:'Cast, reviews, production insights · stream companion', presetType:'content-deep-dive', cat:'catalog', resources:['stream'], category:'misc', color:'#c4b5fd' },
   { id:'debridio-tmdb', label:'Debridio TMDB', desc:'TMDB catalogs via Debridio · meta catalogs', presetType:'debridio-tmdb', credKey:'debridio', cat:'catalog', color:'#fde047' },
   { id:'debridio-tvdb', label:'Debridio TVDB', desc:'TVDB catalogs via Debridio · meta catalogs', presetType:'debridio-tvdb', credKey:'debridio', cat:'catalog', color:'#86efac' },
-  { id:'doctor-who-universe', label:'Doctor Who Universe', desc:'Doctor Who catalogs + streams', presetType:'doctor-who-universe', cat:'catalog', color:'#60a5fa' },
+  { id:'doctor-who-universe', label:'Doctor Who Universe', desc:'Doctor Who catalogs + streams', presetType:'doctor-who-universe', cat:'catalog', resources:['catalog','meta','stream'], category:'streams', color:'#60a5fa' },
   { id:'easynews', label:'EasyNews', desc:'Usenet search · easynews service', presetType:'easynews', cat:'usenet', color:'#fbbf24' },
   { id:'easynewsPlus', label:'EasyNews+', desc:'EasyNews + search catalog · usenet+meta', presetType:'easynewsPlus', cat:'usenet', color:'#facc15' },
   { id:'jackettio', label:'Jackettio', desc:'Jackett aggregator (hosted) · debrid results', presetType:'jackettio', cat:'debrid', color:'#34d399' },
@@ -32,3 +32,11 @@ export const OPTIONAL_SCRAPER_DEFS = [
   { id:'tmdb-collections', label:'TMDB Collections', desc:'Movie collection catalogs · meta catalogs', presetType:'tmdb-collections', cat:'catalog', color:'#a78bfa' },
   { id:'usa-tv-next', label:'USA TV Next', desc:'Next-gen US live TV · live streams', presetType:'usa-tv-next', cat:'live', color:'#22d3ee' },
 ];
+
+// The resources (and category) a toggled extra is emitted with: its own role when
+// the category default is wrong for it (Content Deep Dive is a stream-only preset;
+// Doctor Who Universe serves streams beside its catalogs), otherwise the category's.
+export function presetRole(def, byCategory) {
+  if (def?.resources) return { resources: [...def.resources], ...(def.category ? { category: def.category } : {}) };
+  return byCategory[def?.cat] || { resources: ['stream'] };
+}

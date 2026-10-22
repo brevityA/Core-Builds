@@ -20,12 +20,12 @@ export const OUTPUT_PROFILES = Object.freeze(['stable', 'balanced', 'advanced', 
 // 2.35.7 is the schema pin (#770): by the 2026-10-02 audit every public host ran
 // 2.35.4 or later, and the 2.34.1 -> 2.35.7 contract drift was additive only.
 // Older entries stay so existing saved sessions and shared links keep resolving.
-export const AIOSTREAMS_COMPATIBILITY_TARGETS = Object.freeze(['2.31.1', '2.32.0', '2.33.2', '2.34.0', '2.34.1', '2.35.7', 'unknown']);
+export const AIOSTREAMS_COMPATIBILITY_TARGETS = Object.freeze(['2.31.1', '2.32.0', '2.33.2', '2.34.0', '2.34.1', '2.35.7', '2.36.0', 'unknown']);
 
 // The target a fresh session gets: the AIOStreams release this configurator is
 // pinned against (see UPSTREAM.pin). Single source of truth — app.js imports it
 // for the state default and every fallback that used to hard-code '2.32.0'.
-export const DEFAULT_AIOSTREAMS_VERSION = '2.35.7';
+export const DEFAULT_AIOSTREAMS_VERSION = '2.36.0';
 
 export const OUTPUT_PROFILE_INFO = Object.freeze({
   stable: Object.freeze({
@@ -100,8 +100,8 @@ const STABLE_STREAM_TYPES = new Set([
   'torrentio', 'sootio', 'peerflix', 'hdhub',
 ]);
 
-// Balanced is the default profile, so its source list is what most users get.
-// Restricting it to the Stable set cut a TorBox build to three torrent sources,
+// Balanced was the default profile until v3.17 and is still the first step up from
+// Core Stable. Restricting it to the Stable set cut a TorBox build to three torrent sources,
 // and because AIOStreams applies a template by replacing the whole preset list,
 // every update silently removed these five from configs that predated it.
 const BALANCED_STREAM_TYPES = new Set([
@@ -109,7 +109,8 @@ const BALANCED_STREAM_TYPES = new Set([
   'mediafusion', 'eztv', 'torrent-galaxy', 'zilean', 'knaben',
   // Emitted only for Anime / Movies + Anime content with a torrent debrid service;
   // without it, choosing Anime added no anime source on the default profile.
-  'animetosho',
+  // anime-tosho-new replaces animetosho from 2.36 (see applyAIOStreamsCompatibility).
+  'animetosho', 'anime-tosho-new',
 ]);
 
 const CORE_EXTERNAL_KILL = Object.freeze({
@@ -191,7 +192,7 @@ function isExplicitPreset(preset, context) {
   // type with none: MediaFusion is the only preset that can use Seedr, and the
   // generator emits AnimeTosho only for Anime / Movies + Anime content.
   if (type === 'mediafusion') return services.has('seedr');
-  if (type === 'animetosho') return ['anime', 'mixed'].includes(context.content);
+  if (type === 'animetosho' || type === 'anime-tosho-new') return ['anime', 'mixed'].includes(context.content);
   const optional = new Set(values(context.optionalScrapers).map(v => String(v).toLowerCase()));
   // Optional-extras toggles are explicit by definition. Without this the four extras that are
   // advertised *disabled* on most lanes (neko-bt/sootio/webstreamr/yastream) get filtered back
@@ -408,22 +409,53 @@ function applyAIOStreamsCompatibility(template, context) {
       : {}),
   };
   if (target !== '2.31.1') delete template.metadata.coreBuildsLegacyTorboxSearch;
+  useAnimeToshoForTarget(config, target);
   stripNonSchemaPresetKeys(config);
   return template;
+}
+
+// AnimeTosho's feed (feed.animetosho.org) stopped taking new releases on 2026-05-09
+// and shuts down in October 2026; AIOStreams 2.36 archived that preset. The
+// generators emit its community continuation, anime-tosho-new (feed.animetosho.net),
+// which needs no API key from 2.36.0 but requires one before it. An explicitly
+// older target keeps the archived preset so its save is not refused; 'unknown'
+// is treated as current.
+const ANIME_TOSHO_NEW_FROM = '2.36.0';
+function useAnimeToshoForTarget(config, target) {
+  if (target === 'unknown' || !Array.isArray(config.presets)) return;
+  const [a, b, c] = target.split('.').map(Number), [x, y, z] = ANIME_TOSHO_NEW_FROM.split('.').map(Number);
+  const older = a !== x ? a < x : b !== y ? b < y : c < z;
+  if (!older) return;
+  config.presets = config.presets.map(preset => (
+    preset && String(preset.type).toLowerCase() === 'anime-tosho-new' ? { ...preset, type: 'animetosho' } : preset
+  ));
 }
 
 // AIOStreams' PresetSchema keeps type, instanceId, enabled, options and category,
 // and strips anything else on save. The generators tag presets with a top-level
 // `resources` hint that isStreamPreset() reads while the profiles trim sources;
-// AIOStreams never saw it (it reads options.resources, falling back to everything
-// the preset supports). Dropping it here, after the reducers, leaves the stored
-// config byte-identical and stops the export claiming a restriction nobody applies.
+// AIOStreams never sees it (it reads options.resources, falling back to everything
+// the preset supports), so it is dropped here, after the reducers.
+//
+// Where a preset supports more than the role Core Builds gives it, the hint becomes
+// the options.resources restriction AIOStreams applies. Read from the pinned
+// release's /api/v1/status (2.36.0, 2026-10-22; held by
+// configurator/tests/upstream/preset-resources-2.36.0.json): without it Torrentio,
+// StremThru Store and Peerflix add debrid-library catalogs, Sootio and Flix-Streams
+// catalogs, YaStream catalogs and subtitles, and TMDB Collections streams.
+// MediaFusion and Meteor set options.resources in the generators directly.
 const PRESET_SCHEMA_KEYS = new Set(['type', 'instanceId', 'enabled', 'options', 'category']);
+const RESOURCE_LIMITED_TYPES = new Set(['torrentio', 'stremthrustore', 'peerflix', 'sootio', 'yastream', 'flix-streams', 'tmdb-collections']);
 function stripNonSchemaPresetKeys(config) {
   if (!Array.isArray(config.presets)) return;
   config.presets = config.presets.map(preset => {
     if (!preset || typeof preset !== 'object') return preset;
-    return Object.fromEntries(Object.entries(preset).filter(([key]) => PRESET_SCHEMA_KEYS.has(key)));
+    const kept = Object.fromEntries(Object.entries(preset).filter(([key]) => PRESET_SCHEMA_KEYS.has(key)));
+    const hint = values(preset.resources);
+    if (hint.length && RESOURCE_LIMITED_TYPES.has(String(preset.type || '').toLowerCase()) && !values(kept.options?.resources).length) {
+      kept.options = { ...(kept.options || {}), resources: [...hint] };
+    }
+    return kept;
   });
 }
 

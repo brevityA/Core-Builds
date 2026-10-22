@@ -1,6 +1,6 @@
-// DO NOT EDIT — generated from AIOStreams 0832aa21104c335c4117aa02f75278fe25ffbca0
-// Source: https://github.com/Viren070/AIOStreams/tree/0832aa21104c335c4117aa02f75278fe25ffbca0
-// Upstream version: 2.35.7
+// DO NOT EDIT — generated from AIOStreams ce6244454ee131bf0945b2bd6abc670a449b224d
+// Source: https://github.com/Viren070/AIOStreams/tree/ce6244454ee131bf0945b2bd6abc670a449b224d
+// Upstream version: 2.36.0
 // Regenerate with: npm run sync:upstream   (see configurator/README.md)
 /**
  * Top-level keys of UserDataSchema. AIOStreams uses a plain `z.object`, so

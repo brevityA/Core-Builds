@@ -1,0 +1,767 @@
+{
+  "note": "SUPPORTED_RESOURCES and the resources option choices of every preset, read from a public host's /api/v1/status running the pinned release. Re-capture when UPSTREAM.pin moves (configurator/tests/preset-resources.test.mjs fails until then).",
+  "version": "2.36.0",
+  "commit": "ce624445",
+  "capturedAt": "2026-10-22",
+  "presets": {
+    "ai-companion": {
+      "supported": [
+        "catalog"
+      ],
+      "resourcesOption": [
+        "catalog"
+      ]
+    },
+    "ai-search": {
+      "supported": [
+        "catalog",
+        "meta"
+      ],
+      "resourcesOption": [
+        "catalog",
+        "meta"
+      ]
+    },
+    "aiostreams": {
+      "supported": [],
+      "resourcesOption": [
+        "stream",
+        "subtitles",
+        "catalog",
+        "meta",
+        "addon_catalog",
+        "watch_state"
+      ]
+    },
+    "aiosubtitle": {
+      "supported": [
+        "subtitles"
+      ],
+      "resourcesOption": [
+        "subtitles"
+      ]
+    },
+    "anime-catalogs": {
+      "supported": [
+        "catalog"
+      ],
+      "resourcesOption": [
+        "catalog"
+      ]
+    },
+    "anime-kitsu": {
+      "supported": [
+        "catalog",
+        "meta"
+      ],
+      "resourcesOption": [
+        "catalog",
+        "meta"
+      ]
+    },
+    "anime-tosho-new": {
+      "supported": [
+        "stream"
+      ],
+      "resourcesOption": null
+    },
+    "animetosho": {
+      "supported": [
+        "stream"
+      ],
+      "resourcesOption": null
+    },
+    "argentina-tv": {
+      "supported": [
+        "catalog",
+        "meta",
+        "stream"
+      ],
+      "resourcesOption": [
+        "catalog",
+        "meta",
+        "stream"
+      ]
+    },
+    "astream": {
+      "supported": [
+        "catalog",
+        "meta",
+        "stream"
+      ],
+      "resourcesOption": [
+        "catalog",
+        "meta",
+        "stream"
+      ]
+    },
+    "baguettio": {
+      "supported": [
+        "stream"
+      ],
+      "resourcesOption": [
+        "stream"
+      ]
+    },
+    "bitmagnet": {
+      "supported": [
+        "stream"
+      ],
+      "resourcesOption": null
+    },
+    "brazuca-torrents": {
+      "supported": [
+        "stream"
+      ],
+      "resourcesOption": [
+        "stream"
+      ]
+    },
+    "comet": {
+      "supported": [
+        "stream"
+      ],
+      "resourcesOption": [
+        "stream"
+      ]
+    },
+    "content-deep-dive": {
+      "supported": [
+        "stream"
+      ],
+      "resourcesOption": [
+        "stream"
+      ]
+    },
+    "custom": {
+      "supported": [],
+      "resourcesOption": [
+        "stream",
+        "subtitles",
+        "catalog",
+        "meta",
+        "addon_catalog",
+        "watch_state"
+      ]
+    },
+    "davex": {
+      "supported": [
+        "stream"
+      ],
+      "resourcesOption": null
+    },
+    "dc-universe": {
+      "supported": [
+        "catalog",
+        "meta"
+      ],
+      "resourcesOption": [
+        "catalog",
+        "meta"
+      ]
+    },
+    "debridio": {
+      "supported": [
+        "stream"
+      ],
+      "resourcesOption": [
+        "stream"
+      ]
+    },
+    "debridio-ic4a": {
+      "supported": [
+        "catalog",
+        "meta",
+        "stream"
+      ],
+      "resourcesOption": [
+        "catalog",
+        "meta",
+        "stream"
+      ]
+    },
+    "debridio-tmdb": {
+      "supported": [
+        "catalog",
+        "meta"
+      ],
+      "resourcesOption": [
+        "catalog",
+        "meta"
+      ]
+    },
+    "debridio-tv": {
+      "supported": [
+        "catalog",
+        "meta",
+        "stream"
+      ],
+      "resourcesOption": [
+        "catalog",
+        "meta",
+        "stream"
+      ]
+    },
+    "debridio-tvdb": {
+      "supported": [
+        "catalog",
+        "meta"
+      ],
+      "resourcesOption": [
+        "catalog",
+        "meta"
+      ]
+    },
+    "debridio-watchtower": {
+      "supported": [
+        "stream"
+      ],
+      "resourcesOption": [
+        "stream"
+      ]
+    },
+    "dmm-cast": {
+      "supported": [
+        "stream"
+      ],
+      "resourcesOption": [
+        "stream",
+        "subtitles",
+        "catalog",
+        "meta",
+        "addon_catalog",
+        "watch_state"
+      ]
+    },
+    "doctor-who-universe": {
+      "supported": [
+        "catalog",
+        "meta",
+        "stream"
+      ],
+      "resourcesOption": [
+        "catalog",
+        "meta",
+        "stream"
+      ]
+    },
+    "easynews": {
+      "supported": [
+        "stream"
+      ],
+      "resourcesOption": [
+        "stream"
+      ]
+    },
+    "easynews-search": {
+      "supported": [
+        "stream"
+      ],
+      "resourcesOption": null
+    },
+    "easynewsPlus": {
+      "supported": [
+        "stream",
+        "catalog",
+        "meta"
+      ],
+      "resourcesOption": [
+        "stream",
+        "catalog",
+        "meta"
+      ]
+    },
+    "easynewsPlusPlus": {
+      "supported": [
+        "stream"
+      ],
+      "resourcesOption": [
+        "stream"
+      ]
+    },
+    "eztv": {
+      "supported": [
+        "stream"
+      ],
+      "resourcesOption": null
+    },
+    "fkstream": {
+      "supported": [
+        "catalog",
+        "meta",
+        "stream"
+      ],
+      "resourcesOption": [
+        "catalog",
+        "meta",
+        "stream"
+      ]
+    },
+    "flix-streams": {
+      "supported": [
+        "stream",
+        "catalog",
+        "meta"
+      ],
+      "resourcesOption": [
+        "stream",
+        "catalog",
+        "meta"
+      ]
+    },
+    "hdhub": {
+      "supported": [
+        "stream"
+      ],
+      "resourcesOption": [
+        "stream"
+      ]
+    },
+    "jackett": {
+      "supported": [
+        "stream"
+      ],
+      "resourcesOption": null
+    },
+    "jackettio": {
+      "supported": [
+        "stream"
+      ],
+      "resourcesOption": [
+        "stream"
+      ]
+    },
+    "knaben": {
+      "supported": [
+        "stream"
+      ],
+      "resourcesOption": null
+    },
+    "library": {
+      "supported": [
+        "stream",
+        "catalog",
+        "meta"
+      ],
+      "resourcesOption": [
+        "stream",
+        "catalog",
+        "meta"
+      ]
+    },
+    "marvel-universe": {
+      "supported": [
+        "catalog",
+        "meta"
+      ],
+      "resourcesOption": [
+        "catalog",
+        "meta"
+      ]
+    },
+    "mediafusion": {
+      "supported": [
+        "stream",
+        "catalog",
+        "meta"
+      ],
+      "resourcesOption": [
+        "stream",
+        "catalog",
+        "meta"
+      ]
+    },
+    "meteor": {
+      "supported": [
+        "stream",
+        "meta",
+        "catalog"
+      ],
+      "resourcesOption": [
+        "stream",
+        "meta",
+        "catalog"
+      ]
+    },
+    "more-like-this": {
+      "supported": [
+        "catalog",
+        "meta",
+        "stream"
+      ],
+      "resourcesOption": [
+        "catalog",
+        "meta",
+        "stream"
+      ]
+    },
+    "neko-bt": {
+      "supported": [
+        "stream"
+      ],
+      "resourcesOption": null
+    },
+    "newznab": {
+      "supported": [
+        "stream"
+      ],
+      "resourcesOption": null
+    },
+    "nuvio-streams": {
+      "supported": [
+        "stream"
+      ],
+      "resourcesOption": [
+        "stream"
+      ]
+    },
+    "nzbhydra": {
+      "supported": [
+        "stream"
+      ],
+      "resourcesOption": null
+    },
+    "opensubtitles": {
+      "supported": [
+        "subtitles"
+      ],
+      "resourcesOption": [
+        "subtitles"
+      ]
+    },
+    "opensubtitles-v3-plus": {
+      "supported": [
+        "subtitles"
+      ],
+      "resourcesOption": [
+        "subtitles"
+      ]
+    },
+    "orion": {
+      "supported": [
+        "stream"
+      ],
+      "resourcesOption": [
+        "stream"
+      ]
+    },
+    "peerflix": {
+      "supported": [
+        "stream",
+        "catalog",
+        "meta"
+      ],
+      "resourcesOption": [
+        "stream",
+        "catalog",
+        "meta"
+      ]
+    },
+    "penguplay": {
+      "supported": [
+        "stream",
+        "subtitles",
+        "meta",
+        "catalog"
+      ],
+      "resourcesOption": [
+        "stream",
+        "subtitles",
+        "meta",
+        "catalog"
+      ]
+    },
+    "prowlarr": {
+      "supported": [
+        "stream"
+      ],
+      "resourcesOption": null
+    },
+    "rpdb-catalogs": {
+      "supported": [
+        "catalog"
+      ],
+      "resourcesOption": [
+        "catalog"
+      ]
+    },
+    "seadex": {
+      "supported": [
+        "stream"
+      ],
+      "resourcesOption": null
+    },
+    "sootio": {
+      "supported": [
+        "stream",
+        "catalog"
+      ],
+      "resourcesOption": [
+        "stream",
+        "catalog"
+      ]
+    },
+    "star-wars-universe": {
+      "supported": [
+        "catalog",
+        "meta"
+      ],
+      "resourcesOption": [
+        "catalog",
+        "meta"
+      ]
+    },
+    "streamasia": {
+      "supported": [
+        "stream",
+        "catalog",
+        "meta",
+        "subtitles"
+      ],
+      "resourcesOption": [
+        "stream",
+        "catalog",
+        "meta",
+        "subtitles"
+      ]
+    },
+    "streamfusion": {
+      "supported": [
+        "stream",
+        "catalog",
+        "meta"
+      ],
+      "resourcesOption": [
+        "stream",
+        "catalog",
+        "meta"
+      ]
+    },
+    "streaming-catalogs": {
+      "supported": [
+        "catalog"
+      ],
+      "resourcesOption": [
+        "catalog"
+      ]
+    },
+    "streamnzb": {
+      "supported": [
+        "stream"
+      ],
+      "resourcesOption": [
+        "stream"
+      ]
+    },
+    "stremio-gdrive": {
+      "supported": [
+        "stream",
+        "catalog",
+        "meta"
+      ],
+      "resourcesOption": null
+    },
+    "stremthruStore": {
+      "supported": [
+        "stream",
+        "catalog",
+        "meta"
+      ],
+      "resourcesOption": [
+        "stream",
+        "catalog",
+        "meta"
+      ]
+    },
+    "stremthruTorz": {
+      "supported": [
+        "stream"
+      ],
+      "resourcesOption": [
+        "stream"
+      ]
+    },
+    "subdl": {
+      "supported": [
+        "subtitles"
+      ],
+      "resourcesOption": [
+        "subtitles"
+      ]
+    },
+    "subhero": {
+      "supported": [
+        "subtitles"
+      ],
+      "resourcesOption": [
+        "subtitles"
+      ]
+    },
+    "subsource": {
+      "supported": [
+        "subtitles"
+      ],
+      "resourcesOption": [
+        "subtitles"
+      ]
+    },
+    "the-pirate-bay": {
+      "supported": [
+        "stream"
+      ],
+      "resourcesOption": null
+    },
+    "therarbg": {
+      "supported": [
+        "stream"
+      ],
+      "resourcesOption": null
+    },
+    "tmdb-addon": {
+      "supported": [
+        "catalog",
+        "meta"
+      ],
+      "resourcesOption": [
+        "catalog",
+        "meta"
+      ]
+    },
+    "tmdb-collections": {
+      "supported": [
+        "catalog",
+        "meta",
+        "stream"
+      ],
+      "resourcesOption": [
+        "catalog",
+        "meta",
+        "stream"
+      ]
+    },
+    "torbox": {
+      "supported": [
+        "stream",
+        "meta",
+        "catalog"
+      ],
+      "resourcesOption": [
+        "stream",
+        "meta",
+        "catalog"
+      ]
+    },
+    "torbox-search": {
+      "supported": [
+        "stream"
+      ],
+      "resourcesOption": null
+    },
+    "torrent-catalogs": {
+      "supported": [
+        "catalog"
+      ],
+      "resourcesOption": [
+        "catalog"
+      ]
+    },
+    "torrent-galaxy": {
+      "supported": [
+        "stream"
+      ],
+      "resourcesOption": null
+    },
+    "torrentio": {
+      "supported": [
+        "stream",
+        "meta",
+        "catalog"
+      ],
+      "resourcesOption": [
+        "stream",
+        "catalog",
+        "meta"
+      ]
+    },
+    "torrents-db": {
+      "supported": [
+        "stream"
+      ],
+      "resourcesOption": [
+        "stream",
+        "catalog",
+        "meta"
+      ]
+    },
+    "torznab": {
+      "supported": [
+        "stream"
+      ],
+      "resourcesOption": null
+    },
+    "tsukihime": {
+      "supported": [
+        "stream"
+      ],
+      "resourcesOption": null
+    },
+    "usa-tv": {
+      "supported": [
+        "catalog",
+        "meta",
+        "stream"
+      ],
+      "resourcesOption": [
+        "catalog",
+        "meta",
+        "stream"
+      ]
+    },
+    "usa-tv-next": {
+      "supported": [
+        "catalog",
+        "meta",
+        "stream"
+      ],
+      "resourcesOption": [
+        "catalog",
+        "meta",
+        "stream"
+      ]
+    },
+    "usenet-streamer": {
+      "supported": [
+        "stream"
+      ],
+      "resourcesOption": null
+    },
+    "webstreamr": {
+      "supported": [
+        "stream"
+      ],
+      "resourcesOption": [
+        "stream"
+      ]
+    },
+    "yastream": {
+      "supported": [
+        "stream",
+        "catalog",
+        "meta",
+        "subtitles"
+      ],
+      "resourcesOption": [
+        "stream",
+        "catalog",
+        "meta",
+        "subtitles"
+      ]
+    },
+    "zilean": {
+      "supported": [
+        "stream"
+      ],
+      "resourcesOption": null
+    }
+  }
+}

@@ -489,7 +489,8 @@ Preset `type` values confirmed in AIOStreams source (as of v2.31.0+):
 - `mediafusion-public` — not a separate preset file; likely a config option on `mediafusion`, not a distinct type
 - `torrentio` — TorBox supported but **blocked on elfhosted public instance** by developer request; unstable hosting (March 2026 suspension)
 
-**Anime-specific:** `seadex`, `animetosho`, `neko-bt`, `yastream`, `astream`, `fkstream`
+**Anime-specific:** `seadex`, `anime-tosho-new`, `neko-bt`, `yastream`, `astream`, `fkstream`, `tsukihime`
+- `animetosho` — **ARCHIVED in v2.36.0**: the original feed stopped taking releases on 2026-05-09 and shuts down in October 2026. Generators and Anime templates emit `anime-tosho-new` (same Torznab base, services and options). It needs an API key before 2.36.0 and the generators send none, so `PRESET_MIN_VERSIONS` keeps those builds off older hosts and `applyAIOStreamsCompatibility` swaps it back to `animetosho` for an explicit pre-2.36 target.
 
 **Catalog/meta (META_CATALOGS):** `tmdb-addon` (TMDB metadata), `streaming-catalogs` (streaming service catalogs), `anime-catalogs` (MAL/AniDB/AniList/Kitsu/etc.), `anime-kitsu` (Kitsu anime catalog), `torrent-catalogs` (top seeded torrents), `rpdb-catalogs` (RPDB release tracking), `tmdb-collections` (TMDB collections), `debridio-tmdb` (Debridio TMDB catalogs), `debridio-tvdb` (Debridio TVDB catalogs), `marvel-universe`, `star-wars-universe`, `dc-universe`, `doctor-who-universe` (franchise catalogs)
 
@@ -558,12 +559,12 @@ Meteor ≤ 5, Comet ≤ 5, MediaFusion ≤ 4, EZTV ≤ 3, HdHub ≤ 3, Torrent G
 - `Device/Windows/core-nexus-ultrawide.json` v0.2.13 — Windows PC / ultrawide monitor, 1080p primary + 4K fallback, full lossless audio, HDR-first visual tags, 14-PSE stack
 
 ### Anime
-- `Anime/core-nexus-anime-4k.json` v2.8.19 — 4K anime, SeaDex + AnimeTosho, cachedAnime/uncachedAnime sort
-- `Anime/core-nexus-anime-4k-lite.json` v2.8.17 — cachedAnime/uncachedAnime sort
-- `Anime/core-nexus-anime.json` v2.8.19 — 1080p anime, cachedAnime/uncachedAnime sort
-- `Anime/core-nexus-anime-lite.json` v2.8.17 — cachedAnime/uncachedAnime sort
-- `Anime/core-nexus-anime-dub.json` v2.8.19 — dubbed variant, cachedAnime/uncachedAnime sort
-- `Anime/core-nexus-anime-dub-lite.json` v2.8.17 — cachedAnime/uncachedAnime sort
+- `Anime/core-nexus-anime-4k.json` v2.8.20 — 4K anime, SeaDex + Anime Tosho (`anime-tosho-new`, needs AIOStreams 2.36+), cachedAnime/uncachedAnime sort
+- `Anime/core-nexus-anime-4k-lite.json` v2.8.18 — cachedAnime/uncachedAnime sort
+- `Anime/core-nexus-anime.json` v2.8.20 — 1080p anime, cachedAnime/uncachedAnime sort
+- `Anime/core-nexus-anime-lite.json` v2.8.18 — cachedAnime/uncachedAnime sort
+- `Anime/core-nexus-anime-dub.json` v2.8.20 — dubbed variant, cachedAnime/uncachedAnime sort
+- `Anime/core-nexus-anime-dub-lite.json` v2.8.18 — cachedAnime/uncachedAnime sort
 
 ### Nightly (gitignored — force-add to commit)
 - `Nightly/AppleTV/core-nexus-apple-tv-4k.json` v0.2.12 — DV Profile 5/8, AV1 excluded, SeaDex ISE, REPACK ISE
@@ -571,8 +572,8 @@ Meteor ≤ 5, Comet ≤ 5, MediaFusion ≤ 4, EZTV ≤ 3, HdHub ≤ 3, Torrent G
 - `Nightly/Essential/core-nexus-essential-labs.json` v0.4.5 — Essential 1080p experimental, ESE v2.0 (Protect Library, SeaDex Duplicates, Low Quality filter), perGroup() Extra Cached, anime language passthrough, subtitle PSE, cachedAnime/uncachedAnime sort, age sort key
 - `Nightly/Single/core-nexus-4k-apex-labs.json` v0.15.5 — ESE v2.0 (Protect Library, SeaDex Duplicates, rseMatched tier guards, Low Quality filter), Score IQR Guard, perGroup() dedup, Indexer Diversity, Bad Dual Audio Groups, elite group pins, Bitrate Floor ESEs (4K+1080p REMUX, runtime-aware), anime language passthrough, latestSeason season pack kill, subtitle PSE, cachedAnime/uncachedAnime sort, age sort key
 - `Nightly/Single/core-nexus-stream-labs.json` v0.10.5 — ESE v2.0 (Protect Library, SeaDex Duplicates, Low Quality filter), perGroup() prototypes, dynamicAddonFetching, StreamNZB preset, Bitrate Floor ESEs (1080p REMUX AV1 kill + 8Mbps floor, runtime-aware), anime language passthrough, subtitle PSE, cachedAnime/uncachedAnime sort, age sort key
-- `Nightly/Single/core-nexus-all-rounder-labs.json` v0.4.5 — ESE v2.0 (Protect Library, SeaDex Duplicates, rseMatched tier guards, Low Quality filter), isAnime+hasSeaDex conditional PSEs, anime+live-action scrapers, anime language passthrough, subtitle PSE, cachedAnime/uncachedAnime sort, age sort key, all LABS features
-- `Nightly/Anime/core-nexus-anime-4k-labs.json` v0.3.2 — ESE v2.0 (Protect Library, SeaDex Duplicates, rseMatched tier guards, Low Quality filter), Score IQR Guard, perGroup() dedup, Indexer Diversity, hasSeaDex conditional tiers, anime elite pins, anime language passthrough, subtitle PSE, cachedAnime/uncachedAnime sort, age sort key
+- `Nightly/Single/core-nexus-all-rounder-labs.json` v0.4.6 — ESE v2.0 (Protect Library, SeaDex Duplicates, rseMatched tier guards, Low Quality filter), isAnime+hasSeaDex conditional PSEs, anime+live-action scrapers, anime language passthrough, subtitle PSE, cachedAnime/uncachedAnime sort, age sort key, all LABS features
+- `Nightly/Anime/core-nexus-anime-4k-labs.json` v0.3.3 — ESE v2.0 (Protect Library, SeaDex Duplicates, rseMatched tier guards, Low Quality filter), Score IQR Guard, perGroup() dedup, Indexer Diversity, hasSeaDex conditional tiers, anime elite pins, anime language passthrough, subtitle PSE, cachedAnime/uncachedAnime sort, age sort key
 
 ---
 

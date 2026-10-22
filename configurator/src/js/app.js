@@ -1,7 +1,7 @@
 import { ICO } from '../data/icons.js';
 import { CHANGELOG } from '../data/changelog.js';
 import { FORMATTERS, AUDIO_HELP } from '../data/formatters.js';
-import { OPTIONAL_SCRAPER_DEFS } from '../data/scrapers.js';
+import { OPTIONAL_SCRAPER_DEFS, presetRole } from '../data/scrapers.js';
 import { HOST_BASE_URLS, HOST_LABEL_MAP, HOST_META, MIN_AIOSTREAMS_VERSION } from '../data/hosts.js';
 import { DEVICE_AUDIO_DEFAULTS, DEVICE_FORCE_LIMITED_AUDIO, DEVICE_AV1_SAFE, DEVICE_DV_SAFE, POPULAR_DEVICE_IDS, DEVICE_PROFILES } from '../data/devices.js';
 import { CAROUSEL_SVCS } from '../data/services.js';
@@ -615,7 +615,7 @@ const RADIO_ALLOWED = (() => {
 })();
 
 /* STATE MANAGEMENT */
-const STATE_SCHEMA = 5;
+const STATE_SCHEMA = 6;
 function migrateState(input) {
   const d={...(input||{})}, schema=Number(d._schema||0);
   if(schema<1){
@@ -641,6 +641,12 @@ function migrateState(input) {
     // past AIOStreams' fetch limit, so hosts refuse the whole save. Sessions still on
     // that untouched default move to OpenSubtitles v3+; an explicit mix is kept.
     if(Array.isArray(d.subtitleAddons) && d.subtitleAddons.length===1 && d.subtitleAddons[0]==='aiosubtitle') d.subtitleAddons=['opensubtitles-v3-plus'];
+  }
+  if(schema<6){
+    // 2.35.7 was the default target until 3.18, so every session saved before then
+    // stored it. Left there, Anime builds keep the archived Anime Tosho feed, which
+    // stops returning results in October 2026. A 2.35.x host can still be picked in Review.
+    if(d.aiostreamsVersion==='2.35.7') d.aiostreamsVersion=DEFAULT_AIOSTREAMS_VERSION;
   }
   d._schema=STATE_SCHEMA; return d;
 }
@@ -1477,7 +1483,8 @@ function renderOutputProfilePicker({ compact=false } = {}) {
     '2.33.2': 'v2.33.2 lane: config variants with path-param selector variants supported. No public host runs it any more — kept so saved sessions keep resolving.',
     '2.34.0': 'v2.34.0 lane: an earlier pinned release. No public host runs it any more — kept so saved sessions keep resolving.',
     '2.34.1': 'v2.34.1 lane: the previous schema pin. Builds are the same as on 2.35.7; no public host runs it any more.',
-    '2.35.7': 'v2.35.7 lane (default): the release this configurator\u2019s schema is pinned to (0832aa2). Every public host runs 2.35.4 or later.',
+    '2.35.7': 'v2.35.7 lane: the previous schema pin, for a 2.35.x host such as Omni\u2019s. Anime builds keep the archived Anime Tosho source, because the community feed (anime-tosho-new) needs an API key before 2.36.0.',
+    '2.36.0': 'v2.36.0 lane (default): the release this configurator\u2019s schema is pinned to (ce62444). Anime builds use the community Anime Tosho feed; Omni\u2019s runs 2.35.9 and does not receive them. Every other public host runs 2.36.0.',
     'unknown': 'Unknown target: old TorBox Search is removed rather than assumed portable.',
   };
   const targetNote = TARGET_NOTES[target] || TARGET_NOTES.unknown;
@@ -3989,8 +3996,8 @@ function presets() {
       return d && ['catalog','live','subtitles'].includes(d.cat);
     }).map(sid => {
       const d = OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid);
-      const safeCats = { catalog: { resources:['catalog','meta'], category:'meta_catalogs' }, live: { resources:['stream'] }, subtitles: { resources:['subtitles'] } };
-      const meta = safeCats[d.cat] || { resources:['stream'] };
+      const safeCats = { catalog: { resources:['catalog','meta'], category:'meta_catalogs' }, live: { resources:['catalog','meta','stream'] }, subtitles: { resources:['subtitles'] } };
+      const meta = presetRole(d, safeCats);
       return { type: d.presetType, instanceId: `${d.id}-opt`, enabled:true, options:{ name: d.label, timeout:5000 }, ...meta };
     }),
     ...subtitlePresets(),
@@ -4061,8 +4068,8 @@ function presets() {
       // EasyNews / EasyNews+ read the EasyNews service's login; without it enabled the
       // host refuses the save with "No credentials found for service easynews".
       if (['easynews','easynewsPlus'].includes(d.id) && !easynewsEnabled) return null;
-      const safeCats = { catalog: { resources:['catalog','meta'], category:'meta_catalogs' }, live: { resources:['stream'] }, subtitles: { resources:['subtitles'] }, debrid: { resources:['stream'] }, usenet: { resources:['stream'] } };
-      const meta = safeCats[d.cat] || { resources:['stream'] };
+      const safeCats = { catalog: { resources:['catalog','meta'], category:'meta_catalogs' }, live: { resources:['catalog','meta','stream'] }, subtitles: { resources:['subtitles'] }, debrid: { resources:['stream'] }, usenet: { resources:['stream'] } };
+      const meta = presetRole(d, safeCats);
       return { type: d.presetType, instanceId: `${d.id}-opt`, enabled:true, options:{ name: d.label, timeout:5000 }, ...meta };
     }).filter(Boolean),
     ...S.optionalScrapers.filter(sid => OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid && x.credKey && !x.apiUrl && x.presetType !== 'nzbhydra')).map(sid => {
@@ -4124,7 +4131,7 @@ function presets() {
     { type:'knaben', instanceId:'tam-knaben', enabled:torrentCapable, options:{ name:'Knaben', timeout:6000, mediaTypes:[], useMultipleInstances:false }, resources:['stream'] },
     { type:'torrents-db', instanceId:'nx-tdb-1', enabled:false, options:{ name:'TorrentsDB', timeout:5000, useMultipleInstances:false }, resources:['stream'] },
     ...(animeContent ? [
-      { type:'animetosho', instanceId:'nx-at-01', enabled:(S.content === 'anime' || S.content === 'mixed') && torrentCapable, options:{ name:'AnimeTosho', timeout:5000, mediaTypes:['anime'] }, resources:['stream'] },
+      { type:'anime-tosho-new', instanceId:'nx-at-01', enabled:(S.content === 'anime' || S.content === 'mixed') && torrentCapable, options:{ name:'Anime Tosho', timeout:5000, mediaTypes:['anime'] }, resources:['stream'] },
       { type:'neko-bt', instanceId:'neko-bt-core-builds', enabled:extrasOn('neko-bt') && torrentCapable, options:{ name:'NekoBT', timeout:5000, mediaTypes:['anime'] }, resources:['stream'] },
     ] : []),
     // p2p: v2.33 rejects Sootio outright (no usable service/HTTP provider), so the toggle

@@ -50,7 +50,7 @@ export const PRESET_OPTION_IDS = {
  * would have stayed quiet until some other config tripped it in CI.
  */
 export const UNMODELLED_PRESET_TYPES = new Set([
-  'library', 'comet', 'meteor', 'mediafusion', 'knaben', 'eztv', 'hdhub', 'animetosho',
+  'library', 'comet', 'meteor', 'mediafusion', 'knaben', 'eztv', 'hdhub', 'animetosho', 'anime-tosho-new',
   'seadex', 'neko-bt', 'sootio', 'peerflix', 'easynews-search', 'easynewsPlusPlus',
   'easynewsPlus', 'easynews', 'streamnzb', 'nzbhydra', 'aiosubtitle', 'opensubtitles-v3-plus',
   'tmdb-addon', 'streaming-catalogs', 'anime-catalogs', 'rpdb-catalogs', 'torrent-catalogs',

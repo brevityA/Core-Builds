@@ -356,6 +356,21 @@ test('exported presets carry only the keys AIOStreams keeps', () => {
   assert.ok(!applyOutputProfile(template, 'stable', {}).config.presets.some(p => p.type === 'eztv'));
 });
 
+test('anime-tosho-new ships to 2.36.0+ targets and becomes the archived animetosho below', () => {
+  // 2.35.9 and older require an API key for anime-tosho-new and the generators send none;
+  // the archived preset is the only Anime Tosho those releases accept without one.
+  const template = () => ({ config: { presets: [
+    { type: 'anime-tosho-new', instanceId: 'nx-at-01', enabled: true, resources: ['stream'], options: { name: 'Anime Tosho', timeout: 5000, mediaTypes: ['anime'] } },
+  ] } });
+  const typeFor = aiostreamsVersion => applyOutputProfile(template(), 'advanced', { content: 'anime', aiostreamsVersion }).config.presets.map(p => p.type);
+  assert.deepEqual(typeFor('2.36.0'), ['anime-tosho-new']);
+  assert.deepEqual(typeFor('unknown'), ['anime-tosho-new'], 'an unknown target keeps the live feed rather than guess');
+  for (const v of ['2.35.7', '2.34.1', '2.32.0']) assert.deepEqual(typeFor(v), ['animetosho'], v);
+  const kept = applyOutputProfile(template(), 'advanced', { content: 'anime', aiostreamsVersion: '2.35.7' }).config.presets[0];
+  assert.deepEqual(kept.options, template().config.presets[0].options, 'only the type changes');
+  assert.ok(applyOutputProfile(template(), 'stable', { content: 'anime', aiostreamsVersion: '2.36.0' }).config.presets.some(p => p.type === 'anime-tosho-new'), 'Core Stable keeps it for Anime');
+});
+
 test('Core Stable honours Resolution First, and Quality First still wins', () => {
   const lead = ctx => applyOutputProfile({ config: {} }, 'stable', { resolution: '1080p', ...ctx }).config.sortCriteria.global.slice(0, 2).map(e => e.key);
   assert.deepEqual(lead({}), ['cached', 'resolution']);
