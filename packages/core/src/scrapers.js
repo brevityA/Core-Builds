@@ -18,7 +18,6 @@ export const OPTIONAL_SCRAPER_DEFS = [
   // TorBox (addon), USA TV and Debridio Watchtower — upstream marks each removed, so any
   // config containing one is refused on save by every host. ──
   { id:'anime-kitsu', label:'Anime Kitsu', desc:'Anime catalog using Kitsu · meta catalogs', presetType:'anime-kitsu', cat:'catalog', color:'#f43f5e' },
-  { id:'argentina-tv', label:'Argentina TV', desc:'Live Argentine channels · live streams', presetType:'argentina-tv', cat:'live', color:'#38bdf8' },
   { id:'bitmagnet', label:'Bitmagnet', desc:'Self-hosted BitTorrent DHT indexer · only on hosts that configure it (not ElfHosted, ATBP, Omni, Wizaardd)', presetType:'bitmagnet', cat:'debrid', color:'#a3e635' },
   { id:'brazuca-torrents', label:'Brazuca Torrents', desc:'Dubbed movies & series (Brazilian Portuguese) · direct P2P torrents', presetType:'brazuca-torrents', cat:'p2p', color:'#fb923c' },
   { id:'content-deep-dive', label:'Content Deep Dive', desc:'Cast, reviews, production insights · stream companion', presetType:'content-deep-dive', cat:'catalog', resources:['stream'], category:'misc', color:'#c4b5fd' },

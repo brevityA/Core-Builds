@@ -5,7 +5,7 @@
     "description": "4K template tuned for Xiaomi Mi Box S (2nd gen) and similar Xiaomi/Android TV devices. Dolby Vision Profile 5 and HDR10+ supported — DV-Only Kill disabled. AV1 and VC-1 excluded (no hardware decode on 2nd gen). Lossless audio (TrueHD, DTS-HD MA, DTS:X, FLAC) excluded — Xiaomi passes bitstream via HDMI but most users use built-in speakers or basic soundbars. Handles REMUX well. 2160p primary with 1080p fallback. Based on Core Nexus 4K Samsung TV (TorBox · Library, Comet, Zilean).",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "0.1.6",
+    "version": "0.1.7",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -17,6 +17,11 @@
       "v232Action": "remove legacy preset; configure the separate Newznab endpoint only after validation"
     },
     "changelog": [
+      {
+        "date": "2026-10-22",
+        "version": "0.1.7",
+        "content": "Subtitles moved from AIOSubtitle to OpenSubtitles v3+: AIOStreams 2.36.0 removed the AIOSubtitle preset (its addon is no longer hosted), and every host on 2.36 refused this template with \"AIO Subtitle has been removed\". Same languages; no filter/sort/formatter changes."
+      },
       {
         "date": "2026-10-22",
         "version": "0.1.6",
@@ -31,11 +36,6 @@
         "date": "2026-09-25",
         "version": "0.1.4",
         "content": "Inline regex sync: patterns re-derived from the current Vidhin05 English ranked list (LQ (Sonarr) [B], Radarr Web T3, Sonarr Web T3). No filter/sort/formatter changes."
-      },
-      {
-        "date": "2026-09-05",
-        "version": "0.1.3",
-        "content": "Inline regex sync: patterns re-derived from the current Vidhin05 English ranked list (Anime LQ Groups, BR-DISK, LQ (Release Title) (Radarr), Radarr Bad Dual Groups, Radarr HD Bluray T1, Radarr HD Bluray T2, Sonarr Bad Dual Groups, TrueHD Exclude Groups). No filter/sort/formatter changes."
       }
     ]
   },
@@ -2275,15 +2275,18 @@
         ]
       },
       {
-        "type": "aiosubtitle",
-        "instanceId": "aio-sub-1",
+        "type": "opensubtitles-v3-plus",
+        "instanceId": "osub-v3-1",
         "enabled": true,
         "options": {
-          "timeout": 3000,
-          "name": "AIOSubtitle",
-          "languages": [
+          "name": "OpenSubtitles v3+",
+          "timeout": 5000,
+          "language": [
             "en"
-          ]
+          ],
+          "sources": "all",
+          "includeAiTranslated": false,
+          "movieHashPlusAutoAdjustment": false
         }
       }
     ],

@@ -84,11 +84,11 @@ const EXPLICIT_STREAM_TYPES = new Set([
 const OPTIONAL_EXTRAS_STREAM_TYPES = new Set([
   'knaben', 'zilean', 'neko-bt', 'sootio', 'webstreamr', 'yastream',
   // 17 safe add-ons (v2.34.1 audit — all isSimpleTogglePreset, lowercased, torbox-search removed in v2.32)
-  'anime-kitsu', 'argentina-tv', 'bitmagnet', 'brazuca-torrents',
-  'content-deep-dive', 'debridio-tmdb', 'debridio-tvdb', 'debridio-watchtower',
+  'anime-kitsu', 'bitmagnet', 'brazuca-torrents',
+  'content-deep-dive', 'debridio-tmdb', 'debridio-tvdb',
   'doctor-who-universe', 'easynews', 'easynewsplus', 'jackettio',
   'opensubtitles', 'tmdb-collections', 'torbox',
-  'usa-tv', 'usa-tv-next',
+  'usa-tv-next',
 ]);
 
 const STABLE_STREAM_TYPES = new Set([
@@ -410,6 +410,7 @@ function applyAIOStreamsCompatibility(template, context) {
   };
   if (target !== '2.31.1') delete template.metadata.coreBuildsLegacyTorboxSearch;
   useAnimeToshoForTarget(config, target);
+  dropRemovedPresets(config, target);
   stripNonSchemaPresetKeys(config);
   return template;
 }
@@ -421,11 +422,28 @@ function applyAIOStreamsCompatibility(template, context) {
 // older target keeps the archived preset so its save is not refused; 'unknown'
 // is treated as current.
 const ANIME_TOSHO_NEW_FROM = '2.36.0';
+
+// Presets AIOStreams 2.36.0 marks removed (METADATA.DISABLED.removed): their addons are
+// gone, and a save carrying one is refused ("AIO Subtitle has been removed: Addon is no
+// longer hosted"). An imported or updated config can still hold one, so exports for the
+// pinned or an unknown target drop them; an explicit older target keeps them, since those
+// releases accept them. Held equal to the pinned host data by
+// configurator/tests/preset-resources.test.mjs.
+export const PRESETS_REMOVED_IN_2_36 = Object.freeze([
+  'ai-companion', 'aiosubtitle', 'argentina-tv', 'astream', 'baguettio', 'debridio-ic4a', 'debridio-tv',
+  'debridio-watchtower', 'nuvio-streams', 'streamasia', 'streamfusion', 'subhero', 'torbox', 'torbox-search', 'usa-tv',
+]);
+const REMOVED_PRESET_TYPES = new Set(PRESETS_REMOVED_IN_2_36.map(type => type.toLowerCase()));
+function dropRemovedPresets(config, target) {
+  if (!Array.isArray(config.presets) || (target !== 'unknown' && !targetAtLeast(target, ANIME_TOSHO_NEW_FROM))) return;
+  config.presets = config.presets.filter(preset => !REMOVED_PRESET_TYPES.has(String(preset?.type || '').toLowerCase()));
+}
+function targetAtLeast(target, floor) {
+  const [a, b, c] = target.split('.').map(Number), [x, y, z] = floor.split('.').map(Number);
+  return a !== x ? a > x : b !== y ? b > y : c >= z;
+}
 function useAnimeToshoForTarget(config, target) {
-  if (target === 'unknown' || !Array.isArray(config.presets)) return;
-  const [a, b, c] = target.split('.').map(Number), [x, y, z] = ANIME_TOSHO_NEW_FROM.split('.').map(Number);
-  const older = a !== x ? a < x : b !== y ? b < y : c < z;
-  if (!older) return;
+  if (target === 'unknown' || !Array.isArray(config.presets) || targetAtLeast(target, ANIME_TOSHO_NEW_FROM)) return;
   config.presets = config.presets.map(preset => (
     preset && String(preset.type).toLowerCase() === 'anime-tosho-new' ? { ...preset, type: 'animetosho' } : preset
   ));

@@ -29,7 +29,11 @@ def test_core_stable_templates_stay_within_the_stable_contract(filename, expecte
     # excludedStreamSources, nzbFailover) and failover + excludedStreamTypes took
     # their place, so the templates genuinely changed and had to bump — without it
     # the update banner never offers the corrected copy.
-    assert metadata["version"] == "1.0.2"
+    # 1.0.3: AIOStreams 2.36.0 removed AIOSubtitle and refused both templates
+    # ("AIO Subtitle has been removed"); OpenSubtitles v3+ took its place.
+    assert metadata["version"] == "1.0.3"
+    assert not any(p["type"] == "aiosubtitle" for p in config["presets"])
+    assert any(p["type"] == "opensubtitles-v3-plus" and p.get("enabled") is not False for p in config["presets"])
     assert config["groups"]["enabled"] is False
     assert config["dynamicAddonFetching"]["enabled"] is False
     assert config["syncedRankedRegexUrls"] == []

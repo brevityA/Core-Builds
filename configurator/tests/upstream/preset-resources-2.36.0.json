@@ -1,5 +1,5 @@
 {
-  "note": "SUPPORTED_RESOURCES and the resources option choices of every preset, read from a public host's /api/v1/status running the pinned release. Re-capture when UPSTREAM.pin moves (configurator/tests/preset-resources.test.mjs fails until then).",
+  "note": "SUPPORTED_RESOURCES, the resources option choices, and METADATA.DISABLED.removed of every preset, read from a public host's /api/v1/status running the pinned release. Re-capture when UPSTREAM.pin moves (configurator/tests/preset-resources.test.mjs fails until then).",
   "version": "2.36.0",
   "commit": "ce624445",
   "capturedAt": "2026-10-22",
@@ -10,7 +10,8 @@
       ],
       "resourcesOption": [
         "catalog"
-      ]
+      ],
+      "removed": true
     },
     "ai-search": {
       "supported": [
@@ -39,7 +40,8 @@
       ],
       "resourcesOption": [
         "subtitles"
-      ]
+      ],
+      "removed": true
     },
     "anime-catalogs": {
       "supported": [
@@ -81,7 +83,8 @@
         "catalog",
         "meta",
         "stream"
-      ]
+      ],
+      "removed": true
     },
     "astream": {
       "supported": [
@@ -93,7 +96,8 @@
         "catalog",
         "meta",
         "stream"
-      ]
+      ],
+      "removed": true
     },
     "baguettio": {
       "supported": [
@@ -101,7 +105,8 @@
       ],
       "resourcesOption": [
         "stream"
-      ]
+      ],
+      "removed": true
     },
     "bitmagnet": {
       "supported": [
@@ -178,7 +183,8 @@
         "catalog",
         "meta",
         "stream"
-      ]
+      ],
+      "removed": true
     },
     "debridio-tmdb": {
       "supported": [
@@ -200,7 +206,8 @@
         "catalog",
         "meta",
         "stream"
-      ]
+      ],
+      "removed": true
     },
     "debridio-tvdb": {
       "supported": [
@@ -218,7 +225,8 @@
       ],
       "resourcesOption": [
         "stream"
-      ]
+      ],
+      "removed": true
     },
     "dmm-cast": {
       "supported": [
@@ -413,7 +421,8 @@
       ],
       "resourcesOption": [
         "stream"
-      ]
+      ],
+      "removed": true
     },
     "nzbhydra": {
       "supported": [
@@ -523,7 +532,8 @@
         "catalog",
         "meta",
         "subtitles"
-      ]
+      ],
+      "removed": true
     },
     "streamfusion": {
       "supported": [
@@ -535,7 +545,8 @@
         "stream",
         "catalog",
         "meta"
-      ]
+      ],
+      "removed": true
     },
     "streaming-catalogs": {
       "supported": [
@@ -595,7 +606,8 @@
       ],
       "resourcesOption": [
         "subtitles"
-      ]
+      ],
+      "removed": true
     },
     "subsource": {
       "supported": [
@@ -649,13 +661,15 @@
         "stream",
         "meta",
         "catalog"
-      ]
+      ],
+      "removed": true
     },
     "torbox-search": {
       "supported": [
         "stream"
       ],
-      "resourcesOption": null
+      "resourcesOption": null,
+      "removed": true
     },
     "torrent-catalogs": {
       "supported": [
@@ -715,7 +729,8 @@
         "catalog",
         "meta",
         "stream"
-      ]
+      ],
+      "removed": true
     },
     "usa-tv-next": {
       "supported": [

@@ -13,7 +13,7 @@
       {
         "date": "2026-10-22",
         "version": "2.8.20",
-        "content": "Anime Tosho moved to its community continuation (anime-tosho-new): the original feed stopped taking releases on 2026-05-09 and shuts down in October 2026. Needs AIOStreams 2.36.0 or later, the first release where the new preset no longer asks for an API key. Same name, options and instance ID. Drops a stale v2.31.1-only compatibility marker (this template has no TorBox Search preset). No filter/sort/formatter changes."
+        "content": "Anime Tosho moved to its community continuation (anime-tosho-new): the original feed stopped taking releases on 2026-05-09 and shuts down in October 2026. Needs AIOStreams 2.36.0 or later, the first release where the new preset no longer asks for an API key. Same name, options and instance ID. Drops a stale v2.31.1-only compatibility marker (this template has no TorBox Search preset). Subtitles moved from AIOSubtitle to OpenSubtitles v3+: AIOStreams 2.36.0 removed the AIOSubtitle preset (its addon is no longer hosted), and every host on 2.36 refused this template with \"AIO Subtitle has been removed\". Same languages; no filter/sort/formatter changes."
       }
     ]
   },
@@ -319,15 +319,18 @@
         "category": "HTTP"
       },
       {
-        "type": "aiosubtitle",
-        "instanceId": "aio-sub-1",
+        "type": "opensubtitles-v3-plus",
+        "instanceId": "osub-v3-1",
         "enabled": true,
         "options": {
-          "timeout": 4000,
-          "name": "AIOSubtitle",
-          "languages": [
+          "name": "OpenSubtitles v3+",
+          "timeout": 5000,
+          "language": [
             "en"
-          ]
+          ],
+          "sources": "all",
+          "includeAiTranslated": false,
+          "movieHashPlusAutoAdjustment": false
         }
       }
     ],

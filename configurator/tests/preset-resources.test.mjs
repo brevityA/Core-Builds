@@ -14,6 +14,7 @@ import { readFile } from 'node:fs/promises';
 
 import { generateTemplate } from '../../packages/core/src/generate-template.js';
 import { OPTIONAL_SCRAPER_DEFS } from '../src/data/scrapers.js';
+import { PRESETS_REMOVED_IN_2_36, applyOutputProfile } from '../src/core/output-profile-policy.js';
 
 const upstream = JSON.parse(await readFile(new URL('./upstream/preset-resources-2.36.0.json', import.meta.url), 'utf8'));
 const pin = JSON.parse(await readFile(new URL('../UPSTREAM.pin', import.meta.url), 'utf8'));
@@ -23,8 +24,8 @@ const pin = JSON.parse(await readFile(new URL('../UPSTREAM.pin', import.meta.url
 const SERVES_MORE_THAN_STREAMS = new Set([
   'library', 'tmdb-addon', 'anime-catalogs', 'streaming-catalogs', 'rpdb-catalogs', 'torrent-catalogs',
   'anime-kitsu', 'debridio-tmdb', 'debridio-tvdb', 'tmdb-collections', 'doctor-who-universe',
-  'argentina-tv', 'usa-tv-next', 'easynewsPlus',
-  'opensubtitles', 'opensubtitles-v3-plus', 'subdl', 'aiosubtitle',
+  'usa-tv-next', 'easynewsPlus',
+  'opensubtitles', 'opensubtitles-v3-plus', 'subdl',
 ]);
 
 const EXTRAS = OPTIONAL_SCRAPER_DEFS.filter(d => !d.credKey && !d.apiUrl).map(d => d.id);
@@ -53,7 +54,7 @@ test('the matrix reaches the presets this file is about', () => {
   const types = new Set(exported().map(({ preset }) => preset.type));
   // Flix-Streams is only ever a disabled advert, which every profile drops on export.
   for (const type of ['torrentio', 'stremthruStore', 'peerflix', 'sootio', 'yastream', 'tmdb-collections',
-    'argentina-tv', 'usa-tv-next', 'content-deep-dive', 'doctor-who-universe', 'mediafusion', 'meteor']) {
+    'usa-tv-next', 'content-deep-dive', 'doctor-who-universe', 'mediafusion', 'meteor']) {
     assert.ok(types.has(type), `${type} is never emitted by the matrix, so nothing below checks it`);
   }
 });
@@ -84,7 +85,7 @@ test('every options.resources is something the preset offers', () => {
 
 test('live TV keeps its channel catalogs; Content Deep Dive is a stream preset', () => {
   const byType = type => exported().map(({ preset }) => preset).filter(preset => preset.type === type);
-  for (const type of ['argentina-tv', 'usa-tv-next']) {
+  for (const type of ['usa-tv-next']) {
     for (const preset of byType(type)) assert.deepEqual([...effective(preset)].sort(), ['catalog', 'meta', 'stream'], type);
   }
   for (const preset of byType('content-deep-dive')) {
@@ -92,4 +93,27 @@ test('live TV keeps its channel catalogs; Content Deep Dive is a stream preset',
     assert.equal(preset.category, 'misc', 'its upstream category, not meta_catalogs');
   }
   for (const preset of byType('tmdb-collections')) assert.deepEqual(preset.options.resources, ['catalog', 'meta']);
+});
+
+test('the removed-preset list is exactly what the pinned release marks removed', () => {
+  const removed = Object.entries(upstream.presets).filter(([, p]) => p.removed).map(([id]) => id).sort();
+  assert.deepEqual([...PRESETS_REMOVED_IN_2_36].sort(), removed);
+});
+
+test('nothing exported carries a preset the pinned release removed', () => {
+  for (const { preset } of exported()) {
+    assert.ok(!upstream.presets[preset.type]?.removed, `${preset.type} is removed in ${upstream.version}; a save carrying it is refused`);
+  }
+});
+
+test('an imported removed preset is dropped for 2.36 and unknown targets, kept for older ones', () => {
+  // A live config or an older Core Builds template can still carry AIOSubtitle.
+  const template = () => ({ config: { presets: [
+    { type: 'aiosubtitle', instanceId: 'aio-sub-1', enabled: true, options: { name: 'AIOSubtitle', timeout: 4000, languages: ['en'] } },
+    { type: 'opensubtitles-v3-plus', instanceId: 'osub-v3-1', enabled: true, options: { name: 'OpenSubtitles v3+' } },
+  ] } });
+  const types = aiostreamsVersion => applyOutputProfile(template(), 'advanced', { aiostreamsVersion, preservedPresetIds: ['aio-sub-1'] }).config.presets.map(p => p.type);
+  assert.deepEqual(types('2.36.0'), ['opensubtitles-v3-plus']);
+  assert.deepEqual(types('unknown'), ['opensubtitles-v3-plus']);
+  assert.deepEqual(types('2.35.7'), ['aiosubtitle', 'opensubtitles-v3-plus'], '2.35.x still accepts it');
 });
