@@ -5,7 +5,7 @@
     "description": "Nightly Labs build — single template for live-action TV, movies, and anime. Uses isAnime + hasSeaDex conditional PSEs to switch between anime and live-action quality tiers dynamically. Includes SeaDex, AnimeTosho, NekoBT, Meteor, Comet, MediaFusion, and all LABS features. v0.4.0: Private Tracker Kill for uncached private streams, DAF totalCachedStreams fix, catalog-content exemptions on Unknown Resolution/Quality Kills (15y+). Not a daily driver.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "0.4.6",
+    "version": "0.4.5",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -57,13 +57,8 @@
     "changelog": [
       {
         "date": "2026-10-22",
-        "version": "0.4.6",
-        "content": "Inline regex sync: patterns re-derived from the current Vidhin05 English ranked list (FLUX, Radarr Web T2, Radarr Web T3, Sonarr Web T2, TrueHD Exclude Groups). No filter/sort/formatter changes."
-      },
-      {
-        "date": "2026-10-18",
         "version": "0.4.5",
-        "content": "Inline regex sync: patterns re-derived from the current Vidhin05 English ranked list (Generated Dynamic HDR). No filter/sort/formatter changes."
+        "content": "Inline regex sync: patterns re-derived from the current Vidhin05 English ranked list (FLUX, Generated Dynamic HDR, Radarr Web T2, Radarr Web T3, Sonarr Web T2, TrueHD Exclude Groups). No filter/sort/formatter changes."
       },
       {
         "date": "2026-09-26",

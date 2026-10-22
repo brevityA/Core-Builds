@@ -5,7 +5,7 @@
     "description": "4K template tuned for Xiaomi Mi Box S (2nd gen) and similar Xiaomi/Android TV devices. Dolby Vision Profile 5 and HDR10+ supported — DV-Only Kill disabled. AV1 and VC-1 excluded (no hardware decode on 2nd gen). Lossless audio (TrueHD, DTS-HD MA, DTS:X, FLAC) excluded — Xiaomi passes bitstream via HDMI but most users use built-in speakers or basic soundbars. Handles REMUX well. 2160p primary with 1080p fallback. Based on Core Nexus 4K Samsung TV (TorBox · Library, Comet, Zilean).",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "0.1.7",
+    "version": "0.1.6",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -19,13 +19,8 @@
     "changelog": [
       {
         "date": "2026-10-22",
-        "version": "0.1.7",
-        "content": "Inline regex sync: patterns re-derived from the current Vidhin05 English ranked list (FLUX, Radarr Web T1, Radarr Web T2, Radarr Web T3, Sonarr Web T2, TrueHD Exclude Groups). No filter/sort/formatter changes."
-      },
-      {
-        "date": "2026-10-18",
         "version": "0.1.6",
-        "content": "Inline regex sync: patterns re-derived from the current Vidhin05 English ranked list (Generated Dynamic HDR, LQ (Release Title) (Radarr)). No filter/sort/formatter changes."
+        "content": "Inline regex sync: patterns re-derived from the current Vidhin05 English ranked list (FLUX, Generated Dynamic HDR, LQ (Release Title) (Radarr), Radarr Web T1, Radarr Web T2, Radarr Web T3, Sonarr Web T2, TrueHD Exclude Groups). No filter/sort/formatter changes."
       },
       {
         "date": "2026-09-26",

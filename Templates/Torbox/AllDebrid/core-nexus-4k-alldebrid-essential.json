@@ -5,7 +5,7 @@
     "description": "4K AllDebrid build with Essential-grade ESE stack. IQR Tukey fence PSEs, HDR/DV Priority, Usenet Propagation Guard, AI Upscale Exclusion, and availability-safe episode-pack fallback. No TorBox required — AllDebrid only.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "0.1.6",
+    "version": "0.1.5",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -14,13 +14,8 @@
     "changelog": [
       {
         "date": "2026-10-22",
-        "version": "0.1.6",
-        "content": "Inline regex sync: patterns re-derived from the current Vidhin05 English ranked list (FLUX, Radarr Web T1, Radarr Web T2, Radarr Web T3, Sonarr Web T2, TrueHD Exclude Groups). No filter/sort/formatter changes."
-      },
-      {
-        "date": "2026-10-18",
         "version": "0.1.5",
-        "content": "Inline regex sync: patterns re-derived from the current Vidhin05 English ranked list (Generated Dynamic HDR, LQ (Release Title) (Radarr)). No filter/sort/formatter changes."
+        "content": "Inline regex sync: patterns re-derived from the current Vidhin05 English ranked list (FLUX, Generated Dynamic HDR, LQ (Release Title) (Radarr), Radarr Web T1, Radarr Web T2, Radarr Web T3, Sonarr Web T2, TrueHD Exclude Groups). No filter/sort/formatter changes."
       },
       {
         "date": "2026-09-26",
