@@ -18,15 +18,20 @@ const slug = (env) => env.replace(/^DEFAULT_|_URL$/g, '').toLowerCase().replace(
 const lines = [];
 // Presets: basicPreset({ default: [...], envBase: 'X_URL' }). A default that is a
 // full manifest URL is fetched as-is (e.g. USA TV Next), so the stub URL must be too.
+// Names carry digits (OPENSUBTITLES_V3_PLUS_URL, DEBRIDIO_IC4A_URL): a letters-only
+// pattern skipped both, and the save test fetched the real addon on every save.
 const presets = read('presets.js');
-for (const m of presets.matchAll(/default:\s*\[([^\]]*)\],\s*envBase:\s*'([A-Z_]+)'/g)) {
+for (const m of presets.matchAll(/default:\s*\[([^\]]*)\],\s*envBase:\s*'([A-Z0-9_]+)'/g)) {
   const manifest = /manifest\.json['"]/.test(m[1]) ? '/manifest.json' : '';
   lines.push(`${m[2]}=${STUB}/${slug(m[2])}${manifest}`);
 }
+const declared = [...presets.matchAll(/envBase:\s*'([^']+)'/g)].map((m) => m[1]);
+const missed = declared.filter((env) => !lines.some((line) => line.startsWith(`${env}=`)));
+if (missed.length) throw new Error(`no stub for ${missed.join(', ')}; these would reach the real addon`);
 // Built-ins with no default URL are DISABLED until one is set (Bitmagnet). Built-ins
 // that ship a default keep it: AIOStreams does not fetch them on save.
 const builtins = read('builtins.js');
-for (const m of builtins.matchAll(/default:\s*null,\s*label:\s*'[^']*',\s*env:\s*'(BUILTIN_[A-Z_]+_URL)'/g)) lines.push(`${m[1]}=${STUB}/${slug(m[1].replace(/^BUILTIN_/, ''))}`);
+for (const m of builtins.matchAll(/default:\s*null,\s*label:\s*'[^']*',\s*env:\s*'(BUILTIN_[A-Z0-9_]+_URL)'/g)) lines.push(`${m[1]}=${STUB}/${slug(m[1].replace(/^BUILTIN_/, ''))}`);
 
 if (lines.length < 40) throw new Error(`only ${lines.length} URL envs found; the image layout changed`);
 writeFileSync(new URL('./stub.env', import.meta.url), lines.sort().join('\n') + '\n');
