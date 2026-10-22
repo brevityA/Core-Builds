@@ -83,7 +83,7 @@ test('TorBox Essential Apex Mixed keeps valid episode packs until playable singl
 });
 
 test('P2P and Nuvio generation also avoid early hard season-pack removal', () => {
-  const p2p = generateTemplate({
+  const p2pInput = {
     service: 'p2p',
     device: 'generic',
     resolution: '1080p',
@@ -91,8 +91,13 @@ test('P2P and Nuvio generation also avoid early hard season-pack removal', () =>
     audio: 'limited',
     content: 'all',
     p2pEnabled: true,
-  });
+  };
+  const p2p = generateTemplate({ ...p2pInput, outputProfile: 'balanced' });
   assertAvailabilitySafePackPolicy(p2p.config.excludedStreamExpressions, 'P2P');
+  // Core Stable, the default, carries no pack rule at all: nothing is hidden.
+  const stable = generateTemplate(p2pInput);
+  assert.equal(stable.metadata.coreBuildsProfile, 'stable');
+  assert.deepEqual(stable.config.excludedStreamExpressions.map(expressionLabel), ['Core Stable | External stream kill']);
 
   const host = { id: 'fortheweak', supportsP2P: true, supportsNuvioInstant: true, supportsDebrid: true, supportsHttp: true };
   const nuvio = generateTemplate(

@@ -115,7 +115,7 @@ for (const combo of MATRIX) {
     expect(tpl, 'buildFinal() returned nothing').toBeTruthy();
     expect(tpl.config, 'generated template has no config').toBeTruthy();
     expect(tpl.metadata?.generatedAt, 'generatedAt must be stripped for golden stability').toBeUndefined();
-    const expectedProfile = combo.profile || (state.pseArch === 'apex-mixed' ? 'labs' : state.pseArch === 'iqr' ? 'advanced' : 'balanced');
+    const expectedProfile = combo.profile || (state.pseArch === 'apex-mixed' ? 'labs' : state.pseArch === 'iqr' ? 'advanced' : 'stable');
     expect(tpl.metadata?.coreBuildsProfile, 'generated output must identify its output profile').toBe(expectedProfile);
     expect(tpl.metadata?.coreBuildsAIOStreamsTarget, 'generated output must identify the requested AIOStreams lane').toBe(state.aiostreamsVersion);
     for (const key of [

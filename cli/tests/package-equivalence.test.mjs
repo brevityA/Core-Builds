@@ -92,9 +92,11 @@ for (const combo of GOLDEN_COMBOS) {
     assert.ok(t.metadata, 'missing metadata');
     assert.ok(t.config, 'missing config');
 
+    // Core Stable (the default for Standard) omits caps the user did not set.
+    const optional = t.metadata.coreBuildsProfile === 'stable' ? ['size', 'bitrate'] : [];
     for (const key of ['presets', 'services', 'formatter', 'deduplicator', 'sortCriteria',
       'preferredStreamExpressions', 'includedStreamExpressions', 'excludedStreamExpressions',
-      'size', 'bitrate', 'resultLimits', 'dynamicAddonFetching']) {
+      'size', 'bitrate', 'resultLimits', 'dynamicAddonFetching'].filter(k => !optional.includes(k))) {
       assert.ok(key in t.config, `missing config.${key}`);
     }
 

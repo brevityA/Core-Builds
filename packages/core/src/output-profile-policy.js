@@ -187,6 +187,11 @@ function isExplicitPreset(preset, context) {
   const services = new Set([context.service, ...values(context.multiServices)]);
   if (type === 'debridio') return services.has('debridio');
   if (type === 'debrider') return services.has('debrider');
+  // A lean profile may trim sources, never leave a chosen service or content
+  // type with none: MediaFusion is the only preset that can use Seedr, and the
+  // generator emits AnimeTosho only for Anime / Movies + Anime content.
+  if (type === 'mediafusion') return services.has('seedr');
+  if (type === 'animetosho') return ['anime', 'mixed'].includes(context.content);
   const optional = new Set(values(context.optionalScrapers).map(v => String(v).toLowerCase()));
   // Optional-extras toggles are explicit by definition. Without this the four extras that are
   // advertised *disabled* on most lanes (neko-bt/sootio/webstreamr/yastream) get filtered back
@@ -434,6 +439,16 @@ function applyNativeFilters(config, context) {
     }
   }
 
+  // Hide 4K and Hide Dolby Vision are plain filters, so they belong in native
+  // fields that every profile keeps. Emitted only as stream expressions, they
+  // were wiped with the rest by Stable and Balanced and the toggles did nothing.
+  if (context.exclude4K && resolution !== '1080p') {
+    config.excludedResolutions = unique([...values(config.excludedResolutions), '2160p', '1440p']);
+  }
+  if (context.excludeDV) {
+    config.excludedVisualTags = unique([...values(config.excludedVisualTags), 'DV', 'HDR+DV']);
+  }
+
   const selectedLanguages = unique(values(context.langs));
   if (context.langExclusive && selectedLanguages.length) {
     config.requiredLanguages = selectedLanguages;
@@ -556,9 +571,8 @@ function applyBalancedProfile(template, context) {
 }
 
 /**
- * Resolve a requested profile. `auto` makes Simple Mode and Quick Install
- * genuinely Stable, maps the ordinary Custom flow to Balanced, and reserves
- * Advanced/Labs for an explicit architecture or profile selection.
+ * Resolve a requested profile. `auto` is Core Stable for every flow; only an
+ * explicit architecture (IQR, Apex Mixed) or an explicit profile selects more.
  */
 export function resolveOutputProfile(input = {}) {
   const requested = String(input.outputProfile || 'auto').toLowerCase();
@@ -566,7 +580,35 @@ export function resolveOutputProfile(input = {}) {
   if (input.simpleMode || input.quickStart) return 'stable';
   if (input.pseArch === 'apex-mixed') return 'labs';
   if (input.pseArch === 'iqr') return 'advanced';
-  return 'balanced';
+  return 'stable';
+}
+
+// Builder choices a profile replaces or drops, and why. Stable rewrites the
+// formatter, sort list (where Library Boost lives) and auto-play; Stable and
+// Balanced both drop rules that exist only as stream expressions, and preloading.
+const PROFILE_DROPS = Object.freeze({
+  formatter: Object.freeze({ dropped: ['stable'], reason: 'Core Stable always uses its own stream card' }),
+  libraryBoost: Object.freeze({ dropped: ['stable'], reason: 'Core Stable does not boost library items' }),
+  autoPlay: Object.freeze({ dropped: ['stable'], reason: 'Core Stable turns auto-play off' }),
+  foreignLangKill: Object.freeze({ dropped: ['stable', 'balanced'], reason: 'the foreign-language filter runs only in the Advanced and Labs profiles' }),
+  preload: Object.freeze({ dropped: ['stable', 'balanced'], reason: 'preloading runs only in the Advanced and Labs profiles' }),
+});
+
+/**
+ * What to tell the user when the resolved profile would silently drop a choice
+ * they just made. An `auto` build moves to Balanced when Balanced honours the
+ * choice, so it takes effect; an explicitly chosen profile is never overridden,
+ * and nothing switches to Advanced on its own (it fetches differently). Null
+ * when the choice takes effect as is.
+ */
+export function profileVerdictForChoice(setting, context = {}) {
+  const rule = PROFILE_DROPS[setting];
+  if (!rule) return null;
+  const profile = resolveOutputProfile(context);
+  if (!rule.dropped.includes(profile)) return null;
+  const explicit = OUTPUT_PROFILES.includes(String(context.outputProfile || 'auto').toLowerCase());
+  const switchTo = !explicit && !rule.dropped.includes('balanced') ? 'balanced' : null;
+  return { profile, reason: rule.reason, switchTo };
 }
 
 /**
