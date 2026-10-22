@@ -19,6 +19,7 @@ import { addonPolicy, assertAddonPolicy } from '../core/addon-policy.js';
 import { assembleTemplate, ALLOWED_MIGRATION_FIELDS } from '../core/assemble-template.js';
 import { CONFIG_UPDATE_SECTIONS, diffConfigSections, migrationSelection } from '../core/config-diff.js';
 import { normalizeUpdateTemplate, importedSourceState, mergeImportedPresets, cloneUpdateValue, inheritUpdateCredentials } from '../core/template-update-policy.js';
+import { STREAM_PROXY_IDS, STREAM_PROXY_INFO, DEFAULT_STREAM_PROXY, normaliseStreamProxyState, streamProxyConfig, streamProxyFromConfig, streamProxyProblem, streamProxySaveError, isAioEncrypted } from '../core/stream-proxy-policy.js';
 import { sanitizeTemplateForRemoteImport } from '../core/import-template.js';
 import { nonWhitelistedPatterns, stripNonWhitelisted } from '../core/regex-whitelist.js';
 import { resolveHostCapabilities, parseHostStatus, hostOptionGate, gateTemplateForHost, describeRemovals, describeWarnings } from '../core/host-capability-policy.js';
@@ -449,7 +450,7 @@ async function selectHealthyHost(timeout=4000) {
 // Cloudflare Worker CORS proxy — see cloudflare-worker/README.md for deployment.
 // Set to '' to disable and fall back to direct-only fetches.
 const CORS_PROXY = 'https://core-builds-cors-proxy.tlorenzato26.workers.dev';
-const S = { service:null, device:null, resolution:null, audio:'limited', bandwidthMbps:0, content:null, name:'', multiServices:[], sizeLimit:'unlimited', formatter:'family-v4', p2pEnabled:false, qualityFirst:false, resolutionFirst:false, foreignLangKill:true, matchMode:'balanced', exclude4K:false, excludeDV:false, tmdbToken:'', tmdbApiKey:'', creds:{torbox:'',realdebrid:'',alldebrid:'',premiumize:'',debridlink:'',offcloud:'',easynews:'',easynewsPass:'',nzbgeek:'',debridio:'',debrider:'',nzbnoob:'',althub:'',usenetcrawler:'',drunkenslug:'',nzbfinder:'',jackett:'',prowlarr:'',subdl:''}, instanceHost:'elfhosted', instanceUrl:'', instanceUuid:'', instancePassword:'', baseUuid:'', basePassword:'', quickStart:false, langs: ['English'], langExclusive: false, cacheMode: 'mixed', streamPool: 'normal', pseArch: 'standard', telemetryOk: false, simpleMode: false, outputProfile:'auto', aiostreamsVersion:DEFAULT_AIOSTREAMS_VERSION, installMode: 'direct', stremioEmail: '', stremioPassword: '', subtitleLangs: ['en'], subtitleAddons: ['opensubtitles-v3-plus'], catalogs: ['tmdb-addon'], dedupMerge: false, optionalScrapers: [], cleanInstall: false, quickProfile: 'balanced', preloadEnabled:true, autoPlayMethod:'matchingFile', addonTimeout:6000, patchCinemeta:false, installAIOMeta:false, libraryBoost:'default', nzbFailover:false, nzbFailoverPosition:'after-torrents', maxFailoverNzbs:3 };
+const S = { service:null, device:null, resolution:null, audio:'limited', bandwidthMbps:0, content:null, name:'', multiServices:[], sizeLimit:'unlimited', formatter:'family-v4', p2pEnabled:false, qualityFirst:false, resolutionFirst:false, foreignLangKill:true, matchMode:'balanced', exclude4K:false, excludeDV:false, tmdbToken:'', tmdbApiKey:'', creds:{torbox:'',realdebrid:'',alldebrid:'',premiumize:'',debridlink:'',offcloud:'',easynews:'',easynewsPass:'',nzbgeek:'',debridio:'',debrider:'',nzbnoob:'',althub:'',usenetcrawler:'',drunkenslug:'',nzbfinder:'',jackett:'',prowlarr:'',subdl:''}, instanceHost:'elfhosted', instanceUrl:'', instanceUuid:'', instancePassword:'', baseUuid:'', basePassword:'', quickStart:false, langs: ['English'], langExclusive: false, cacheMode: 'mixed', streamPool: 'normal', pseArch: 'standard', telemetryOk: false, simpleMode: false, outputProfile:'auto', aiostreamsVersion:DEFAULT_AIOSTREAMS_VERSION, installMode: 'direct', stremioEmail: '', stremioPassword: '', subtitleLangs: ['en'], subtitleAddons: ['opensubtitles-v3-plus'], streamProxy: { ...DEFAULT_STREAM_PROXY, proxiedServices: [], proxiedAddons: [] }, streamProxyPassword: '', catalogs: ['tmdb-addon'], dedupMerge: false, optionalScrapers: [], cleanInstall: false, quickProfile: 'balanced', preloadEnabled:true, autoPlayMethod:'matchingFile', addonTimeout:6000, patchCinemeta:false, installAIOMeta:false, libraryBoost:'default', nzbFailover:false, nzbFailoverPosition:'after-torrents', maxFailoverNzbs:3 };
 // A clean template update must not inherit unrelated wizard/experimental flags.
 const INITIAL_STATE = cloneUpdateValue(S);
 function replaceState(nextState) {
@@ -473,6 +474,7 @@ function releaseMigrationForControl(action, element) {
   if (['set-simple-cache', 'set-cache-mode'].includes(action)) releaseMigrationFields(['excludeCached', 'excludeUncached']);
   if (['set-simple-match', 'set-match-mode'].includes(action)) releaseMigrationFields(['deduplicator', 'sortCriteria']);
   if (['toggle-lang', 'toggle-lang-exclusive'].includes(action)) releaseMigrationFields(['preferredLanguages', 'requiredLanguages']);
+  if (['toggle-stream-proxy', 'set-proxy-id', 'toggle-proxy-service', 'update-proxy-url', 'update-proxy-public-url', 'update-proxy-password'].includes(action)) releaseMigrationFields(['proxy']);
   if (['set-audio', 'device-scroll-pick', 'dev-more-select'].includes(action) || (action === 'update-radio' && ['audio', 'device'].includes(key))) releaseMigrationFields(['excludedAudioTags', 'preferredAudioTags', 'preferredAudioChannels', 'excludedEncodes', 'preferredEncodes', 'preferredVisualTags']);
   const expressionFields = CONFIG_UPDATE_SECTIONS.filter(section => ['pses', 'eses', 'ises'].includes(section.key)).flatMap(section => section.fields);
   if (['set-audio', 'device-scroll-pick', 'dev-more-select', 'set-pse-arch', 'toggle-lang', 'toggle-lang-exclusive'].includes(action)
@@ -832,6 +834,8 @@ function loadState() {
         if (parsed.instancePassword) S.instancePassword = parsed.instancePassword;
         if (parsed.baseUuid) S.baseUuid = parsed.baseUuid;
         if (parsed.basePassword) S.basePassword = parsed.basePassword;
+        if (parsed.streamProxy) S.streamProxy = normaliseStreamProxyState(parsed.streamProxy);
+        if (typeof parsed.streamProxyPassword === 'string') S.streamProxyPassword = parsed.streamProxyPassword;
         if (parsed.stremioEmail) S.stremioEmail = parsed.stremioEmail;
         if (parsed.stremioPassword) S.stremioPassword = parsed.stremioPassword;
         if (Array.isArray(parsed._importedPresets)) {
@@ -1777,6 +1781,11 @@ function renderAdvancedPanel() {
         <div style="margin-top:8px"><div style="font-size:.68rem;color:#6b7280;margin-bottom:5px">Autoplay method</div><div style="display:flex;gap:5px">${[['matchingFile','Matching file'],['matchingIndex','Matching index'],['firstFile','First file']].map(([v,l])=>`<button data-action="set-autoplay-method" data-val="${v}" style="flex:1;padding:6px;border-radius:7px;border:1px solid ${(S.autoPlayMethod||'matchingFile')===v?'rgba(0,212,255,.4)':'rgba(255,255,255,.08)'};background:${(S.autoPlayMethod||'matchingFile')===v?'rgba(0,212,255,.1)':'transparent'};color:${(S.autoPlayMethod||'matchingFile')===v?'#67e8f9':'#6b7280'};font-size:.65rem;cursor:pointer">${l}</button>`).join('')}</div></div>
         <div style="margin-top:8px"><div style="font-size:.68rem;color:#6b7280;margin-bottom:5px">Global addon timeout</div><div style="display:flex;gap:5px">${[4000,6000,8000,10000].map(v=>`<button data-action="set-addon-timeout" data-val="${v}" style="flex:1;padding:6px;border-radius:7px;border:1px solid ${Number(S.addonTimeout||6000)===v?'rgba(0,212,255,.4)':'rgba(255,255,255,.08)'};background:${Number(S.addonTimeout||6000)===v?'rgba(0,212,255,.1)':'transparent'};color:${Number(S.addonTimeout||6000)===v?'#67e8f9':'#6b7280'};font-size:.65rem;cursor:pointer">${v/1000}s</button>`).join('')}</div></div>
         <div style="margin-top:8px"><div style="font-size:.68rem;color:#6b7280;margin-bottom:5px">Bandwidth cap (Mbps) <span style="opacity:.6">— auto-limits bitrate to 80% of your speed</span></div><input type="number" min="1" max="10000" placeholder="e.g. 100" value="${Number(S.bandwidthMbps)||''}" data-action="set-bandwidth" style="width:100%;padding:7px 10px;border-radius:7px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.04);color:#e6edf3;font-size:.72rem;outline:none" /></div>
+      </div>
+
+      <div>
+        <div style="font-size:.72rem;font-weight:700;color:#4b5563;letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px">Stream Proxy</div>
+        ${streamProxyCardHtml()}
       </div>
 
       <div>
@@ -3342,6 +3351,25 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       });
     }
+    if (action === 'toggle-stream-proxy') {
+      S.streamProxy = { ...normaliseStreamProxyState(S.streamProxy), enabled: !S.streamProxy?.enabled };
+      saveState();
+      refreshStreamProxyCard();
+      if (S.streamProxy.enabled) document.getElementById('proxyUrl')?.focus();
+    }
+    if (action === 'disable-stream-proxy') {
+      S.streamProxy = { ...normaliseStreamProxyState(S.streamProxy), enabled: false };
+      saveState();
+      refreshStreamProxyCard();
+      showToast('Stream proxy turned off. Install again to save without it.');
+    }
+    if (action === 'toggle-proxy-service') {
+      const id = (e.target.closest('[data-action="toggle-proxy-service"]') || e.target).dataset.val;
+      const px = normaliseStreamProxyState(S.streamProxy);
+      S.streamProxy = { ...px, proxiedServices: px.proxiedServices.includes(id) ? px.proxiedServices.filter(v => v !== id) : [...px.proxiedServices, id] };
+      saveState();
+      refreshStreamProxyCard();
+    }
     if (action === 'toggle-pref') {
       const card = e.target.closest('[data-action="toggle-pref"]') || e.target;
       const key = card.dataset.key;
@@ -3610,6 +3638,13 @@ document.addEventListener('DOMContentLoaded', () => {
   // Handle inputs and changes
   document.addEventListener('change', (e) => {
     if (e.target.dataset.action) releaseMigrationForControl(e.target.dataset.action, e.target);
+    if (e.target.dataset.action === 'set-proxy-id') {
+      if (!STREAM_PROXY_IDS.includes(e.target.value)) return;
+      S.streamProxy = { ...normaliseStreamProxyState(S.streamProxy), id: e.target.value };
+      saveState();
+      refreshStreamProxyCard();
+      return;
+    }
     if (e.target.dataset.action === 'set-aiostreams-target') {
       const target = e.target.value;
       if (!AIOSTREAMS_COMPATIBILITY_TARGETS.includes(target)) return;
@@ -3778,14 +3813,77 @@ document.addEventListener('DOMContentLoaded', () => {
       const mbps = Math.floor(Number(e.target.value));
       S.bandwidthMbps = Number.isFinite(mbps) && mbps > 0 ? Math.min(mbps, 10000) : 0;
     }
+    else if (a === 'update-proxy-url' || a === 'update-proxy-public-url') {
+      S.streamProxy = { ...normaliseStreamProxyState(S.streamProxy), [a === 'update-proxy-url' ? 'url' : 'publicUrl']: e.target.value.trim() };
+      refreshStreamProxyStatus();
+    }
+    else if (a === 'update-proxy-password') { S.streamProxyPassword = e.target.value; refreshStreamProxyStatus(); }
     else if (a === 'update-stremio-email') S.stremioEmail = e.target.value.trim();
     else if (a === 'update-stremio-password') S.stremioPassword = e.target.value;
 
-    if(['update-name', 'update-cred', 'update-tmdb', 'update-tmdb-key', 'update-url', 'update-pwd', 'update-uuid', 'update-stremio-email', 'update-stremio-password', 'set-bandwidth'].includes(a)){
+    if(['update-name', 'update-cred', 'update-tmdb', 'update-tmdb-key', 'update-url', 'update-pwd', 'update-uuid', 'update-stremio-email', 'update-stremio-password', 'set-bandwidth', 'update-proxy-url', 'update-proxy-public-url', 'update-proxy-password'].includes(a)){
       saveState();
     }
   });
 });
+
+/* STREAM PROXY (MediaFlow / StremThru / built-in) */
+const PROXY_SERVICE_LABELS = { torbox:'TorBox', realdebrid:'Real-Debrid', alldebrid:'AllDebrid', premiumize:'Premiumize', debridlink:'Debrid-Link', offcloud:'Offcloud', easydebrid:'EasyDebrid', pikpak:'PikPak', seedr:'Seedr', easynews:'EasyNews', stremio_nntp:'Usenet (NNTP)', none:'P2P & direct links' };
+function proxyStatusText(px) {
+  if (!px.enabled) return { tone:'var(--th-tx3)', text:'Off. Streams play straight from the debrid or source CDN.' };
+  const problem = streamProxyProblem(px, S.streamProxyPassword);
+  if (problem) return { tone:'var(--th-red)', text:`${problem} Until then the build leaves the proxy off.` };
+  const scope = px.proxiedServices.length ? px.proxiedServices.map(id => PROXY_SERVICE_LABELS[id] || id).join(', ') : 'every stream';
+  const sealed = isAioEncrypted(px.url) || isAioEncrypted(S.streamProxyPassword) ? ' These settings are still encrypted by the AIOStreams instance you exported them from, so they only save there.' : '';
+  return { tone:'var(--th-green)', text:`AIOStreams will play ${scope} through ${STREAM_PROXY_INFO[px.id].label}. It checks the proxy when you save, so it must be reachable from the AIOStreams host.${sealed}` };
+}
+function streamProxyCardHtml() {
+  const px = normaliseStreamProxyState(S.streamProxy);
+  const info = STREAM_PROXY_INFO[px.id];
+  const status = proxyStatusText(px);
+  // Theme tokens, not literals: the drawer renders in both themes.
+  const field = 'width:100%;padding:7px 10px;border-radius:7px;border:1px solid var(--th-input-border);background:var(--th-input-bg);color:var(--th-tx);color-scheme:var(--th-select-scheme);font-size:.72rem';
+  const label = 'font-size:.68rem;color:var(--th-tx3);margin:8px 0 5px';
+  // AIOStreams' own usenet engine is never proxied, so it is not offered.
+  const ids = (() => { try { return services().filter(sv => sv.enabled && sv.id !== 'aiostreams').map(sv => sv.id); } catch (e) { return []; } })();
+  const choices = [...new Set([...ids, ...px.proxiedServices.filter(id => id !== 'none'), 'none'])];
+  const chips = choices.map(id => {
+    const on = px.proxiedServices.includes(id);
+    return `<button type="button" data-action="toggle-proxy-service" data-val="${escHtml(id)}" aria-pressed="${on}" style="padding:6px 10px;border-radius:6px;font-size:.72rem;font-weight:${on?'700':'500'};border:1px solid ${on?'var(--th-green-border)':'var(--th-border-strong)'};background:${on?'var(--th-green-bg)':'transparent'};color:${on?'var(--th-green)':'var(--th-tx2)'};cursor:pointer">${escHtml(PROXY_SERVICE_LABELS[id] || id)}</button>`;
+  }).join('');
+  const on = px.enabled;
+  return `<div id="streamProxyCard">
+    <div class="pref-card${on?' pref-on':''}" data-action="toggle-stream-proxy" role="switch" aria-checked="${on}" tabindex="0" style="cursor:pointer">
+      <div class="pref-body-inner"><div class="pref-title">Play through my proxy</div><div class="pref-desc">Route playback through your own MediaFlow Proxy or StremThru, for example to share one debrid IP across devices or get past ISP throttling. You need a proxy you run or rent.</div></div>
+      <div class="pref-circle">${on?'<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#0d1117" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>':''}</div>
+    </div>
+    ${on ? `<div style="margin-top:8px">
+      <label for="proxyKind" style="display:block;${label}">Proxy</label>
+      <select id="proxyKind" data-action="set-proxy-id" style="${field}">${STREAM_PROXY_IDS.map(id => `<option value="${id}" ${id === px.id ? 'selected' : ''}>${STREAM_PROXY_INFO[id].label}</option>`).join('')}</select>
+      ${px.id === 'builtin' ? `<div style="${label}">Uses the AIOStreams instance you install to as the proxy.</div>` : `<label for="proxyUrl" style="display:block;${label}">Address</label>
+      <input id="proxyUrl" type="url" inputmode="url" autocomplete="off" spellcheck="false" placeholder="https://proxy.example.com" value="${escHtml(px.url)}" data-action="update-proxy-url" style="${field}" />`}
+      <label for="proxyPassword" style="display:block;${label}">${escHtml(info.credential)}</label>
+      <input id="proxyPassword" type="password" autocomplete="off" placeholder="${escHtml(info.credential)}" value="${escHtml(S.streamProxyPassword || '')}" data-action="update-proxy-password" style="${field}" />
+      <div style="font-size:.62rem;color:var(--th-tx3);margin-top:4px;line-height:1.4">${escHtml(info.hint)} Saved on this device and written into the config you install; never put in share links.</div>
+      ${px.id === 'builtin' ? '' : `<label for="proxyPublicUrl" style="display:block;${label}">Public address <span style="opacity:.6">(optional, only if players reach the proxy at a different address)</span></label>
+      <input id="proxyPublicUrl" type="url" inputmode="url" autocomplete="off" spellcheck="false" placeholder="https://proxy.example.com" value="${escHtml(px.publicUrl)}" data-action="update-proxy-public-url" style="${field}" />`}
+      <div style="${label}">Proxy streams from <span style="opacity:.6">(none picked = all)</span></div>
+      <div style="display:flex;flex-wrap:wrap;gap:5px">${chips}</div>
+    </div>` : ''}
+    <div id="proxyStatus" role="status" style="font-size:.66rem;line-height:1.4;margin-top:8px;color:${status.tone}">${escHtml(status.text)}</div>
+  </div>`;
+}
+function refreshStreamProxyCard() {
+  const card = document.getElementById('streamProxyCard');
+  if (card) card.outerHTML = streamProxyCardHtml();
+}
+function refreshStreamProxyStatus() {
+  const el = document.getElementById('proxyStatus');
+  if (!el) return;
+  const status = proxyStatusText(normaliseStreamProxyState(S.streamProxy));
+  el.style.color = status.tone;
+  el.textContent = status.text;
+}
 
 /* PAYLOAD GENERATION & API LOGIC */
 function insights() {
@@ -4394,7 +4492,7 @@ function build() {
     sortCriteria: sortPolicy(S),
     deduplicator: (function(){ const isFree=S.service==='p2p'||S.service==='http'; return { enabled:true, excludeAddons:[], multiGroupBehaviour: S.matchMode === 'relaxed' ? 'conservative' : 'aggressive', keys:isFree?['filename','infoHash','smartDetect']:['filename','infoHash','smartDetect'], cached: isFree ? 'disabled' : (S.matchMode === 'relaxed' ? 'per_service' : 'single_result'), uncached: isFree ? 'disabled' : 'per_service', p2p:'per_addon', smartDetectAttributes:['size','resolution','quality','visualTags','audioTags','audioChannels','languages','encode','edition','network','remastered','bitrate','releaseGroup'], smartDetectRounding: S.matchMode === 'strict' ? 5 : 10, libraryBehaviour: isFree ? 'ignore' : 'prefer', tiebreakers:[{type:'torrent_seeders',position:'before_addon'},{type:'usenet_age',position:'before_addon'}], ...(S.dedupMerge ? { merge: { enabled: true, failoverVariants: true, fields: [] } } : {}) }; })(),
     formatter: (function(){ const _f = S.formatter === 'custom' && S.customFormatter ? S.customFormatter : FORMATTERS.find(f => f.id === (S.formatter||'family-v4')) || FORMATTERS[0]; return { id:'tamtaro', definitions:{ overrides:{ tamtaro:{ name: _f.name, description: _f.d } } } }; })(),
-    proxy: { id:'mediaflow', proxiedAddons:[], proxiedServices:[] },
+    proxy: streamProxyConfig(S.streamProxy, S.streamProxyPassword),
     resultLimits: { global: rc.maxResults, resolution: rc.maxResultsPerResolution, mode: 'conjunctive' },
     size: sizePolicy(input),
     bitrate: bitratePolicy(input, hasTmdb),
@@ -4526,6 +4624,15 @@ function renderConfigRejectedDispatch(safeMsg, apiDetail) {
     const mp = built.find(p => presetMatchesAddon(p, afe.name));
     _lastAddonKey = mp ? (mp.options && mp.options.name) || mp.type || afe.name : afe.name;
     return renderAddonFetchFallback(afe.name, afe.reason, safeMsg);
+  }
+  const proxyHint = streamProxySaveError(apiDetail);
+  if (proxyHint) {
+    return `<div style="margin-top:10px;padding:12px 14px;border-radius:10px;background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.25)">`+
+      `<div style="font-size:.82rem;font-weight:700;color:#fbbf24;margin-bottom:6px">${ICO.warn(14,'#fbbf24')} Your stream proxy stopped the save</div>`+
+      `<div style="font-size:.76rem;color:#8b949e;line-height:1.5;margin-bottom:8px">${escHtml(proxyHint)}</div>`+
+      `<code style="font-size:.7rem;background:rgba(0,0,0,.3);padding:4px 8px;border-radius:4px;display:block;margin-bottom:8px;word-break:break-word;color:#f59e0b">${safeMsg}</code>`+
+      `<button data-action="disable-stream-proxy" style="padding:8px 14px;border-radius:8px;border:1px solid rgba(245,158,11,.4);background:rgba(245,158,11,.12);color:#fbbf24;font-size:.78rem;font-weight:700;cursor:pointer">Turn the proxy off</button>`+
+      `</div>`;
   }
   return `<div style="margin-top:10px;padding:12px 14px;border-radius:10px;background:rgba(248,113,113,.06);border:1px solid rgba(248,113,113,.2)"><div style="font-size:.82rem;font-weight:700;color:#f87171;margin-bottom:6px">${ICO.warn(14,'#f87171')} Config rejected by AIOStreams</div><div style="font-size:.76rem;color:#8b949e;line-height:1.5;margin-bottom:8px"><code style="font-size:.72rem;background:rgba(0,0,0,.3);padding:4px 8px;border-radius:4px;display:block;margin-top:4px;word-break:break-word;color:#f87171">${safeMsg}</code></div><div style="display:flex;gap:8px"><button data-action="simple-install" style="padding:8px 16px;border-radius:8px;border:1px solid rgba(0,212,255,.3);background:rgba(0,212,255,.06);color:#00d4ff;font-size:.8rem;font-weight:700;cursor:pointer">Retry</button><button data-action="generate-dl" style="padding:8px 16px;border-radius:8px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.03);color:#9ca3af;font-size:.8rem;font-weight:700;cursor:pointer">Export JSON</button></div></div>`;
 }
@@ -5134,6 +5241,13 @@ function parseTemplateToState(tpl) {
   };
   if (OUTPUT_PROFILES.includes(tpl?.metadata?.coreBuildsProfile)) st.outputProfile = tpl.metadata.coreBuildsProfile;
   if (AIOSTREAMS_COMPATIBILITY_TARGETS.includes(tpl?.metadata?.coreBuildsAIOStreamsTarget)) st.aiostreamsVersion = tpl.metadata.coreBuildsAIOStreamsTarget;
+  // An exported live config carries the user's working proxy; keep it rather than
+  // replacing it with an off switch on the next push.
+  if (c.proxy?.enabled === true && c.proxy.url) {
+    const recovered = streamProxyFromConfig(c.proxy);
+    st.streamProxy = recovered.state;
+    if (recovered.credentials) st.streamProxyPassword = recovered.credentials;
+  }
 
   const presets = c.presets || [];
   const enabledPresets = presets.filter(p => p.enabled !== false);
@@ -5466,6 +5580,12 @@ function upgradeToTemplate(input, opts = {}) {
     nextState[key] = savedState[key];
   }
   nextState.creds = { ...INITIAL_STATE.creds, ...inheritUpdateCredentials(savedState.creds || {}, parsed.creds || {}) };
+  // A proxy is the user's own infrastructure, like the destination above: a
+  // Core Builds template carries none, so updating from one keeps theirs.
+  if (!parsed.streamProxy?.enabled) {
+    nextState.streamProxy = cloneUpdateValue(savedState.streamProxy || DEFAULT_STREAM_PROXY);
+    nextState.streamProxyPassword = savedState.streamProxyPassword || '';
+  }
   nextState._migrationKeep = null;
   nextState._migrationRemove = [];
 

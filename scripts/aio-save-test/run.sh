@@ -20,8 +20,8 @@ case "$VARIANT" in
     ACCESS=(-e REGEX_FILTER_ACCESS=all -e SEL_SYNC_ACCESS=all) ;;
   restricted)
     ALLOW="$HERE/allowlist.elfhosted.json"
-    # process.stdout.write, not node -p: captured by $(...), node -p output stops at 65,536
-    # characters, and ElfHosted's list passed that on 2026-10-22. AIOStreams then got half a
+    # process.stdout.write, not node -p: node -p output into a pipe stops at 65,536 bytes
+    # (Node 22), and ElfHosted's list passed that on 2026-10-22. AIOStreams then got half a
     # JSON array and refused to start ("Invalid environment variable configuration").
     json() { node -e "process.stdout.write(JSON.stringify(require('$ALLOW').$1))"; }
     ACCESS=(-e "REGEX_FILTER_ACCESS=$(node -p "require('$ALLOW').level")" -e SEL_SYNC_ACCESS=trusted
