@@ -1,10 +1,14 @@
 # Changelog
 
-## 3.11.0 (2026-10-18)
+## 3.11.0 (2026-10-22)
 
 ### Fixed
 - **Inline regex re-synced after Vidhin05 added SumVision to Generated Dynamic HDR (43 templates)** — hosts accept a regex only on an exact string match with their allowlist, and ElfHosted's now holds only the new text, so every template and generated config carrying the old copy was refused on save ("1 / N regexes are not allowed"). Re-derived with `check_upstream_drift.mjs --update` + `sync_ranked_regex.py`, which also carried SiCFoI into `LQ (Release Title) (Radarr)`. The new upstream `IMF` entry is reported for review and not adopted (list membership is human-gated). Each affected template bumps a patch version with a changelog entry so the update banner offers it.
 - **`check_upstream_drift.mjs` reports changes to repeated names** — upstream names both Generated Dynamic HDR patterns identically and the checker keyed entries by name, so a change to the first was invisible; #790 listed two other changes and missed the one breaking saves. Repeats are keyed `Name [B]`, `Name [C]` (the ranked list's convention), and a changed pattern still present in the configurator's shipped consts is flagged as refusing saves. Covered by `tests/test_upstream_drift.py`.
+- **Second re-sync (2026-10-22): Radarr Web T1–T3, Sonarr Web T2, FLUX, TrueHD Exclude Groups (43 templates)** — Vidhin05 added monkee and CMRG, dropped SiGMA and DON, and removed FLUX's `/i` flag. Five of the changed strings were in the reviewed ranked list, so allowlisted hosts refused them; every copy (templates, `Filtering/ranked-regex-patterns.json`, `cli/data/ranked-regex.json`, the configurator) is re-synced verbatim and the ElfHosted allowlist snapshot re-captured (now 6 synced URLs, adding Vidhin05 French).
+- **`sync_ranked_regex.py` compared pattern bodies, not flags** — `norm()` strips the `/…/flags` wrapper and both the replace step and `--check` used it, so FLUX losing `/i` left 69 copies stale while `--check` passed. Wrapped copies now need an exact match (`in_snapshot`), and `tests/test_sync_ranked_regex.py` pins it (3 of its 4 tests fail on the old script).
+- **`packages/core` regex consts brought under the sync** — the script never covered `packages/core/src/generate-template.js` or `PREFERRED_REGEX_1080P`; the CLI carried the stale FLUX and a BR-DISK filter older than either snapshot. Both are re-synced and now part of `--check`.
+- **Restricted save test passes the full allowlist** — `run.sh` captured `node -p` output with `$(...)`, which stops at 65,536 characters; ElfHosted's list crossed that today, so AIOStreams got half a JSON array and refused to start.
 - **Save-test allowlist snapshot refreshed** — `scripts/aio-save-test/allowlist.elfhosted.json` (from 2026-10-03) still held the old literal, so the restricted CI run passed while ElfHosted refused every save. Now captured from ElfHosted 2.36.0.
 
 ## 3.10.0 (2026-10-13)

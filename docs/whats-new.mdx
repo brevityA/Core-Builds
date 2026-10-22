@@ -10,7 +10,7 @@ This page is regenerated from `configurator/src/data/changelog.js` by `scripts/s
 
 For the template-suite release log, see the [Changelog](https://corebuilds-docs.docsalot.dev/changelog).
 
-## Configurator v3.17 (Oct 18 2026)
+## Configurator v3.17 (Oct 22 2026)
 
 <CardGroup cols={2}>
   <Card title="ElfHosted saves refused" icon="sparkles">
@@ -18,6 +18,9 @@ For the template-suite release log, see the [Changelog](https://corebuilds-docs.
   </Card>
   <Card title="The drift watcher now names the entry that broke" icon="bolt">
     it opened an issue on Oct 15 but listed two other changes. Upstream gives both Generated Dynamic HDR patterns the same name, and the watcher keyed entries by name alone, so the second hid any change to the first. Repeated names are now told apart, and an issue says when a changed pattern is one every generated config ships, which means saves are being refused already. The save test's copy of ElfHosted's allowlist was also two weeks stale, still holding the old text, which is why it stayed green; it is refreshed.
+  </Card>
+  <Card title="Five more regex patterns re-synced" icon="shield-check">
+    on Oct 22 Vidhin05 edited Radarr Web T1–T3, Sonarr Web T2, FLUX and TrueHD Exclude Groups (monkee and CMRG added, SiGMA and DON dropped, FLUX made case-sensitive). Every build that carries the inline regex list shipped five strings ElfHosted no longer allows, so saves were refused again. All copies now match upstream character for character. The re-sync tool had skipped the FLUX edit because it ignored regex flags, and it never covered the CLI's own copies, where an outdated BR-DISK filter had also been left behind; both are fixed and now checked.
   </Card>
 </CardGroup>
 

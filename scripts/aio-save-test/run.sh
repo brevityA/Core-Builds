@@ -20,9 +20,13 @@ case "$VARIANT" in
     ACCESS=(-e REGEX_FILTER_ACCESS=all -e SEL_SYNC_ACCESS=all) ;;
   restricted)
     ALLOW="$HERE/allowlist.elfhosted.json"
+    # process.stdout.write, not node -p: captured by $(...), node -p output stops at 65,536
+    # characters, and ElfHosted's list passed that on 2026-10-22. AIOStreams then got half a
+    # JSON array and refused to start ("Invalid environment variable configuration").
+    json() { node -e "process.stdout.write(JSON.stringify(require('$ALLOW').$1))"; }
     ACCESS=(-e "REGEX_FILTER_ACCESS=$(node -p "require('$ALLOW').level")" -e SEL_SYNC_ACCESS=trusted
-            -e "WHITELISTED_REGEX_PATTERNS_URLS=$(node -p "JSON.stringify(require('$ALLOW').urls)")"
-            -e "WHITELISTED_REGEX_PATTERNS=$(node -p "JSON.stringify(require('$ALLOW').patterns)")")
+            -e "WHITELISTED_REGEX_PATTERNS_URLS=$(json urls)"
+            -e "WHITELISTED_REGEX_PATTERNS=$(json patterns)")
     export MATRIX_HOST=elfhosted ;;
   *) echo "unknown variant: $VARIANT (open|restricted)" >&2; exit 2 ;;
 esac
