@@ -11,7 +11,7 @@ Auto-generated from [`CHANGELOG.md`](https://github.com/brevityA/Core-Builds/blo
 
 | Version | Date | Highlights |
 | --- | --- | --- |
-| v3.11.0 | 2026-10-18 | Inline regex re-synced after Vidhin05 added SumVision to Generated Dynamic HDR (43 templates) — hosts accept a regex onl… |
+| v3.11.0 | 2026-10-22 | Inline regex re-synced after Vidhin05 added SumVision to Generated Dynamic HDR (43 templates) — hosts accept a regex onl… |
 | v3.10.0 | 2026-10-13 | Host-preload collection drops the nested Deprecated lane — sync_template_collection.py checked only the first path part … |
 | v3.9.0 | 2026-09-26 | nzbFailover → failover across all 60 active templates — AIOStreams renamed the key and migrates the old spelling before … |
 | v3.8.0 | 2026-09-22 | Dead-key purge across all 55 active templates — maxResults, maxResultsPerResolution, seadexBestOnly, excludedStreamSourc… |

@@ -39,7 +39,7 @@ test('collectRegexPatternSet: a regex-scoring golden carries the synced URL + it
 
 // Balanced keeps inline regex but no synced URL since v3.14. Before that it shipped
 // neither, so its builds sorted on a regexScore nothing filled. (Balanced was the
-// default until v3.18; Core Stable is now, and the default golden carries neither.)
+// default until v3.17; Core Stable is now, and the default golden carries neither.)
 test('collectRegexPatternSet: a Balanced golden carries inline patterns but no synced URL', async () => {
   const golden = JSON.parse(await readFile(new URL('../e2e/golden/core-balanced-torbox-1080p.json', import.meta.url), 'utf8'));
   const set = collectRegexPatternSet(golden.config);
