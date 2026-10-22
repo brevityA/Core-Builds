@@ -199,8 +199,9 @@ def patch_torbox_readme(patcher, versions, release_version):
 # template-directory.mdx heading name -> template stem. Every "### Name — vX.Y.Z"
 # heading on that page needs an entry, or its version silently stops updating;
 # tests/test_sync_docs_headings.py holds the page to this map. Until v3.18 it
-# covered 22 of 44 headings and every Lite, Fire Stick, Labs and device variant
-# had drifted (Windows Ultrawide read v0.2.4 against a v0.2.14 template).
+# matched 21 of the page's 43 headings, and all 22 others had drifted: every
+# Lite, Fire Stick, Labs and device variant (Windows Ultrawide read v0.2.4
+# against a v0.2.13 template).
 TEMPLATE_DIRECTORY_HEADINGS = {
     "4K Apex": "core-nexus-4k-apex",
     "4K Apex (TorBox-only)": "core-nexus-4k-apex-torbox",

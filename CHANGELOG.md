@@ -1,5 +1,13 @@
 # Changelog
 
+## 3.12.0 (2026-10-22)
+
+### Fixed
+- **52 templates refused on AIOStreams 2.36 (AIOSubtitle removed)** — AIOStreams 2.36.0 marks the `aiosubtitle` preset removed ("Addon is no longer hosted") and refuses any config carrying it. Seven of the eight public hosts, ElfHosted included, run 2.36.0, so every maintained template with AIOSubtitle enabled was refused on save with "AIO Subtitle has been removed". Each now uses `opensubtitles-v3-plus` (instance `osub-v3-1`, same languages), the configurator's default since 3.16, with one patch bump; templates already bumped for the Anime Tosho change carry both notes in one row. Verified by saving templates into AIOStreams 2.36.0. Legacy, Deprecated, Community and Personal templates are untouched.
+
+### Changed
+- **Anime Tosho moved to its live feed (9 templates, one bump each)** — AIOStreams 2.36.0 archives the `animetosho` preset: the original feed stopped taking releases on 2026-05-09 and shuts down in October 2026. The seven Anime templates plus Anime 4K Labs and All-Rounder Labs now use `anime-tosho-new`, the community continuation, with the same name, options and instance ID. It needs AIOStreams 2.36.0 or later (older releases require an API key for it); seven of the eight public hosts run 2.36.0. Each template drops a stale `maximumAIOStreamsVersion: 2.31.1` marker it never needed, since none carries TorBox Search. The host-preload collection is regenerated.
+
 ## 3.11.0 (2026-10-22)
 
 ### Fixed
