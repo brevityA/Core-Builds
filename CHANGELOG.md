@@ -1,5 +1,13 @@
 # Changelog
 
+## 3.12.0 (2026-10-22)
+
+### Fixed
+- **52 templates refused on AIOStreams 2.36 (AIOSubtitle removed)** — AIOStreams 2.36.0 marks the `aiosubtitle` preset removed ("Addon is no longer hosted") and refuses any config carrying it. Seven of the eight public hosts, ElfHosted included, run 2.36.0, so every maintained template with AIOSubtitle enabled was refused on save with "AIO Subtitle has been removed". Each now uses `opensubtitles-v3-plus` (instance `osub-v3-1`, same languages), the configurator's default since 3.16, with one patch bump; templates already bumped for the Anime Tosho change carry both notes in one row. Verified by saving templates into AIOStreams 2.36.0. Legacy, Deprecated, Community and Personal templates are untouched.
+
+### Changed
+- **Anime Tosho moved to its live feed (9 templates, one bump each)** — AIOStreams 2.36.0 archives the `animetosho` preset: the original feed stopped taking releases on 2026-05-09 and shuts down in October 2026. The seven Anime templates plus Anime 4K Labs and All-Rounder Labs now use `anime-tosho-new`, the community continuation, with the same name, options and instance ID. It needs AIOStreams 2.36.0 or later (older releases require an API key for it); seven of the eight public hosts run 2.36.0. Each template drops a stale `maximumAIOStreamsVersion: 2.31.1` marker it never needed, since none carries TorBox Search. The host-preload collection is regenerated.
+
 ## 3.11.0 (2026-10-22)
 
 ### Fixed
@@ -7,7 +15,7 @@
 - **`check_upstream_drift.mjs` reports changes to repeated names** — upstream names both Generated Dynamic HDR patterns identically and the checker keyed entries by name, so a change to the first was invisible; #790 listed two other changes and missed the one breaking saves. Repeats are keyed `Name [B]`, `Name [C]` (the ranked list's convention), and a changed pattern still present in the configurator's shipped consts is flagged as refusing saves. Covered by `tests/test_upstream_drift.py`.
 - **`sync_ranked_regex.py` compared pattern bodies, not flags** — `norm()` strips the `/…/flags` wrapper and both the replace step and `--check` used it, so FLUX losing `/i` left 69 copies stale while `--check` passed. Wrapped copies now need an exact match (`in_snapshot`), and `tests/test_sync_ranked_regex.py` pins it (3 of its 4 tests fail on the old script).
 - **`packages/core` regex consts brought under the sync** — the script never covered `packages/core/src/generate-template.js` or `PREFERRED_REGEX_1080P`; the CLI carried the stale FLUX and a BR-DISK filter older than either snapshot. Both are re-synced and now part of `--check`.
-- **Restricted save test passes the full allowlist** — `run.sh` captured `node -p` output with `$(...)`, which stops at 65,536 characters; ElfHosted's list crossed that today, so AIOStreams got half a JSON array and refused to start.
+- **Restricted save test passes the full allowlist** — `run.sh` read the allowlist with `node -p`, whose output to a pipe stopped at 65,536 bytes on Node 22, measured on a 72,063-byte string, where `node -e "process.stdout.write(…)"` delivers all of it. ElfHosted's list crossed that today, so AIOStreams got half a JSON array and refused to start.
 - **Save-test allowlist snapshot refreshed** — `scripts/aio-save-test/allowlist.elfhosted.json` (from 2026-10-03) still held the old literal, so the restricted CI run passed while ElfHosted refused every save. Now captured from ElfHosted 2.36.0.
 
 ## 3.10.0 (2026-10-13)

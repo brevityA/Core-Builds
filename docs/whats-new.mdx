@@ -1,14 +1,54 @@
 ---
-title: "What's New — Configurator v3.17"
+title: "What's New — Configurator v3.18"
 sidebarTitle: "What's New"
-description: "Latest Core Builds Configurator releases (v3.17 and earlier), auto-generated from the in-app changelog."
+description: "Latest Core Builds Configurator releases (v3.18 and earlier), auto-generated from the in-app changelog."
 ---
 
 # What's New in the Configurator
 
-This page is regenerated from `configurator/src/data/changelog.js` by `scripts/sync-docs.py`, so it always reflects the latest shipped configurator version (currently **v3.17**).
+This page is regenerated from `configurator/src/data/changelog.js` by `scripts/sync-docs.py`, so it always reflects the latest shipped configurator version (currently **v3.18**).
 
 For the template-suite release log, see the [Changelog](https://corebuilds-docs.docsalot.dev/changelog).
+
+## Configurator v3.18 (Oct 22 2026)
+
+<CardGroup cols={2}>
+  <Card title="Templates save on AIOStreams 2.36 again" icon="sparkles">
+    AIOStreams 2.36.0 removed the AIOSubtitle addon and refuses any config that includes it, and 52 Core Builds templates did, so every host on 2.36 (seven of the eight public ones, ElfHosted included) refused them with “AIO Subtitle has been removed”. They now use OpenSubtitles v3+, the configurator’s default since 3.16. Re-import your template to pick up the fix.
+  </Card>
+  <Card title="AIOSubtitle leaves Fine-Tune" icon="bolt">
+    its addon is no longer hosted. A saved AIOSubtitle choice moves to OpenSubtitles v3+ and your other subtitle sources stay; a config you import or update has it removed before install.
+  </Card>
+  <Card title="Retired addons are never sent" icon="shield-check">
+    AIOStreams 2.36.0 retired 15 addons, among them Argentina TV, USA TV, Nuvio Streams, Debridio WatchTower and AIOSubtitle. Argentina TV is no longer offered, and any of the 15 found in an imported or updated config is dropped before install instead of getting it refused.
+  </Card>
+  <Card title="Anime Tosho moves to its live feed" icon="sliders">
+    the original Anime Tosho stopped taking releases on May 9 and its feed shuts down this month, so Anime builds were about to lose their anime source. Anime and Movies + Anime builds now use the community continuation (anime-tosho-new in AIOStreams 2.36), as do the nine Anime and Labs templates. It needs AIOStreams 2.36.0, which seven of the eight public hosts run: builds carrying it are not sent to Omni’s (2.35.9, now marked legacy), and picking the 2.35.7 target keeps the old source.
+  </Card>
+  <Card title="Pinned to AIOStreams 2.36.0" icon="gauge">
+    the schema the configurator checks against, and its default compatibility target, move from 2.35.7 to 2.36.0, the release ElfHosted and most hosts run. Sessions saved on the old 2.35.7 default move with it; a target you picked yourself is kept.
+  </Card>
+  <Card title="Stream proxy that works" icon="wand">
+    Fine-Tune has a Stream Proxy section again, and AIOStreams now applies it: MediaFlow Proxy, StremThru or the AIOStreams built-in proxy, with its address, password and the services to route. The old toggle sent no address and no on switch, so it never proxied anything. AIOStreams checks the proxy when you save; if it cannot reach it, the configurator says so and offers to turn it off. The password stays on your device and in the config you install, never in share links.
+  </Card>
+  <Card title="Updates keep your proxy" icon="layers">
+    installing after importing your live config replaced a proxy you had set up in AIOStreams with an empty one. It is now carried over, and updating from a Core Builds template keeps yours.
+  </Card>
+  <Card title="Sources serve only streams" icon="bug">
+    AIOStreams runs a source with everything it supports unless the config narrows it, and the configurator’s limit never reached it. Torrentio, StremThru Store and Peerflix added debrid-library catalogs to your home screen, Sootio and Flix-Streams catalogs, YaStream catalogs and subtitles. They now serve streams only, and TMDB Collections serves only its catalogs.
+  </Card>
+  <Card title="Live TV shows its channels" icon="sparkles">
+    USA TV Next was limited to streams, but its channels are browsed in catalogs, so switching it on added nothing to browse. It keeps its catalogs now. Content Deep Dive is sent as the stream companion it is, and Doctor Who Universe keeps its streams.
+  </Card>
+  <Card title="Template directory versions are current" icon="bolt">
+    the docs page showed 22 of its 43 templates with old version numbers (Windows Ultrawide read v0.2.4 against v0.2.13). Every heading now updates with its template.
+  </Card>
+  <Card title="The unlinked V3 prototype is gone" icon="shield-check">
+    an unfinished second configurator was still published at /configurator/rebuild/ though nothing linked to it. It is removed, and twelve dated audit and plan documents moved from the repository root into archive/.
+  </Card>
+</CardGroup>
+
+---
 
 ## Configurator v3.17 (Oct 22 2026)
 
@@ -89,57 +129,5 @@ For the template-suite release log, see the [Changelog](https://corebuilds-docs.
   </Card>
   <Card title="Upstream watch re-pinned" icon="sliders">
     the AIOStreams contract watcher had flagged additive drift since September 26 (#770). It is re-pinned, and its source extraction no longer depends on GitHub’s API, which some networks refuse.
-  </Card>
-</CardGroup>
-
----
-
-## Configurator v3.14 (Oct 2 2026)
-
-<CardGroup cols={2}>
-  <Card title="Default builds get their scrapers back" icon="sparkles">
-    the Balanced profile, which every standard build has used since August, kept only a fixed short list of sources: a TorBox build shipped three torrent scrapers (StremThru Torz, Meteor, Comet) where an Advanced build ships eight. AIOStreams applies a template by replacing the whole addon list, so every update also deleted MediaFusion, EZTV, Torrent Galaxy, Zilean and Knaben from configs that had them. All five are back in Balanced; on P2P and EasyNews-only builds the four that need a debrid service are left out (see below). Simple Mode and Quick Install keep the short Stable list on purpose. The Knaben and Zilean toggle cards are gone: every build with a torrent debrid service already includes both, and neither can run without one, so the cards could not change anything.
-  </Card>
-  <Card title="Default builds get their release filtering back" icon="bolt">
-    Balanced was meant to drop remote scoring and instead deleted every regex list, including the inline ones copied verbatim from host allowlists. Default users lost release-group ranking and the exclusions for upscaled, BR-DISK, extras and retagged releases, while the sort order kept a regexScore step that had nothing left to score. The inline lists return; synced regex URLs stay off, so nothing new depends on a remote file or a host allowlisting a URL.
-  </Card>
-  <Card title="P2P and EasyNews-only builds save again" icon="shield-check">
-    EZTV, Torrent Galaxy, Knaben and Zilean are AIOStreams built-ins that need a torrent debrid service, and AIOStreams validates a config by building every enabled addon: one of them with no such service refuses the whole save, not just that addon. Advanced builds without debrid shipped all four switched on. They are now left out of builds with no debrid service and stay in everywhere else, so the save succeeds; rebuild after adding a debrid service to get them.
-  </Card>
-  <Card title="4K builds rank cached results first again" icon="sliders">
-    4K builds sort every 2160p above every 1080p, but the same step also put quality above cache status, so an uncached 4K REMUX outranked a cached 4K WEB-DL. On a debrid account the top result could start a download instead of playing — the likely cause of reports that sorting sometimes misbehaves. Cached now comes straight after resolution in every 4K sort list, including Simple Mode and Quick Install builds: 4K still beats 1080p, and inside each resolution cached beats uncached. 1080p series also gain the separate cached/uncached ordering movies and anime always had, so uncached episodes now rank by seeders the way uncached movies do.
-  </Card>
-  <Card title="Sort steps that do nothing are removed" icon="gauge">
-    regexScore is now dropped whenever a config carries no ranked regex, and audioChannel is dropped from generated configs because AIOStreams has no sorter case for it: it compares every stream as equal. It returns once upstream handles it. Checked-in templates keep it unchanged.
-  </Card>
-  <Card title="Offline mode retired, and the stale cache it could leave" icon="wand">
-    the configurator registered a service worker that served the whole app from cache without ever checking for updates, under a cache name unchanged since v3.10. It never ran on the main configurator page, but it did install for anyone who opened the copy under /configurator/dist/, and those browsers kept running the v3.10 build. The page no longer registers one, removes any it finds, and the worker file is replaced by one that clears its cache, unregisters itself and reloads onto the current build.
-  </Card>
-  <Card title="Offcloud, PikPak and Seedr builds save again" icon="layers">
-    the configurator asked each for a single API key, but AIOStreams requires Offcloud's API key plus account email and password, PikPak's email and password, and a Seedr encoded token issued by MediaFusion; a direct install with any of them was refused. The forms now ask for exactly those fields. Seedr builds also stop adding StremThru, which cannot use Seedr and failed the save on its own: MediaFusion is the one AIOStreams source that supports it.
-  </Card>
-  <Card title="EasyNews, Usenet, Seedr and Debridio builds save again" icon="bug">
-    every one of these was refused by AIOStreams, and it is already the case on the live site. Found by saving 462 generated configs into a real AIOStreams 2.35.7: SeaDex, like EZTV and Knaben, only runs with a torrent debrid service but was added to every build except P2P; EasyNews Search on the Usenet route asked for an AIOStreams Auth setting unless told to use only EasyNews; and Debridio, NekoBT, Jackett, Prowlarr, Jackettio and the Newznab indexers were emitted on builds with no service able to back them. Each is now added only when something can run it, the EasyNews add-on cards ask for EasyNews as a service first, and the debrid-only cards are greyed out on builds without a torrent debrid service.
-  </Card>
-  <Card title="Retired add-ons can no longer break a save" icon="sparkles">
-    TorBox (addon), USA TV and Debridio Watchtower were offered as toggles, but AIOStreams marks all three removed and refuses any config containing one, on every host. They are gone from the list and stripped from older saved setups. Bitmagnet stays, but only works on hosts that configure it, so it is now stripped on ElfHosted, ATBP, Omni's and Wizaardd; the live host check also reads each host's own disabled-add-on list, which is how it now catches Viren's nightly blocking Torrentio.
-  </Card>
-  <Card title="Anime builds get an anime scraper on the default profile" icon="bolt">
-    choosing Anime or Movies + Anime added AnimeTosho only on Advanced; the default Balanced profile stripped it, so the choice changed nothing. It now ships on both whenever a torrent debrid service is set. Like EZTV and Knaben, AnimeTosho cannot run without one, and an Advanced anime build on P2P or EasyNews carried it anyway, which refused the save; those builds now leave it out.
-  </Card>
-  <Card title="Age Rating Limit removed" icon="shield-check">
-    the filter wrote a certification() rule, but AIOStreams has no such function: on Advanced and Labs the host refused the whole config, and on Stable and Balanced the rule was silently dropped, so the control did nothing while saying it filtered. The control is gone until AIOStreams ships a rating filter; saved setups that chose a rating keep loading.
-  </Card>
-  <Card title="Descriptions checked against AIOStreams and the live hosts" icon="sliders">
-    every host now shows the version it actually runs (2.35.4 to 2.35.7; the picker still said 2.34.1, and Omni's is no longer behind, so it drops 'legacy'). The Recommended Stack panel is rewritten: it called StremThru Torz and Knaben usenet sources, recommended Torrentio, and listed developer notes. Also corrected: Brazuca Torrents is P2P, not debrid (and is now selectable on P2P builds); EasyDebrid is a debrid service, not an aggregator; Samsung TVs gained AV1 in 2020; the Fire TV Stick HD plays HDR10 and HLG; the Anime option keeps dual-audio releases rather than filtering to SeaDex only; the troubleshooter quoted 8 excluded and 107 ranked patterns where Balanced ships 3 and about 80; and Stream Pool showed two contradictory sets of counts and now shows the stop count the build uses, saying plainly that Stable and Balanced ignore it.
-  </Card>
-  <Card title="Updating keeps your setup" icon="gauge">
-    applying a template update rebuilt every source from defaults, so scrapers you had added, custom endpoints, per-instance keys and timeouts disappeared, and sections you chose to keep were overwritten. Updates now merge into what you have: imported sources, IDs, endpoints, credentials and timeouts are kept, declined changes stay declined, and the preview compares the actual output you would install. Preview and Cancel change nothing, Undo restores the previous setup, and the update screen says plainly that confirming here does not change an addon already installed in AIOStreams until you reinstall. A saved NZBHydra, Jackett or Prowlarr key is reused only when the imported preset points at the same address, so a key is never sent to an indexer it was not entered for.
-  </Card>
-  <Card title="First-time Nuvio setup" icon="wand">
-    the Nuvio route now builds through the same pipeline as every other install, honours the host you picked instead of swapping in another one, separates import links from manifests, and offers the JSON as a download if every paste service fails. Public import links strip access keys and private URLs and disable any source that needed them.
-  </Card>
-  <Card title="Release notes now say when generated output is unchanged" icon="layers">
-    3.12 to 3.13 produced byte-identical configs, and default-profile users saw none of 3.9 through 3.11 either, yet each release read as a config change: re-importing showed no changes in AIOStreams and looked broken. A new check blocks any release that changes no generated config unless its notes say so, and blocks the opposite claim when output did change.
   </Card>
 </CardGroup>

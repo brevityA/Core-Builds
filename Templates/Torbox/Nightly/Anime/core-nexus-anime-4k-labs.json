@@ -5,15 +5,17 @@
     "description": "Nightly Labs build of Anime 4K. Tests SeaDex-aware conditional PSEs, perGroup() dedup, Score IQR Guard, Indexer Diversity, anime elite group pins, private tracker kill, and totalCachedStreams DAF. Not a daily driver — report regressions before these features graduate to stable.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "0.3.2",
+    "version": "0.3.3",
     "category": "Anime",
     "sourceUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Anime/core-nexus-anime-4k-labs.json",
     "changelogUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md",
-    "coreBuildsCompatibility": {
-      "legacyTorboxSearch": true,
-      "maximumAIOStreamsVersion": "2.31.1",
-      "v232Action": "remove legacy preset; configure the separate Newznab endpoint only after validation"
-    }
+    "changelog": [
+      {
+        "date": "2026-10-22",
+        "version": "0.3.3",
+        "content": "Anime Tosho moved to its community continuation (anime-tosho-new): the original feed stopped taking releases on 2026-05-09 and shuts down in October 2026. Needs AIOStreams 2.36.0 or later, the first release where the new preset no longer asks for an API key. Same name, options and instance ID. Drops a stale v2.31.1-only compatibility marker (this template has no TorBox Search preset). Subtitles moved from AIOSubtitle to OpenSubtitles v3+: AIOStreams 2.36.0 removed the AIOSubtitle preset (its addon is no longer hosted), and every host on 2.36 refused this template with \"AIO Subtitle has been removed\". Same languages; no filter/sort/formatter changes."
+      }
+    ]
   },
   "config": {
     "addonName": "Core Nexus Anime 4K",
@@ -217,7 +219,7 @@
         }
       },
       {
-        "type": "animetosho",
+        "type": "anime-tosho-new",
         "enabled": true,
         "options": {
           "name": "AnimeTosho",
@@ -317,15 +319,18 @@
         "category": "HTTP"
       },
       {
-        "type": "aiosubtitle",
-        "instanceId": "aio-sub-1",
+        "type": "opensubtitles-v3-plus",
+        "instanceId": "osub-v3-1",
         "enabled": true,
         "options": {
-          "timeout": 4000,
-          "name": "AIOSubtitle",
-          "languages": [
+          "name": "OpenSubtitles v3+",
+          "timeout": 5000,
+          "language": [
             "en"
-          ]
+          ],
+          "sources": "all",
+          "includeAiTranslated": false,
+          "movieHashPlusAutoAdjustment": false
         }
       }
     ],

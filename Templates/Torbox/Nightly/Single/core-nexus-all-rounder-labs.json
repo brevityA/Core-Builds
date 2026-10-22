@@ -5,7 +5,7 @@
     "description": "Nightly Labs build — single template for live-action TV, movies, and anime. Uses isAnime + hasSeaDex conditional PSEs to switch between anime and live-action quality tiers dynamically. Includes SeaDex, AnimeTosho, NekoBT, Meteor, Comet, MediaFusion, and all LABS features. v0.4.0: Private Tracker Kill for uncached private streams, DAF totalCachedStreams fix, catalog-content exemptions on Unknown Resolution/Quality Kills (15y+). Not a daily driver.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "0.4.5",
+    "version": "0.4.6",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -49,12 +49,12 @@
         "name": "Enable SeaDex (anime quality)"
       }
     ],
-    "coreBuildsCompatibility": {
-      "legacyTorboxSearch": true,
-      "maximumAIOStreamsVersion": "2.31.1",
-      "v232Action": "remove legacy preset; configure the separate Newznab endpoint only after validation"
-    },
     "changelog": [
+      {
+        "date": "2026-10-22",
+        "version": "0.4.6",
+        "content": "Anime Tosho moved to its community continuation (anime-tosho-new): the original feed stopped taking releases on 2026-05-09 and shuts down in October 2026. Needs AIOStreams 2.36.0 or later, the first release where the new preset no longer asks for an API key. Same name, options and instance ID. Drops a stale v2.31.1-only compatibility marker (this template has no TorBox Search preset). Subtitles moved from AIOSubtitle to OpenSubtitles v3+: AIOStreams 2.36.0 removed the AIOSubtitle preset (its addon is no longer hosted), and every host on 2.36 refused this template with \"AIO Subtitle has been removed\". Same languages; no filter/sort/formatter changes."
+      },
       {
         "date": "2026-10-22",
         "version": "0.4.5",
@@ -69,11 +69,6 @@
         "date": "2026-09-25",
         "version": "0.4.3",
         "content": "Inline regex sync: patterns re-derived from the current Vidhin05 English ranked list (Radarr Web T3, Sonarr Web T3). No filter/sort/formatter changes."
-      },
-      {
-        "date": "2026-09-05",
-        "version": "0.4.2",
-        "content": "Inline regex sync: patterns re-derived from the current Vidhin05 English ranked list (Anime LQ Groups, BR-DISK, Radarr HD Bluray T1, Radarr HD Bluray T2, TrueHD Exclude Groups). No filter/sort/formatter changes."
       }
     ]
   },
@@ -2144,7 +2139,7 @@
         ]
       },
       {
-        "type": "animetosho",
+        "type": "anime-tosho-new",
         "enabled": true,
         "options": {
           "name": "AnimeTosho",
@@ -2333,15 +2328,18 @@
         "category": "HTTP"
       },
       {
-        "type": "aiosubtitle",
-        "instanceId": "aio-sub-1",
+        "type": "opensubtitles-v3-plus",
+        "instanceId": "osub-v3-1",
         "enabled": true,
         "options": {
-          "timeout": 4000,
-          "name": "AIOSubtitle",
-          "languages": [
+          "name": "OpenSubtitles v3+",
+          "timeout": 5000,
+          "language": [
             "en"
-          ]
+          ],
+          "sources": "all",
+          "includeAiTranslated": false,
+          "movieHashPlusAutoAdjustment": false
         }
       }
     ],

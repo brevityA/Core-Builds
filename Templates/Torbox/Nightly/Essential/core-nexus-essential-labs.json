@@ -5,7 +5,7 @@
     "description": "Experimental Nightly. Tests: TorBox Essential debrid-only (no external scrapers). Runs on TorBox cache only. 1080p build. Template directives: exit thresholds configurable at import. v0.4.0: Private Tracker Kill, DAF fix, catalog-guarded Unknown Resolution/Quality Kills.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "0.4.5",
+    "version": "0.4.6",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -34,6 +34,11 @@
     "changelog": [
       {
         "date": "2026-10-22",
+        "version": "0.4.6",
+        "content": "Subtitles moved from AIOSubtitle to OpenSubtitles v3+: AIOStreams 2.36.0 removed the AIOSubtitle preset (its addon is no longer hosted), and every host on 2.36 refused this template with \"AIO Subtitle has been removed\". Same languages; no filter/sort/formatter changes."
+      },
+      {
+        "date": "2026-10-22",
         "version": "0.4.5",
         "content": "Inline regex sync: patterns re-derived from the current Vidhin05 English ranked list (FLUX, Generated Dynamic HDR, Radarr Web T2, Radarr Web T3, Sonarr Web T2, TrueHD Exclude Groups). No filter/sort/formatter changes."
       },
@@ -46,11 +51,6 @@
         "date": "2026-09-25",
         "version": "0.4.3",
         "content": "Inline regex sync: patterns re-derived from the current Vidhin05 English ranked list (Radarr Web T3, Sonarr Web T3). No filter/sort/formatter changes."
-      },
-      {
-        "date": "2026-09-05",
-        "version": "0.4.2",
-        "content": "Inline regex sync: patterns re-derived from the current Vidhin05 English ranked list (Anime LQ Groups, BR-DISK, Radarr HD Bluray T1, Radarr HD Bluray T2, TrueHD Exclude Groups). No filter/sort/formatter changes."
       }
     ]
   },
@@ -2053,15 +2053,18 @@
         ]
       },
       {
-        "type": "aiosubtitle",
-        "instanceId": "aio-sub-1",
+        "type": "opensubtitles-v3-plus",
+        "instanceId": "osub-v3-1",
         "enabled": true,
         "options": {
-          "timeout": 4000,
-          "name": "AIOSubtitle",
-          "languages": [
+          "name": "OpenSubtitles v3+",
+          "timeout": 5000,
+          "language": [
             "en"
-          ]
+          ],
+          "sources": "all",
+          "includeAiTranslated": false,
+          "movieHashPlusAutoAdjustment": false
         }
       }
     ],

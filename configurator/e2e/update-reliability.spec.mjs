@@ -269,10 +269,12 @@ test('manual subtitle edits release kept sources, respect language dialects and 
   await page.locator('#advancedDrawer [data-action="toggle-sub-lang"][data-val="en"]').click();
   const unchanged = await page.evaluate(() => window.__coreBuilds.generate());
   const asSaved = ({ resources, ...preset }) => preset;   // AIOStreams strips a top-level `resources`
-  for (const source of subtitles) expect(unchanged.config.presets.find(p => p.instanceId === source.instanceId)).toEqual(asSaved(source));
+  // AIOStreams 2.36.0 removed AIOSubtitle and refuses a config carrying it, so the
+  // kept source is dropped from the export; the other two survive untouched.
+  expect(unchanged.config.presets.some(p => p.instanceId === 'my-aiosubs')).toBe(false);
+  for (const source of subtitles.filter(s => s.type !== 'aiosubtitle')) expect(unchanged.config.presets.find(p => p.instanceId === source.instanceId)).toEqual(asSaved(source));
   await page.locator('#advancedDrawer [data-action="toggle-sub-lang"][data-val="fr"]').click();
   const updated = await page.evaluate(() => window.__coreBuilds.generate());
-  expect(updated.config.presets.find(p => p.instanceId === 'my-aiosubs').options.languages).toEqual(['en', 'fr']);
   expect(updated.config.presets.find(p => p.instanceId === 'my-opensubs').options.language).toEqual(['en', 'fr']);
   expect(updated.config.presets.find(p => p.instanceId === 'my-subdl').options.language).toEqual(['EN', 'FR']);
   expect(updated.config.presets.find(p => p.instanceId === 'my-subdl').options.subDlApiKey).toBe('SYNTHETIC-SUBDL');
@@ -290,7 +292,7 @@ test('manual subtitle edits release kept sources, respect language dialects and 
   await page.locator('#advancedDrawer [data-action="toggle-sub-addon"][data-val="opensubtitles-v3-plus"]').click();
   const deselected = await page.evaluate(() => window.__coreBuilds.generate());
   expect(deselected.config.presets.some(p => p.instanceId === 'my-opensubs' && p.enabled !== false)).toBe(false);
-  expect(deselected.config.presets.find(p => p.instanceId === 'my-aiosubs').options.timeout).toBe(7000);
+  expect(deselected.config.presets.find(p => p.instanceId === 'my-subdl').options.timeout).toBe(7000);
 
   // SubDL-only exports use uppercase codes; the wizard must display them as
   // selected and remove French rather than append a duplicate FR entry.

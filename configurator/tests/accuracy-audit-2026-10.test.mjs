@@ -104,16 +104,18 @@ test('troubleshooter and Stream Pool numbers come from the build, not stale copy
 
 test('Anime content gets AnimeTosho on the default profile, only with a torrent debrid service', () => {
   // AnimeTosho is a Torznab built-in: with no StremThru-capable service it fails the
-  // whole save, so P2P / EasyNews anime builds must not carry it enabled.
+  // whole save, so P2P / EasyNews anime builds must not carry it enabled. The generators
+  // emit its community continuation (anime-tosho-new); the archived feed goes dark in Oct 2026.
   const types = (input) => generateTemplate(input, {}).config.presets.filter(p => p.enabled !== false).map(p => p.type);
-  assert.ok(types({ service: 'torbox-pro', content: 'anime' }).includes('animetosho'));
-  assert.ok(types({ service: 'torbox-pro', content: 'mixed' }).includes('animetosho'));
-  assert.ok(!types({ service: 'torbox-pro', content: 'all' }).includes('animetosho'));
-  assert.ok(!types({ service: 'p2p', content: 'anime' }).includes('animetosho'));
-  assert.ok(!types({ service: 'easynews', content: 'anime' }).includes('animetosho'));
-  const ctx = { service: 'torbox-pro', resolution: '1080p', langs: ['English'], langExclusive: false, sizeLimit: 'unlimited', bandwidthMbps: 0, multiServices: ['torbox-pro'], optionalScrapers: [] };
+  assert.ok(types({ service: 'torbox-pro', content: 'anime' }).includes('anime-tosho-new'));
+  assert.ok(types({ service: 'torbox-pro', content: 'mixed' }).includes('anime-tosho-new'));
+  assert.ok(!types({ service: 'torbox-pro', content: 'all' }).includes('anime-tosho-new'));
+  assert.ok(!types({ service: 'p2p', content: 'anime' }).includes('anime-tosho-new'));
+  assert.ok(!types({ service: 'easynews', content: 'anime' }).includes('anime-tosho-new'));
+  assert.ok(!types({ service: 'torbox-pro', content: 'anime' }).includes('animetosho'), 'the archived preset is not emitted for the pinned target');
+  const ctx = { service: 'torbox-pro', resolution: '1080p', langs: ['English'], langExclusive: false, sizeLimit: 'unlimited', bandwidthMbps: 0, multiServices: ['torbox-pro'], optionalScrapers: [], aiostreamsVersion: '2.36.0' };
   const balanced = applyOutputProfile(generateTemplate({ service: 'torbox-pro', content: 'anime' }, {}), 'balanced', ctx);
-  assert.ok(balanced.config.presets.some(p => p.type === 'animetosho'), 'Balanced must keep AnimeTosho');
+  assert.ok(balanced.config.presets.some(p => p.type === 'anime-tosho-new'), 'Balanced must keep AnimeTosho');
 });
 
 test('Brazuca (P2P-only) is gated on HTTP builds and allowed on P2P', () => {

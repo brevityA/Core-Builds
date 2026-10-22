@@ -5,7 +5,7 @@
     "description": "Single-click instant play — 4K. Only cached streams appear — zero uncached results. Derived from Speed 4K but with excludeUncached:true, a 2-stream dynamic stop condition, and pre-resolved top stream. Resolution order: 2160p → 1080p fallback. DV → HDR10+ → HDR priority. If content has no cached streams, the 0Cached ISE shows a title passthrough rather than a blank screen. 4K · TorBox Essential · Library, Comet, Zilean.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "2.10.12",
+    "version": "2.10.13",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -17,6 +17,11 @@
       "v232Action": "remove legacy preset; configure the separate Newznab endpoint only after validation"
     },
     "changelog": [
+      {
+        "date": "2026-10-22",
+        "version": "2.10.13",
+        "content": "Subtitles moved from AIOSubtitle to OpenSubtitles v3+: AIOStreams 2.36.0 removed the AIOSubtitle preset (its addon is no longer hosted), and every host on 2.36 refused this template with \"AIO Subtitle has been removed\". Same languages; no filter/sort/formatter changes."
+      },
       {
         "date": "2026-10-22",
         "version": "2.10.12",
@@ -31,11 +36,6 @@
         "date": "2026-09-25",
         "version": "2.10.10",
         "content": "Inline regex sync: patterns re-derived from the current Vidhin05 English ranked list (LQ (Sonarr) [B], Radarr Web T3, Sonarr Web T3). No filter/sort/formatter changes."
-      },
-      {
-        "date": "2026-09-05",
-        "version": "2.10.9",
-        "content": "Inline regex sync: patterns re-derived from the current Vidhin05 English ranked list (Anime LQ Groups, BR-DISK, LQ (Release Title) (Radarr), Radarr Bad Dual Groups, Radarr HD Bluray T1, Radarr HD Bluray T2, Sonarr Bad Dual Groups, TrueHD Exclude Groups). No filter/sort/formatter changes."
       }
     ]
   },
@@ -258,15 +258,18 @@
         ]
       },
       {
-        "type": "aiosubtitle",
-        "instanceId": "aio-sub-1",
+        "type": "opensubtitles-v3-plus",
+        "instanceId": "osub-v3-1",
         "enabled": true,
         "options": {
-          "timeout": 4000,
-          "name": "AIOSubtitle",
-          "languages": [
+          "name": "OpenSubtitles v3+",
+          "timeout": 5000,
+          "language": [
             "en"
-          ]
+          ],
+          "sources": "all",
+          "includeAiTranslated": false,
+          "movieHashPlusAutoAdjustment": false
         }
       }
     ],

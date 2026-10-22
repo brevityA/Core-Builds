@@ -18,7 +18,7 @@ import { getSelPolicy } from './sel-policy.js';
 import { rankedSelPolicy } from './ranked-sel-policy.js';
 import { SCORE_IQR_GUARD } from './sel-iqr-policy.js';
 import { sanitizeAioEnumArrays } from './schema.js';
-import { OPTIONAL_SCRAPER_DEFS } from './scrapers.js';
+import { OPTIONAL_SCRAPER_DEFS, presetRole } from './scrapers.js';
 import { requireNuvioInstantHost } from './nuvio-hosts.js';
 import { NUVIO_ADDONS } from './nuvio-torbox-instant.js';
 import { applyOutputProfile, resolveOutputProfile, DEFAULT_AIOSTREAMS_VERSION } from './output-profile-policy.js';
@@ -79,7 +79,7 @@ function buildSubtitlePresets(input) {
   const addons = input.subtitleAddons || ['opensubtitles-v3-plus'];
   const langs = input.subtitleLangs || ['en'];
   const out = [];
-  if (addons.includes('aiosubtitle')) out.push({ type:'aiosubtitle', instanceId:'aio-sub-1', enabled:true, options:{ name:'AIOSubtitle', timeout:4000, languages:langs } });
+  // AIOSubtitle is not emitted: AIOStreams 2.36.0 removed it and refuses a config carrying it.
   if (addons.includes('opensubtitles-v3-plus')) out.push({ type:'opensubtitles-v3-plus', instanceId:'osub-v3-1', enabled:true, options:{ name:'OpenSubtitles v3+', timeout:5000, language:langs, sources:'all', includeAiTranslated:false, movieHashPlusAutoAdjustment:false } });
   // SubDL refuses the save without an API key (AIOStreams marks subDlApiKey required).
   if (addons.includes('subdl') && input.credentials?.subdl) {
@@ -168,7 +168,6 @@ function buildPresets(input) {
     { type:'peerflix', instanceId:'pflx-1', enabled:true, options:{ name:'Peerflix', timeout:7000, showTorrentLinks:false, useMultipleInstances:false }, resources:['stream'] },
     { type:'webstreamr', instanceId:'wsr-1', enabled:extrasOn('webstreamr'), options:{ name:'WebStreamr', timeout:7000 }, resources:['stream'] },
     { type:'yastream', instanceId:'yas-1', enabled:extrasOn('yastream'), options:{ name:'YaStream', timeout:7000 }, resources:['stream'] },
-    { type:'nuvio-streams', instanceId:'nvs-1', enabled:false, options:{ name:'Nuvio Streams', timeout:7000 }, resources:['stream'] },
     { type:'flix-streams', instanceId:'flx-1', enabled:false, options:{ name:'Flix-Streams', timeout:7000 }, resources:['stream'] },
     { type:'hdhub', instanceId:'hdhub-1', enabled:true, options:{ name:'HdHub', timeout:5000, resources:['stream'], mediaTypes:['movie','series','anime'] } },
     // New safe add-ons: catalog/live/subtitles work on HTTP (no debrid/usenet needed)
@@ -177,8 +176,8 @@ function buildPresets(input) {
       return d && ['catalog','live','subtitles'].includes(d.cat);
     }).map(sid => {
       const d = OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid);
-      const safeCats = { catalog: { resources:['catalog','meta'], category:'meta_catalogs' }, live: { resources:['stream'] }, subtitles: { resources:['subtitles'] } };
-      const meta = safeCats[d.cat] || { resources:['stream'] };
+      const safeCats = { catalog: { resources:['catalog','meta'], category:'meta_catalogs' }, live: { resources:['catalog','meta','stream'] }, subtitles: { resources:['subtitles'] } };
+      const meta = presetRole(d, safeCats);
       return { type: d.presetType, instanceId: `${d.id}-opt`, enabled:true, options:{ name: d.label, timeout:5000 }, ...meta };
     }),
     ...buildSubtitlePresets(input),
@@ -284,8 +283,8 @@ function buildPresets(input) {
       // EasyNews / EasyNews+ read the EasyNews service's login; without it enabled the
       // host refuses the save with "No credentials found for service easynews".
       if (['easynews','easynewsPlus'].includes(d.id) && !easynewsEnabled) return null;
-      const safeCats = { catalog: { resources:['catalog','meta'], category:'meta_catalogs' }, live: { resources:['stream'] }, subtitles: { resources:['subtitles'] }, debrid: { resources:['stream'] }, usenet: { resources:['stream'] } };
-      const meta = safeCats[d.cat] || { resources:['stream'] };
+      const safeCats = { catalog: { resources:['catalog','meta'], category:'meta_catalogs' }, live: { resources:['catalog','meta','stream'] }, subtitles: { resources:['subtitles'] }, debrid: { resources:['stream'] }, usenet: { resources:['stream'] } };
+      const meta = presetRole(d, safeCats);
       // Preserve existing special-case for anime-kitsu etc — generic is fine.
       return { type: d.presetType, instanceId: `${d.id}-opt`, enabled:true, options:{ name: d.label, timeout:5000 }, ...meta };
     }).filter(Boolean),
@@ -299,11 +298,9 @@ function buildPresets(input) {
       // debridioApiKey is required with no upstream default, so the same rule as
       // jackett/prowlarr applies: no key, no preset. These three shipped as keyless
       // toggles and emitted {name,timeout} only, which the host refuses outright.
-      if (d.id === 'debridio-tmdb' || d.id === 'debridio-tvdb' || d.id === 'debridio-watchtower') {
+      if (d.id === 'debridio-tmdb' || d.id === 'debridio-tvdb') {
         if (!creds.debridio) return null;
-        const meta = d.id === 'debridio-watchtower'
-          ? { resources:['stream'] }
-          : { resources:['catalog','meta'], category:'meta_catalogs' };
+        const meta = { resources:['catalog','meta'], category:'meta_catalogs' };
         return { type:d.presetType, instanceId:`${d.id}-opt`, enabled:true, options:{ name:d.label, timeout:5000, debridioApiKey:creds.debridio }, ...meta };
       }
       return null;
@@ -317,7 +314,6 @@ function buildPresets(input) {
     }),
     ...(hasExtraHttp ? [
       { type:'webstreamr', instanceId:'wsr-1', enabled:extrasOn('webstreamr'), options:{ name:'WebStreamr', timeout:7000 }, resources:['stream'] },
-      { type:'nuvio-streams', instanceId:'nvs-1', enabled:false, options:{ name:'Nuvio Streams', timeout:7000 }, resources:['stream'] },
       { type:'flix-streams', instanceId:'flx-1', enabled:false, options:{ name:'Flix-Streams', timeout:7000 }, resources:['stream'] },
     ] : []),
     { type:'meteor', instanceId:'nx-fix-02', enabled:true, options:{ name:'Meteor', timeout:6000, yourMedia:{ sources:['torrent','webdl','usenet'], showStreams:true, enabled:true }, usenet:{ enabled:true, customSearchEngines:true }, url:'https://meteorfortheweebs.midnightignite.me', resources:['stream'] } },
@@ -329,7 +325,7 @@ function buildPresets(input) {
     { type:'knaben', instanceId:'tam-knaben', enabled:torrentCapable, options:{ name:'Knaben', timeout:6000, mediaTypes:[], useMultipleInstances:false }, resources:['stream'] },
     { type:'torrents-db', instanceId:'nx-tdb-1', enabled:false, options:{ name:'TorrentsDB', timeout:5000, useMultipleInstances:false }, resources:['stream'] },
     ...(animeContent ? [
-      { type:'animetosho', instanceId:'nx-at-01', enabled:(content === 'anime' || content === 'mixed') && torrentCapable, options:{ name:'AnimeTosho', timeout:5000, mediaTypes:['anime'] }, resources:['stream'] },
+      { type:'anime-tosho-new', instanceId:'nx-at-01', enabled:(content === 'anime' || content === 'mixed') && torrentCapable, options:{ name:'Anime Tosho', timeout:5000, mediaTypes:['anime'] }, resources:['stream'] },
       { type:'neko-bt', instanceId:'neko-bt-core-builds', enabled:extrasOn('neko-bt') && torrentCapable, options:{ name:'NekoBT', timeout:5000, mediaTypes:['anime'] }, resources:['stream'] },
     ] : []),
     // p2p: v2.33 rejects Sootio outright (no usable service/HTTP provider), so the toggle

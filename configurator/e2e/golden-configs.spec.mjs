@@ -58,7 +58,7 @@ const BASE = {
   quickStart: false,
   simpleMode: false,
   outputProfile: 'auto',
-  aiostreamsVersion: '2.35.7',
+  aiostreamsVersion: '2.36.0',
   tmdbToken: '',
   tmdbApiKey: '',
 };
