@@ -5,7 +5,7 @@
     "description": "Windows PC / Ultra-Wide. 1080p primary · 1440p when available · 4K fallback. Full audio (Atmos, TrueHD, DTS-HD MA, DTS:X) · all encodes including AV1 · HDR-first visual priority. No codec restrictions.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "0.2.14",
+    "version": "0.2.13",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -19,13 +19,8 @@
     "changelog": [
       {
         "date": "2026-10-22",
-        "version": "0.2.14",
-        "content": "Inline regex sync: patterns re-derived from the current Vidhin05 English ranked list (FLUX, Radarr Web T1, Radarr Web T2, Radarr Web T3, Sonarr Web T2, TrueHD Exclude Groups). No filter/sort/formatter changes."
-      },
-      {
-        "date": "2026-10-18",
         "version": "0.2.13",
-        "content": "Inline regex sync: patterns re-derived from the current Vidhin05 English ranked list (Generated Dynamic HDR, LQ (Release Title) (Radarr)). No filter/sort/formatter changes."
+        "content": "Inline regex sync: patterns re-derived from the current Vidhin05 English ranked list (FLUX, Generated Dynamic HDR, LQ (Release Title) (Radarr), Radarr Web T1, Radarr Web T2, Radarr Web T3, Sonarr Web T2, TrueHD Exclude Groups). No filter/sort/formatter changes."
       },
       {
         "date": "2026-09-26",
