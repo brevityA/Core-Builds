@@ -2,7 +2,7 @@
   "metadata": {
     "id": "core-nexus-base-torbox",
     "name": "Core Builds Base — TorBox",
-    "version": "1.1.5",
+    "version": "1.1.6",
     "description": "Shared base configuration for all Core Builds TorBox templates. Import this first, then use its UUID in the configurator to generate slimmed child templates.",
     "author": "Branding-Brevity",
     "sourceUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Base/core-nexus-base-torbox.json",
@@ -20,6 +20,11 @@
       "v232Action": "remove legacy preset; configure the separate Newznab endpoint only after validation"
     },
     "changelog": [
+      {
+        "date": "2026-10-22",
+        "version": "1.1.6",
+        "content": "Inline regex sync: patterns re-derived from the current Vidhin05 English ranked list (FLUX, Radarr Web T2, Radarr Web T3, Sonarr Web T2, TrueHD Exclude Groups). No filter/sort/formatter changes."
+      },
       {
         "date": "2026-10-18",
         "version": "1.1.5",
@@ -247,7 +252,7 @@
         "score": 60
       },
       {
-        "pattern": "/^(?=.*(WEB[-_. ]DL(?:mux)?|WEBDL|AmazonHD|AmazonSD|iTunesHD|MaxdomeHD|NetflixU?HD|WebHD|HBOMaxHD|DisneyHD|[. ]WEB[. ](?:[xh][ .]?26[45]|AVC|HEVC|DDP?[ .]?5[. ]1)|(?:720|1080|2160)p[-. ]WEB[-. ]|[-. ]WEB[-. ](?:720|1080|2160)p|(?:AMZN|NF|DP)[. -]WEB[. -](?!Rip)|WebRip|Web-Rip|WEBMux))(?=.*\\b(?:dB|MiU|MZABI|playWEB|SbR|SMURF|XEBEC|4KBEC|CEBEX)\\b).*/i",
+        "pattern": "/^(?=.*(WEB[-_. ]DL(?:mux)?|WEBDL|AmazonHD|AmazonSD|iTunesHD|MaxdomeHD|NetflixU?HD|WebHD|HBOMaxHD|DisneyHD|[. ]WEB[. ](?:[xh][ .]?26[45]|AVC|HEVC|DDP?[ .]?5[. ]1)|(?:720|1080|2160)p[-. ]WEB[-. ]|[-. ]WEB[-. ](?:720|1080|2160)p|(?:AMZN|NF|DP)[. -]WEB[. -](?!Rip)|WebRip|Web-Rip|WEBMux))(?=.*\\b(?:dB|MiU|monkee|MZABI|playWEB|SbR|SMURF|XEBEC|4KBEC|CEBEX)\\b).*/i",
         "name": "Radarr Web T2",
         "score": 40
       },
@@ -262,7 +267,7 @@
         "score": 40
       },
       {
-        "pattern": "/^(?=.*(WEB[-_. ]DL(?:mux)?|WEBDL|AmazonHD|AmazonSD|iTunesHD|MaxdomeHD|NetflixU?HD|WebHD|HBOMaxHD|DisneyHD|[. ]WEB[. ](?:[xh][ .]?26[45]|AVC|HEVC|DDP?[ .]?5[. ]1)|(?:720|1080|2160)p[-. ]WEB[-. ]|[-. ]WEB[-. ](?:720|1080|2160)p|(?:AMZN|NF|DP)[. -]WEB[. -](?!Rip)|WebRip|Web-Rip|WEBMux))(?=.*\\b(?:3cTWeB|4KBEC|BTW|BLUTONiUM|BYNDR|CEBEX|Chotab|Cinefeel|CiT|Coo7|dB|FC|iJP|iKA|iT00NZ|JETIX|KHN|MiU|MZABI|NPMS|NYH|orbitron|playWEB|PSiG|ROCCaT|RTFM|SA89|SbR|SDCC|TEPES|TVSmash|WELP|XEBEC)\\b).*/i",
+        "pattern": "/^(?=.*(WEB[-_. ]DL(?:mux)?|WEBDL|AmazonHD|AmazonSD|iTunesHD|MaxdomeHD|NetflixU?HD|WebHD|HBOMaxHD|DisneyHD|[. ]WEB[. ](?:[xh][ .]?26[45]|AVC|HEVC|DDP?[ .]?5[. ]1)|(?:720|1080|2160)p[-. ]WEB[-. ]|[-. ]WEB[-. ](?:720|1080|2160)p|(?:AMZN|NF|DP)[. -]WEB[. -](?!Rip)|WebRip|Web-Rip|WEBMux))(?=.*\\b(?:3cTWeB|4KBEC|BTW|BLUTONiUM|BYNDR|CEBEX|Chotab|Cinefeel|CiT|CMRG|Coo7|dB|FC|iJP|iKA|iT00NZ|JETIX|KHN|MiU|MZABI|NPMS|NYH|orbitron|playWEB|PSiG|ROCCaT|RTFM|SA89|SbR|SDCC|TEPES|TVSmash|WELP|XEBEC)\\b).*/i",
         "name": "Sonarr Web T2",
         "score": 40
       },
@@ -272,7 +277,7 @@
         "score": 40
       },
       {
-        "pattern": "/^(?=.*(WEB[-_. ]DL(?:mux)?|WEBDL|AmazonHD|AmazonSD|iTunesHD|MaxdomeHD|NetflixU?HD|WebHD|HBOMaxHD|DisneyHD|[. ]WEB[. ](?:[xh][ .]?26[45]|AVC|HEVC|DDP?[ .]?5[. ]1)|(?:720|1080|2160)p[-. ]WEB[-. ]|[-. ]WEB[-. ](?:720|1080|2160)p|(?:AMZN|NF|DP)[. -]WEB[. -](?!Rip)|WebRip|Web-Rip|WEBMux))(?=.*\\b(?:BLOOM|Dooky|GNOMiSSiON|NINJACENTRAL|NPMS|ROCCaT|SiGMA|SLiGNOME|SwAgLaNdEr)\\b).*/i",
+        "pattern": "/^(?=.*(WEB[-_. ]DL(?:mux)?|WEBDL|AmazonHD|AmazonSD|iTunesHD|MaxdomeHD|NetflixU?HD|WebHD|HBOMaxHD|DisneyHD|[. ]WEB[. ](?:[xh][ .]?26[45]|AVC|HEVC|DDP?[ .]?5[. ]1)|(?:720|1080|2160)p[-. ]WEB[-. ]|[-. ]WEB[-. ](?:720|1080|2160)p|(?:AMZN|NF|DP)[. -]WEB[. -](?!Rip)|WebRip|Web-Rip|WEBMux))(?=.*\\b(?:BLOOM|Dooky|GNOMiSSiON|NINJACENTRAL|NPMS|ROCCaT|SLiGNOME|SwAgLaNdEr)\\b).*/i",
         "name": "Radarr Web T3",
         "score": 40
       },
@@ -412,7 +417,7 @@
         "score": 80
       },
       {
-        "pattern": "/\\b(FLUX)\\b/i",
+        "pattern": "/\\b(FLUX)\\b/",
         "name": "FLUX",
         "score": 80
       },
@@ -537,7 +542,7 @@
         "score": -50
       },
       {
-        "pattern": "/\\b(3L|CtrlHD|DON|HQMUX|W4NK3R)\\b/i",
+        "pattern": "/\\b(3L|CtrlHD|HQMUX|W4NK3R)\\b/i",
         "name": "TrueHD Exclude Groups",
         "score": -50
       },

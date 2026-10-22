@@ -81,7 +81,7 @@ test('a Seedr-only build emits no StremThru preset (StremThru cannot use Seedr)'
 });
 
 test('no age-rating filter is emitted or offered: AIOStreams SEL has no certification()', () => {
-  // The always-null stub and the ageLimit state were removed in v3.19.
+  // The always-null stub and the ageLimit state were removed in v3.17.
   assert.doesNotMatch(app, /data-action="set-age-limit"|ageLimit|certification\(/, 'no Age Rating control or filter');
   for (const ageLimit of ['G', 'PG', 'R']) {
     const eses = generateTemplate({ service: 'torbox-pro', ageLimit }, {}).config.excludedStreamExpressions || [];

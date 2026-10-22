@@ -55,7 +55,7 @@ test('all golden configurations use late pack fallbacks as their final ESEs', as
       );
     }
     if (template.metadata?.coreBuildsProfile === 'stable') {
-      // Core Stable (the default since v3.18) carries no pack rule at all, so nothing is hidden.
+      // Core Stable (the default since v3.17) carries no pack rule at all, so nothing is hidden.
       assert.deepEqual(labels(expressions), ['Core Stable | External stream kill'], `${name}: Stable has no pack rule`);
     } else if (!['http-1080p'].includes(name)) {
       assert.deepEqual(labels(expressions), LATE_PACK_LABELS, `${name} must end with late pack fallbacks`);

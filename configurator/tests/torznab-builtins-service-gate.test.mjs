@@ -25,7 +25,7 @@ test('no Torznab built-in is enabled on a route without a torrent debrid service
 });
 
 test('the built-ins stay enabled wherever a torrent debrid service exists', () => {
-  // The service gate, measured on Balanced: Core Stable (the default since v3.18)
+  // The service gate, measured on Balanced: Core Stable (the default since v3.17)
   // trims the four by design, which the next test pins.
   for (const service of ['torbox-pro', 'realdebrid', 'alldebrid']) {
     assert.deepEqual(enabledBuiltins({ service, outputProfile: 'balanced' }).sort(), [...BUILTINS].sort(), `${service}: built-ins should be on`);
