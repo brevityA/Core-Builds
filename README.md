@@ -97,7 +97,7 @@ Open the [**Configurator**](https://brevitya.github.io/Core-Builds/) and pick a 
 2. **Open your AIOStreams host** → Settings → About → Get Started → Load Template → paste URL
 3. **Enter your TorBox API key** → Save → copy manifest URL → install in Stremio or WuPlay
 
-> 🟢 [**Live host status →**](https://github.com/brevityA/Core-Builds/blob/main/STATUS.md) — ElfHosted · Yeb's · Midnight's · Kuu's · ATBP · Omni's
+> 🟢 [**Check your host →**](https://brevitya.github.io/Core-Builds/tools/preflight/) — Preflight probes the exact host you target with your config, on demand
 
 ---
 
@@ -318,7 +318,7 @@ All formatters use `id: tamtaro` with `definitions.overrides['tamtaro']`. Import
 | [`Formatters/`](https://github.com/brevityA/Core-Builds/tree/main/Formatters) | Elite, TV, and legacy formatters |
 | [`Guides/`](https://github.com/brevityA/Core-Builds/tree/main/Guides) | Import guide, troubleshooting, device profiles |
 | [`CHANGELOG.md`](https://github.com/brevityA/Core-Builds/blob/main/CHANGELOG.md) | Full version history |
-| [`STATUS.md`](https://github.com/brevityA/Core-Builds/blob/main/STATUS.md) | Live host status |
+| [`archive/`](https://github.com/brevityA/Core-Builds/tree/main/archive) | Past audits, plans and the frozen host-status snapshot |
 
 ---
 
