@@ -147,6 +147,14 @@ test('Express Install manifest target skips Stremio and shows the manifest modal
   await page.locator('#expressGo').click();
   await page.locator('#pwdPrompt .pwd-go').click();
   await expect(page.locator('#manifestModal')).toBeVisible({ timeout: 45000 });
+  // toBeVisible ignores overlap. The result opened under the Express panel for
+  // months: assert it is the layer actually on top, and that Express closed.
+  const top = await page.evaluate(() => {
+    const box = document.querySelector('#manifestModal .modal-box').getBoundingClientRect();
+    return !!document.elementFromPoint(box.left + box.width / 2, box.top + box.height / 2)?.closest('#manifestModal');
+  });
+  expect(top).toBe(true);
+  await expect(page.locator('#expressLaneModal')).toHaveCount(0);
   expect(posted).toHaveLength(1);
   expect(JSON.stringify(posted[0].config)).not.toContain('torbox-search');
 });

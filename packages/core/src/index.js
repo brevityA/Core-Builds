@@ -8,7 +8,6 @@ export { sizePolicy, bitratePolicy, filterPolicy, isHighResolution } from './fil
 export { sortPolicy } from './sort-policy.js';
 export { addonPolicy, assertAddonPolicy } from './addon-policy.js';
 export { getSelPolicy, normalizeSelPolicy, assertSelPolicy, SEL_ARCHITECTURES } from './sel-policy.js';
-export { AGE_RATINGS, AGE_RATING_CERTIFICATIONS, generateAgeRatingESE } from './agerating.js';
 export { OPTIONAL_SCRAPER_DEFS } from './scrapers.js';
 export { SCORE_IQR_GUARD } from './sel-iqr-policy.js';
 export { isNuvioInstantHost, requireNuvioInstantHost } from './nuvio-hosts.js';

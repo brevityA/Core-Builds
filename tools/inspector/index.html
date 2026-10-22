@@ -240,13 +240,6 @@ function checkHostCompat(config) {
     hosts.fortheweak.status = 'err';
   }
 
-  const allExprs = [...(cfg.excludedStreamExpressions||[]),...(cfg.includedStreamExpressions||[]),...(cfg.preferredStreamExpressions||[])];
-  if (allExprs.some(e => e.expression && /\bnot\s*\(/.test(e.expression))) {
-    hosts.elfhosted.issues.push('SEL uses not() — must use negate()');
-    hosts.elfhosted.status = 'err';
-    hosts.fortheweak.issues.push('SEL uses not() — must use negate()');
-    hosts.fortheweak.status = 'err';
-  }
 
   return hosts;
 }

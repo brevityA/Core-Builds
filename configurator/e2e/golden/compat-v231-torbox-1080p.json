@@ -11,7 +11,7 @@
     "setToSaveInstallMenu": true,
     "sourceUrl": "https://github.com/brevityA/Core-Builds",
     "changelogUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md",
-    "coreBuildsVersion": "3.18",
+    "coreBuildsVersion": "3.19",
     "coreBuildsAIOStreamsTarget": "2.31.1",
     "coreBuildsProfile": "stable",
     "coreBuildsProfileVersion": "1"
@@ -240,10 +240,7 @@
           "mediaTypes": [
             "anime"
           ]
-        },
-        "resources": [
-          "stream"
-        ]
+        }
       },
       {
         "type": "stremthruTorz",
@@ -254,10 +251,7 @@
           "timeout": 6000,
           "includeP2P": false,
           "useMultipleInstances": false
-        },
-        "resources": [
-          "stream"
-        ]
+        }
       },
       {
         "type": "meteor",
@@ -326,10 +320,6 @@
           "name": "TMDB",
           "timeout": 6000
         },
-        "resources": [
-          "catalog",
-          "meta"
-        ],
         "category": "meta_catalogs"
       }
     ],

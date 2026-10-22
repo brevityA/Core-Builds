@@ -11,7 +11,7 @@
     "setToSaveInstallMenu": true,
     "sourceUrl": "https://github.com/brevityA/Core-Builds",
     "changelogUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md",
-    "coreBuildsVersion": "3.18",
+    "coreBuildsVersion": "3.19",
     "coreBuildsAIOStreamsTarget": "2.35.7",
     "coreBuildsProfile": "stable",
     "coreBuildsProfileVersion": "1"
@@ -220,10 +220,7 @@
           "name": "EasyNews++",
           "timeout": 6000,
           "strictTitleMatching": true
-        },
-        "resources": [
-          "stream"
-        ]
+        }
       },
       {
         "type": "easynews-search",
@@ -236,10 +233,7 @@
           "services": [
             "easynews"
           ]
-        },
-        "resources": [
-          "stream"
-        ]
+        }
       },
       {
         "type": "meteor",
@@ -308,10 +302,6 @@
           "name": "TMDB",
           "timeout": 6000
         },
-        "resources": [
-          "catalog",
-          "meta"
-        ],
         "category": "meta_catalogs"
       }
     ],

@@ -13,7 +13,6 @@ import { OPTIONAL_SCRAPER_DEFS } from '../src/data/scrapers.js';
 import { PROVIDER_CREDENTIALS, SERVICE_CREDENTIAL_FIELDS, serviceCredentials, serviceCredentialKeys } from '../src/data/credentials.js';
 import { UPSTREAM_REMOVED_PRESET_IDS } from '../src/data/host-capabilities.js';
 import { parseHostStatus, resolveHostCapabilities, knownHostKeys } from '../src/core/host-capability-policy.js';
-import { generateAgeRatingESE } from '../src/data/agerating.js';
 import { generateTemplate } from '../../packages/core/src/generate-template.js';
 import { applyOutputProfile } from '../src/core/output-profile-policy.js';
 
@@ -81,9 +80,13 @@ test('a Seedr-only build emits no StremThru preset (StremThru cannot use Seedr)'
   assert.ok(types.includes('mediafusion'), 'MediaFusion is the one preset that supports Seedr');
 });
 
-test('the age-rating filter emits nothing: AIOStreams SEL has no certification()', () => {
-  for (const rating of ['G', 'PG', 'PG-13', 'R', 'NC-17', 'none']) assert.equal(generateAgeRatingESE(rating), null, rating);
-  assert.doesNotMatch(app, /data-action="set-age-limit"/, 'the Age Rating control must not be offered');
+test('no age-rating filter is emitted or offered: AIOStreams SEL has no certification()', () => {
+  // The always-null stub and the ageLimit state were removed in v3.19.
+  assert.doesNotMatch(app, /data-action="set-age-limit"|ageLimit|certification\(/, 'no Age Rating control or filter');
+  for (const ageLimit of ['G', 'PG', 'R']) {
+    const eses = generateTemplate({ service: 'torbox-pro', ageLimit }, {}).config.excludedStreamExpressions || [];
+    assert.ok(!eses.some(e => /certification\(/.test(e.expression || '')), ageLimit);
+  }
 });
 
 test('the Recommended Stack modal no longer repeats the false claims', () => {

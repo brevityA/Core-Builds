@@ -49,7 +49,6 @@ configurator/               — Web app (main product)
 
 tools/                      — Tools hub
   inspector/                — Template Inspector (paste JSON for instant validation)
-  debug/                    — Debug utilities
 account-tools/              — Addon Backup (read-only Stremio addon backup)
 cli/                        — CLI tool (available)
 cloudflare-worker/          — CORS proxy (Cloudflare Worker for cross-origin requests)
@@ -173,7 +172,6 @@ The `build()` function (line ~3400) assembles the full AIOStreams config from cu
 - **Backup timeline** — 20-entry local backup with restore
 - **Library Boost** — three modes: Default, Strong (top priority), None (disabled)
 - **Bandwidth Estimator** — device-aware bandwidth suggestion with manual override
-- **Age Limit** — content age filter with 7d/30d/90d/1y/2y presets
 - **NZB Failover** — configurable position (before/after torrents) and max NZB count
 - **Patch Cinemeta** — automatic by default (hides Cinemeta catalogs, uses Cinebye)
 
@@ -285,6 +283,9 @@ python3 scripts/template_builder.py --only stream  # filter by name
 8. **NC-17 label** — means "Adults Only" (most restrictive), NOT "No Restriction"
 9. **Jackett/Prowlarr filter** — use `x.credKey && !x.apiUrl` (NOT `x.credKey && x.apiUrl`)
 10. **validate_templates.py** — guard `isinstance(t, list)` before `t.get()` (Filtering/*.json are arrays)
+11. **Preset keys** — AIOStreams' `PresetSchema` keeps `type`, `instanceId`, `enabled`, `options`, `category` and strips anything else on save. A resource restriction goes in `options.resources`; a top-level `resources` is ignored (the preset falls back to everything it supports). The generators still tag presets with a top-level `resources` hint because `isStreamPreset()` reads it while the profiles trim sources; `applyAIOStreamsCompatibility` strips it from the export. Verified by saving 334 generated configs into the pinned image and reading them back (`?raw=true`).
+12. **`not()` is valid SEL** — AIOStreams builds its expr-eval parser with logical operators on, so `not(x)` works on every host. Never "repair" it to `negate(`: `negate(streams, originalStreams)` takes two stream arrays and throws otherwise.
+13. **No rating filter exists** — AIOStreams has no `certification()`; the always-null age-rating stub and `ageLimit` state were removed in v3.19. Family setups rely on a separate kids profile, the app's own age restriction, a PIN and the adult-title filename ESE.
 
 ---
 

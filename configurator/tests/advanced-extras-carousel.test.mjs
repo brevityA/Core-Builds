@@ -15,7 +15,8 @@ test('Advanced Builder restores the inline extras and scraper carousel', () => {
 test('Quick and guided routes retain the compact optional-services picker', () => {
   assert.ok(app.includes('const compactOptSection ='));
   assert.ok(app.includes('showAdditionalServicesPicker(options={})'));
-  assert.ok(app.includes('id="flExtrasBtn"'));
+  // Express opens it (the retired Fast Lane's flExtrasBtn went with that modal).
+  assert.ok(app.includes('data-action="open-additional-services"'));
 });
 
 test('carousel cards expose selection state to keyboard and assistive technology', () => {

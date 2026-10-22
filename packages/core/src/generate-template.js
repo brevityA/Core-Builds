@@ -17,7 +17,6 @@ import { addonPolicy, assertAddonPolicy } from './addon-policy.js';
 import { getSelPolicy } from './sel-policy.js';
 import { rankedSelPolicy } from './ranked-sel-policy.js';
 import { SCORE_IQR_GUARD } from './sel-iqr-policy.js';
-import { generateAgeRatingESE } from './agerating.js';
 import { sanitizeAioEnumArrays } from './schema.js';
 import { OPTIONAL_SCRAPER_DEFS } from './scrapers.js';
 import { requireNuvioInstantHost } from './nuvio-hosts.js';
@@ -232,8 +231,8 @@ function buildPresets(input) {
   const multiHasTorbox = isMulti && (multiServices.includes('torbox-pro') || multiServices.includes('torbox-ess'));
   const storeSlot = isMulti
     ? [...(multiHasTorbox ? [{ type:'stremthruTorz', instanceId:'67c', enabled:true, options:{ name:'StremThru Torz', timeout:5000, includeP2P:false, useMultipleInstances:false }, resources:['stream'] }] : []), ...multiServices.filter(s => debridServices.includes(s)).map((s, i) => ({ type:'stremthruStore', instanceId:`68${String.fromCharCode(97+i)}`, enabled:true, options:{ name:storeLabels[s] || 'StremThru Store', timeout:5000, useMultipleInstances:false }, resources:['stream'] }))]
-    : useStore ? [{ type:'stremthruStore', instanceId:'68a', enabled:true, options:{ name:storeLabels[svc] || 'StremThru Store', timeout:5000, useMultipleInstances:false }, resources:['stream'] }]
-    : svc === 'hybrid' ? [{ type:'stremthruTorz', instanceId:'67c', enabled:true, options:{ name:'StremThru Torz', timeout:5000, includeP2P:false, useMultipleInstances:false }, resources:['stream'] }, { type:'stremthruStore', instanceId:'68a', enabled:true, options:{ name:'StremThru RD', timeout:5000, useMultipleInstances:false }, resources:['stream'] }]
+    : useStore ? [{ type:'stremthruStore', instanceId:'68a', enabled:true, options:{ name:storeLabels[svc] || 'StremThru Store', timeout:5000 }, resources:['stream'] }]
+    : svc === 'hybrid' ? [{ type:'stremthruTorz', instanceId:'67c', enabled:true, options:{ name:'StremThru Torz', timeout:5000, includeP2P:false, useMultipleInstances:false }, resources:['stream'] }, { type:'stremthruStore', instanceId:'68a', enabled:true, options:{ name:'StremThru RD', timeout:5000 }, resources:['stream'] }]
     // Seedr: no StremThru preset supports it (only MediaFusion does), and a Store/Torz
     // instance with no usable service fails the whole save.
     : isP2P || isEasynews || isDebridio || isUsenet || svc === 'seedr' ? []
@@ -405,7 +404,6 @@ function buildEses(input) {
     if (is1080) out.push({ enabled:true, expression:"/* Hard Resolution Kill */ resolution(streams,'2160p','1440p')" });
     if (input.exclude4K && !is1080) out.push({ enabled:true, expression:"/* Exclude 4K / UHD */ resolution(streams,'2160p','1440p')" });
     if (input.excludeDV) out.push({ enabled:true, expression:"/* Exclude Dolby Vision */ visualTag(streams,'DV','HDR+DV')" });
-    { const ae = generateAgeRatingESE(input.ageLimit); if (ae) out.push(ae); }
     return out;
   }
 
@@ -424,7 +422,6 @@ function buildEses(input) {
     if (input.excludeDV) out.push({ enabled:true, expression:"/* Exclude Dolby Vision */ visualTag(streams,'DV','HDR+DV')" });
     // Size cap is owned by the native size policy on this route too — see the
     // note on the debrid path below (C07_DUPLICATE_SIZE_CAP).
-    { const ae = generateAgeRatingESE(input.ageLimit); if (ae) out.push(ae); }
     out.push(...lateEpisodePackFallbackEses());
     return out;
   }
@@ -477,8 +474,6 @@ function buildEses(input) {
   // sizeLimit and applies it on every route). Emitting a Size Limit SEL too
   // capped twice with different pack/folder semantics — reported as "size
   // filtering is applied twice" (C07_DUPLICATE_SIZE_CAP).
-  const ageEse = generateAgeRatingESE(input.ageLimit);
-  if (ageEse) out.push(ageEse);
   out.push(...lateEpisodePackFallbackEses());
   return out;
 }
@@ -561,7 +556,6 @@ function generateNuvioTemplate(input, options = {}) {
   if (input.sizeLimit && input.sizeLimit !== 'unlimited') {
     eses.push({ enabled:true, expression:`/* Size Limit — max ${input.sizeLimit}GB */ size(streams,'1B','${input.sizeLimit}GB')` });
   }
-  { const ae = generateAgeRatingESE(input.ageLimit); if (ae) eses.push(ae); }
   eses.push(...lateEpisodePackFallbackEses());
 
   const pses = [];
@@ -764,7 +758,7 @@ export function generateTemplate(rawInput = {}, options = {}) {
     sortCriteria: sortPolicy(input),
     deduplicator: (function(){ return { enabled:true, excludeAddons:[], multiGroupBehaviour: input.matchMode === 'relaxed' ? 'conservative' : 'aggressive', keys:isFree?['filename','infoHash','smartDetect']:['filename','infoHash','smartDetect'], cached: isFree ? 'disabled' : (input.matchMode === 'relaxed' ? 'per_service' : 'single_result'), uncached: isFree ? 'disabled' : 'per_service', p2p:'per_addon', smartDetectAttributes:['size','resolution','quality','visualTags','audioTags','audioChannels','languages','encode','edition','network','remastered','bitrate','releaseGroup'], smartDetectRounding: input.matchMode === 'strict' ? 5 : 10, libraryBehaviour: isFree ? 'ignore' : 'prefer', tiebreakers:[{type:'torrent_seeders',position:'before_addon'},{type:'usenet_age',position:'before_addon'}], ...(input.dedupMerge ? { merge: { enabled: true, failoverVariants: true, fields: [] } } : {}) }; })(),
     formatter: (function(){ const _f = input.formatter === 'custom' && input.customFormatter ? input.customFormatter : formatters.find(f => f.id === (input.formatter||'family-v4')) || formatters[0] || { name:'', d:'' }; return { id:'tamtaro', definitions:{ overrides:{ tamtaro:{ name: _f.name, description: _f.d } } } }; })(),
-    proxy: { id:'mediaflow', proxiedAddons:[], proxiedServices: input.proxyEnabled ? (input.proxiedServices?.length ? [...input.proxiedServices] : []) : [] },
+    proxy: { id:'mediaflow', proxiedAddons:[], proxiedServices:[] },
     resultLimits: { global: rc.maxResults, resolution: rc.maxResultsPerResolution, mode: 'conjunctive' },
     size: sizePolicy(normalizedInput),
     bitrate: bitratePolicy(normalizedInput, hasTmdb),
@@ -889,6 +883,8 @@ export function generateTemplate(rawInput = {}, options = {}) {
     sizeLimit: input.sizeLimit,
     bandwidthMbps: input.bandwidthMbps,
     cacheMode: input.cacheMode,
+    qualityFirst: Boolean(input.qualityFirst),
+    resolutionFirst: Boolean(input.resolutionFirst),
     exclude4K: Boolean(input.exclude4K),
     excludeDV: Boolean(input.excludeDV),
     aiostreamsVersion: input.aiostreamsVersion,

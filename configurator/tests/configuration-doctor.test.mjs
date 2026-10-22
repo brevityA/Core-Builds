@@ -37,7 +37,9 @@ test('doctor returns stable structured findings without mutating input', () => {
   const before = JSON.stringify(input);
   const result = diagnoseTemplate(input);
   assert.equal(JSON.stringify(input), before);
-  assert.ok(result.summary.blocker >= 3);
+  assert.ok(result.summary.blocker >= 2);
+  // not() is valid SEL (AIOStreams enables logical operators): never a finding.
+  assert.ok(!result.findings.some(f => f.id.startsWith('legacy-not')));
   assert.ok(result.findings.some(f => f.id.startsWith('secret:') && f.path.includes('apiKey')));
   assert.ok(result.findings.some(f => f.id === 'removed-preset:0'));
   assert.ok(result.findings.some(f => f.id === 'duplicate-instance:1'));
@@ -55,7 +57,8 @@ test('selected repairs are explicit, pure, and leave unselected findings alone',
   assert.equal(fixed.config.titleMatching.mode, 'fuzzy');
   assert.equal(fixed.config.titleMatching.similarityThreshold, .85);
   assert.equal(fixed.config.yearMatching.strict, false);
-  assert.match(fixed.config.includedStreamExpressions[0].expression, /^negate\(/);
+  // The doctor used to rewrite not( into negate(, which needs two stream arrays and throws.
+  assert.equal(fixed.config.includedStreamExpressions[0].expression, 'not(cached(streams))');
 });
 
 test('credential repairs redact nested values and URL parameters', () => {
