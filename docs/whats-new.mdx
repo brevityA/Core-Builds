@@ -1,14 +1,30 @@
 ---
-title: "What's New — Configurator v3.16"
+title: "What's New — Configurator v3.17"
 sidebarTitle: "What's New"
-description: "Latest Core Builds Configurator releases (v3.16 and earlier), auto-generated from the in-app changelog."
+description: "Latest Core Builds Configurator releases (v3.17 and earlier), auto-generated from the in-app changelog."
 ---
 
 # What's New in the Configurator
 
-This page is regenerated from `configurator/src/data/changelog.js` by `scripts/sync-docs.py`, so it always reflects the latest shipped configurator version (currently **v3.16**).
+This page is regenerated from `configurator/src/data/changelog.js` by `scripts/sync-docs.py`, so it always reflects the latest shipped configurator version (currently **v3.17**).
 
 For the template-suite release log, see the [Changelog](https://corebuilds-docs.docsalot.dev/changelog).
+
+## Configurator v3.17 (Oct 22 2026)
+
+<CardGroup cols={2}>
+  <Card title="ElfHosted saves refused" icon="sparkles">
+    fixed. Since about Oct 15 every config exported from the configurator was refused with '1 regexes are not allowed'. Vidhin05 added the SumVision release group to one of the two Generated Dynamic HDR patterns, and hosts accept a regex only when it matches their allowlist character for character, so the copy every build carried stopped counting as allowed. Removing that row let a save through, which is how it was reported. The pattern is now re-derived verbatim from upstream across the configurator, the CLI, the shared filter files and 43 templates, each of which bumps so the update banner offers the fixed copy; the same pass carries the other upstream edit (SiCFoI added to LQ (Release Title) (Radarr)). Checked against a real AIOStreams with ElfHosted's current rules: 0 of 388 builds saved before, 388 of 388 after.
+  </Card>
+  <Card title="The drift watcher now names the entry that broke" icon="bolt">
+    it opened an issue on Oct 15 but listed two other changes. Upstream gives both Generated Dynamic HDR patterns the same name, and the watcher keyed entries by name alone, so the second hid any change to the first. Repeated names are now told apart, and an issue says when a changed pattern is one every generated config ships, which means saves are being refused already. The save test's copy of ElfHosted's allowlist was also two weeks stale, still holding the old text, which is why it stayed green; it is refreshed.
+  </Card>
+  <Card title="Five more regex patterns re-synced" icon="shield-check">
+    on Oct 22 Vidhin05 edited Radarr Web T1–T3, Sonarr Web T2, FLUX and TrueHD Exclude Groups (monkee and CMRG added, SiGMA and DON dropped, FLUX made case-sensitive). Every build that carries the inline regex list shipped five strings ElfHosted no longer allows, so saves were refused again. All copies now match upstream character for character. The re-sync tool had skipped the FLUX edit because it ignored regex flags, and it never covered the CLI's own copies, where an outdated BR-DISK filter had also been left behind; both are fixed and now checked.
+  </Card>
+</CardGroup>
+
+---
 
 ## Configurator v3.16 (Oct 3 2026)
 
@@ -89,18 +105,5 @@ For the template-suite release log, see the [Changelog](https://corebuilds-docs.
   </Card>
   <Card title="Release notes now say when generated output is unchanged" icon="layers">
     3.12 to 3.13 produced byte-identical configs, and default-profile users saw none of 3.9 through 3.11 either, yet each release read as a config change: re-importing showed no changes in AIOStreams and looked broken. A new check blocks any release that changes no generated config unless its notes say so, and blocks the opposite claim when output did change.
-  </Card>
-</CardGroup>
-
----
-
-## Configurator v3.13 (Sep 27 2026)
-
-<CardGroup cols={2}>
-  <Card title="Configuration Doctor repairs hardened" icon="sparkles">
-    three fixes from the post-release audit of the new Doctor. Credential redaction now covers the whole imported file: the diagnosis recorded paths relative to the unwrapped template while the repair pass walked the wrapper, so on array-wrapped exports every selected redaction silently did nothing and the 'repaired' download still carried the keys. The scan now walks the entire input — wrapper keys, string arrays (a token in a synced-URL entry is flagged like any other), and every config in a multi-template array, not just the first one the structural checks unwrap. Removing a dead preset now also removes its instanceId from groups — AIOStreams rejects a config whose group references a preset that no longer exists, which would have turned a safe repair into a save failure; a grouping left empty is dropped, and groups disable entirely when none remain.
-  </Card>
-  <Card title="Install verification is now real" icon="bolt">
-    the Full Stack success panel said your addons 'were read back from your account', but nothing read them back. The install now ends with an actual re-read of the Stremio addon collection, checked against what was requested; a missing addon is reported plainly instead of celebrated. The Doctor's payload gauge also now measures the config the host actually receives rather than the template wrapper around it, so a wrapped export is no longer counted against the 100 KB save limit twice over.
   </Card>
 </CardGroup>

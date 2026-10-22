@@ -5,13 +5,18 @@
     "description": "Core Nexus 4K for AllDebrid. IQR Tukey fence bitrate PSEs · DV/HDR priority · TrueHD/Atmos · uncapped bitrate. Requires AllDebrid account.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "0.4.13",
+    "version": "0.4.14",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
     "sourceUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/AllDebrid/core-nexus-4k-alldebrid.json",
     "changelogUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md",
     "changelog": [
+      {
+        "date": "2026-10-22",
+        "version": "0.4.14",
+        "content": "Inline regex sync: patterns re-derived from the current Vidhin05 English ranked list (FLUX, Generated Dynamic HDR, LQ (Release Title) (Radarr), Radarr Web T1, Radarr Web T2, Radarr Web T3, Sonarr Web T2, TrueHD Exclude Groups). No filter/sort/formatter changes."
+      },
       {
         "date": "2026-09-26",
         "version": "0.4.13",
@@ -461,7 +466,7 @@
         "score": 80
       },
       {
-        "pattern": "/\\b(FLUX)\\b/i",
+        "pattern": "/\\b(FLUX)\\b/",
         "name": "FLUX",
         "score": 80
       },
@@ -606,7 +611,7 @@
         "score": 40
       },
       {
-        "pattern": "/^(?=.*(WEB[-_. ]DL(?:mux)?|WEBDL|AmazonHD|AmazonSD|iTunesHD|MaxdomeHD|NetflixU?HD|WebHD|HBOMaxHD|DisneyHD|[. ]WEB[. ](?:[xh][ .]?26[45]|AVC|HEVC|DDP?[ .]?5[. ]1)|(?:720|1080|2160)p[-. ]WEB[-. ]|[-. ]WEB[-. ](?:720|1080|2160)p|(?:AMZN|NF|DP)[. -]WEB[. -](?!Rip)|WebRip|Web-Rip|WEBMux))(?=.*\\b(?:dB|MiU|MZABI|playWEB|SbR|SMURF|XEBEC|4KBEC|CEBEX)\\b).*/i",
+        "pattern": "/^(?=.*(WEB[-_. ]DL(?:mux)?|WEBDL|AmazonHD|AmazonSD|iTunesHD|MaxdomeHD|NetflixU?HD|WebHD|HBOMaxHD|DisneyHD|[. ]WEB[. ](?:[xh][ .]?26[45]|AVC|HEVC|DDP?[ .]?5[. ]1)|(?:720|1080|2160)p[-. ]WEB[-. ]|[-. ]WEB[-. ](?:720|1080|2160)p|(?:AMZN|NF|DP)[. -]WEB[. -](?!Rip)|WebRip|Web-Rip|WEBMux))(?=.*\\b(?:dB|MiU|monkee|MZABI|playWEB|SbR|SMURF|XEBEC|4KBEC|CEBEX)\\b).*/i",
         "name": "Radarr Web T2",
         "score": 40
       },
@@ -621,12 +626,12 @@
         "score": 40
       },
       {
-        "pattern": "/^(?=.*(WEB[-_. ]DL(?:mux)?|WEBDL|AmazonHD|AmazonSD|iTunesHD|MaxdomeHD|NetflixU?HD|WebHD|HBOMaxHD|DisneyHD|[. ]WEB[. ](?:[xh][ .]?26[45]|AVC|HEVC|DDP?[ .]?5[. ]1)|(?:720|1080|2160)p[-. ]WEB[-. ]|[-. ]WEB[-. ](?:720|1080|2160)p|(?:AMZN|NF|DP)[. -]WEB[. -](?!Rip)|WebRip|Web-Rip|WEBMux))(?=.*\\b(?:BLOOM|Dooky|GNOMiSSiON|NINJACENTRAL|NPMS|ROCCaT|SiGMA|SLiGNOME|SwAgLaNdEr)\\b).*/i",
+        "pattern": "/^(?=.*(WEB[-_. ]DL(?:mux)?|WEBDL|AmazonHD|AmazonSD|iTunesHD|MaxdomeHD|NetflixU?HD|WebHD|HBOMaxHD|DisneyHD|[. ]WEB[. ](?:[xh][ .]?26[45]|AVC|HEVC|DDP?[ .]?5[. ]1)|(?:720|1080|2160)p[-. ]WEB[-. ]|[-. ]WEB[-. ](?:720|1080|2160)p|(?:AMZN|NF|DP)[. -]WEB[. -](?!Rip)|WebRip|Web-Rip|WEBMux))(?=.*\\b(?:BLOOM|Dooky|GNOMiSSiON|NINJACENTRAL|NPMS|ROCCaT|SLiGNOME|SwAgLaNdEr)\\b).*/i",
         "name": "Radarr Web T3",
         "score": 40
       },
       {
-        "pattern": "/^(?=.*(WEB[-_. ]DL(?:mux)?|WEBDL|AmazonHD|AmazonSD|iTunesHD|MaxdomeHD|NetflixU?HD|WebHD|HBOMaxHD|DisneyHD|[. ]WEB[. ](?:[xh][ .]?26[45]|AVC|HEVC|DDP?[ .]?5[. ]1)|(?:720|1080|2160)p[-. ]WEB[-. ]|[-. ]WEB[-. ](?:720|1080|2160)p|(?:AMZN|NF|DP)[. -]WEB[. -](?!Rip)|WebRip|Web-Rip|WEBMux))(?=.*\\b(?:3cTWeB|4KBEC|BTW|BLUTONiUM|BYNDR|CEBEX|Chotab|Cinefeel|CiT|Coo7|dB|FC|iJP|iKA|iT00NZ|JETIX|KHN|MiU|MZABI|NPMS|NYH|orbitron|playWEB|PSiG|ROCCaT|RTFM|SA89|SbR|SDCC|TEPES|TVSmash|WELP|XEBEC)\\b).*/i",
+        "pattern": "/^(?=.*(WEB[-_. ]DL(?:mux)?|WEBDL|AmazonHD|AmazonSD|iTunesHD|MaxdomeHD|NetflixU?HD|WebHD|HBOMaxHD|DisneyHD|[. ]WEB[. ](?:[xh][ .]?26[45]|AVC|HEVC|DDP?[ .]?5[. ]1)|(?:720|1080|2160)p[-. ]WEB[-. ]|[-. ]WEB[-. ](?:720|1080|2160)p|(?:AMZN|NF|DP)[. -]WEB[. -](?!Rip)|WebRip|Web-Rip|WEBMux))(?=.*\\b(?:3cTWeB|4KBEC|BTW|BLUTONiUM|BYNDR|CEBEX|Chotab|Cinefeel|CiT|CMRG|Coo7|dB|FC|iJP|iKA|iT00NZ|JETIX|KHN|MiU|MZABI|NPMS|NYH|orbitron|playWEB|PSiG|ROCCaT|RTFM|SA89|SbR|SDCC|TEPES|TVSmash|WELP|XEBEC)\\b).*/i",
         "name": "Sonarr Web T2",
         "score": 40
       },
@@ -901,7 +906,7 @@
         "score": -50
       },
       {
-        "pattern": "/^(?=.*\\b(BiTOR|DepraveD|SasukeducK|tarunk9c|VD0N|VECTOR|VisionXpert)\\b)(?=.*(?:\\bHDR10(\\+|P(lus)?)\\b|\\b(dv|dovi|dolby[ .]?v(ision)?)\\b)).*/i",
+        "pattern": "/^(?=.*\\b(BiTOR|DepraveD|SasukeducK|SumVision|tarunk9c|VD0N|VECTOR|VisionXpert)\\b)(?=.*(?:\\bHDR10(\\+|P(lus)?)\\b|\\b(dv|dovi|dolby[ .]?v(ision)?)\\b)).*/i",
         "name": "Generated Dynamic HDR",
         "score": -50
       },
@@ -921,7 +926,7 @@
         "score": -50
       },
       {
-        "pattern": "/\\b(3L|CtrlHD|DON|HQMUX|W4NK3R)\\b/i",
+        "pattern": "/\\b(3L|CtrlHD|HQMUX|W4NK3R)\\b/i",
         "name": "TrueHD Exclude Groups",
         "score": -50
       },
@@ -1102,7 +1107,7 @@
       {
         "originalName": "Generated Dynamic HDR",
         "name": "Generated Dynamic HDR",
-        "pattern": "/^(?=.*\\b(BiTOR|DepraveD|SasukeducK|tarunk9c|VD0N|VECTOR|VisionXpert)\\b)(?=.*(?:\\bHDR10(\\+|P(lus)?)\\b|\\b(dv|dovi|dolby[ .]?v(ision)?)\\b)).*/i",
+        "pattern": "/^(?=.*\\b(BiTOR|DepraveD|SasukeducK|SumVision|tarunk9c|VD0N|VECTOR|VisionXpert)\\b)(?=.*(?:\\bHDR10(\\+|P(lus)?)\\b|\\b(dv|dovi|dolby[ .]?v(ision)?)\\b)).*/i",
         "score": -50
       },
       {
@@ -1120,7 +1125,7 @@
       {
         "originalName": "FLUX",
         "name": "FLUX",
-        "pattern": "/\\b(FLUX)\\b/i",
+        "pattern": "/\\b(FLUX)\\b/",
         "score": 80
       },
       {
@@ -1186,13 +1191,13 @@
       {
         "originalName": "TrueHD Exclude Groups",
         "name": "TrueHD Exclude Groups",
-        "pattern": "/\\b(3L|CtrlHD|DON|HQMUX|W4NK3R)\\b/i",
+        "pattern": "/\\b(3L|CtrlHD|HQMUX|W4NK3R)\\b/i",
         "score": -50
       },
       {
         "originalName": "Radarr Web T1",
         "name": "Radarr Web T1",
-        "pattern": "/^(?=.*(WEB[-_. ]DL(?:mux)?|WEBDL|AmazonHD|AmazonSD|iTunesHD|MaxdomeHD|NetflixU?HD|WebHD|HBOMaxHD|DisneyHD|[. ]WEB[. ](?:[xh][ .]?26[45]|AVC|HEVC|DDP?[ .]?5[. ]1)|(?:720|1080|2160)p[-. ]WEB[-. ]|[-. ]WEB[-. ](?:720|1080|2160)p|(?:AMZN|NF|DP)[. -]WEB[. -](?!Rip)|WebRip|Web-Rip|WEBMux))(?=.*\\b(?:ABBIE|AJP69|BLUTONiUM|BYNDR|CMRG|CRFW|CRUD|GNOME|HONE|Kitsune|MADSKY|NOSiViD|NTb|NTG|PAXA|PEXA|RAWR|SiC|TEPES|TheFarm|XEPA|ZoroSenpai)\\b).*/i",
+        "pattern": "/^(?=.*(WEB[-_. ]DL(?:mux)?|WEBDL|AmazonHD|AmazonSD|iTunesHD|MaxdomeHD|NetflixU?HD|WebHD|HBOMaxHD|DisneyHD|[. ]WEB[. ](?:[xh][ .]?26[45]|AVC|HEVC|DDP?[ .]?5[. ]1)|(?:720|1080|2160)p[-. ]WEB[-. ]|[-. ]WEB[-. ](?:720|1080|2160)p|(?:AMZN|NF|DP)[. -]WEB[. -](?!Rip)|WebRip|Web-Rip|WEBMux))(?=.*\\b(?:ABBIE|AJP69|BLUTONiUM|BYNDR|CMRG|CRFW|CRUD|HONE|Kitsune|MADSKY|NOSiViD|NTb|NTG|PAXA|PEXA|RAWR|SiC|TEPES|TheFarm|XEPA|ZoroSenpai)\\b).*/i",
         "score": 60
       },
       {
@@ -1234,7 +1239,7 @@
       {
         "originalName": "LQ (Release Title) (Radarr)",
         "name": "LQ (Release Title) (Radarr)",
-        "pattern": "/\\b(1XBET|BEN[ ._-]THE[ ._-]MEN|Feranki1980|GalaxyRG|(?<!-)jennaortega(UHD)?|R&H|READ(\\s|\\.)+NOTE|SWTYBLZ|TeeWee|TEKNO3D|Will1869)\\b|(-D3US|D3US-)|(?<!\\bweb[ ._-]?(dl|rip)?\\b.*)-(EVO)\\b|(?<!\\bweb[ ._-]?(dl|rip)?\\b.*)-(PiRaTeS)\\b|^(?!.*\\bMA\\b.*\\bWEB-?DL\\b).*\\b(HHWEB)\\b|(?<!\\b(remux).*?)\\b(unkn0wn)\\b/i",
+        "pattern": "/\\b(1XBET|BEN[ ._-]THE[ ._-]MEN|Feranki1980|GalaxyRG|(?<!-)jennaortega(UHD)?|R&H|READ(\\s|\\.)+NOTE|SWTYBLZ|TeeWee|TEKNO3D|Will1869)\\b|(-D3US|D3US-)|(?<!\\bweb[ ._-]?(dl|rip)?\\b.*)-(EVO)\\b|(?<!\\bweb[ ._-]?(dl|rip)?\\b.*)-(PiRaTeS)\\b|^(?!.*\\bMA\\b.*\\bWEB-?DL\\b).*\\b(HHWEB)\\b|(?<!\\b(remux).*?)\\b(unkn0wn)\\b|^(?=.*\\b(CMv4)\\b).*\\b(SiCFoI)\\b/i",
         "score": -75
       },
       {
