@@ -5,7 +5,7 @@
     "description": "4K template tuned for Apple TV 4K (3rd gen) and Infuse. Dolby Vision Profile 5/8 is natively supported — DV streams are prioritised. HDR10+ (3rd gen exclusive), HDR10, HLG, and SDR are also shown. AV1 hard-excluded (no hardware decoder on the A15 chip — severe performance hit). DD+ Atmos is the native top audio format. 2160p primary with 1080p fallback. Based on Core Nexus 4K Pro (TorBox · Library, Comet, Zilean).",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "0.2.13",
+    "version": "0.2.12",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -19,13 +19,8 @@
     "changelog": [
       {
         "date": "2026-10-22",
-        "version": "0.2.13",
-        "content": "Inline regex sync: patterns re-derived from the current Vidhin05 English ranked list (FLUX, Radarr Web T2, Radarr Web T3, Sonarr Web T2, TrueHD Exclude Groups). No filter/sort/formatter changes."
-      },
-      {
-        "date": "2026-10-18",
         "version": "0.2.12",
-        "content": "Inline regex sync: patterns re-derived from the current Vidhin05 English ranked list (Generated Dynamic HDR). No filter/sort/formatter changes."
+        "content": "Inline regex sync: patterns re-derived from the current Vidhin05 English ranked list (FLUX, Generated Dynamic HDR, Radarr Web T2, Radarr Web T3, Sonarr Web T2, TrueHD Exclude Groups). No filter/sort/formatter changes."
       },
       {
         "date": "2026-09-26",

@@ -5,7 +5,7 @@
     "description": "Speed-optimised 4K build for TorBox Essential and EasyNews subscribers. Lean sources: Library, Comet, and Zilean — the four fastest, delivering cached results in 2–3 seconds. 2160p priority · DV and HDR10+ · TrueHD/Atmos · files up to 150 GB. SeaDex best-release enforced for anime. Requires active TorBox Essential and EasyNews subscriptions.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "2.10.15",
+    "version": "2.10.14",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -19,13 +19,8 @@
     "changelog": [
       {
         "date": "2026-10-22",
-        "version": "2.10.15",
-        "content": "Inline regex sync: patterns re-derived from the current Vidhin05 English ranked list (FLUX, Radarr Web T1, Radarr Web T2, Radarr Web T3, Sonarr Web T2, TrueHD Exclude Groups). No filter/sort/formatter changes."
-      },
-      {
-        "date": "2026-10-18",
         "version": "2.10.14",
-        "content": "Inline regex sync: patterns re-derived from the current Vidhin05 English ranked list (Generated Dynamic HDR, LQ (Release Title) (Radarr)). No filter/sort/formatter changes."
+        "content": "Inline regex sync: patterns re-derived from the current Vidhin05 English ranked list (FLUX, Generated Dynamic HDR, LQ (Release Title) (Radarr), Radarr Web T1, Radarr Web T2, Radarr Web T3, Sonarr Web T2, TrueHD Exclude Groups). No filter/sort/formatter changes."
       },
       {
         "date": "2026-09-26",
