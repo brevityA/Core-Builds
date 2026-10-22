@@ -287,10 +287,7 @@
           "mediaTypes": [
             "anime"
           ]
-        },
-        "resources": [
-          "stream"
-        ]
+        }
       },
       {
         "type": "stremthruTorz",
@@ -301,10 +298,7 @@
           "timeout": 6000,
           "includeP2P": false,
           "useMultipleInstances": false
-        },
-        "resources": [
-          "stream"
-        ]
+        }
       },
       {
         "type": "meteor",
@@ -373,10 +367,6 @@
           "name": "TMDB",
           "timeout": 6000
         },
-        "resources": [
-          "catalog",
-          "meta"
-        ],
         "category": "meta_catalogs"
       }
     ],

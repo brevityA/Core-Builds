@@ -1326,10 +1326,7 @@
           "mediaTypes": [
             "anime"
           ]
-        },
-        "resources": [
-          "stream"
-        ]
+        }
       },
       {
         "type": "stremthruTorz",
@@ -1340,10 +1337,7 @@
           "timeout": 6000,
           "includeP2P": false,
           "useMultipleInstances": false
-        },
-        "resources": [
-          "stream"
-        ]
+        }
       },
       {
         "type": "meteor",
@@ -1413,10 +1407,7 @@
         "options": {
           "name": "EZTV",
           "timeout": 6000
-        },
-        "resources": [
-          "stream"
-        ]
+        }
       },
       {
         "type": "torrent-galaxy",
@@ -1425,10 +1416,7 @@
         "options": {
           "name": "Torrent Galaxy",
           "timeout": 6000
-        },
-        "resources": [
-          "stream"
-        ]
+        }
       },
       {
         "type": "knaben",
@@ -1439,10 +1427,7 @@
           "timeout": 6000,
           "mediaTypes": [],
           "useMultipleInstances": false
-        },
-        "resources": [
-          "stream"
-        ]
+        }
       },
       {
         "type": "opensubtitles-v3-plus",
@@ -1467,10 +1452,6 @@
           "name": "TMDB",
           "timeout": 6000
         },
-        "resources": [
-          "catalog",
-          "meta"
-        ],
         "category": "meta_catalogs"
       }
     ],

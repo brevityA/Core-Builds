@@ -257,7 +257,8 @@ function stableSortCriteria(context) {
   // sort-policy.js#hoistResolution, so an uncached 2160p never outranks a
   // cached one on quality alone.
   const lead = ['resolution', 'cached', 'quality'];
-  const global = resolutionTierFirst(context)
+  // Resolution First leads with resolution at any tier; Quality First still wins, as in sort-policy.
+  const global = resolutionTierFirst(context) || (context.resolutionFirst && !context.qualityFirst)
     ? [
       ...lead.flatMap(key => base.filter(entry => entry.key === key)),
       ...base.filter(entry => !lead.includes(entry.key)),
@@ -407,7 +408,23 @@ function applyAIOStreamsCompatibility(template, context) {
       : {}),
   };
   if (target !== '2.31.1') delete template.metadata.coreBuildsLegacyTorboxSearch;
+  stripNonSchemaPresetKeys(config);
   return template;
+}
+
+// AIOStreams' PresetSchema keeps type, instanceId, enabled, options and category,
+// and strips anything else on save. The generators tag presets with a top-level
+// `resources` hint that isStreamPreset() reads while the profiles trim sources;
+// AIOStreams never saw it (it reads options.resources, falling back to everything
+// the preset supports). Dropping it here, after the reducers, leaves the stored
+// config byte-identical and stops the export claiming a restriction nobody applies.
+const PRESET_SCHEMA_KEYS = new Set(['type', 'instanceId', 'enabled', 'options', 'category']);
+function stripNonSchemaPresetKeys(config) {
+  if (!Array.isArray(config.presets)) return;
+  config.presets = config.presets.map(preset => {
+    if (!preset || typeof preset !== 'object') return preset;
+    return Object.fromEntries(Object.entries(preset).filter(([key]) => PRESET_SCHEMA_KEYS.has(key)));
+  });
 }
 
 function applyNativeFilters(config, context) {
@@ -592,6 +609,7 @@ const PROFILE_DROPS = Object.freeze({
   autoPlay: Object.freeze({ dropped: ['stable'], reason: 'Core Stable turns auto-play off' }),
   foreignLangKill: Object.freeze({ dropped: ['stable', 'balanced'], reason: 'the foreign-language filter runs only in the Advanced and Labs profiles' }),
   preload: Object.freeze({ dropped: ['stable', 'balanced'], reason: 'preloading runs only in the Advanced and Labs profiles' }),
+  streamPool: Object.freeze({ dropped: ['stable', 'balanced'], reason: 'the stream pool sizes dynamic fetching, which runs only in the Advanced and Labs profiles' }),
 });
 
 /**

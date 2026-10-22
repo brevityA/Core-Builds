@@ -478,8 +478,8 @@
       ['🈶 Mostly other languages','English takes the back seat']
     ],
     kids: [
-      ['🚫 Adults only','No age filtering'],
-      ['🧸 Family-safe','Age gates on from day one']
+      ['🚫 Adults only','No kids profile'],
+      ['🧸 Family-safe','Kids profile, PIN and adult-title filter']
     ],
     device: [
       ['📺 TV','Samsung / Android TV'],
@@ -554,7 +554,7 @@
     if (state.langs === 'en') bits.push('I\'ll quietly drop non-English audio so lists stay clean');
     if (state.langs === 'multi') bits.push('I\'ll keep other languages right alongside English');
     if (state.langs === 'foreign') bits.push('I\'ll tune the whole thing around your languages, English second');
-    if (state.kids) bits.push('<b>family-safe age filters</b> on, from the very first stream');
+    if (state.kids) bits.push('a <b>kids profile</b> with a PIN and an adult-title filter (AIOStreams can\'t filter by age rating, so the profile is the lock)');
     await say(bits.length ? 'Noted — ' + bits.join(', and ') + '. 👍' : 'All default then — clean and simple. 👍');
   }
   async function askDeviceAppQ(){
@@ -623,7 +623,7 @@
     const a = {stremio:'one-tap install into <b>Stremio</b>', nuvio:'manifest link, ready to paste into <b>Nuvio</b>', wuplay:'manifest link, ready to paste into <b>WuPlay</b>', other:'manifest link for <b>any Stremio-compatible app</b>'}[state.app] || '';
     const l = {en:'English only', multi:'English + other languages', foreign:'non-English first'}[state.langs] || 'English only';
     document.getElementById('wmName').textContent = state.name || c;
-    return `<div class="summary" style="margin:10px 0 2px"><b>${c}</b> base · ${s} · tuned for your <b>${d}</b><br>${a}<br><span style="color:var(--dim);font-size:.62rem">${l}${state.kids ? ' · 🧸 family-safe age filters' : ''} · quality filtering, HDR/DV handling and the right formatter — all picked for you</span></div>`;
+    return `<div class="summary" style="margin:10px 0 2px"><b>${c}</b> base · ${s} · tuned for your <b>${d}</b><br>${a}<br><span style="color:var(--dim);font-size:.62rem">${l}${state.kids ? ' · 🧸 kids profile + PIN' : ''} · quality filtering, HDR/DV handling and the right formatter — all picked for you</span></div>`;
   }
 
   // ---- watch-me sequencer (generic, with CB step-3 key pause + step-2 hiccup) ----

@@ -50,8 +50,10 @@ test('update preserves keyed scrapers, multiple indexers, options and instance I
   // Options are compared but credential values must not be rendered in the diff.
   await expect(page.locator('#diffModal')).not.toContainText('SYNTHETIC-');
   const updated = await apply(page);
+  // Preserved as AIOStreams stores them: its PresetSchema strips a top-level `resources`.
+  const asSaved = ({ resources, ...preset }) => preset;
   for (const source of sources) {
-    expect(updated.config.presets.find(p => p.instanceId === source.instanceId)).toEqual(source);
+    expect(updated.config.presets.find(p => p.instanceId === source.instanceId)).toEqual(asSaved(source));
   }
   const ids = updated.config.presets.map(p => p.instanceId);
   expect(new Set(ids).size).toBe(ids.length);
@@ -61,7 +63,7 @@ test('update preserves keyed scrapers, multiple indexers, options and instance I
   await page.reload();
   await page.waitForFunction(() => Boolean(window.__coreBuilds));
   const reloaded = await page.evaluate(() => window.__coreBuilds.generate());
-  for (const source of sources) expect(reloaded.config.presets.find(p => p.instanceId === source.instanceId)).toEqual(source);
+  for (const source of sources) expect(reloaded.config.presets.find(p => p.instanceId === source.instanceId)).toEqual(asSaved(source));
   const backups = await page.evaluate(() => localStorage.getItem('coreBuildBackups') || '');
   expect(backups).not.toContain('SYNTHETIC-');
 });
@@ -266,7 +268,8 @@ test('manual subtitle edits release kept sources, respect language dialects and 
   // providers' independently imported languages or release their kept values.
   await page.locator('#advancedDrawer [data-action="toggle-sub-lang"][data-val="en"]').click();
   const unchanged = await page.evaluate(() => window.__coreBuilds.generate());
-  for (const source of subtitles) expect(unchanged.config.presets.find(p => p.instanceId === source.instanceId)).toEqual(source);
+  const asSaved = ({ resources, ...preset }) => preset;   // AIOStreams strips a top-level `resources`
+  for (const source of subtitles) expect(unchanged.config.presets.find(p => p.instanceId === source.instanceId)).toEqual(asSaved(source));
   await page.locator('#advancedDrawer [data-action="toggle-sub-lang"][data-val="fr"]').click();
   const updated = await page.evaluate(() => window.__coreBuilds.generate());
   expect(updated.config.presets.find(p => p.instanceId === 'my-aiosubs').options.languages).toEqual(['en', 'fr']);

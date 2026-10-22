@@ -221,10 +221,7 @@
           "timeout": 6000,
           "showTorrentLinks": false,
           "useMultipleInstances": false
-        },
-        "resources": [
-          "stream"
-        ]
+        }
       },
       {
         "type": "hdhub",
@@ -266,10 +263,6 @@
           "name": "TMDB",
           "timeout": 6000
         },
-        "resources": [
-          "catalog",
-          "meta"
-        ],
         "category": "meta_catalogs"
       }
     ],

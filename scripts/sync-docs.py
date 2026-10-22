@@ -678,7 +678,7 @@ def gen_tools_whatsnew(cfg_entries, limit=4, per_version=4):
     link = (
         '      <div class="news-item"><span class="badge" style="flex-shrink:0;background:'
         'rgba(0,212,255,.12);color:var(--th-accent)">↗</span><span style="color:var(--th-tx2)">'
-        '<a href="https://brevitya.github.io/Core-Builds/#changelog" style="color:var(--th-accent);'
+        '<a href="https://brevitya.github.io/Core-Builds/configurator/#changelog" style="color:var(--th-accent);'
         'text-decoration:none">Full Configurator changelog →</a> &nbsp;·&nbsp; '
         '<a href="https://corebuilds-docs.docsalot.dev/changelog" style="color:var(--th-accent);'
         'text-decoration:none">suite changelog →</a></span></div>'

@@ -212,10 +212,7 @@
           "name": "Torrentio",
           "timeout": 6000,
           "useMultipleInstances": false
-        },
-        "resources": [
-          "stream"
-        ]
+        }
       },
       {
         "type": "meteor",
@@ -287,10 +284,7 @@
           "timeout": 6000,
           "showTorrentLinks": false,
           "useMultipleInstances": false
-        },
-        "resources": [
-          "stream"
-        ]
+        }
       },
       {
         "type": "opensubtitles-v3-plus",
@@ -315,10 +309,6 @@
           "name": "TMDB",
           "timeout": 6000
         },
-        "resources": [
-          "catalog",
-          "meta"
-        ],
         "category": "meta_catalogs"
       }
     ],

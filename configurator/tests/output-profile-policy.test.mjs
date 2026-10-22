@@ -336,8 +336,38 @@ test('an imported custom source is explicit and survives both safe profiles', ()
   const template = { config: { presets: [{ type: 'newznab', instanceId: 'my-indexer', enabled: true, resources: ['stream'], options: { api: { url: 'https://example.invalid/api', apiKey: 'LOCAL-ONLY' } } }] } };
   for (const profile of ['stable', 'balanced']) {
     const result = applyOutputProfile(template, profile, { preservedPresetIds: ['my-indexer'] });
-    assert.deepEqual(result.config.presets, template.config.presets);
+    // Kept, minus the top-level `resources` AIOStreams' PresetSchema strips on save anyway.
+    const { resources, ...asSaved } = template.config.presets[0];
+    assert.deepEqual(result.config.presets, [asSaved]);
   }
+});
+
+test('exported presets carry only the keys AIOStreams keeps', () => {
+  const template = { config: { presets: [
+    { type: 'eztv', instanceId: 'e1', enabled: true, resources: ['stream'], options: { name: 'EZTV' } },
+    { type: 'library', instanceId: 'l1', enabled: true, category: 'mine', options: { resources: ['stream', 'catalog'] } },
+  ] } };
+  for (const profile of ['stable', 'balanced', 'advanced', 'labs']) {
+    for (const preset of applyOutputProfile(template, profile, { optionalScrapers: ['eztv'] }).config.presets) {
+      assert.deepEqual(Object.keys(preset).filter(k => !['type', 'instanceId', 'enabled', 'options', 'category'].includes(k)), [], `${profile} ${preset.type}`);
+    }
+  }
+  // The hint still drives Stable trimming before it is stripped: EZTV is a stream preset Stable drops.
+  assert.ok(!applyOutputProfile(template, 'stable', {}).config.presets.some(p => p.type === 'eztv'));
+});
+
+test('Core Stable honours Resolution First, and Quality First still wins', () => {
+  const lead = ctx => applyOutputProfile({ config: {} }, 'stable', { resolution: '1080p', ...ctx }).config.sortCriteria.global.slice(0, 2).map(e => e.key);
+  assert.deepEqual(lead({}), ['cached', 'resolution']);
+  assert.deepEqual(lead({ resolutionFirst: true }), ['resolution', 'cached']);
+  assert.deepEqual(lead({ resolutionFirst: true, qualityFirst: true }), ['cached', 'resolution']);
+});
+
+test('stream pool is reported as Advanced/Labs only', () => {
+  assert.equal(profileVerdictForChoice('streamPool', { outputProfile: 'advanced' }), null);
+  const verdict = profileVerdictForChoice('streamPool', {});
+  assert.equal(verdict.profile, 'stable');
+  assert.equal(verdict.switchTo, null, 'nothing auto-switches to Advanced');
 });
 
 test('originally absent fields remain absent after profile defaults', () => {

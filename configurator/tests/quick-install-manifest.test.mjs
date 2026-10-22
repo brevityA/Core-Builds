@@ -18,8 +18,10 @@ test('Other app target keeps and displays the raw manifest URL', () => {
   assert.ok(!app.includes("if (state.target==='manifest') installTarget='app'"));
 });
 
-test('successful Quick Install closes its overlay before opening the result modal', () => {
-  assert.ok(app.includes("document.getElementById('fastLaneModal')?.remove();\n      showManifestModal(manifestUrl, pwd, hostLbl, target);"));
+test('successful Express install closes its overlay before opening the result modal', () => {
+  // Express (.fastlane-overlay, z 10020) would otherwise cover the z 200 manifest modal.
+  assert.ok(app.includes("document.getElementById('expressLaneModal')?.remove();\n      showManifestModal(manifestUrl, pwd, hostLbl, target);"));
+  assert.ok(!app.includes("getElementById('fastLaneModal')"), 'the retired Fast Lane id closes nothing');
 });
 
 test('mutating host requests are never raced through direct and proxy paths', () => {

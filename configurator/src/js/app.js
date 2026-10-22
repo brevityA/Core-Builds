@@ -9,9 +9,8 @@ import { PROVIDER_CREDENTIALS } from '../data/credentials.js';
 import { serviceCredentialKeys, serviceCredentials } from '../data/credentials.js';
 import { initErrorLogger, logError, errorLogHtml, formatErrorLog, clearErrorLog, exportErrorLog } from './error-logger.js';
 import { initContactWidget } from './contact-widget.js';
-import { AGE_RATINGS, generateAgeRatingESE } from '../data/agerating.js';
-import { SPEED_TIERS, calculateBitrateLimit, DEVICE_BANDWIDTH_HINTS } from '../data/bandwidth.js';
-import { hasTmdbCredentials, bandwidthCapMbps, templateInput } from '../core/template-policy.js';
+import { calculateBitrateLimit, DEVICE_BANDWIDTH_HINTS } from '../data/bandwidth.js';
+import { hasTmdbCredentials, templateInput } from '../core/template-policy.js';
 import { resolutionPolicy, encodePolicy, audioPolicy } from '../core/device-policies.js';
 import { sortPolicy } from '../core/sort-policy.js';
 import { rankedSelPolicy } from '../core/ranked-sel-policy.js';
@@ -26,8 +25,6 @@ import { resolveHostCapabilities, parseHostStatus, hostOptionGate, gateTemplateF
 import { sanitizeDisplayName } from '../core/input-sanitize.js';
 import { getSelPolicy } from '../core/sel-policy.js';
 import { SCORE_IQR_GUARD } from '../core/sel-iqr-policy.js';
-import { APEX_MIXED_PSES } from '../core/sel-policy-data.js';
-import { iqrExpression } from '../core/iqr-expression.js';
 import { createUpdateSession, commitUpdate, cancelUpdate } from '../core/update-session.js';
 import { scoreStream, scoreFormattedStream } from '../core/core-score-policy.js';
 import { isNewer, parseChangelogRange, shouldCheck, normalizeTemplateMeta } from '../core/update-check.js';
@@ -452,7 +449,7 @@ async function selectHealthyHost(timeout=4000) {
 // Cloudflare Worker CORS proxy — see cloudflare-worker/README.md for deployment.
 // Set to '' to disable and fall back to direct-only fetches.
 const CORS_PROXY = 'https://core-builds-cors-proxy.tlorenzato26.workers.dev';
-const S = { service:null, device:null, resolution:null, audio:'limited', bandwidthMbps:0, content:null, name:'', multiServices:[], sizeLimit:'unlimited', formatter:'family-v4', p2pEnabled:false, qualityFirst:false, resolutionFirst:false, foreignLangKill:true, matchMode:'balanced', exclude4K:false, excludeDV:false, tmdbToken:'', tmdbApiKey:'', creds:{torbox:'',realdebrid:'',alldebrid:'',premiumize:'',debridlink:'',offcloud:'',easynews:'',easynewsPass:'',nzbgeek:'',debridio:'',debrider:'',nzbnoob:'',althub:'',usenetcrawler:'',drunkenslug:'',nzbfinder:'',jackett:'',prowlarr:'',subdl:''}, instanceHost:'elfhosted', instanceUrl:'', instanceUuid:'', instancePassword:'', baseUuid:'', basePassword:'', quickStart:false, langs: ['English'], langExclusive: false, cacheMode: 'mixed', streamPool: 'normal', pseArch: 'standard', telemetryOk: false, simpleMode: false, outputProfile:'auto', aiostreamsVersion:DEFAULT_AIOSTREAMS_VERSION, installMode: 'direct', stremioEmail: '', stremioPassword: '', subtitleLangs: ['en'], subtitleAddons: ['opensubtitles-v3-plus'], proxyEnabled: false, proxiedServices: [], catalogs: ['tmdb-addon'], dedupMerge: false, optionalScrapers: [], cleanInstall: false, quickProfile: 'balanced', preloadEnabled:true, autoPlayMethod:'matchingFile', addonTimeout:6000, patchCinemeta:false, installAIOMeta:false, ageLimit:'none', libraryBoost:'default', nzbFailover:false, nzbFailoverPosition:'after-torrents', maxFailoverNzbs:3 };
+const S = { service:null, device:null, resolution:null, audio:'limited', bandwidthMbps:0, content:null, name:'', multiServices:[], sizeLimit:'unlimited', formatter:'family-v4', p2pEnabled:false, qualityFirst:false, resolutionFirst:false, foreignLangKill:true, matchMode:'balanced', exclude4K:false, excludeDV:false, tmdbToken:'', tmdbApiKey:'', creds:{torbox:'',realdebrid:'',alldebrid:'',premiumize:'',debridlink:'',offcloud:'',easynews:'',easynewsPass:'',nzbgeek:'',debridio:'',debrider:'',nzbnoob:'',althub:'',usenetcrawler:'',drunkenslug:'',nzbfinder:'',jackett:'',prowlarr:'',subdl:''}, instanceHost:'elfhosted', instanceUrl:'', instanceUuid:'', instancePassword:'', baseUuid:'', basePassword:'', quickStart:false, langs: ['English'], langExclusive: false, cacheMode: 'mixed', streamPool: 'normal', pseArch: 'standard', telemetryOk: false, simpleMode: false, outputProfile:'auto', aiostreamsVersion:DEFAULT_AIOSTREAMS_VERSION, installMode: 'direct', stremioEmail: '', stremioPassword: '', subtitleLangs: ['en'], subtitleAddons: ['opensubtitles-v3-plus'], catalogs: ['tmdb-addon'], dedupMerge: false, optionalScrapers: [], cleanInstall: false, quickProfile: 'balanced', preloadEnabled:true, autoPlayMethod:'matchingFile', addonTimeout:6000, patchCinemeta:false, installAIOMeta:false, libraryBoost:'default', nzbFailover:false, nzbFailoverPosition:'after-torrents', maxFailoverNzbs:3 };
 // A clean template update must not inherit unrelated wizard/experimental flags.
 const INITIAL_STATE = cloneUpdateValue(S);
 function replaceState(nextState) {
@@ -471,7 +468,7 @@ function releaseMigrationForControl(action, element) {
     || (action === 'toggle-pref' && ['qualityFirst', 'resolutionFirst'].includes(key))) {
     releaseMigrationFields(CONFIG_UPDATE_SECTIONS.find(section => section.key === 'sort').fields);
   }
-  if (['toggle-service', 'toggle-carousel-service', 'toggle-optional-scraper', 'add-optional-scraper', 'remove-optional-scraper', 'toggle-catalog'].includes(action)) releaseMigrationFields(['services', 'presets', 'groups']);
+  if (['toggle-service', 'toggle-carousel-service', 'toggle-optional-scraper', 'add-optional-scraper', 'toggle-catalog'].includes(action)) releaseMigrationFields(['services', 'presets', 'groups']);
   if (action === 'update-radio' && key === 'resolution') releaseMigrationFields(['sortCriteria', 'preferredResolutions', 'excludedResolutions', 'requiredResolutions', 'includedResolutions']);
   if (['set-simple-cache', 'set-cache-mode'].includes(action)) releaseMigrationFields(['excludeCached', 'excludeUncached']);
   if (['set-simple-match', 'set-match-mode'].includes(action)) releaseMigrationFields(['deduplicator', 'sortCriteria']);
@@ -485,12 +482,10 @@ function releaseMigrationForControl(action, element) {
   if (action === 'set-addon-timeout') releaseMigrationFields(['presets']);
   if (action === 'set-autoplay-method') releaseMigrationFields(['autoPlay']);
 
-  if (action === 'toggle-proxy-svc') releaseMigrationFields(['proxy']);
-  if (['toggle-foreign-kill', 'set-age-limit', 'update-bandwidth'].includes(action)) releaseMigrationFields(['excludedStreamExpressions', 'bitrate']);
+  if (['toggle-foreign-kill', 'set-bandwidth'].includes(action)) releaseMigrationFields(['excludedStreamExpressions', 'bitrate']);
   if (action === 'toggle-p2p') releaseMigrationFields(['excludedStreamExpressions']);
   if (action === 'toggle-pref') {
     if (['exclude4K', 'excludeDV', 'foreignLangKill', 'p2pEnabled'].includes(key)) releaseMigrationFields(['excludedStreamExpressions']);
-    if (key === 'proxyEnabled') releaseMigrationFields(['proxy']);
     if (key === 'dedupMerge') releaseMigrationFields(['deduplicator']);
     if (key === 'preloadEnabled') releaseMigrationFields(['preloadStreams']);
   }
@@ -669,7 +664,7 @@ function sanitizeCustomFormatter(value) {
   return { name, d:description, label };
 }
 // Only wizard selections are shareable — never credentials, tokens, UUIDs, or passwords
-const SHARE_KEYS = ['device','resolution','audio','content','name','multiServices','sizeLimit','formatter','p2pEnabled','qualityFirst','resolutionFirst','foreignLangKill','matchMode','exclude4K','excludeDV','quickStart','langs','langExclusive','cacheMode','streamPool','instanceHost','simpleMode','outputProfile','aiostreamsVersion','pseArch','subtitleLangs','subtitleAddons','proxyEnabled','proxiedServices','catalogs','dedupMerge','optionalScrapers','preloadEnabled','autoPlayMethod','addonTimeout','bandwidthMbps','patchCinemeta','installAIOMeta','ageLimit','libraryBoost','nzbFailover','nzbFailoverPosition','maxFailoverNzbs'];
+const SHARE_KEYS = ['device','resolution','audio','content','name','multiServices','sizeLimit','formatter','p2pEnabled','qualityFirst','resolutionFirst','foreignLangKill','matchMode','exclude4K','excludeDV','quickStart','langs','langExclusive','cacheMode','streamPool','instanceHost','simpleMode','outputProfile','aiostreamsVersion','pseArch','subtitleLangs','subtitleAddons','catalogs','dedupMerge','optionalScrapers','preloadEnabled','autoPlayMethod','addonTimeout','bandwidthMbps','patchCinemeta','installAIOMeta','libraryBoost','nzbFailover','nzbFailoverPosition','maxFailoverNzbs'];
 function shareConfig() {
   try {
     const pub = {};
@@ -698,12 +693,11 @@ function sanitizeSharedConfig(d) {
   pick('outputProfile', v => ['auto', ...OUTPUT_PROFILES].includes(v));
   pick('aiostreamsVersion', v => AIOSTREAMS_COMPATIBILITY_TARGETS.includes(v));
   pick('sizeLimit',    v => ['10','20','30','50','unlimited'].includes(String(v).replace(/GB$/,'')));
-  pick('ageLimit',     v => AGE_RATINGS.some(r => r.v === v));
   pick('libraryBoost', v => ['none','default','strong'].includes(v));
   pick('nzbFailoverPosition', v => ['before-torrents','after-torrents'].includes(v));
   pick('maxFailoverNzbs', v => [1,2,3,5].includes(Number(v)));
   pick('instanceHost', v => v === 'auto' || v === 'custom' || Object.prototype.hasOwnProperty.call(HOST_BASE_URLS, v));
-  ['p2pEnabled','qualityFirst','resolutionFirst','foreignLangKill','exclude4K','excludeDV','quickStart','langExclusive','simpleMode','dedupMerge','proxyEnabled','preloadEnabled','patchCinemeta','installAIOMeta','nzbFailover'].forEach(k => pick(k, v => typeof v === 'boolean'));
+  ['p2pEnabled','qualityFirst','resolutionFirst','foreignLangKill','exclude4K','excludeDV','quickStart','langExclusive','simpleMode','dedupMerge','preloadEnabled','patchCinemeta','installAIOMeta','nzbFailover'].forEach(k => pick(k, v => typeof v === 'boolean'));
   pick('autoPlayMethod', v => ['matchingFile','matchingIndex','firstFile'].includes(v));
   pick('addonTimeout', v => [4000,6000,8000,10000].includes(Number(v)));
   if (Array.isArray(d.multiServices)) out.multiServices = d.multiServices.filter(v => SVC_IDS.includes(v));
@@ -713,7 +707,6 @@ function sanitizeSharedConfig(d) {
   if (Array.isArray(d.subtitleAddons)) out.subtitleAddons = d.subtitleAddons.filter(v => ['aiosubtitle', 'opensubtitles-v3-plus', 'subdl'].includes(v));
   if (Array.isArray(d.subtitleLangs)) out.subtitleLangs = d.subtitleLangs.filter(v => typeof v === 'string' && v.length >= 2 && v.length <= 5);
   if (Array.isArray(d.catalogs)) out.catalogs = d.catalogs.filter(v => ['tmdb-addon', 'streaming-catalogs', 'anime-catalogs', 'rpdb-catalogs', 'torrent-catalogs'].includes(v));
-  if (Array.isArray(d.proxiedServices)) out.proxiedServices = d.proxiedServices.filter(v => SVC_IDS.includes(v));
   return out;
 }
 
@@ -759,13 +752,6 @@ function restoreBackup(idx) {
   saveState();
   render();
   showToast('Restored backup from ' + new Date(snap._ts).toLocaleString());
-}
-function deleteBackup(idx) {
-  try {
-    const list = getBackups();
-    list.splice(idx, 1);
-    localStorage.setItem('coreBuildBackups', JSON.stringify(list));
-  } catch(e) {}
 }
 function backupTimelineHtml() {
   const list = getBackups();
@@ -1225,17 +1211,6 @@ const FMT_PREVIEWS = {
   }
 };
 
-function fmtPreviewHtml(fmtId) {
-  const p = FMT_PREVIEWS[fmtId] || FMT_PREVIEWS['family-v4'];
-  return `<div class="fmt-live-preview">
-    <div class="fmt-live-poster">${ICO.film(16,'#6b7280')}</div>
-    <div class="fmt-live-lines">
-      <div class="fmt-live-n">${p.n}</div>
-      ${p.d.map(l=>`<div class="fmt-live-d">${l}</div>`).join('')}
-    </div>
-  </div>`;
-}
-
 function fmtDropdownHtml() {
   const isCustom = S.formatter === 'custom' && S.customFormatter;
   const allFmts = [...FORMATTERS];
@@ -1289,41 +1264,6 @@ function updateFmtReceiptRow() {
       if (val) { val.textContent = fmtLbl; val.className = `receipt-row-val${S.formatter !== 'family-v4' ? ' hl' : ''}`; }
     }
   });
-}
-
-function customFormatterCard() {
-  if (!S.customFormatter) return '';
-  const on = S.formatter === 'custom';
-  const lbl = S.customFormatter.label || 'Custom';
-  return `<div class="fmt-card" data-action="set-formatter" data-val="custom" data-active="${on}">
-    <div style="display:flex;align-items:center;gap:14px;padding:13px 16px">
-      <div style="width:10px;height:10px;border-radius:50%;background:#a78bfa;flex-shrink:0"></div>
-      <div style="flex:1;min-width:0">
-        <span class="fmt-lbl" style="font-weight:700;font-size:.9rem">${lbl.replace(/</g,'&lt;')}</span>
-        <span style="margin-left:6px;background:rgba(167,139,250,.15);border-radius:4px;padding:2px 6px;font-size:.65rem;color:#a78bfa">Imported</span>
-        <div style="color:#6b7280;font-size:.72rem;margin-top:2px">Your imported formatter · <a href="#" data-action="clear-custom-formatter" style="color:#ef4444;text-decoration:none;font-size:.7rem">Remove</a></div>
-      </div>
-      <span class="fmt-arr"></span>
-    </div>
-  </div>`;
-}
-
-function videoPrefHtml() {
-  const chk = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#0d1117" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
-  const card = (key, title, desc) => {
-    const on = !!S[key];
-    return `<div class="pref-card${on?' pref-on':''}" data-action="toggle-pref" data-key="${key}">
-      <div class="pref-body-inner"><div class="pref-title">${title}</div><div class="pref-desc">${desc}</div></div>
-      <div class="pref-circle">${on?chk:''}</div>
-    </div>`;
-  };
-  return `<div class="pref-section">
-    <div class="pref-section-label">Video Preferences</div>
-    ${card('qualityFirst','Prioritize Quality over Resolution','Sorts by source quality (e.g. REMUX) before resolution.')}
-    ${card('resolutionFirst','Resolution First','Higher resolution always ranks above lower, even if lower-res is cached.')}
-    ${card('exclude4K','Exclude 4K / UHD','Removes 2160p content. Good for bandwidth saving.')}
-    ${card('excludeDV','Exclude Dolby Vision','Fixes purple/green tint on unsupported screens.')}
-  </div>`;
 }
 
 function renderP2pToggle() {
@@ -1709,7 +1649,6 @@ function renderAdvancedPanel() {
         ${prefCard('resolutionFirst','Resolution First','Higher resolution always ranks above lower, even if lower-res is cached.')}
         ${prefCard('exclude4K','Exclude 4K / UHD','Removes 2160p streams. Good for bandwidth saving.')}
         ${prefCard('excludeDV','Exclude Dolby Vision','Fixes purple/green tint on unsupported screens.')}
-        <!-- Age Rating Limit removed 2026-10-02: AIOStreams SEL has no certification() function, so the filter either failed the save (Advanced/Labs) or was silently dropped (Stable/Balanced). -->
         <div style="background:#111720;border:1.5px solid rgba(255,255,255,.08);border-radius:10px;padding:14px 16px;margin-top:8px">
           <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px">
             <span style="font-size:.78rem;font-weight:600;color:#6b7280">Stream Pool</span> ${ftTip('When AIOStreams may stop waiting for slower sources: it returns once this many cached results at your target resolution have arrived, or after the time limit. <strong>Larger = more choice</strong>, slower loads. Only the Advanced and Labs profiles use it; Stable and Balanced always wait for every source.')}
@@ -1820,28 +1759,10 @@ function renderAdvancedPanel() {
         </div>
       </div>
 
-      ${(S.service !== 'p2p' && S.service !== 'http') ? `<div>
-        <div style="font-size:.72rem;font-weight:700;color:#4b5563;letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:6px">${ICO.gear(16,'#64748b')} Proxy & Resilience</div>
-        <div style="background:#111720;border:1.5px solid rgba(255,255,255,.08);border-radius:10px;padding:14px 16px">
-          ${prefCard('proxyEnabled','Enable Stream Proxy','Route streams through MediaFlow proxy. Helps with geo-restrictions and ISP throttling.')}
-          ${S.proxyEnabled ? `<div style="margin-top:10px">
-            <div style="font-size:.78rem;font-weight:600;color:#6b7280;margin-bottom:8px">Proxy Through Services</div>
-            <div style="display:flex;flex-wrap:wrap;gap:4px">
-              ${['realdebrid','alldebrid','torbox','premiumize','debridlink','easynews'].map(s=>{
-                const on=(S.proxiedServices||[]).includes(s);
-                const names={realdebrid:'Real-Debrid',alldebrid:'AllDebrid',torbox:'TorBox',premiumize:'Premiumize',debridlink:'Debrid-Link',easynews:'EasyNews'};
-                return `<button data-action="toggle-proxy-svc" data-val="${s}" style="padding:6px 10px;border-radius:6px;font-size:.72rem;font-weight:${on?'700':'500'};border:1px solid ${on?'rgba(100,116,139,.5)':'rgba(255,255,255,.07)'};background:${on?'rgba(100,116,139,.12)':'transparent'};color:${on?'#94a3b8':'#6b7280'};cursor:pointer;transition:all .15s">${names[s]||s}</button>`;
-              }).join('')}
-            </div>
-          </div>` : ''}
-          <div style="margin-top:10px">
-            ${prefCard('dedupMerge','Failover Streams','Keep deduplicated streams as fallbacks instead of discarding. If the primary stream fails, AIOStreams tries the next best match.')}
-          </div>
-        </div>
-      </div>` : `<div>
+      <div>
         <div style="font-size:.72rem;font-weight:700;color:#4b5563;letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:6px">${ICO.gear(16,'#64748b')} Resilience</div>
         ${prefCard('dedupMerge','Failover Streams','Keep deduplicated streams as fallbacks. If the primary stream fails, AIOStreams tries the next best match.')}
-      </div>`}
+      </div>
 
       <div>
         <div style="font-size:.72rem;font-weight:700;color:#4b5563;letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px">Playback & Timing</div>
@@ -2958,8 +2879,6 @@ document.addEventListener('DOMContentLoaded', () => {
   document.addEventListener('keydown', (e) => {
     if ((e.ctrlKey || e.metaKey) && (e.key === '/' || e.key === '?' || e.code === 'Slash')) { e.preventDefault(); showShortcutsModal(); return; }
     if (_tutStep >= 0) { if (e.key === 'Escape') tutClose(); else if (e.key === 'ArrowRight' || e.key === 'Enter') document.getElementById('tutNext')?.click(); else if (e.key === 'ArrowLeft') document.getElementById('tutBack')?.click(); return; }
-    const qsOv = document.getElementById('qsOverlay');
-    if (qsOv && qsOv.classList.contains('open')) { if (e.key === 'Escape') qsOv.classList.remove('open'); return; }
 
     // Modal focus trap + Escape to close
     const modal = document.getElementById('manifestModal') || document.getElementById('advModal');
@@ -3223,7 +3142,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (action === 'close-advanced') closeAdvancedDrawer();
     if (action === 'close-and-next') { closeAdvancedDrawer(); if (step < STEPS && S.multiServices.length > 0) { step++; pushStep(); saveState(); render(); window.scrollTo(0,0); } }
     if (action === 'start-setup') { S.quickStart = false; document.getElementById('main').classList.remove('nav-back'); step = 1; pushStep(); saveState(); render(); window.scrollTo(0,0); }
-    if (action === 'open-fast-lane') showExpressLane();   // legacy Quick-Install action → consolidated Express lane (Patch 32)
     if (action === 'open-express-lane') showExpressLane();
     if (action === 'update-now') applyRemoteUpdate();
     if (action === 'revert-update') revertToPrevious();
@@ -3306,9 +3224,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (action === 'update-template') { showUpdateTemplateModal(); }
     if (action === 'test-drive') { showTestDriveModal(); }
     if (action === 'reset-state') { if (confirm('Start over? Your current selections will be cleared.')) { showAdvanced = false; clearState(); } }
-    if (action === 'open-quickstart') { const qo = document.getElementById('qsOverlay'); qo.classList.add('open'); const prevFocus = document.activeElement; const onQKey = (e) => { if (e.key === 'Escape'){ qo.classList.remove('open'); document.removeEventListener('keydown', onQKey); if (prevFocus && prevFocus.focus) prevFocus.focus(); } }; document.addEventListener('keydown', onQKey); }
-    if (action === 'close-quickstart') { document.getElementById('qsOverlay').classList.remove('open'); }
-    if (action === 'close-quickstart-overlay' && e.target.id === 'qsOverlay') { document.getElementById('qsOverlay').classList.remove('open'); }
     if (action === 'tut-start') { tutGo(1); }
     if (action === 'tut-next') { if (_tutStep < TUT_STEPS.length - 1) tutGo(_tutStep + 1); else { tutClose(); showExpressLane(); } }   // tutorial ends in the consolidated lane
     if (action === 'tut-back') { if (_tutStep > 1) tutGo(_tutStep - 1); }
@@ -3397,27 +3312,6 @@ document.addEventListener('DOMContentLoaded', () => {
       const modal = document.getElementById('supportOverlay');
       if (modal) modal.classList.remove('active');
     }
-    if (action === 'copy-crypt') {
-      const btn = e.target.closest('[data-target]') || e.target;
-      const targetId = btn.dataset.target;
-      const textNode = document.getElementById(targetId);
-      if (textNode) {
-        navigator.clipboard.writeText(textNode.textContent.trim()).then(() => {
-          showToast('Address copied to clipboard');
-          const origText = btn.textContent;
-          btn.textContent = '✓ Copied';
-          btn.style.color = '#34d399';
-          btn.style.borderColor = 'rgba(16, 185, 129, 0.4)';
-          btn.style.background = 'rgba(16, 185, 129, 0.12)';
-          setTimeout(() => {
-            btn.textContent = origText;
-            btn.style.color = '';
-            btn.style.borderColor = '';
-            btn.style.background = '';
-          }, 2000);
-        });
-      }
-    }
     if (action === 'copy-wuplay') {
       const btn = e.target.closest('[data-action="copy-wuplay"]') || e.target;
       const url = btn.dataset.url;
@@ -3450,9 +3344,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (S[key] && key === 'foreignLangKill') applyChoiceProfile('foreignLangKill');
         saveState();
         const on = !!S[key];
-        if (key === 'proxyEnabled') {
-          const sy = window.scrollY; render(); window.scrollTo(0, sy);
-        } else {
+        {
           card.classList.toggle('pref-on', on);
           const circ = card.querySelector('.pref-circle');
           if (circ) circ.innerHTML = on ? '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#0d1117" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>' : '';
@@ -3481,6 +3373,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     if (action === 'set-pool') {
       S.streamPool = (e.target.closest('[data-action="set-pool"]') || e.target).dataset.val;
+      if (S.streamPool !== 'normal') applyChoiceProfile('streamPool');
       saveState();
       document.querySelectorAll('[data-action="set-pool"]').forEach(btn => {
         const on = btn.dataset.val === (S.streamPool||'normal');
@@ -3601,20 +3494,6 @@ document.addEventListener('DOMContentLoaded', () => {
       if (nm) nm.style.color = on ? '#f97316' : '#9ca3af';
       saveState();
     }
-    if (action === 'toggle-proxy-svc') {
-      const btn = e.target.closest('[data-action="toggle-proxy-svc"]') || e.target;
-      const val = btn.dataset.val;
-      if (!S.proxiedServices) S.proxiedServices = [];
-      const idx = S.proxiedServices.indexOf(val);
-      if (idx >= 0) S.proxiedServices.splice(idx, 1);
-      else S.proxiedServices.push(val);
-      const on = S.proxiedServices.includes(val);
-      btn.style.borderColor = on ? 'rgba(100,116,139,.5)' : 'rgba(255,255,255,.07)';
-      btn.style.background = on ? 'rgba(100,116,139,.12)' : 'transparent';
-      btn.style.color = on ? '#94a3b8' : '#6b7280';
-      btn.style.fontWeight = on ? '700' : '500';
-      saveState();
-    }
     if (action === 'set-match-mode') {
       S.matchMode = (e.target.closest('[data-action="set-match-mode"]') || e.target).dataset.val;
       if (S.matchMode === 'strict') S.qualityFirst = true;
@@ -3705,11 +3584,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (sec) sec.insertAdjacentHTML('beforeend', '<div class="opt-scraper-hint">API keys for selected extras appear on Accounts & Keys.</div>');
       } else if (!hasExtras && hint) { hint.remove(); }
       saveState(); renderProgress();
-    }
-    if (action === 'remove-optional-scraper') {
-      const sid = el.dataset.scraperId;
-      const i = S.optionalScrapers.indexOf(sid);
-      if (i >= 0) { S.optionalScrapers.splice(i, 1); saveState(); render(); }
     }
     if (action === 'svc-cat') {
       const cat = el.dataset.cat;
@@ -3893,10 +3767,14 @@ document.addEventListener('DOMContentLoaded', () => {
       updateUuidValidation(S.instanceUuid);
     }
     else if (a === 'paste-manifest') onPasteManifest(e.target.value);
+    else if (a === 'set-bandwidth') {
+      const mbps = Math.floor(Number(e.target.value));
+      S.bandwidthMbps = Number.isFinite(mbps) && mbps > 0 ? Math.min(mbps, 10000) : 0;
+    }
     else if (a === 'update-stremio-email') S.stremioEmail = e.target.value.trim();
     else if (a === 'update-stremio-password') S.stremioPassword = e.target.value;
 
-    if(['update-name', 'update-cred', 'update-tmdb', 'update-tmdb-key', 'update-url', 'update-pwd', 'update-uuid', 'update-stremio-email', 'update-stremio-password'].includes(a)){
+    if(['update-name', 'update-cred', 'update-tmdb', 'update-tmdb-key', 'update-url', 'update-pwd', 'update-uuid', 'update-stremio-email', 'update-stremio-password', 'set-bandwidth'].includes(a)){
       saveState();
     }
   });
@@ -4123,8 +4001,8 @@ function presets() {
   const multiHasTorbox = isMulti && (S.multiServices.includes('torbox-pro') || S.multiServices.includes('torbox-ess'));
   const storeSlot = isMulti
     ? [...(multiHasTorbox ? [{ type:'stremthruTorz', instanceId:'67c', enabled:true, options:{ name:'StremThru Torz', timeout:5000, includeP2P:false, useMultipleInstances:false }, resources:['stream'] }] : []), ...S.multiServices.filter(s => debridServices.includes(s)).map((s, i) => ({ type:'stremthruStore', instanceId:`68${String.fromCharCode(97+i)}`, enabled:true, options:{ name:storeLabels[s] || 'StremThru Store', timeout:5000, useMultipleInstances:false }, resources:['stream'] }))]
-    : useStore ? [{ type:'stremthruStore', instanceId:'68a', enabled:true, options:{ name:storeLabels[svc] || 'StremThru Store', timeout:5000, useMultipleInstances:false }, resources:['stream'] }]
-    : svc === 'hybrid' ? [{ type:'stremthruTorz', instanceId:'67c', enabled:true, options:{ name:'StremThru Torz', timeout:5000, includeP2P:false, useMultipleInstances:false }, resources:['stream'] }, { type:'stremthruStore', instanceId:'68a', enabled:true, options:{ name:'StremThru RD', timeout:5000, useMultipleInstances:false }, resources:['stream'] }]
+    : useStore ? [{ type:'stremthruStore', instanceId:'68a', enabled:true, options:{ name:storeLabels[svc] || 'StremThru Store', timeout:5000 }, resources:['stream'] }]
+    : svc === 'hybrid' ? [{ type:'stremthruTorz', instanceId:'67c', enabled:true, options:{ name:'StremThru Torz', timeout:5000, includeP2P:false, useMultipleInstances:false }, resources:['stream'] }, { type:'stremthruStore', instanceId:'68a', enabled:true, options:{ name:'StremThru RD', timeout:5000 }, resources:['stream'] }]
     : isP2P && S._nuvioInstant ? [{ type:'stremthruTorz', instanceId:'67c', enabled:true, options:{ name:'StremThru Torz', timeout:5000, includeP2P:true, useMultipleInstances:false }, resources:['stream'] }]
     // Seedr: no StremThru preset supports it (only MediaFusion does), and a Store/Torz
     // instance with no usable service fails the whole save.
@@ -4348,7 +4226,6 @@ function eses() {
     if (is1080) out.push({ enabled:true, expression:"/* Hard Resolution Kill */ resolution(streams,'2160p','1440p')" });
     if (S.exclude4K && !is1080) out.push({ enabled:true, expression:"/* Exclude 4K / UHD */ resolution(streams,'2160p','1440p')" });
     if (S.excludeDV) out.push({ enabled:true, expression:"/* Exclude Dolby Vision */ visualTag(streams,'DV','HDR+DV')" });
-    { const ae = generateAgeRatingESE(S.ageLimit); if (ae) out.push(ae); }
     return out;
   }
 
@@ -4369,7 +4246,6 @@ function eses() {
       // S.sizeLimit and applies it on every route). Emitting a Size Limit SEL too
       // capped twice with different pack/folder semantics — reported as "size
       // filtering is applied twice" (C07_DUPLICATE_SIZE_CAP).
-    { const ae = generateAgeRatingESE(S.ageLimit); if (ae) out.push(ae); }
     out.push(...lateEpisodePackFallbackEses());
     return out;
   }
@@ -4428,8 +4304,6 @@ function eses() {
     // S.sizeLimit and applies it on every route). Emitting a Size Limit SEL too
     // capped twice with different pack/folder semantics — reported as "size
     // filtering is applied twice" (C07_DUPLICATE_SIZE_CAP).
-  const ageEse = generateAgeRatingESE(S.ageLimit);
-  if (ageEse) out.push(ageEse);
   out.push(...lateEpisodePackFallbackEses());
   return out;
 }
@@ -4513,7 +4387,7 @@ function build() {
     sortCriteria: sortPolicy(S),
     deduplicator: (function(){ const isFree=S.service==='p2p'||S.service==='http'; return { enabled:true, excludeAddons:[], multiGroupBehaviour: S.matchMode === 'relaxed' ? 'conservative' : 'aggressive', keys:isFree?['filename','infoHash','smartDetect']:['filename','infoHash','smartDetect'], cached: isFree ? 'disabled' : (S.matchMode === 'relaxed' ? 'per_service' : 'single_result'), uncached: isFree ? 'disabled' : 'per_service', p2p:'per_addon', smartDetectAttributes:['size','resolution','quality','visualTags','audioTags','audioChannels','languages','encode','edition','network','remastered','bitrate','releaseGroup'], smartDetectRounding: S.matchMode === 'strict' ? 5 : 10, libraryBehaviour: isFree ? 'ignore' : 'prefer', tiebreakers:[{type:'torrent_seeders',position:'before_addon'},{type:'usenet_age',position:'before_addon'}], ...(S.dedupMerge ? { merge: { enabled: true, failoverVariants: true, fields: [] } } : {}) }; })(),
     formatter: (function(){ const _f = S.formatter === 'custom' && S.customFormatter ? S.customFormatter : FORMATTERS.find(f => f.id === (S.formatter||'family-v4')) || FORMATTERS[0]; return { id:'tamtaro', definitions:{ overrides:{ tamtaro:{ name: _f.name, description: _f.d } } } }; })(),
-    proxy: { id:'mediaflow', proxiedAddons:[], proxiedServices: S.proxyEnabled ? (S.proxiedServices.length ? [...S.proxiedServices] : []) : [] },
+    proxy: { id:'mediaflow', proxiedAddons:[], proxiedServices:[] },
     resultLimits: { global: rc.maxResults, resolution: rc.maxResultsPerResolution, mode: 'conjunctive' },
     size: sizePolicy(input),
     bitrate: bitratePolicy(input, hasTmdb),
@@ -4812,14 +4686,6 @@ function hostGateEntries() {
 }
 
 /** True when the selected host cannot accept this option (see hostGateEntries). */
-function hostBlocks(option) {
-  return hostGateEntries().some(entry => entry.option === option && entry.action !== 'confirm');
-}
-
-function hostBlockReason(option) {
-  return hostGateEntries().find(entry => entry.option === option)?.reason || '';
-}
-
 function lastHostGateRemovals() { return _lastHostGateRemovals; }
 function lastHostGateWarnings() { return _lastHostGateWarnings; }
 
@@ -5050,7 +4916,6 @@ function showChangelog() {
   if (ex) ex.remove();
   const _lt = document.documentElement.getAttribute('data-theme')==='light';
   const _bg = _lt ? '#ffffff' : '#0d1117';
-  const _card = _lt ? '#f6f8fa' : '#161b22';
   const _bdr = _lt ? 'rgba(0,0,0,.1)' : 'rgba(255,255,255,.06)';
   const _txt = _lt ? '#1f2328' : '#e6edf3';
   const _sub = _lt ? '#656d76' : '#8b949e';
@@ -5071,6 +4936,9 @@ function showChangelog() {
     </div>`).join('');
   const overlay = document.createElement('div');
   overlay.id = 'changelogModal';
+  overlay.setAttribute('role', 'dialog');
+  overlay.setAttribute('aria-modal', 'true');
+  overlay.setAttribute('aria-label', 'Changelog');
   overlay.style.cssText = 'position:fixed;inset:0;z-index:10000;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);animation:fadeIn .15s ease';
   overlay.innerHTML = `
     <div style="background:${_bg};border-radius:14px;border:1px solid ${_bdr};width:min(560px,92vw);max-height:82vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,.4);animation:scaleIn .2s ease">
@@ -5137,11 +5005,6 @@ function showCompareTemplates() {
   selB.selectedIndex = Math.min(1, CMP_TEMPLATES.length - 1);
 
   function yn(v) { return v ? '<span class="cmp-badge yes">Yes</span>' : '<span class="cmp-badge no">No</span>'; }
-  function diffCls(a, b) { return a !== b ? ' diff' : ''; }
-  function numCls(a, b, higherBetter) {
-    if (a === b) return '';
-    return higherBetter ? (a > b ? ' good' : ' bad') : '';
-  }
 
   function updateComparison() {
     const ai = parseInt(selA.value), bi = parseInt(selB.value);
@@ -5472,14 +5335,6 @@ function parseTemplateToState(tpl) {
     st.dedupMerge = false;
   }
 
-  // Proxy settings
-  if (c.proxy) {
-    st.proxyEnabled = Array.isArray(c.proxy.proxiedServices) && c.proxy.proxiedServices.length > 0;
-    st.proxiedServices = Array.isArray(c.proxy.proxiedServices) ? c.proxy.proxiedServices : [];
-  } else {
-    st.proxyEnabled = false;
-    st.proxiedServices = [];
-  }
 
 
   return st;
@@ -5511,6 +5366,9 @@ function showDiffModal(oldCfg, newCfg, parsed, onApply, onCancel, importedConfli
   const overlay = document.createElement('div');
   overlay.id = 'diffModal';
   overlay.className = 'df-overlay';
+  overlay.setAttribute('role', 'dialog');
+  overlay.setAttribute('aria-modal', 'true');
+  overlay.setAttribute('aria-label', 'Review template changes');
 
   const selectAllId = 'dfSelAll';
   const selectAllHtml = sections.length > 1 ? '<div style="display:flex;align-items:center;gap:6px;margin-bottom:10px;padding:6px 10px;background:rgba(0,212,255,.04);border:1px solid rgba(0,212,255,.1);border-radius:8px"><label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:.72rem;color:#8b949e;user-select:none;flex:1"><input type="checkbox" id="'+selectAllId+'" checked style="accent-color:#00d4ff;width:14px;height:14px;cursor:pointer"> Select all sections</label><span style="font-size:.65rem;color:#4b5563">Uncheck to keep existing values; host and compatibility limits still apply</span></div>' : '';
@@ -6563,7 +6421,7 @@ function simpleFinishHtml() {
               ${[['mixed','Mixed'],['cached','Cached only'],['uncached','Uncached only']].map(([v,l]) => `<button data-action="set-simple-cache" data-val="${v}" data-active="${S.cacheMode===v}" style="flex:1;padding:5px 10px;border-radius:7px;font-size:.72rem;font-weight:700;cursor:pointer;transition:all .15s;border:1px solid ${S.cacheMode===v?'rgba(0,212,255,.4)':'rgba(255,255,255,.08)'};background:${S.cacheMode===v?'rgba(0,212,255,.1)':'transparent'};color:${S.cacheMode===v?'#00d4ff':'#6b7280'}">${l}</button>`).join('')}
             </div>
           </div>
-          <div>
+          ${['advanced', 'labs'].includes(activeOutputProfile()) ? `          <div>
             <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px">
               <span style="font-size:.72rem;font-weight:700;color:#8b949e">Stream pool</span>
               <span style="font-size:.6rem;color:#4b5563;font-weight:600">${streamPoolSummary()}</span>
@@ -6572,7 +6430,7 @@ function simpleFinishHtml() {
               ${streamPoolChoices().map(([v,l,c]) => `<button data-action="set-simple-pool" data-val="${v}" data-active="${(S.streamPool||'normal')===v}" style="flex:1;padding:7px 10px 5px;border-radius:7px;font-size:.72rem;font-weight:700;cursor:pointer;transition:all .15s;border:1px solid ${(S.streamPool||'normal')===v?'rgba(0,212,255,.4)':'rgba(255,255,255,.08)'};background:${(S.streamPool||'normal')===v?'rgba(0,212,255,.1)':'transparent'};color:${(S.streamPool||'normal')===v?'#00d4ff':'#6b7280'};line-height:1.3">${l}<br><span style="font-size:.6rem;font-weight:600;opacity:.7">${c}</span></button>`).join('')}
             </div>
             <div style="font-size:.65rem;color:#4b5563;margin-top:4px;line-height:1.4">More streams = better quality picks but slower load</div>
-          </div>
+          </div>` : ''}
           <div>
             <button data-action="set-simple-quality" data-active="${!!S.qualityFirst}" style="width:100%;padding:8px 12px;border-radius:7px;font-size:.72rem;font-weight:700;cursor:pointer;transition:all .15s;border:1px solid ${S.qualityFirst?'rgba(0,212,255,.4)':'rgba(255,255,255,.08)'};background:${S.qualityFirst?'rgba(0,212,255,.1)':'transparent'};color:${S.qualityFirst?'#00d4ff':'#6b7280'};display:flex;align-items:center;justify-content:space-between">
               <span>Quality over resolution</span>
@@ -6858,13 +6716,6 @@ function healthScoreHtml() {
 
 const TEMPLATE_VERSION = CONFIGURATOR_VERSION;
 
-function addVersionMetadata(template) {
-  if (!template.metadata) template.metadata = {};
-  template.metadata.coreBuildsVersion = TEMPLATE_VERSION;
-  template.metadata.generatedAt = new Date().toISOString();
-  return template;
-}
-
 function checkTemplateVersion() {
   try {
     const last = JSON.parse(localStorage.getItem('coreBuildLastGen') || 'null');
@@ -6905,11 +6756,6 @@ function hostCompatCheck() {
   const FORTHEWEAK_BLOCKED = ['Radarr Web T1','Sonarr Web T1','Radarr Bad Dual Groups','Sonarr Bad Dual Groups','hallowed','LQ (Radarr)','LQ (Radarr) [B]','LQ (Sonarr)','LQ (Sonarr) [B]','LQ (Release Title) (Radarr)','LQ (Release Title) (Sonarr)'];
   const TAMTARO_URL_FRAGMENT = 'Tam-Taro/SEL-Filtering-and-Sorting';
   const TAMTARO_OLD_URL_FRAGMENT = 'Tamtaro/SEL-Filtering-and-Sorting';
-  const regexFields = [
-    ...(cfg.rankedRegexPatterns||[]),
-    ...(cfg.excludedRegexPatterns||[]).map((p,i) => typeof p === 'string' ? {name:'Excluded #'+(i+1), pattern:p} : p),
-    ...(cfg.preferredRegexPatterns||[]),
-  ];
   const syncedUrls = [
     ...(cfg.syncedRankedRegexUrls||[]),
     ...(cfg.syncedExcludedRegexUrls||[]),
@@ -6945,29 +6791,9 @@ function hostCompatCheck() {
     hosts.fortheweak.issues.push(msg);
     hosts.fortheweak.status = 'err';
   }
-  const allExprs = [
-    ...(cfg.excludedStreamExpressions||[]),
-    ...(cfg.includedStreamExpressions||[]),
-    ...(cfg.preferredStreamExpressions||[]),
-  ];
-  const hasNot = allExprs.some(e => e.expression && /\bnot\s*\(/.test(e.expression));
-  if (hasNot) {
-    hosts.elfhosted.issues.push('SEL uses not() — must use negate() instead');
-    hosts.elfhosted.status = 'err';
-    hosts.fortheweak.issues.push('SEL uses not() — must use negate() instead');
-    hosts.fortheweak.status = 'err';
-  }
-  const excluded = cfg.excludedRegexPatterns||[];
-  const inlinePatterns = excluded.filter(p => {
-    const s = typeof p === 'string' ? p : (p.pattern||'');
-    return /\(\?[=!<]/.test(s);
-  });
-  if (!cfg.syncedRankedRegexUrls || !cfg.syncedRankedRegexUrls.some(u => u.includes('Vidhin05'))) {
-    if (ranked.length) {
-      hosts.elfhosted.issues.push('No Vidhin05 synced URL — inline regex patterns may not be whitelisted');
-      if (hosts.elfhosted.status === 'ok') hosts.elfhosted.status = 'warn';
-    }
-  }
+  // No not() rule: AIOStreams builds its SEL parser with logical operators on,
+  // so not(x) is valid on every host. And no "missing Vidhin05 URL" warning: the
+  // allowlist is the host's own exact-match list, checked by nonWhitelistedPatterns.
   const customSyncUrls = syncedUrls.filter(u => !u.includes('Vidhin05') && !u.includes(TAMTARO_URL_FRAGMENT) && !u.includes(TAMTARO_OLD_URL_FRAGMENT) && !u.includes('brevityA/Core-Builds'));
   if (customSyncUrls.length) {
     hosts.elfhosted.issues.push(customSyncUrls.length + ' custom synced URL' + (customSyncUrls.length>1?'s':'') + ' — may not be on host allowlist');
@@ -7183,6 +7009,7 @@ function handleDeepLink(hash) {
   if (hash === '#advanced') { setTimeout(() => document.querySelector('[data-action="custom-start"]')?.click(), 250); return; }
   if (hash === '#update') { setTimeout(() => document.querySelector('[data-action="update-template"]')?.click(), 250); return; }
   if (hash === '#backup') { step = STEPS; pushStep(); render(); window.scrollTo(0, 0); return; } // backup timeline lives on the final/Done screen
+  if (hash === '#changelog') { setTimeout(showChangelog, 250); return; } // tools page "Full Configurator changelog" link
 }
 
 function showTroubleshooter() {
@@ -7756,195 +7583,6 @@ async function runExpressInstall(p) {
   }
 }
 
-function showFastLane() {
-  document.getElementById('fastLaneModal')?.remove();
-  const initialServices = (S.multiServices && S.multiServices.length ? S.multiServices : [S.service || 'torbox-pro']).map(v=>v==='torbox'?'torbox-pro':v).filter(v=>['torbox-pro','realdebrid','alldebrid','premiumize','easynews','p2p'].includes(v));
-  const state = { target:'app', services:initialServices.length?initialServices:['torbox-pro'], extras:(S.multiServices||[]).filter(v=>CAROUSEL_SVCS.includes(v)), scrapers:[...(S.optionalScrapers||[])], profile:S.quickProfile || 'balanced', nuvioDevice:S.device||'generic', nuvioResolution:S.resolution||'4k' };
-  const overlay = document.createElement('div');
-  overlay.id = 'fastLaneModal';
-  overlay.className = 'fastlane-overlay';
-  overlay.innerHTML = `<div class="fastlane-panel" role="dialog" aria-modal="true" aria-labelledby="fastLaneTitle">
-    <div class="fastlane-head"><div class="fastlane-head-copy"><div class="fastlane-kicker">Quick install</div><div class="fastlane-title" id="fastLaneTitle">Working streams in one short flow.</div><div class="fastlane-sub">Pick where you watch, your service, and how aggressively Core Builds should search. Advanced controls remain available later.</div></div><button class="fastlane-close" id="fastLaneClose" aria-label="Close">✕</button></div>
-    <div class="fastlane-section"><div class="fastlane-label">1 / Where do you watch?</div><div class="fastlane-grid apps" id="flApps">
-      ${[['app','Stremio','Direct or manifest'],['nuvio','Nuvio','Manifest URL'],['wuplay','WuPlay','Manifest URL'],['manifest','Other app','Copy manifest']].map(([v,n,d])=>`<button class="fastlane-choice${state.target===v?' active':''}" data-fl-target="${v}"><b>${n}</b><span>${d}</span></button>`).join('')}
-    </div></div>
-    <div class="fastlane-section" id="flServiceSection"><div class="fastlane-label">2 / Providers <span style="font-weight:600;text-transform:none;letter-spacing:0">— choose one or more</span></div><div class="fastlane-grid services" id="flServices">
-      ${[['torbox-pro','TorBox'],['realdebrid','Real-Debrid'],['alldebrid','AllDebrid'],['premiumize','Premiumize'],['easynews','EasyNews'],['p2p','Free / P2P']].map(([v,n])=>`<button class="fastlane-choice${state.services.includes(v)?' active':''}" data-fl-service="${v}"><b>${n}</b><span>${v==='p2p'?'No key required':'Credentials required'}</span></button>`).join('')}
-    </div><button type="button" id="flExtrasBtn" class="additional-services-btn" style="width:100%;margin-top:8px;display:flex;align-items:center;gap:10px;padding:11px 13px;border-radius:11px;border:1px solid rgba(255,255,255,.09);background:#0e1621;color:#c9d5df;cursor:pointer;text-align:left"><span style="font-size:1rem;color:#a78bfa">＋</span><span style="flex:1"><b style="display:block;font-size:.72rem">Additional services &amp; scrapers</b><span style="display:block;font-size:.6rem;color:#718093;margin-top:1px">P2P, HTTP, Debridio, Usenet and optional indexers</span></span><span id="flExtrasCount" style="font-size:.6rem;font-weight:900;color:#67e8f9"></span><span>→</span></button></div>
-    <div id="flNuvioSection" style="display:none"></div>
-    <div class="fastlane-section" id="flCredentials"></div>
-    <div class="fastlane-section" id="flProfileSection"><div class="fastlane-label">3 / Performance profile</div><div class="fastlane-grid profiles" id="flProfiles">
-      ${[['fast','Fast','1080p · cached first · smaller files'],['balanced','Balanced','4K · sensible pool · 30GB cap'],['maximum','Maximum','4K · largest pool · quality first']].map(([v,n,d])=>`<button class="fastlane-choice${state.profile===v?' active':''}" data-fl-profile="${v}"><b>${n}</b><span>${d}</span></button>`).join('')}
-    </div></div>
-    <div class="fastlane-section" id="flInstallFields"></div>
-    <label class="fastlane-check" id="flCleanLabel"><input type="checkbox" id="flClean" ${S.cleanInstall?'checked':''}><span><b style="color:#b8c4ce">Replace older AIOStreams installs</b><br>When pushing directly to Stremio, remove older manifests from known public AIOStreams hosts before adding this one.</span></label><a href="../account-tools/" target="_blank" rel="noopener noreferrer" class="fastlane-backup-link" id="flBackupLink" style="display:block;margin:6px 0 0 28px">Back up your current addons first →</a>
-    <a href="../tools/" target="_blank" rel="noopener noreferrer" style="display:block;margin:3px 0 0 28px;font-size:.72rem;color:#8b949e;text-decoration:none;transition:color .15s" onmouseover="this.style.color='#a78bfa'" onmouseout="this.style.color='#8b949e'">All Core Tools →</a>
-    <div style="margin-top:10px;padding:10px 14px;border-radius:10px;background:rgba(52,211,153,.04);border:1px solid rgba(52,211,153,.12)" id="flStackSetup">
-      <div style="font-size:.72rem;font-weight:700;color:#34d399;margin-bottom:8px;display:flex;align-items:center;gap:6px">${ICO.rocket(12,'#34d399')} Full Stack Setup <span style="font-size:.58rem;font-weight:600;padding:1px 5px;border-radius:3px;background:rgba(52,211,153,.12);color:#34d399;border:1px solid rgba(52,211,153,.25)">NEW</span></div>
-      <label style="display:flex;align-items:flex-start;gap:8px;cursor:pointer;margin-bottom:6px"><input type="checkbox" id="flPatchCinemeta" ${S.patchCinemeta?'checked':''} style="margin-top:2px;flex-shrink:0"><span style="font-size:.74rem;color:#c9d5df"><b style="color:#e6edf3">Patch Cinemeta</b><br><span style="color:#8b949e">Hide Cinemeta catalogs/metadata so AIOMetadata takes over. Uses Cinebye.</span></span></label>
-      <label style="display:flex;align-items:flex-start;gap:8px;cursor:pointer"><input type="checkbox" id="flInstallAIOMeta" ${S.installAIOMeta?'checked':''} style="margin-top:2px;flex-shrink:0"><span style="font-size:.74rem;color:#c9d5df"><b style="color:#e6edf3">Install AIOMetadata</b><br><span style="color:#8b949e">Better catalogs, metadata, and posters. Replaces Cinemeta.</span></span></label>
-    </div>
-    <button class="fastlane-go" id="btnAutoCreate">Create &amp; Install →</button><div id="aioResult" class="fastlane-result"></div>
-  </div>`;
-  document.body.appendChild(overlay);
-  const creds = document.getElementById('flCredentials');
-  const installFields = document.getElementById('flInstallFields');
-  const captureCredentialDrafts = () => {
-    overlay.querySelectorAll('[data-fl-cred]').forEach(inp=>{S.creds[inp.dataset.flCred]=inp.value.trim();});
-    overlay.querySelectorAll('[data-fl-tmdb]').forEach(inp=>{S[inp.dataset.flTmdb]=inp.value.trim();});
-  };
-  const renderNuvioSections = () => {
-    const isNuvio = state.target === 'nuvio';
-    const svcSection = overlay.querySelector('#flServiceSection');
-    const profileSection = overlay.querySelector('#flProfileSection');
-    const nuvioSection = overlay.querySelector('#flNuvioSection');
-    const extrasBtn = document.getElementById('flExtrasBtn');
-    const stackSetup = overlay.querySelector('#flStackSetup');
-    const cleanLabel = overlay.querySelector('#flCleanLabel');
-    const backupLink = overlay.querySelector('#flBackupLink');
-    if (svcSection) svcSection.style.display = isNuvio ? 'none' : '';
-    if (profileSection) profileSection.style.display = isNuvio ? 'none' : '';
-    if (extrasBtn) extrasBtn.style.display = isNuvio ? 'none' : '';
-    if (stackSetup) stackSetup.style.display = isNuvio ? 'none' : '';
-    if (cleanLabel) cleanLabel.style.display = isNuvio ? 'none' : '';
-    if (backupLink) backupLink.style.display = isNuvio ? 'none' : '';
-    if (!nuvioSection) return;
-    if (!isNuvio) { nuvioSection.style.display = 'none'; return; }
-    nuvioSection.style.display = '';
-    const nuvioHosts = Object.entries(HOST_META).filter(([,m]) => m.supportsNuvioInstant && m.supportsP2P).map(([k]) => k);
-    nuvioSection.innerHTML = `
-      <div style="margin-bottom:14px;padding:12px 14px;border-radius:10px;background:rgba(251,146,60,.06);border:1px solid rgba(251,146,60,.2)">
-        <div style="font-size:.78rem;font-weight:700;color:#fb923c;margin-bottom:5px">${ICO.warn(14,'#fb923c')} TorBox Connected Services</div>
-        <div style="font-size:.76rem;color:#c9d5df;line-height:1.55">Connect TorBox in <strong style="color:#fb923c">Nuvio → Connected Services</strong>. Do <strong style="color:#f87171">not</strong> enter a TorBox API key into AIOStreams — the generated template uses P2P scrapers only.</div>
-      </div>
-      <div class="fastlane-section"><div class="fastlane-label">2 / Device</div><div class="fastlane-grid services" id="flNuvioDevices">
-        ${[['generic','Standard'],['shield','NVIDIA Shield'],['firestick-4kmax','Fire Stick 4K Max'],['onn','onn 4K'],['googletv','Google TV'],['samsung','Samsung TV'],['appletv-new','Apple TV 4K'],['windows','Windows PC']].map(([v,n])=>`<button class="fastlane-choice${state.nuvioDevice===v?' active':''}" data-fl-nuvio-device="${v}"><b>${n}</b></button>`).join('')}
-      </div></div>
-      <div class="fastlane-section"><div class="fastlane-label">3 / Resolution</div><div class="fastlane-grid profiles" id="flNuvioRes">
-        ${[['4k','4K','2160p primary · 1080p fallback'],['1080p','1080p','Excludes 4K content'],['mixed','Mixed','Adaptive · no hard caps']].map(([v,n,d])=>`<button class="fastlane-choice${state.nuvioResolution===v?' active':''}" data-fl-nuvio-res="${v}"><b>${n}</b><span>${d}</span></button>`).join('')}
-      </div></div>
-      <div class="fastlane-section"><div class="fastlane-label">4 / AIOStreams host</div>
-        <div class="fastlane-note" style="margin-bottom:8px">Only hosts that support P2P and Nuvio Instant are shown.</div>
-        <div class="fastlane-grid services" id="flNuvioHosts">
-          ${nuvioHosts.map(k=>`<button class="fastlane-choice active" data-fl-nuvio-host="${k}" disabled style="opacity:.7;cursor:default"><b>${HOST_LABEL_MAP[k]||k}</b><span>${HOST_BASE_URLS[k]?.replace('https://','')}</span></button>`).join('')}
-        </div>
-      </div>`;
-  };
-  const renderContext = () => {
-    const isNuvio = state.target === 'nuvio';
-    renderNuvioSections();
-    if (isNuvio) {
-      creds.innerHTML = '';
-      installFields.innerHTML = `<div class="fastlane-note">Core Builds will generate a P2P template and open Nuvio import instructions.</div>`;
-      return;
-    }
-    const credKeys={ 'torbox-pro':'torbox',realdebrid:'realdebrid',alldebrid:'alldebrid',premiumize:'premiumize',debrider:'debrider' };
-    const fields=[];
-    const credentialField=(key,{type='password',autocomplete='off',showLink=true}={})=>{
-      const d=PROVIDER_CREDENTIALS[key]||{label:key,placeholder:''};
-      const link=showLink&&d.url?`<a class="fastlane-get-key" href="${d.url}" target="_blank" rel="noopener noreferrer">${d.linkLabel||'Get key'} &nearr;</a>`:key==='streamnzb'?'<span class="fastlane-key-hint">Use your instance manifest</span>':'';
-      return `<div class="fastlane-credential"><div class="fastlane-credential-head"><label>${d.label}</label>${link}</div><input class="fastlane-field" data-fl-cred="${key}" type="${type}" autocomplete="${autocomplete}" placeholder="${d.placeholder||''}" value="${escH(S.creds[key]||'')}"></div>`;
-    };
-    state.services.filter(v=>credKeys[v]).forEach(v=>fields.push(credentialField(credKeys[v])));
-    if(state.services.includes('easynews')) fields.push(credentialField('easynews',{type:'text',autocomplete:'username'}),credentialField('easynewsPass',{autocomplete:'current-password',showLink:false}));
-    const extraCreds={debridio:'debridio',nzbgeek:'nzbgeek',streamnzb:'streamnzb'};
-    state.extras.filter(v=>extraCreds[v]).forEach(v=>fields.push(credentialField(extraCreds[v],{type:v==='streamnzb'?'url':'password'})));
-    state.scrapers.forEach(id=>{const d=OPTIONAL_SCRAPER_DEFS.find(x=>x.id===id);if(d?.credKey)fields.push(credentialField(d.credKey));});
-    const tmdbField=(key,{type='password',maxlength=400}={})=>{const d=PROVIDER_CREDENTIALS[key];return `<div class="fastlane-credential"><div class="fastlane-credential-head"><label>${d.label}</label><a class="fastlane-get-key" href="${d.url}" target="_blank" rel="noopener noreferrer">${d.linkLabel||'Get key'} &nearr;</a></div><input class="fastlane-field" data-fl-tmdb="${key}" type="${type}" autocomplete="off" maxlength="${maxlength}" placeholder="${d.placeholder}" value="${(S[key]||'').replace(/"/g,'&quot;')}"></div>`;};
-    const tmdbMetadata=`<details class="fastlane-metadata" ${S.tmdbToken||S.tmdbApiKey?'open':''}><summary><span><b>TMDB metadata</b><small>Optional · improves matching and release-date filtering</small></span><span class="fastlane-metadata-state">${S.tmdbToken||S.tmdbApiKey?'Set':'Add key'}</span></summary><div class="fastlane-metadata-body"><div class="fastlane-note">Add either a TMDB Read Access Token or API Key. Leave both blank and Core Builds will disable every TMDB-dependent feature so AIOStreams accepts the config.</div><div class="fastlane-fields">${tmdbField('tmdbToken')}${tmdbField('tmdbApiKey',{maxlength:60})}</div></div></details>`;
-    const freeNote=[...state.services,...state.extras].some(v=>v==='p2p'||v==='http')?'<div class="fastlane-note">Free/P2P sources require no key and depend on active seeders and compatible hosts.</div>':'';
-    const providerFields=fields.length?`<div class="fastlane-label">Provider credentials</div><div class="fastlane-fields">${fields.join('')}</div>${freeNote}`:freeNote||'<div class="fastlane-note">Select at least one provider.</div>';
-    creds.innerHTML = providerFields + tmdbMetadata;
-    const extraCount=state.extras.length+state.scrapers.length, countEl=document.getElementById('flExtrasCount');if(countEl)countEl.textContent=extraCount?`${extraCount} selected`:'';
-    installFields.innerHTML = state.target === 'app' ? `<div class="fastlane-label">Stremio direct install <span style="font-weight:600;text-transform:none;letter-spacing:0">— optional</span></div><div class="fastlane-fields"><input class="fastlane-field" id="flStremioEmail" type="email" autocomplete="email" placeholder="Stremio email (leave blank for manifest)" value="${(S.stremioEmail||'').replace(/"/g,'&quot;')}"><input class="fastlane-field" id="flStremioPass" type="password" autocomplete="current-password" placeholder="Stremio password" value="${(S.stremioPassword||'').replace(/"/g,'&quot;')}"></div><div class="fastlane-note" style="margin-top:7px">Credentials are used only for the direct Stremio API request. Leave both blank to receive a manifest URL instead.</div>` : `<div class="fastlane-note">Core Builds will create a protected manifest and open the ${state.target==='manifest'?'copy/install':state.target} instructions.</div>`;
-  };
-  const activate = (selector, attr, value) => overlay.querySelectorAll(selector).forEach(b=>b.classList.toggle('active',b.getAttribute(attr)===value));
-  overlay.addEventListener('click', async e => {
-    const targetBtn = e.target.closest('[data-fl-target]');
-    if (targetBtn) { state.target=targetBtn.dataset.flTarget; activate('[data-fl-target]','data-fl-target',state.target); renderContext(); return; }
-    const nuvioDevBtn = e.target.closest('[data-fl-nuvio-device]');
-    if (nuvioDevBtn) { state.nuvioDevice=nuvioDevBtn.dataset.flNuvioDevice; overlay.querySelectorAll('[data-fl-nuvio-device]').forEach(b=>b.classList.toggle('active',b.dataset.flNuvioDevice===state.nuvioDevice)); return; }
-    const nuvioResBtn = e.target.closest('[data-fl-nuvio-res]');
-    if (nuvioResBtn) { state.nuvioResolution=nuvioResBtn.dataset.flNuvioRes; overlay.querySelectorAll('[data-fl-nuvio-res]').forEach(b=>b.classList.toggle('active',b.dataset.flNuvioRes===state.nuvioResolution)); return; }
-    const serviceBtn = e.target.closest('[data-fl-service]');
-    if (serviceBtn) { captureCredentialDrafts(); const v=serviceBtn.dataset.flService, i=state.services.indexOf(v); if(i>=0){if(state.services.length===1)return;state.services.splice(i,1);}else state.services.push(v); overlay.querySelectorAll('[data-fl-service]').forEach(b=>b.classList.toggle('active',state.services.includes(b.dataset.flService))); renderContext(); return; }
-    if(e.target.closest('#flExtrasBtn')){captureCredentialDrafts();showAdditionalServicesPicker({services:state.extras,scrapers:state.scrapers,onApply:(sv,sc)=>{state.extras=sv;state.scrapers=sc;renderContext();}});return;}
-    const profileBtn = e.target.closest('[data-fl-profile]');
-    if (profileBtn) { state.profile=profileBtn.dataset.flProfile; activate('[data-fl-profile]','data-fl-profile',state.profile); return; }
-    if (e.target === overlay || e.target.closest('#fastLaneClose')) { overlay.remove(); return; }
-    if (e.target.closest('#btnAutoCreate')) {
-      const btn = document.getElementById('btnAutoCreate');
-      const result = document.getElementById('aioResult');
-      result.innerHTML='';
-      if (state.target === 'nuvio') {
-        btn.disabled=true;
-        btn.innerHTML = `<span class="dot-spin"><span></span><span></span><span></span></span> Generating Nuvio template…`;
-        try {
-          // Same rule as runExpressInstall: an explicit host pick is never swapped.
-          const picked = pickNuvioHost();
-          if (picked.error) { btn.disabled=false; btn.innerHTML='Create &amp; Install →'; result.innerHTML = `<div class="td-error">${picked.error}</div>`; return; }
-          const nuvioHost = picked.host;
-          const tmpl = buildNuvioTemplate(nuvioHost, state.nuvioDevice, state.nuvioResolution);
-          // Nuvio uses the same public import-link transport as other routes;
-          // TMDB values carried from a previous setup must not be uploaded.
-          const jsonStr = JSON.stringify(sanitizeTemplateForRemoteImport(tmpl), null, 2);
-          btn.innerHTML = `<span class="dot-spin"><span></span><span></span><span></span></span> Creating import link…`;
-          const importUrl = await uploadJsonForImport(jsonStr);
-          btn.disabled=false; btn.innerHTML='Create &amp; Install →';
-          if (importUrl) {
-            const nuvioChips = Object.entries(HOST_META).filter(([,m])=>m.supportsNuvioInstant&&m.supportsP2P).map(([k])=>[HOST_LABEL_MAP[k]||k, HOST_BASE_URLS[k]+'/stremio/configure']);
-            const chipHtml = nuvioChips.map(([n,u])=>`<a href="${u}?template=${encodeURIComponent(importUrl)}" target="_blank" rel="noopener noreferrer" class="inst-chip inst-chip-import">▶ ${n}</a>`).join('');
-            const tmdbReminder = S.tmdbToken || S.tmdbApiKey
-              ? `<div style="margin-bottom:10px;padding:9px 12px;border-radius:8px;background:rgba(245,158,11,.05);border:1px solid rgba(245,158,11,.16);font-size:.72rem;color:#c9d5df;line-height:1.5">${ICO.warn(12,'#fbbf24')} Your TMDB credential was removed from this public import link. Re-enter it in AIOStreams after import if you want metadata matching features.</div>`
-              : '';
-            result.innerHTML = `<div class="import-success" style="margin-top:12px">
-              <div style="margin-bottom:10px;padding:10px 12px;border-radius:8px;background:rgba(251,146,60,.06);border:1px solid rgba(251,146,60,.18)"><div style="font-size:.74rem;font-weight:700;color:#fb923c;margin-bottom:3px">${ICO.warn(12,'#fb923c')} Next step: connect TorBox</div><div style="font-size:.72rem;color:#c9d5df;line-height:1.5">Go to <strong style="color:#fb923c">Nuvio → Connected Services</strong> and connect your TorBox account there. Do <strong style="color:#f87171">not</strong> enter a TorBox API key in AIOStreams.</div></div>${tmdbReminder}
-              <strong style="color:#e6edf3">Tap a host to import your Nuvio template:</strong>
-              <div style="color:#6b7280;font-size:.8rem;margin:6px 0 10px"><strong style="color:#e6edf3">1.</strong> Tap a host below to open AIOStreams<br><strong style="color:#e6edf3">2.</strong> Your template loads automatically<br><strong style="color:#e6edf3">3.</strong> Set a password and click Save<br><strong style="color:#e6edf3">4.</strong> Copy the manifest URL into Nuvio</div>
-              <div class="inst-chips">${chipHtml}</div>
-              <div style="color:#4b5563;font-size:.74rem;margin:8px 0 4px">Or copy this import URL:</div>
-              <div style="display:flex;gap:6px;align-items:stretch"><div class="manifest-url" style="flex:1;min-width:0;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" data-action="copy-manifest" data-url="${importUrl.replace(/"/g,'&quot;')}" title="Click to copy">${escHtml(importUrl)}</div><button data-action="copy-manifest" data-url="${importUrl.replace(/"/g,'&quot;')}" style="flex-shrink:0;padding:0 12px;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.28);border-radius:6px;color:#00d4ff;font-size:.8rem;font-weight:700;cursor:pointer;white-space:nowrap">Copy</button></div>
-            </div>`;
-            showToast('Nuvio template created — tap a host to import');
-          } else {
-            result.innerHTML = `<div class="import-success import-error" style="margin-top:12px"><strong style="color:#f87171">Could not reach any paste service</strong><div style="color:#6b7280;font-size:.8rem;margin:6px 0 10px;line-height:1.5">Download the JSON and import it manually into AIOStreams.</div></div>`;
-          }
-        } catch(err) {
-          btn.disabled=false; btn.innerHTML='Create &amp; Install →';
-          result.innerHTML=`<div class="td-error">${esc(err.message || 'Something went wrong')}</div>`;
-        }
-        return;
-      }
-      let missing='';
-      overlay.querySelectorAll('[data-fl-cred]').forEach(inp=>{const v=inp.value.trim();if(!v&&!missing)missing=inp.placeholder;else S.creds[inp.dataset.flCred]=v;});
-      overlay.querySelectorAll('[data-fl-tmdb]').forEach(inp=>{S[inp.dataset.flTmdb]=inp.value.trim();});
-      if(missing){result.innerHTML=`<div class="td-error">Enter ${missing}.</div>`;return;}
-      S.multiServices = [...new Set([...state.services,...state.extras])];
-      S.optionalScrapers = [...state.scrapers];
-      S.service = deriveService();
-      S.p2pEnabled = S.multiServices.includes('p2p');
-      S.simpleMode = true; S.quickStart = true; S.outputProfile = 'auto';
-      applyQuickProfile(state.profile);
-      S.cleanInstall = document.getElementById('flClean')?.checked || false;
-      S.patchCinemeta = document.getElementById('flPatchCinemeta')?.checked !== false;
-      S.installAIOMeta = document.getElementById('flInstallAIOMeta')?.checked !== false;
-      let installTarget = state.target;
-      if (state.target === 'app') {
-        S.stremioEmail=document.getElementById('flStremioEmail').value.trim();
-        S.stremioPassword=document.getElementById('flStremioPass').value;
-        const hasLogin=S.stremioEmail && S.stremioPassword;
-        S.installMode=hasLogin?'direct':'manifest';
-        installTarget='app';
-      } else { S.installMode='manifest'; }
-      step=STEPS; saveState();
-      btn.disabled=true;
-      try { await simpleInstall(installTarget); } finally { btn.disabled=false; }
-    }
-  });
-  renderContext();
-  document.getElementById('fastLaneClose').focus();
-}
-
 function buildSanitizedDiagnostics() {
   const hosts = (()=>{ try{return hostCompatCheck();}catch(e){return null;} })();
   const profileAudit = (()=>{ try{return outputProfileAudit();}catch(e){return null;} })();
@@ -8149,7 +7787,9 @@ async function simpleInstall(target) {
         }
       }
       btn.disabled = false; btn.innerHTML = origHtml;
-      document.getElementById('fastLaneModal')?.remove();
+      // The manifest modal is a z-index 200 layer; Express sits at 10020. Close
+      // Express first or the URL the user came for opens hidden behind it.
+      document.getElementById('expressLaneModal')?.remove();
       showManifestModal(manifestUrl, pwd, hostLbl, target);
       return;
     }
@@ -8403,11 +8043,6 @@ function onPasteManifest(val) {
     if (extracted.password && !S.instancePassword) { S.instancePassword = extracted.password; saveState(); const pe=document.getElementById('aioPwd'); if(pe)pe.value=extracted.password; }
   }
   showManifestModal(val, null, null);
-}
-
-function wuplayBtn(manifestUrl) {
-  const safe = escH(manifestUrl||'');
-  return `<button type="button" data-action="copy-wuplay" data-url="${safe}" title="Copy manifest URL — paste into WuPlay → Addons → Add Addon" style="flex:1;display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 14px;border-radius:8px;font-weight:700;font-size:.88rem;cursor:pointer;border:1px solid #4f46e5;background:#16103a;color:#a78bfa;transition:all .15s"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>WuPlay</button>`;
 }
 
 function instanceChips(templateUrl) {
