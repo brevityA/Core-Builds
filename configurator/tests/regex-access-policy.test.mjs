@@ -37,20 +37,23 @@ test('collectRegexPatternSet: a regex-scoring golden carries the synced URL + it
   assert.equal(set.inline.size, 83);
 });
 
-// Balanced (the default) keeps inline regex but no synced URL since v3.14. Before that it
-// shipped neither, so default builds sorted on a regexScore nothing filled.
-test('collectRegexPatternSet: a default (Balanced) golden carries inline patterns but no synced URL', async () => {
-  const golden = JSON.parse(await readFile(new URL('../e2e/golden/torbox-1080p-standard.json', import.meta.url), 'utf8'));
+// Balanced keeps inline regex but no synced URL since v3.14. Before that it shipped
+// neither, so its builds sorted on a regexScore nothing filled. (Balanced was the
+// default until v3.17; Core Stable is now, and the default golden carries neither.)
+test('collectRegexPatternSet: a Balanced golden carries inline patterns but no synced URL', async () => {
+  const golden = JSON.parse(await readFile(new URL('../e2e/golden/core-balanced-torbox-1080p.json', import.meta.url), 'utf8'));
   const set = collectRegexPatternSet(golden.config);
   assert.equal(set.syncedUrls.length, 0);
   assert.equal(set.inline.size, 79);
 });
 
 test('collectRegexPatternSet: a Stable golden still carries neither', async () => {
-  const golden = JSON.parse(await readFile(new URL('../e2e/golden/core-stable-torbox-1080p.json', import.meta.url), 'utf8'));
-  const set = collectRegexPatternSet(golden.config);
-  assert.equal(set.syncedUrls.length, 0);
-  assert.equal(set.inline.size, 0);
+  for (const name of ['core-stable-torbox-1080p', 'torbox-1080p-standard']) {
+    const golden = JSON.parse(await readFile(new URL(`../e2e/golden/${name}.json`, import.meta.url), 'utf8'));
+    const set = collectRegexPatternSet(golden.config);
+    assert.equal(set.syncedUrls.length, 0, name);
+    assert.equal(set.inline.size, 0, name);
+  }
 });
 
 test('regexAccessDecision: skip when there is nothing to validate or nothing it can know', () => {

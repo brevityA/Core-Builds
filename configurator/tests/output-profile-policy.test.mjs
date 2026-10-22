@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {
   OUTPUT_PROFILES,
   applyOutputProfile,
+  profileVerdictForChoice,
   resolveOutputProfile,
 } from '../src/core/output-profile-policy.js';
 import {
@@ -75,13 +76,51 @@ function richTemplate() {
   };
 }
 
-test('auto profile makes Simple Mode and Quick Install stable', () => {
+test('auto profile is Core Stable for every flow; only an explicit architecture selects more', () => {
   assert.equal(resolveOutputProfile({ simpleMode:true }), 'stable');
   assert.equal(resolveOutputProfile({ quickStart:true }), 'stable');
-  assert.equal(resolveOutputProfile({ simpleMode:false, quickStart:false }), 'balanced');
+  assert.equal(resolveOutputProfile({ simpleMode:false, quickStart:false }), 'stable');
+  assert.equal(resolveOutputProfile({}), 'stable');
+  assert.equal(resolveOutputProfile({ pseArch:'standard' }), 'stable');
   assert.equal(resolveOutputProfile({ pseArch:'iqr' }), 'advanced');
   assert.equal(resolveOutputProfile({ pseArch:'apex-mixed' }), 'labs');
+  // A quick-start preset that carries an architecture (4K Apex) stays Stable.
+  assert.equal(resolveOutputProfile({ quickStart:true, pseArch:'iqr' }), 'stable');
   assert.equal(resolveOutputProfile({ outputProfile:'balanced', simpleMode:true }), 'balanced');
+});
+
+test('a choice Core Stable drops moves an automatic build to Balanced, never an explicit one', () => {
+  assert.deepEqual(profileVerdictForChoice('formatter', {}), { profile:'stable', reason:'Core Stable always uses its own stream card', switchTo:'balanced' });
+  assert.equal(profileVerdictForChoice('libraryBoost', {}).switchTo, 'balanced');
+  assert.equal(profileVerdictForChoice('autoPlay', {}).switchTo, 'balanced');
+  // Explicitly chosen Stable is respected: say why, do not override.
+  assert.equal(profileVerdictForChoice('formatter', { outputProfile:'stable' }).switchTo, null);
+  // Balanced and above honour these: nothing to say.
+  assert.equal(profileVerdictForChoice('formatter', { outputProfile:'balanced' }), null);
+  assert.equal(profileVerdictForChoice('formatter', { pseArch:'iqr' }), null);
+  assert.equal(profileVerdictForChoice('unknown-setting', {}), null);
+});
+
+test('Advanced-only choices are reported, never auto-switched to Advanced', () => {
+  for (const setting of ['foreignLangKill', 'preload']) {
+    const onStable = profileVerdictForChoice(setting, {});
+    assert.equal(onStable.profile, 'stable');
+    assert.equal(onStable.switchTo, null);
+    assert.match(onStable.reason, /Advanced and Labs/);
+    assert.equal(profileVerdictForChoice(setting, { outputProfile:'balanced' }).switchTo, null);
+    assert.equal(profileVerdictForChoice(setting, { outputProfile:'advanced' }), null);
+  }
+});
+
+test('Hide 4K and Hide Dolby Vision survive Stable and Balanced as native filters', () => {
+  for (const profile of ['stable', 'balanced']) {
+    const out = applyOutputProfile(richTemplate(), profile, { service:'torbox-pro', resolution:'4k', langs:['English'], exclude4K:true, excludeDV:true });
+    assert.ok(out.config.excludedResolutions.includes('2160p') && out.config.excludedResolutions.includes('1440p'), `${profile}: 4K hidden`);
+    assert.ok(out.config.excludedVisualTags.includes('DV') && out.config.excludedVisualTags.includes('HDR+DV'), `${profile}: DV hidden`);
+    const off = applyOutputProfile(richTemplate(), profile, { service:'torbox-pro', resolution:'4k', langs:['English'] });
+    assert.ok(!off.config.excludedResolutions.includes('2160p'), `${profile}: 4K kept when the toggle is off`);
+    assert.ok(!off.config.excludedVisualTags.includes('DV'), `${profile}: DV kept when the toggle is off`);
+  }
 });
 
 test('Core Stable reduces output to a local, deterministic policy', () => {

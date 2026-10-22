@@ -31,7 +31,7 @@ import { iqrExpression } from '../core/iqr-expression.js';
 import { createUpdateSession, commitUpdate, cancelUpdate } from '../core/update-session.js';
 import { scoreStream, scoreFormattedStream } from '../core/core-score-policy.js';
 import { isNewer, parseChangelogRange, shouldCheck, normalizeTemplateMeta } from '../core/update-check.js';
-import { AIOSTREAMS_COMPATIBILITY_TARGETS, DEFAULT_AIOSTREAMS_VERSION, OUTPUT_PROFILES, OUTPUT_PROFILE_INFO, resolveOutputProfile, applyOutputProfile } from '../core/output-profile-policy.js';
+import { AIOSTREAMS_COMPATIBILITY_TARGETS, DEFAULT_AIOSTREAMS_VERSION, OUTPUT_PROFILES, OUTPUT_PROFILE_INFO, resolveOutputProfile, applyOutputProfile, profileVerdictForChoice } from '../core/output-profile-policy.js';
 import { hasLibraryCapableService, hasTorrentDebridService, hasEnabledService, USENET_INDEXER_SERVICE_IDS, DEBRIDIO_SERVICE_IDS, missingDirectInstallCredentials } from '../core/install-policy.js';
 import { hostRoutingDecision, autoRoutableHostKeys, hostPickerLabel } from '../core/host-routing.js';
 import { collectRegexPatternSet, regexAccessDecision } from '../core/regex-access-policy.js';
@@ -1458,6 +1458,8 @@ function outputProfileContext() {
     // 4K-tier-first rule (and the same explicit opt-out) as sort-policy.js.
     qualityFirst: Boolean(S.qualityFirst),
     resolutionFirst: Boolean(S.resolutionFirst),
+    exclude4K: Boolean(S.exclude4K),
+    excludeDV: Boolean(S.excludeDV),
     aiostreamsVersion: AIOSTREAMS_COMPATIBILITY_TARGETS.includes(S.aiostreamsVersion) ? S.aiostreamsVersion : DEFAULT_AIOSTREAMS_VERSION,
     preservedPresetIds: (S._importedPresets || []).map(preset => preset.instanceId),
     preserveFields: Object.keys(S._migrationKeep || {}),
@@ -1494,6 +1496,20 @@ function activeOutputProfile() {
   return resolveOutputProfile(outputProfileContext());
 }
 
+// A choice the active profile would drop is never left to fail silently: an
+// automatic build moves to Balanced when that honours it, otherwise we say why
+// it has no effect. Call after updating S and before render().
+function applyChoiceProfile(setting) {
+  const verdict = profileVerdictForChoice(setting, outputProfileContext());
+  if (!verdict) return;
+  if (verdict.switchTo) {
+    S.outputProfile = verdict.switchTo;
+    showToast(`Switched to ${OUTPUT_PROFILE_INFO[verdict.switchTo].label}: ${verdict.reason}.`);
+  } else {
+    showToast(`No effect on ${OUTPUT_PROFILE_INFO[verdict.profile].label}: ${verdict.reason}.`);
+  }
+}
+
 function renderOutputProfilePicker({ compact=false } = {}) {
   const active = activeOutputProfile();
   const choices = compact ? ['stable', 'balanced'] : ['stable', 'balanced', 'advanced', 'labs'];
@@ -1512,7 +1528,7 @@ function renderOutputProfilePicker({ compact=false } = {}) {
       <span style="display:block;font-size:.62rem;line-height:1.35;color:${on ? '#c9d1d9' : '#6b7280'};margin-top:3px">${info.description}</span>
     </button>`;
   }).join('');
-  const flowDefault = S.simpleMode || S.quickStart ? 'Core Stable' : (S.pseArch === 'apex-mixed' ? 'Labs' : S.pseArch === 'iqr' ? 'Advanced' : 'Balanced');
+  const flowDefault = OUTPUT_PROFILE_INFO[resolveOutputProfile({ ...outputProfileContext(), outputProfile: 'auto' })].label;
   const target = AIOSTREAMS_COMPATIBILITY_TARGETS.includes(S.aiostreamsVersion) ? S.aiostreamsVersion : DEFAULT_AIOSTREAMS_VERSION;
   // Descriptions live with the options so the picker cannot say less than the target list knows.
   const TARGET_NOTES = {
@@ -2026,7 +2042,7 @@ function splashHtml() {
         <div class="hybrid-lede">Choose your service, device, and preferences. Core Builds turns them into a checked <strong>AIOStreams template</strong> — and can write the whole stack (AIOStreams + AIOMetadata + a Cinemeta patch + subtitles) <strong>straight into your Stremio account</strong>. No JSON editing either way.</div>
         <div class="hybrid-trust"><span><i></i> Runs locally</span><span><i></i> Open source · MIT</span><span><i></i> Build without a login — or push it in one click</span></div>
         <div class="splash-stats" id="splashStats"></div>
-        <div class="hybrid-subnote">First stream preloads by default · 6s addon timeout · keys go only to the host you choose</div>
+        <div class="hybrid-subnote">Core Stable by default · 6s addon timeout · keys go only to the host you choose</div>
       </div>
       <div class="hybrid-core-stage splash-anim splash-anim-d2">
         <button type="button" class="core-support-mark" data-action="open-support" aria-label="Support Core Builds" title="Support Core Builds">
@@ -2881,6 +2897,7 @@ document.addEventListener('DOMContentLoaded', () => {
         S.simpleMode = false;
         S.quickStart = false;
         S.outputProfile = 'auto';
+        applyChoiceProfile('formatter');
         saveState();
         _badgeBuilderRoute = true;
       }
@@ -3026,6 +3043,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (e.target.dataset.action) releaseMigrationForControl(e.target.dataset.action, e.target);
     if (e.target.matches('[data-action="fmt-dropdown-change"]')) {
       S.formatter = e.target.value;
+      applyChoiceProfile('formatter');
       saveState();
       updateFmtFeatured();
       updateFmtReceiptRow();
@@ -3100,6 +3118,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (action === 'fmt-scroll-pick') {
       S.formatter = el.dataset.fmt;
+      applyChoiceProfile('formatter');
       saveState();
       updateFmtFeatured();
       updateFmtReceiptRow();
@@ -3214,7 +3233,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (action === 'easy-start')   { S.simpleMode = true;  S.quickStart = false; S.outputProfile='auto'; document.getElementById('main').classList.remove('nav-back'); step = 1; pushStep(); saveState(); render(); window.scrollTo(0,0); }
     if (action === 'custom-start') { S.simpleMode = false; S.quickStart = false; S.outputProfile='auto'; document.getElementById('main').classList.remove('nav-back'); step = 1; pushStep(); saveState(); render(); window.scrollTo(0,0); }
     if (action === 'show-full-review') { S.outputProfile = activeOutputProfile(); S.simpleMode = false; saveState(); render(); window.scrollTo(0,0); }
-    if (action === 'set-simple-fmt') { S.formatter = el.dataset.val; saveState(); render(); }
+    if (action === 'set-simple-fmt') { S.formatter = el.dataset.val; applyChoiceProfile('formatter'); saveState(); render(); }
     if (action === 'set-output-profile') {
       const requested = el.dataset.val;
       if (requested && ['auto', ...OUTPUT_PROFILES].includes(requested)) {
@@ -3229,7 +3248,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (action === 'set-simple-pool') { S.streamPool = el.dataset.val; saveState(); render(); }
     if (action === 'set-simple-quality') { S.qualityFirst = !S.qualityFirst; saveState(); render(); }
     if (action === 'set-simple-resfirst') { S.resolutionFirst = !S.resolutionFirst; saveState(); render(); }
-    if (action === 'set-autoplay-method') { S.autoPlayMethod=el.dataset.val; saveState(); render(); }
+    if (action === 'set-autoplay-method') { S.autoPlayMethod=el.dataset.val; applyChoiceProfile('autoPlay'); saveState(); render(); }
     if (action === 'set-addon-timeout') {
       S.addonTimeout = Number(el.dataset.val);
       if (S._importedPresets) S._importedPresets.forEach(preset => { preset.options.timeout = S.addonTimeout; });
@@ -3426,7 +3445,10 @@ document.addEventListener('DOMContentLoaded', () => {
       const card = e.target.closest('[data-action="toggle-pref"]') || e.target;
       const key = card.dataset.key;
       if (key && key in S) {
-        S[key] = !S[key]; saveState();
+        S[key] = !S[key];
+        if (S[key] && key === 'preloadEnabled') applyChoiceProfile('preload');
+        if (S[key] && key === 'foreignLangKill') applyChoiceProfile('foreignLangKill');
+        saveState();
         const on = !!S[key];
         if (key === 'proxyEnabled') {
           const sy = window.scrollY; render(); window.scrollTo(0, sy);
@@ -3471,6 +3493,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     if (action === 'set-library-boost') {
       S.libraryBoost = (e.target.closest('[data-action="set-library-boost"]') || e.target).dataset.val;
+      if (S.libraryBoost !== 'none') applyChoiceProfile('libraryBoost');
       saveState();
       document.querySelectorAll('[data-action="set-library-boost"]').forEach(btn => {
         const on = btn.dataset.val === (S.libraryBoost||'default');
@@ -3631,6 +3654,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     if (action === 'set-formatter') {
       S.formatter = (e.target.closest('[data-action="set-formatter"]') || e.target).dataset.val;
+      applyChoiceProfile('formatter');
       saveState();
       document.querySelectorAll('[data-action="set-formatter"]').forEach(card => {
         card.dataset.active = String(card.dataset.val === S.formatter);
@@ -3782,6 +3806,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     if (e.target.dataset.action === 'toggle-foreign-kill') {
       S.foreignLangKill = e.target.checked;
+      if (S.foreignLangKill) applyChoiceProfile('foreignLangKill');
       saveState();
       const wasOpen = document.getElementById('langDetails')?.open;
       render();
@@ -5205,9 +5230,12 @@ function showFormatterImport() {
       releaseMigrationFields(['formatter']);
       S.customFormatter = { name: obj.name, d: obj.description, label: obj._label || obj.label || 'Custom' };
       S.formatter = 'custom';
+      const profileBefore = S.outputProfile;
+      applyChoiceProfile('formatter');
       saveState();
       overlay.style.opacity = '0'; overlay.style.transition = 'opacity .15s';
-      setTimeout(() => { overlay.remove(); render(); showToast('Custom formatter imported'); }, 160);
+      // A profile switch already toasted why; do not overwrite that message.
+      setTimeout(() => { overlay.remove(); render(); if (S.outputProfile === profileBefore) showToast('Custom formatter imported'); }, 160);
     } catch(e) { errEl.textContent = 'Invalid JSON: ' + e.message; errEl.style.display = ''; }
   }
 

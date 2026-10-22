@@ -889,6 +889,8 @@ export function generateTemplate(rawInput = {}, options = {}) {
     sizeLimit: input.sizeLimit,
     bandwidthMbps: input.bandwidthMbps,
     cacheMode: input.cacheMode,
+    exclude4K: Boolean(input.exclude4K),
+    excludeDV: Boolean(input.excludeDV),
     aiostreamsVersion: input.aiostreamsVersion,
   };
   return applyOutputProfile(result, resolveOutputProfile(profileContext), profileContext);
