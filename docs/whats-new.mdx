@@ -1,14 +1,30 @@
 ---
-title: "What's New — Configurator v3.21"
+title: "What's New — Configurator v3.22"
 sidebarTitle: "What's New"
-description: "Latest Core Builds Configurator releases (v3.21 and earlier), auto-generated from the in-app changelog."
+description: "Latest Core Builds Configurator releases (v3.22 and earlier), auto-generated from the in-app changelog."
 ---
 
 # What's New in the Configurator
 
-This page is regenerated from `configurator/src/data/changelog.js` by `scripts/sync-docs.py`, so it always reflects the latest shipped configurator version (currently **v3.21**).
+This page is regenerated from `configurator/src/data/changelog.js` by `scripts/sync-docs.py`, so it always reflects the latest shipped configurator version (currently **v3.22**).
 
 For the template-suite release log, see the [Changelog](https://corebuilds-docs.docsalot.dev/changelog).
+
+## Configurator v3.22 (Oct 23 2026)
+
+<CardGroup cols={2}>
+  <Card title="Quick install reaches every setting" icon="sparkles">
+    a new Defaults we’ll use list shows what Quick install leaves at its default: audio, size and quality, stream cards, subtitles and catalogs. Tap one and the full builder opens at that setting, with your service, key, device, quality and install target already filled in, so nothing is lost when you move from Quick to Custom. Install from Review when you are done.
+  </Card>
+  <Card title="Customize every setting" icon="bolt">
+    the link under the list opens all of Fine-Tune the same way.
+  </Card>
+  <Card title="Generated output unchanged" icon="shield-check">
+    every config the configurator and the CLI build is byte-for-byte what 3.21 produced; only the version stamp moves.
+  </Card>
+</CardGroup>
+
+---
 
 ## Configurator v3.21 (Oct 23 2026)
 
@@ -56,45 +72,5 @@ For the template-suite release log, see the [Changelog](https://corebuilds-docs.
   </Card>
   <Card title="Generated output unchanged" icon="bolt">
     builds without PenguPlay are byte-for-byte what 3.18 produced; only the version stamp moves.
-  </Card>
-</CardGroup>
-
----
-
-## Configurator v3.18 (Oct 22 2026)
-
-<CardGroup cols={2}>
-  <Card title="Templates save on AIOStreams 2.36 again" icon="sparkles">
-    AIOStreams 2.36.0 removed the AIOSubtitle addon and refuses any config that includes it, and 52 Core Builds templates did, so every host on 2.36 (seven of the eight public ones, ElfHosted included) refused them with “AIO Subtitle has been removed”. They now use OpenSubtitles v3+, the configurator’s default since 3.16. Re-import your template to pick up the fix.
-  </Card>
-  <Card title="AIOSubtitle leaves Fine-Tune" icon="bolt">
-    its addon is no longer hosted. A saved AIOSubtitle choice moves to OpenSubtitles v3+ and your other subtitle sources stay; a config you import or update has it removed before install.
-  </Card>
-  <Card title="Retired addons are never sent" icon="shield-check">
-    AIOStreams 2.36.0 retired 15 addons, among them Argentina TV, USA TV, Nuvio Streams, Debridio WatchTower and AIOSubtitle. Argentina TV is no longer offered, and any of the 15 found in an imported or updated config is dropped before install instead of getting it refused.
-  </Card>
-  <Card title="Anime Tosho moves to its live feed" icon="sliders">
-    the original Anime Tosho stopped taking releases on May 9 and its feed shuts down this month, so Anime builds were about to lose their anime source. Anime and Movies + Anime builds now use the community continuation (anime-tosho-new in AIOStreams 2.36), as do the nine Anime and Labs templates. It needs AIOStreams 2.36.0, which seven of the eight public hosts run: builds carrying it are not sent to Omni’s (2.35.9, now marked legacy), and picking the 2.35.7 target keeps the old source.
-  </Card>
-  <Card title="Pinned to AIOStreams 2.36.0" icon="gauge">
-    the schema the configurator checks against, and its default compatibility target, move from 2.35.7 to 2.36.0, the release ElfHosted and most hosts run. Sessions saved on the old 2.35.7 default move with it; a target you picked yourself is kept.
-  </Card>
-  <Card title="Stream proxy that works" icon="wand">
-    Fine-Tune has a Stream Proxy section again, and AIOStreams now applies it: MediaFlow Proxy, StremThru or the AIOStreams built-in proxy, with its address, password and the services to route. The old toggle sent no address and no on switch, so it never proxied anything. AIOStreams checks the proxy when you save; if it cannot reach it, the configurator says so and offers to turn it off. The password stays on your device and in the config you install, never in share links.
-  </Card>
-  <Card title="Updates keep your proxy" icon="layers">
-    installing after importing your live config replaced a proxy you had set up in AIOStreams with an empty one. It is now carried over, and updating from a Core Builds template keeps yours.
-  </Card>
-  <Card title="Sources serve only streams" icon="bug">
-    AIOStreams runs a source with everything it supports unless the config narrows it, and the configurator’s limit never reached it. Torrentio, StremThru Store and Peerflix added debrid-library catalogs to your home screen, Sootio and Flix-Streams catalogs, YaStream catalogs and subtitles. They now serve streams only, and TMDB Collections serves only its catalogs.
-  </Card>
-  <Card title="Live TV shows its channels" icon="sparkles">
-    USA TV Next was limited to streams, but its channels are browsed in catalogs, so switching it on added nothing to browse. It keeps its catalogs now. Content Deep Dive is sent as the stream companion it is, and Doctor Who Universe keeps its streams.
-  </Card>
-  <Card title="Template directory versions are current" icon="bolt">
-    the docs page showed 22 of its 43 templates with old version numbers (Windows Ultrawide read v0.2.4 against v0.2.13). Every heading now updates with its template.
-  </Card>
-  <Card title="The unlinked V3 prototype is gone" icon="shield-check">
-    an unfinished second configurator was still published at /configurator/rebuild/ though nothing linked to it. It is removed, and twelve dated audit and plan documents moved from the repository root into archive/.
   </Card>
 </CardGroup>

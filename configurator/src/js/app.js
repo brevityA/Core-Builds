@@ -46,7 +46,7 @@ const STEPS = 6;
 // workflow) the raw x.y here expands to x.y.0 in package.json / versions.json and
 // the release tag; the built badge drops the trailing .0. At the 2026-09-06
 // audit the release tag was v3.7.0 while this said 3.1 — they must move together.
-const CONFIGURATOR_VERSION = '3.21';
+const CONFIGURATOR_VERSION = '3.22';
 // Set to a collector endpoint to enable the opt-in anonymous usage ping (service+device+resolution only).
 // Leave empty to keep the feature fully disabled and hidden.
 const USAGE_BEACON_URL = '';
@@ -1653,12 +1653,12 @@ function renderAdvancedPanel() {
       ${renderOutputProfilePicker()}
 
       <div>
-        <div style="font-size:.72rem;font-weight:700;color:#4b5563;letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:6px">${ICO.speaker(16,'#f59e0b')} Sound Profile ${ftTip('Controls which <strong>audio codecs</strong> are allowed in your streams. <strong>Auto</strong> lets the device profile decide and drops lossless formats (TrueHD, DTS-HD MA) on devices that cannot pass them through. <strong>Full Lossless</strong> keeps everything, for home-theatre setups with a capable receiver.')}</div>
+        <div id="ft-audio" style="font-size:.72rem;font-weight:700;color:#4b5563;letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:6px">${ICO.speaker(16,'#f59e0b')} Sound Profile ${ftTip('Controls which <strong>audio codecs</strong> are allowed in your streams. <strong>Auto</strong> lets the device profile decide and drops lossless formats (TrueHD, DTS-HD MA) on devices that cannot pass them through. <strong>Full Lossless</strong> keeps everything, for home-theatre setups with a capable receiver.')}</div>
         <div style="display:flex;flex-direction:column;gap:7px">${audioRows}</div>
       </div>
 
       <div>
-        <div style="font-size:.72rem;font-weight:700;color:#4b5563;letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:6px">${ICO.video(16,'#ec4899')} Video Preferences ${ftTip('<strong>Size Limit</strong> caps per-file size. <strong>Quality vs Resolution</strong> decides ranking priority &mdash; quality prefers REMUX/WEB-DL over raw resolution. <strong>Exclude 4K</strong> removes 2160p for bandwidth saving. <strong>Exclude DV</strong> removes Dolby Vision streams that cause purple/green tint on unsupported screens.')}</div>
+        <div id="ft-video" style="font-size:.72rem;font-weight:700;color:#4b5563;letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:6px">${ICO.video(16,'#ec4899')} Video Preferences ${ftTip('<strong>Size Limit</strong> caps per-file size. <strong>Quality vs Resolution</strong> decides ranking priority &mdash; quality prefers REMUX/WEB-DL over raw resolution. <strong>Exclude 4K</strong> removes 2160p for bandwidth saving. <strong>Exclude DV</strong> removes Dolby Vision streams that cause purple/green tint on unsupported screens.')}</div>
         <div style="background:#111720;border:1.5px solid rgba(255,255,255,.08);border-radius:10px;padding:14px 16px;margin-bottom:8px">
           <div style="font-size:.78rem;font-weight:600;color:#6b7280;margin-bottom:10px">Size Limit</div>
           <div style="display:flex;gap:5px">${sizePills}</div>
@@ -1715,13 +1715,13 @@ function renderAdvancedPanel() {
       </div>
 
       <div>
-        <div style="font-size:.72rem;font-weight:700;color:#4b5563;letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:6px">${ICO.palette(16,'#a78bfa')} Stream Layout (Formatter) ${ftTip('Controls how streams appear in Stremio. The <strong>formatter</strong> defines the layout of each stream result &mdash; what info is shown (codec, resolution, size, etc.) and how it&apos;s arranged. You can import custom formatters for different visual styles.')}</div>
+        <div id="ft-layout" style="font-size:.72rem;font-weight:700;color:#4b5563;letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:6px">${ICO.palette(16,'#a78bfa')} Stream Layout (Formatter) ${ftTip('Controls how streams appear in Stremio. The <strong>formatter</strong> defines the layout of each stream result &mdash; what info is shown (codec, resolution, size, etc.) and how it&apos;s arranged. You can import custom formatters for different visual styles.')}</div>
         ${fmtDropdownHtml()}
         <button data-action="import-formatter" style="margin-top:10px;width:100%;padding:10px;border-radius:8px;border:1.5px dashed rgba(167,139,250,.3);background:transparent;color:#a78bfa;font-size:.78rem;font-weight:600;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='rgba(167,139,250,.6)'" onmouseout="this.style.borderColor='rgba(167,139,250,.3)'">${S.customFormatter ? '⟳ Replace Custom Formatter' : ICO.folder(14,'#a78bfa')+' Import Custom Formatter'}</button>
       </div>
 
       <div>
-        <div style="font-size:.72rem;font-weight:700;color:#4b5563;letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:6px">${ICO.globe(16,'#06b6d4')} Subtitles ${ftTip('Choose subtitle providers and languages. <strong>OpenSubtitles v3+</strong> (the default) has the largest database. <strong>AIOSubtitle</strong> is currently slow to respond, and hosts may refuse the save while it is enabled. <strong>SubDL</strong> is a fast alternative (requires a free API key from subdl.com). Select languages your household needs &mdash; this affects which subtitles are fetched.')}</div>
+        <div id="ft-subtitles" style="font-size:.72rem;font-weight:700;color:#4b5563;letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:6px">${ICO.globe(16,'#06b6d4')} Subtitles ${ftTip('Choose subtitle providers and languages. <strong>OpenSubtitles v3+</strong> (the default) has the largest database. <strong>AIOSubtitle</strong> is currently slow to respond, and hosts may refuse the save while it is enabled. <strong>SubDL</strong> is a fast alternative (requires a free API key from subdl.com). Select languages your household needs &mdash; this affects which subtitles are fetched.')}</div>
         <div style="background:#111720;border:1.5px solid rgba(255,255,255,.08);border-radius:10px;padding:14px 16px">
           <div style="font-size:.78rem;font-weight:600;color:#6b7280;margin-bottom:8px">Subtitle Sources</div>
           <div style="display:flex;flex-direction:column;gap:5px">
@@ -1762,7 +1762,7 @@ function renderAdvancedPanel() {
       </div>
 
       <div>
-        <div style="font-size:.72rem;font-weight:700;color:#4b5563;letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:6px">${ICO.compass(16,'#f97316')} Catalogs & Discovery ${ftTip('Adds <strong>browse catalogs</strong> to your Stremio home screen for discovering content. These don&apos;t affect stream quality &mdash; they just add new ways to find movies and shows (trending, by streaming service, anime databases, etc).')}</div>
+        <div id="ft-catalogs" style="font-size:.72rem;font-weight:700;color:#4b5563;letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:6px">${ICO.compass(16,'#f97316')} Catalogs & Discovery ${ftTip('Adds <strong>browse catalogs</strong> to your Stremio home screen for discovering content. These don&apos;t affect stream quality &mdash; they just add new ways to find movies and shows (trending, by streaming service, anime databases, etc).')}</div>
         <div style="background:#111720;border:1.5px solid rgba(255,255,255,.08);border-radius:10px;padding:14px 16px">
           <div style="font-size:.65rem;color:#4b5563;margin-bottom:10px;line-height:1.4">Add browse catalogs to your Stremio home screen for discovering content.</div>
           <div style="display:flex;flex-direction:column;gap:5px">
@@ -7480,7 +7480,7 @@ function showExpressLane() {
   overlay.id = 'expressLaneModal';
   overlay.className = 'fastlane-overlay';
   overlay.innerHTML = `<div class="fastlane-panel fastlane-express" role="dialog" aria-modal="true" aria-labelledby="expressTitle">
-    <div class="fastlane-head"><button class="fastlane-back" type="button" data-express-back aria-label="Back">&larr; Back</button><div class="fastlane-head-copy"><div class="fastlane-kicker">Express install</div><div class="fastlane-title" id="expressTitle">Working streams in about 30 seconds.</div><div class="fastlane-sub">Pick your debrid, connect Stremio, done. Core Builds picks sensible defaults — fine-tune any of it later in Advanced.</div></div><button class="fastlane-close" id="expressClose" aria-label="Close">✕</button></div>
+    <div class="fastlane-head"><button class="fastlane-back" type="button" data-express-back aria-label="Back">&larr; Back</button><div class="fastlane-head-copy"><div class="fastlane-kicker">Express install</div><div class="fastlane-title" id="expressTitle">Working streams in about 30 seconds.</div><div class="fastlane-sub">Pick your debrid, connect Stremio, done. Everything else has a sensible default — change any of them under Defaults we’ll use.</div></div><button class="fastlane-close" id="expressClose" aria-label="Close">✕</button></div>
     <div class="fastlane-section"><div class="fastlane-label">1 · Debrid service</div>
       <div class="fastlane-grid services">${EXPRESS_SERVICES.map(([v,n,d])=>`<button type="button" class="fastlane-choice${state.service===v?' active':''}" data-express-service="${v}"><b>${n}</b><span>${d}</span></button>`).join('')}</div>
       <div id="expressCreds">${renderCreds()}</div>
@@ -7512,6 +7512,10 @@ function showExpressLane() {
         <button type="button" data-action="create-stremio-account" style="margin-top:6px;font-size:.74rem;color:var(--th-accent);background:none;border:none;cursor:pointer;padding:0;font-weight:600">Create random account →</button>
       </div>
     </div>
+    <div class="fastlane-section"><div class="fastlane-label">Defaults we’ll use</div>
+      <div class="fastlane-defaults" id="expressDefaults">${expressDefaultRows().map(([sec, name, val]) => `<button type="button" class="fastlane-default" data-express-customize="${sec}"><span class="fastlane-default-name">${name}</span><span class="fastlane-default-val">${val}</span><span class="fastlane-default-go" aria-hidden="true">›</span></button>`).join('')}</div>
+      <button type="button" class="fastlane-customize" data-express-customize="">Customize every setting →</button>
+    </div>
     <details class="fastlane-optional"><summary style="cursor:pointer;color:#8b949e;font-weight:700;letter-spacing:.04em;text-transform:uppercase">Optional</summary>
       <div style="margin-top:8px"><div style="font-size:.64rem;font-weight:800;color:#8b949e;letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px">Performance profile</div>
         <div class="fastlane-grid services cols-3">${[['fast','Fast','1080p · cached first'],['balanced','Balanced','4K · sensible pool'],['maximum','Maximum','4K · largest pool']].map(([v,n,d])=>`<button type="button" class="fastlane-choice${state.profile===v?' active':''}" data-express-profile="${v}"><b>${n}</b><span>${d}</span></button>`).join('')}</div>
@@ -7535,6 +7539,20 @@ function showExpressLane() {
   document.getElementById('expressHost')?.addEventListener('change', e => { S.instanceHost = e.target.value; saveState(); probeExpressHost(); refreshExpressSummary(); });
   _expressLaneService = state.service;
   probeExpressHost();
+  // Everything Quick install collects, read from the lane as it stands.
+  const expressPayload = () => ({
+    service: state.service,
+    target: state.target,
+    creds: Object.fromEntries([...overlay.querySelectorAll('[data-express-cred]')].map(i => [i.dataset.expressCred, i.value.trim()])),
+    stremioEmail: document.getElementById('stremioEmailInline')?.value.trim() || '',
+    stremioPassword: document.getElementById('stremioPasswordInline')?.value || '',
+    fullStack: document.getElementById('expressFullStack')?.checked !== false,
+    clean: document.getElementById('expressClean')?.checked === true,
+    tmdb: document.getElementById('expressTmdb')?.value.trim() || '',
+    extras: { services: state.extras, scrapers: state.scrapers },
+    profile: state.profile, device: state.device, resolution: state.resolution,
+    cacheMode: S.cacheMode,
+  });
   // Truthful-at-a-glance chorus above the Install button — every pick lands in it.
   const refreshExpressSummary = () => {
     const elSum = document.getElementById('expressSummary');
@@ -7619,20 +7637,25 @@ function showExpressLane() {
       });
       return;
     }
+    const customizeBtn = e.target.closest('[data-express-customize]');
+    if (customizeBtn) {
+      const hostSel = document.getElementById('expressHost');
+      if (hostSel) S.instanceHost = hostSel.value;
+      applyExpressChoices(expressPayload());
+      S.simpleMode = false; S.quickStart = false;
+      closeLane(true);
+      // Replace the lane's history entry with the builder's, so Back from here returns to the landing.
+      step = STEPS;
+      try { history.replaceState({ step }, ''); } catch(err) {}
+      saveState(); render(); window.scrollTo(0, 0);
+      openAdvancedDrawer(document.querySelector('[data-action="open-advanced"]'));
+      const target = customizeBtn.dataset.expressCustomize && document.getElementById(customizeBtn.dataset.expressCustomize);
+      if (target) requestAnimationFrame(() => target.scrollIntoView({ block: 'start' }));
+      showToast('Your Quick install choices are kept — change anything, then install from Review');
+      return;
+    }
     if (e.target.closest('#expressGo')) {
-      const payload = {
-        service: state.service,
-        target: state.target,
-        creds: Object.fromEntries([...overlay.querySelectorAll('[data-express-cred]')].map(i => [i.dataset.expressCred, i.value.trim()])),
-        stremioEmail: document.getElementById('stremioEmailInline')?.value.trim() || '',
-        stremioPassword: document.getElementById('stremioPasswordInline')?.value || '',
-        fullStack: document.getElementById('expressFullStack')?.checked !== false,
-        clean: document.getElementById('expressClean')?.checked === true,
-        tmdb: document.getElementById('expressTmdb')?.value.trim() || '',
-        extras: { services: state.extras, scrapers: state.scrapers },
-        profile: state.profile, device: state.device, resolution: state.resolution,
-        cacheMode: S.cacheMode,
-      };
+      const payload = expressPayload();
       const hostSel = document.getElementById('expressHost');
       if (hostSel) {
         S.instanceHost = hostSel.value;   // explicit host choice is honored — resolveInstallHost() never silently fails over
@@ -7646,18 +7669,15 @@ function showExpressLane() {
   document.getElementById('expressClose').focus();
 }
 
-async function runExpressInstall(p) {
+// Quick install picks → builder state. Shared by the install itself and by the
+// hand-off into Custom build, so a setting changed there starts from what Quick chose.
+function applyExpressChoices(p) {
   const isFree = p.service === 'p2p';
-  if (p.target === 'app' && !isFree) {
-    if (!p.stremioEmail || !p.stremioPassword) { showToast('Add your Stremio login or create a random account', true); return; }
-    S.stremioEmail = p.stremioEmail; S.stremioPassword = p.stremioPassword;
-  }
   applyQuickProfile(p.profile || 'balanced');
   if (p.cacheMode) S.cacheMode = p.cacheMode;   // explicit "Streams shown" pick outranks the profile's bundled default
   if (p.device) S.device = p.device;
   if (p.resolution) S.resolution = p.resolution;
   S.service = p.service;
-  S.p2pEnabled = isFree;
   const extrasSvc = p.extras?.services || [];
   const extrasScr = p.extras?.scrapers || [];
   S.multiServices = [...new Set([...(isFree ? ['p2p'] : [p.service]), ...extrasSvc])];
@@ -7666,13 +7686,37 @@ async function runExpressInstall(p) {
   // Extra services push the config into multi-service mode so their presets emit.
   S.service = deriveService() || S.service;
   S.content = 'all';
-  S.installMode = 'direct';
-  S.quickStart = true;
   Object.assign(S.creds, p.creds);
   S.patchCinemeta = p.fullStack;
   S.installAIOMeta = p.fullStack;
   S.cleanInstall = p.clean;
   if (p.tmdb) { S.tmdbToken = p.tmdb; S.tmdbApiKey = p.tmdb; }
+  if (p.stremioEmail) S.stremioEmail = p.stremioEmail;
+  if (p.stremioPassword) S.stremioPassword = p.stremioPassword;   // in memory only; saveState() never writes it
+}
+
+// The rows under "Defaults we'll use": what Quick install leaves at its default,
+// each opening the Fine-Tune section that changes it.
+function expressDefaultRows() {
+  const subs = (S.subtitleAddons || []).length ? `${(S.subtitleLangs || ['en']).map(l => String(l).toUpperCase()).join(', ')} · ${(S.subtitleAddons || []).length} source${(S.subtitleAddons || []).length > 1 ? 's' : ''}` : 'Off';
+  return [
+    ['ft-audio', 'Audio', label('audio', S.audio)],
+    ['ft-video', 'Size and quality', `${S.sizeLimit === 'unlimited' || !S.sizeLimit ? 'No size limit' : escHtml(String(S.sizeLimit))}${S.exclude4K ? ' · no 4K' : ''}${S.excludeDV ? ' · no Dolby Vision' : ''}`],
+    ['ft-layout', 'Stream cards', label('formatter', S.formatter || 'family-v4')],
+    ['ft-subtitles', 'Subtitles', escHtml(subs)],
+    ['ft-catalogs', 'Catalogs', `${(S.catalogs || []).length} on`],
+  ];
+}
+
+async function runExpressInstall(p) {
+  const isFree = p.service === 'p2p';
+  if (p.target === 'app' && !isFree) {
+    if (!p.stremioEmail || !p.stremioPassword) { showToast('Add your Stremio login or create a random account', true); return; }
+    S.stremioEmail = p.stremioEmail; S.stremioPassword = p.stremioPassword;
+  }
+  applyExpressChoices(p);
+  S.installMode = 'direct';
+  S.quickStart = true;
   // Route targets: app -> Direct Install; nuvio/wuplay/manifest -> manifest URL
   // (nuvio uses the dedicated instant route so its template is Nuvio-shaped).
   if (p.target === 'nuvio') {

@@ -1,4 +1,9 @@
 export const CHANGELOG = [
+  { v:'3.22', date:'Oct 23 2026', items:[
+    'Quick install reaches every setting — a new Defaults we’ll use list shows what Quick install leaves at its default: audio, size and quality, stream cards, subtitles and catalogs. Tap one and the full builder opens at that setting, with your service, key, device, quality and install target already filled in, so nothing is lost when you move from Quick to Custom. Install from Review when you are done.',
+    'Customize every setting — the link under the list opens all of Fine-Tune the same way.',
+    'Generated output unchanged — every config the configurator and the CLI build is byte-for-byte what 3.21 produced; only the version stamp moves.',
+  ]},
   { v:'3.21', date:'Oct 23 2026', items:[
     'Quick install is a full-screen page on phones — it used to open as a pop-up over the landing, with two-column grids of small cards. On a phone it now fills the screen: one column of full-width rows you can tap easily, larger text, and the Install button pinned to the bottom so it is always in reach. Desktop keeps the centred panel.',
     'Back closes Quick install — the new Back button at the top, or your phone’s own Back button, returns to the landing. The system Back button used to leave the site.',
