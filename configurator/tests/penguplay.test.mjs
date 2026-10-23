@@ -52,3 +52,14 @@ test('the toggle collects the URL, and the CLI shares the same definition', () =
   assert.deepEqual(coreScrapers.OPTIONAL_SCRAPER_DEFS.find(d => d.id === 'penguplay'), def);
   assert.deepEqual(coreScrapers.penguplayPreset(URL_OK), penguplayPreset(URL_OK));
 });
+
+test('an imported PenguPlay is switched off when its URL would be refused, and takes an edited URL', async () => {
+  const { mergeImportedPresets, importedSourceState } = await import('../src/core/template-update-policy.js');
+  const imported = [{ type: 'penguplay', instanceId: 'pengu-imp', enabled: true, options: { name: 'PenguPlay', manifestUrl: URL_OK, timeout: 7000 } }];
+  assert.equal(importedSourceState({ presets: imported }).creds.penguplay, URL_OK, 'the imported URL reaches the field');
+  const ctx = creds => ({ optionalScrapers: ['penguplay'], subtitleAddons: [], creds });
+  const kept = mergeImportedPresets([], imported, ctx({ penguplay: URL_OK })).find(p => p.type === 'penguplay');
+  assert.equal(kept.enabled, true);
+  const broken = mergeImportedPresets([], imported, ctx({ penguplay: 'https://pengu.example/configure' })).find(p => p.type === 'penguplay');
+  assert.equal(broken.enabled, false, 'AIOStreams would refuse the save');
+});
