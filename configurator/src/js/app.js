@@ -46,7 +46,7 @@ const STEPS = 6;
 // workflow) the raw x.y here expands to x.y.0 in package.json / versions.json and
 // the release tag; the built badge drops the trailing .0. At the 2026-09-06
 // audit the release tag was v3.7.0 while this said 3.1 — they must move together.
-const CONFIGURATOR_VERSION = '3.22';
+const CONFIGURATOR_VERSION = '3.23';
 // Set to a collector endpoint to enable the opt-in anonymous usage ping (service+device+resolution only).
 // Leave empty to keep the feature fully disabled and hidden.
 const USAGE_BEACON_URL = '';
@@ -114,7 +114,7 @@ function payloadSizeGuard(cfg) {
   return { over: bytes > AIOSTREAMS_PAYLOAD_LIMIT, near: bytes > AIOSTREAMS_PAYLOAD_WARN, bytes, kb: Math.round(bytes/1024) };
 }
 function payloadTooLargeHtml(sz) {
-  return `<div class="import-success import-error" style="margin-top:12px"><strong style="color:#f87171">Config too large for AIOStreams</strong><div style="color:#6b7280;font-size:.8rem;margin:6px 0 2px;line-height:1.5">${sz.kb} KB exceeds AIOStreams' 100 KB (102,400-byte) save limit. Trim filters (e.g. fewer optional scrapers), use a Lite template, or export the JSON and trim it manually.</div></div>`;
+  return `<div class="u-mt12 import-success import-error"><strong class="u-red">Config too large for AIOStreams</strong><div class="u-note-tight">${sz.kb} KB exceeds AIOStreams' 100 KB (102,400-byte) save limit. Trim filters (e.g. fewer optional scrapers), use a Lite template, or export the JSON and trim it manually.</div></div>`;
 }
 
 // ── XS/S webtools: debounce, feature flags, host cache ──────────────────────
@@ -194,7 +194,7 @@ function livePayloadHtml() {
     const bg = sz.over ? 'rgba(239,68,68,.08)' : sz.near ? 'rgba(245,158,11,.06)' : 'rgba(16,185,129,.06)';
     const border = sz.over ? 'rgba(239,68,68,.18)' : sz.near ? 'rgba(245,158,11,.14)' : 'rgba(16,185,129,.14)';
     return `<div id="liveByteCounter" style="margin-top:10px;padding:8px 10px;border-radius:8px;background:${bg};border:1px solid ${border};display:flex;align-items:center;gap:8px">`
-      + `<div style="flex:1"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px"><span style="font-size:.68rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:${barColor}">${sz.over ? 'Over limit' : sz.near ? 'Near limit' : 'Payload size'}</span><span style="font-size:.70rem;font-weight:700;color:#8b949e">${sz.kb} KB / 100 KB · ${pct}%</span></div>`
+      + `<div class="u-flex1"><div class="u-between4"><span style="font-size:.68rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:${barColor}">${sz.over ? 'Over limit' : sz.near ? 'Near limit' : 'Payload size'}</span><span style="font-size:.70rem;font-weight:700;color:#8b949e">${sz.kb} KB / 100 KB · ${pct}%</span></div>`
       + `<div style="height:4px;border-radius:2px;background:rgba(255,255,255,.08);overflow:hidden"><div style="width:${Math.min(100,pct)}%;height:100%;background:${barColor};transition:width .25s"></div></div></div>`
       + `</div>`;
   } catch(e) { return ''; }
@@ -394,29 +394,29 @@ function hostErrorHtml(raw) {
   const m = String(raw||'');
   if (m.startsWith('HOST_BLOCKS_FREE:')) {
     const h = escHtml(m.split(':')[1]);
-    return `<div class="import-success import-error" style="margin-top:12px"><strong style="color:#f87171">${h} doesn't allow free/P2P configs</strong><div style="color:#6b7280;font-size:.8rem;margin:6px 0 2px;line-height:1.5">Pick a host that supports free sources (Advanced → Hosts, or set the host to Auto), or use a debrid service.</div></div>`;
+    return `<div class="u-mt12 import-success import-error"><strong class="u-red">${h} doesn't allow free/P2P configs</strong><div class="u-note-tight">Pick a host that supports free sources (Advanced → Hosts, or set the host to Auto), or use a debrid service.</div></div>`;
   }
   if (m.startsWith('HOST_OUTDATED:')) {
     const [,h,v] = m.split(':');
-    return `<div class="import-success import-error" style="margin-top:12px"><strong style="color:#f87171">${escHtml(h)} is running AIOStreams v${escHtml(v)} (needs ≥ 2.32.0)</strong><div style="color:#6b7280;font-size:.8rem;margin:6px 0 2px;line-height:1.5">That host is behind the current floor. Switch to Auto (fastest healthy host), pick an updated host, or ask the host admin to update.</div></div>`;
+    return `<div class="u-mt12 import-success import-error"><strong class="u-red">${escHtml(h)} is running AIOStreams v${escHtml(v)} (needs ≥ 2.32.0)</strong><div class="u-note-tight">That host is behind the current floor. Switch to Auto (fastest healthy host), pick an updated host, or ask the host admin to update.</div></div>`;
   }
   if (m.startsWith('HOST_UNREACHABLE:')) {
     const h = escHtml(m.slice('HOST_UNREACHABLE:'.length));
-    return `<div class="import-success import-error" style="margin-top:12px"><strong style="color:#f87171">${h} isn't answering</strong><div style="color:#6b7280;font-size:.8rem;margin:6px 0 2px;line-height:1.5">Your chosen host didn't respond in time. Switch Host to Auto to let Core Builds pick the fastest healthy host, or try again shortly.</div></div>`;
+    return `<div class="u-mt12 import-success import-error"><strong class="u-red">${h} isn't answering</strong><div class="u-note-tight">Your chosen host didn't respond in time. Switch Host to Auto to let Core Builds pick the fastest healthy host, or try again shortly.</div></div>`;
   }
-  return `<div class="import-success import-error" style="margin-top:12px"><strong style="color:#f87171">All Hosts Unreachable</strong></div>`;
+  return `<div class="u-mt12 import-success import-error"><strong class="u-red">All Hosts Unreachable</strong></div>`;
 }
 
 // Inline notice for the Direct Install key gate — names the exact missing key(s).
 function missingCredHtml(missing) {
-  const rows = missing.map(m => `<li style="margin:2px 0"><b style="color:#fbbf24">${escHtml(m.label)}</b></li>`).join('');
-  return `<div class="import-success import-error" style="margin-top:12px"><strong style="color:#f87171">Direct Install needs a key</strong><div style="color:#6b7280;font-size:.8rem;margin:6px 0 4px;line-height:1.5">The AIOStreams host rejects a config whose service has no credential ("Option apiKey is required"). Enter:<ul style="margin:4px 0 6px;padding-left:18px">${rows}</ul>then install again — or use <b>Export JSON</b>, which stays keyless.</div></div>`;
+  const rows = missing.map(m => `<li style="margin:2px 0"><b class="u-yellow">${escHtml(m.label)}</b></li>`).join('');
+  return `<div class="u-mt12 import-success import-error"><strong class="u-red">Direct Install needs a key</strong><div style="color:#6b7280;font-size:.8rem;margin:6px 0 4px;line-height:1.5">The AIOStreams host rejects a config whose service has no credential ("Option apiKey is required"). Enter:<ul style="margin:4px 0 6px;padding-left:18px">${rows}</ul>then install again — or use <b>Export JSON</b>, which stays keyless.</div></div>`;
 }
 
 // Inline notice for the host-routing gate (capability matrix, audit defect 4).
 function hostRoutingNoticeHtml(decision) {
   const warn = decision.status === 'warn';
-  return `<div class="import-success${warn ? ' import-info' : ' import-error'}" style="margin-top:12px"><strong style="color:${warn ? '#fbbf24' : '#f87171'}">${warn ? 'Heads-up before deploying' : 'This host can\'t take this config'}</strong><div style="color:#6b7280;font-size:.8rem;margin:6px 0 2px;line-height:1.5">${decision.reasons.map(r => escHtml(r)).join('<br>')}</div></div>`;
+  return `<div class="import-success${warn ? ' import-info' : ' import-error'}" style="margin-top:12px"><strong style="color:${warn ? '#fbbf24' : '#f87171'}">${warn ? 'Heads-up before deploying' : 'This host can\'t take this config'}</strong><div class="u-note-tight">${decision.reasons.map(r => escHtml(r)).join('<br>')}</div></div>`;
 }
 
 async function selectHealthyHost(timeout=4000) {
@@ -597,7 +597,7 @@ const DEFS = [
       { v:'ultrawide', icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="2" y="11" width="40" height="22" rx="2" stroke="#8b5cf6" stroke-width="2" fill="#0e0a1f"/><text x="22" y="26" text-anchor="middle" fill="#8b5cf6" font-size="8" font-weight="700" font-family="system-ui,sans-serif">21 : 9</text><rect x="17" y="33" width="10" height="4" rx="1" fill="#8b5cf6"/><line x1="12" y1="41" x2="32" y2="41" stroke="#8b5cf6" stroke-width="2" stroke-linecap="round"/></svg>', name:'Ultrawide',      desc:'1080p → 1440p → 4K tiers · pair with Windows PC device' },
     ]
   },
-  { id:'content', title:'Content Preferences', desc:'What will you primarily watch? Not sure? <strong style="color:#e6edf3">Skip — it covers everything.</strong>', key:'content', cols:'c1', layout:'svc-list', noHero:true,
+  { id:'content', title:'Content Preferences', desc:'What will you primarily watch? Not sure? <strong class="u-tx">Skip — it covers everything.</strong>', key:'content', cols:'c1', layout:'svc-list', noHero:true,
     opts:[
       { v:'all',   icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><circle cx="22" cy="22" r="18" stroke="#64748b" stroke-width="2" fill="#0f172a"/><circle cx="15" cy="16" r="4.5" fill="#ef4444" opacity="0.85"/><circle cx="29" cy="16" r="4.5" fill="#3b82f6" opacity="0.85"/><circle cx="15" cy="28" r="4.5" fill="#f9a8d4" opacity="0.85"/><circle cx="29" cy="28" r="4.5" fill="#94a3b8" opacity="0.6"/></svg>', name:'Everything',       desc:'Movies · TV · anime · safe default' },
       { v:'live',  icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><rect x="5" y="17" width="34" height="22" rx="2" fill="#1a0808" stroke="#ef4444" stroke-width="2"/><rect x="5" y="9" width="34" height="10" rx="2" fill="#ef4444"/><line x1="13" y1="9" x2="9" y2="19" stroke="#1a0808" stroke-width="3" stroke-linecap="round"/><line x1="21" y1="9" x2="17" y2="19" stroke="#1a0808" stroke-width="3" stroke-linecap="round"/><line x1="29" y1="9" x2="25" y2="19" stroke="#1a0808" stroke-width="3" stroke-linecap="round"/><line x1="37" y1="9" x2="33" y2="19" stroke="#1a0808" stroke-width="3" stroke-linecap="round"/><line x1="9" y1="25" x2="35" y2="25" stroke="#ef4444" stroke-width="1" opacity="0.5"/><line x1="9" y1="31" x2="35" y2="31" stroke="#ef4444" stroke-width="1" opacity="0.5"/></svg>', name:'Movies & TV',      desc:'Films &amp; series · no anime scrapers' },
@@ -605,7 +605,7 @@ const DEFS = [
       { v:'anime', icon:'<svg width="44" height="44" viewBox="0 0 44 44" fill="none"><circle cx="22" cy="13" r="5.5" fill="#f9a8d4"/><circle cx="31" cy="18" r="5.5" fill="#f9a8d4"/><circle cx="28" cy="29" r="5.5" fill="#f9a8d4"/><circle cx="16" cy="29" r="5.5" fill="#f9a8d4"/><circle cx="13" cy="18" r="5.5" fill="#f9a8d4"/><circle cx="22" cy="22" r="5.5" fill="#fce7f3"/><circle cx="22" cy="22" r="2" fill="#f472b6"/><line x1="37" y1="5" x2="37" y2="10" stroke="#f9a8d4" stroke-width="1.5" stroke-linecap="round"/><line x1="34.5" y1="7.5" x2="39.5" y2="7.5" stroke="#f9a8d4" stroke-width="1.5" stroke-linecap="round"/></svg>', name:'Anime',            desc:'SeaDex picks ranked first · keeps dual-audio and original-language releases' },
     ]
   },
-  { id:'apis', title:'Accounts & Keys', desc:'Optional — add credentials for selected providers. <strong style="color:#3fb950">Export JSON</strong> keeps the generated file local; <strong style="color:#fbbf24">Direct Install</strong> sends it to the AIOStreams host you choose.', key:null, cols:'c1', opts:[] },
+  { id:'apis', title:'Accounts & Keys', desc:'Optional — add credentials for selected providers. <strong class="u-green">Export JSON</strong> keeps the generated file local; <strong class="u-yellow">Direct Install</strong> sends it to the AIOStreams host you choose.', key:null, cols:'c1', opts:[] },
   { id:'review', title:'Review & Install', desc:'Confirm your settings, install directly, or generate a manifest URL.', key:null, cols:'c2', opts:[] }
 ];
 
@@ -779,7 +779,7 @@ function backupTimelineHtml() {
     const res = escHtml(b.resolution || '?');
     return `<div class="bk-row" style="display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:6px;transition:background .12s" onmouseover="this.style.background='rgba(255,255,255,.04)'" onmouseout="this.style.background='transparent'"><span style="font-size:.68rem;color:#6b7280;min-width:110px">${time}</span><span style="font-size:.68rem;color:#8b949e;flex:1">${svc} · ${res}${b._ver?' · v'+escHtml(b._ver):''}</span><button data-action="restore-backup" data-idx="${i}" style="padding:3px 10px;font-size:.65rem;font-weight:700;border-radius:5px;border:1px solid rgba(0,212,255,.2);background:rgba(0,212,255,.06);color:#3d9db5;cursor:pointer;transition:background .12s" onmouseover="this.style.background='rgba(0,212,255,.14)'" onmouseout="this.style.background='rgba(0,212,255,.06)'">Restore</button></div>`;
   }).join('');
-  return `<details class="hc-box" style="margin-top:8px"><summary class="hc-hdr" style="list-style:none;cursor:pointer"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#8b949e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg> Backup History (${list.length}) <span style="margin-left:auto;font-size:.65rem;opacity:.6">▼</span></summary><div class="hc-hosts" style="max-height:240px;overflow-y:auto">${rows}</div></details>`;
+  return `<details class="u-mt8 hc-box"><summary class="hc-hdr" style="list-style:none;cursor:pointer"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#8b949e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg> Backup History (${list.length}) <span style="margin-left:auto;font-size:.65rem;opacity:.6">▼</span></summary><div class="hc-hosts" style="max-height:240px;overflow-y:auto">${rows}</div></details>`;
 }
 function lastGenDiff() {
   try {
@@ -1134,7 +1134,7 @@ function renderOpts(def) {
     }).join('');
     const hasExtras = S.multiServices.some(s => CAROUSEL_SVCS.includes(s)) || S.optionalScrapers.length;
     const extraCount = S.multiServices.filter(s=>CAROUSEL_SVCS.includes(s)).length + S.optionalScrapers.length;
-    const compactOptSection = `<div class="opt-scraper-section"><button type="button" class="additional-services-btn" data-action="open-additional-services" style="width:100%;display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:13px;border:1px solid rgba(255,255,255,.09);background:linear-gradient(145deg,#111b27,#0d151f);color:#c9d5df;cursor:pointer;text-align:left"><span style="width:34px;height:34px;border-radius:9px;display:grid;place-items:center;background:rgba(167,139,250,.09);color:#a78bfa">＋</span><span style="flex:1"><b style="display:block;font-size:.82rem">Additional services &amp; scrapers</b><span style="display:block;color:#718093;font-size:.68rem;margin-top:2px">P2P, HTTP, Usenet, Debridio and optional indexers</span></span>${extraCount?`<span style="padding:3px 8px;border-radius:99px;background:rgba(0,212,255,.09);border:1px solid rgba(0,212,255,.2);color:#67e8f9;font-size:.62rem;font-weight:900">${extraCount} selected</span>`:''}<span style="color:#637185">→</span></button>${hasExtras?'<div class="opt-scraper-hint">Selected extras are active. Their credentials appear on Accounts &amp; Keys.</div>':''}</div>`;
+    const compactOptSection = `<div class="opt-scraper-section"><button type="button" class="additional-services-btn" data-action="open-additional-services" style="width:100%;display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:13px;border:1px solid rgba(255,255,255,.09);background:linear-gradient(145deg,#111b27,#0d151f);color:#c9d5df;cursor:pointer;text-align:left"><span style="width:34px;height:34px;border-radius:9px;display:grid;place-items:center;background:rgba(167,139,250,.09);color:#a78bfa">＋</span><span class="u-flex1"><b style="display:block;font-size:.82rem">Additional services &amp; scrapers</b><span style="display:block;color:#718093;font-size:.68rem;margin-top:2px">P2P, HTTP, Usenet, Debridio and optional indexers</span></span>${extraCount?`<span style="padding:3px 8px;border-radius:99px;background:rgba(0,212,255,.09);border:1px solid rgba(0,212,255,.2);color:#67e8f9;font-size:.62rem;font-weight:900">${extraCount} selected</span>`:''}<span style="color:#637185">→</span></button>${hasExtras?'<div class="opt-scraper-hint">Selected extras are active. Their credentials appear on Accounts &amp; Keys.</div>':''}</div>`;
     const carouselOptSection = `<div class="opt-scraper-section"><div class="opt-scraper-divider"><span class="opt-scraper-line"></span><span class="opt-scraper-label">Extras &amp; Optional Scrapers</span><span class="opt-scraper-count" id="extrasCarouselCount">${extraCount ? extraCount+' selected' : 'Optional'}</span><span class="opt-scraper-line"></span></div><div class="opt-scraper-desc">Swipe or scroll, then tap any card to toggle it. Multi-select is supported.</div><div class="scroll-fade-wrap" data-scroll-start="true" data-scroll-end="false"><div class="opt-scraper-scroll" aria-label="Additional services and optional scrapers">${svcCarouselCards}${scraperCards}</div></div>${hasExtras ? '<div class="opt-scraper-hint">Selected extras are active. Required credentials appear on Accounts &amp; Keys.</div>' : ''}</div>`;
     const optSection = S.simpleMode ? compactOptSection : carouselOptSection;
     return `<div class="svc-list">${heroHtml}${searchHtml}${segHtml}<div id="svcRows">${rowsHtml}</div>${emptyHtml}${optSection}</div>`;
@@ -1365,7 +1365,7 @@ function renderMatchMode() {
   }).join('');
   return `<div class="pref-card" style="cursor:default;flex-direction:column;align-items:stretch;gap:10px;margin-top:8px">
     <div style="font-size:.78rem;font-weight:700;color:#9ca3af;letter-spacing:.03em;text-transform:uppercase;display:flex;align-items:center;gap:6px">Match Aggressiveness ${ftTip('Controls how aggressively AIOStreams <strong>deduplicates</strong> (removes duplicate) streams. <strong>Relaxed</strong> keeps more results &mdash; you see more options but some may be near-identical. <strong>Balanced</strong> removes obvious duplicates while keeping variety (recommended). <strong>Strict</strong> aggressively merges similar streams, showing fewer but higher-quality results.')}</div>
-    <div style="display:flex;gap:6px">${pills}</div>
+    <div class="u-row6">${pills}</div>
   </div>`;
 }
 
@@ -1391,7 +1391,7 @@ function renderCacheMode() {
   }).join('');
   return `<div class="pref-card" style="cursor:default;flex-direction:column;align-items:stretch;gap:10px;margin-top:8px">
     <div style="font-size:.78rem;font-weight:700;color:#9ca3af;letter-spacing:.03em;text-transform:uppercase;display:flex;align-items:center;gap:6px">Stream Availability ${ftTip('<strong>Mixed</strong> shows both cached (instant play) and uncached (needs downloading) streams, with cached ranked first. <strong>Cached Only</strong> shows only streams already stored on your debrid service for instant playback. <strong>Uncached</strong> shows only streams that need to be downloaded first &mdash; useful for building your debrid library.')}</div>
-    <div style="display:flex;gap:6px">${pills}</div>
+    <div class="u-row6">${pills}</div>
   </div>`;
 }
 
@@ -1537,8 +1537,8 @@ function outputProfileAuditHtml() {
   ];
   const visibleIssues = audit.conflicts.slice(0, 4);
   const budgetLine = audit.budget.ok
-    ? `<span style="color:#34d399">Within ${profile.shortLabel} complexity budget</span>`
-    : `<span style="color:#fbbf24">${audit.budget.violations.length} ${profile.shortLabel.toLowerCase()} budget check${audit.budget.violations.length === 1 ? '' : 's'} exceeded</span>`;
+    ? `<span class="u-green">Within ${profile.shortLabel} complexity budget</span>`
+    : `<span class="u-yellow">${audit.budget.violations.length} ${profile.shortLabel.toLowerCase()} budget check${audit.budget.violations.length === 1 ? '' : 's'} exceeded</span>`;
   const issueHtml = visibleIssues.length
     ? `<div style="margin-top:7px;display:flex;flex-direction:column;gap:4px">${visibleIssues.map(item => `<div style="font-size:.67rem;line-height:1.4;color:${item.severity === 'error' ? '#f87171' : '#fbbf24'}">${item.severity === 'error' ? '✕' : '⚠'} <b>${item.title}</b> — ${item.message}</div>`).join('')}${audit.conflicts.length > visibleIssues.length ? `<div style="font-size:.64rem;color:#6b7280">+${audit.conflicts.length - visibleIssues.length} more conflict check${audit.conflicts.length - visibleIssues.length === 1 ? '' : 's'} in diagnostics</div>` : ''}</div>`
     : `<div style="margin-top:7px;font-size:.67rem;color:#34d399">✓ No conflicting rule stacks detected.</div>`;
@@ -1653,49 +1653,49 @@ function renderAdvancedPanel() {
       ${renderOutputProfilePicker()}
 
       <div>
-        <div id="ft-audio" style="font-size:.72rem;font-weight:700;color:#4b5563;letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:6px">${ICO.speaker(16,'#f59e0b')} Sound Profile ${ftTip('Controls which <strong>audio codecs</strong> are allowed in your streams. <strong>Auto</strong> lets the device profile decide and drops lossless formats (TrueHD, DTS-HD MA) on devices that cannot pass them through. <strong>Full Lossless</strong> keeps everything, for home-theatre setups with a capable receiver.')}</div>
+        <div class="ft-head" id="ft-audio">${ICO.speaker(16,'#f59e0b')} Sound Profile ${ftTip('Controls which <strong>audio codecs</strong> are allowed in your streams. <strong>Auto</strong> lets the device profile decide and drops lossless formats (TrueHD, DTS-HD MA) on devices that cannot pass them through. <strong>Full Lossless</strong> keeps everything, for home-theatre setups with a capable receiver.')}</div>
         <div style="display:flex;flex-direction:column;gap:7px">${audioRows}</div>
       </div>
 
       <div>
-        <div id="ft-video" style="font-size:.72rem;font-weight:700;color:#4b5563;letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:6px">${ICO.video(16,'#ec4899')} Video Preferences ${ftTip('<strong>Size Limit</strong> caps per-file size. <strong>Quality vs Resolution</strong> decides ranking priority &mdash; quality prefers REMUX/WEB-DL over raw resolution. <strong>Exclude 4K</strong> removes 2160p for bandwidth saving. <strong>Exclude DV</strong> removes Dolby Vision streams that cause purple/green tint on unsupported screens.')}</div>
-        <div style="background:#111720;border:1.5px solid rgba(255,255,255,.08);border-radius:10px;padding:14px 16px;margin-bottom:8px">
+        <div class="ft-head" id="ft-video">${ICO.video(16,'#ec4899')} Video Preferences ${ftTip('<strong>Size Limit</strong> caps per-file size. <strong>Quality vs Resolution</strong> decides ranking priority &mdash; quality prefers REMUX/WEB-DL over raw resolution. <strong>Exclude 4K</strong> removes 2160p for bandwidth saving. <strong>Exclude DV</strong> removes Dolby Vision streams that cause purple/green tint on unsupported screens.')}</div>
+        <div class="ft-box u-mb8">
           <div style="font-size:.78rem;font-weight:600;color:#6b7280;margin-bottom:10px">Size Limit</div>
-          <div style="display:flex;gap:5px">${sizePills}</div>
+          <div class="u-row5">${sizePills}</div>
         </div>
         ${prefCard('qualityFirst','Prioritize Quality over Resolution','Sorts by source quality (e.g. REMUX) before resolution.')}
         ${prefCard('resolutionFirst','Resolution First','Higher resolution always ranks above lower, even if lower-res is cached.')}
         ${prefCard('exclude4K','Exclude 4K / UHD','Removes 2160p streams. Good for bandwidth saving.')}
         ${prefCard('excludeDV','Exclude Dolby Vision','Fixes purple/green tint on unsupported screens.')}
-        <div style="background:#111720;border:1.5px solid rgba(255,255,255,.08);border-radius:10px;padding:14px 16px;margin-top:8px">
+        <div class="ft-box u-mt8">
           <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px">
             <span style="font-size:.78rem;font-weight:600;color:#6b7280">Stream Pool</span> ${ftTip('When AIOStreams may stop waiting for slower sources: it returns once this many cached results at your target resolution have arrived, or after the time limit. <strong>Larger = more choice</strong>, slower loads. Only the Advanced and Labs profiles use it; Stable and Balanced always wait for every source.')}
-            <span style="font-size:.65rem;color:#4b5563">${streamPoolSummary()}</span>
+            <span class="u-micro">${streamPoolSummary()}</span>
           </div>
-          <div style="display:flex;gap:5px">
+          <div class="u-row5">
             ${streamPoolChoices().map(([v,l,c]) => `<button data-action="set-pool" data-val="${v}" style="flex:1;padding:8px 8px 6px;border-radius:6px;font-size:.72rem;font-weight:700;cursor:pointer;transition:all .15s;border:1px solid ${(S.streamPool||'normal')===v?'rgba(0,212,255,.4)':'rgba(255,255,255,.08)'};background:${(S.streamPool||'normal')===v?'rgba(0,212,255,.1)':'transparent'};color:${(S.streamPool||'normal')===v?'#00d4ff':'#6b7280'};line-height:1.3">${l}<br><span style="font-size:.6rem;font-weight:600;opacity:.7">${c}</span></button>`).join('')}
           </div>
           <div style="font-size:.65rem;color:#4b5563;margin-top:6px;line-height:1.4">More streams = better quality picks but slower load times</div>
         </div>
-        ${(S.service !== 'http' && S.service !== 'p2p') ? `<div style="background:#111720;border:1.5px solid rgba(255,255,255,.08);border-radius:10px;padding:14px 16px;margin-top:8px">
+        ${(S.service !== 'http' && S.service !== 'p2p') ? `<div class="ft-box u-mt8">
           <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
             <span style="font-size:.78rem;font-weight:600;color:#6b7280">PSE Quality Architecture</span> ${ftTip('<strong>Standard</strong> uses simple resolution/quality tiers to rank streams. <strong>Apex IQR</strong> uses statistical bitrate analysis (interquartile range) to detect outliers &mdash; it adapts to what&apos;s actually available, filtering out suspiciously low or high bitrates. Apex IQR matches the flagship 4K Apex template.')}
           </div>
           <div style="font-size:.65rem;color:#4b5563;margin-bottom:10px;line-height:1.4">How stream quality tiers are built. Standard uses simple resolution/quality filters. Apex IQR uses statistical bitrate analysis matching the flagship Apex template.</div>
-          <div style="display:flex;gap:5px">
+          <div class="u-row5">
             ${[['standard','Standard','Simple quality tiers'],['iqr','Apex IQR','Statistical bitrate filtering'],['apex-mixed','Apex Mixed','IQR + adaptive · niche-friendly']].map(([v,l,d]) => { const on=(S.pseArch||'standard')===v; return `<button data-action="set-pse-arch" data-val="${v}" data-active="${on}" style="flex:1;padding:8px 8px 6px;border-radius:6px;font-size:.72rem;font-weight:700;cursor:pointer;transition:all .15s;border:1px solid ${on?'rgba(0,212,255,.4)':'rgba(255,255,255,.08)'};background:${on?'rgba(0,212,255,.1)':'transparent'};color:${on?'#00d4ff':'#6b7280'};line-height:1.3">${l}<br><span style="font-size:.6rem;font-weight:600;opacity:.7">${d}</span></button>`; }).join('')}
           </div>
         </div>` : ''}
-        ${(S.service !== 'http' && S.service !== 'p2p') ? `<div style="background:#111720;border:1.5px solid rgba(255,255,255,.08);border-radius:10px;padding:14px 16px;margin-top:8px">
+        ${(S.service !== 'http' && S.service !== 'p2p') ? `<div class="ft-box u-mt8">
           <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
             <span style="font-size:.78rem;font-weight:600;color:#6b7280">Library Boost</span> ${ftTip('<strong>Default</strong> ranks library items first within each quality tier. <strong>Strong</strong> always puts library items at the very top regardless of quality. <strong>None</strong> removes library sorting entirely.')}
           </div>
           <div style="font-size:.65rem;color:#4b5563;margin-bottom:10px;line-height:1.4">How much priority your existing library items get in results</div>
-          <div style="display:flex;gap:5px">
+          <div class="u-row5">
             ${[['none','None','Sorted normally'],['default','Default','First within tier'],['strong','Strong','Always top']].map(([v,l,dd]) => { const on=(S.libraryBoost||'default')===v; return `<button data-action="set-library-boost" data-val="${v}" style="flex:1;padding:8px 8px 6px;border-radius:6px;font-size:.72rem;font-weight:700;cursor:pointer;transition:all .15s;border:1px solid ${on?'rgba(0,212,255,.4)':'rgba(255,255,255,.08)'};background:${on?'rgba(0,212,255,.1)':'transparent'};color:${on?'#00d4ff':'#6b7280'};line-height:1.3">${l}<br><span style="font-size:.6rem;font-weight:600;opacity:.7">${dd}</span></button>`; }).join('')}
           </div>
         </div>` : ''}
-        ${(S.service !== 'http' && S.service !== 'p2p' && (S.multiServices.includes('easynews') || S.multiServices.includes('nzbgeek') || S.multiServices.includes('streamnzb') || S.service === 'easynews' || S.service === 'nzbgeek' || S.service === 'streamnzb')) ? `<div style="background:#111720;border:1.5px solid rgba(255,255,255,.08);border-radius:10px;padding:14px 16px;margin-top:8px">
+        ${(S.service !== 'http' && S.service !== 'p2p' && (S.multiServices.includes('easynews') || S.multiServices.includes('nzbgeek') || S.multiServices.includes('streamnzb') || S.service === 'easynews' || S.service === 'nzbgeek' || S.service === 'streamnzb')) ? `<div class="ft-box u-mt8">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
             <div>
               <div style="font-size:.78rem;font-weight:700;color:#e6edf3">Failover</div>
@@ -1707,7 +1707,7 @@ function renderAdvancedPanel() {
             <div style="display:flex;gap:6px;margin-bottom:8px">
               ${[['before-torrents','Before limiting'],['after-torrents','Final list']].map(([v,l]) => { const on=(S.nzbFailoverPosition||'after-torrents')===v; return `<button data-action="set-nzb-failover-pos" data-val="${v}" style="flex:1;padding:6px 8px;border-radius:7px;border:1px solid ${on?'rgba(0,212,255,.4)':'rgba(255,255,255,.08)'};background:${on?'rgba(0,212,255,.1)':'transparent'};color:${on?'#00d4ff':'#6b7280'};font-size:.7rem;font-weight:700;cursor:pointer">${l}</button>`; }).join('')}
             </div>
-            <div style="display:flex;gap:6px">
+            <div class="u-row6">
               ${[[1,'1 attempt'],[2,'2 attempts'],[3,'3 attempts'],[5,'5 attempts']].map(([v,l]) => { const on=(S.maxFailoverNzbs||3)===v; return `<button data-action="set-max-failover-nzbs" data-val="${v}" style="flex:1;padding:6px 8px;border-radius:7px;border:1px solid ${on?'rgba(0,212,255,.4)':'rgba(255,255,255,.08)'};background:${on?'rgba(0,212,255,.1)':'transparent'};color:${on?'#00d4ff':'#6b7280'};font-size:.7rem;font-weight:700;cursor:pointer">${l}</button>`; }).join('')}
             </div>
           ` : ''}
@@ -1715,31 +1715,31 @@ function renderAdvancedPanel() {
       </div>
 
       <div>
-        <div id="ft-layout" style="font-size:.72rem;font-weight:700;color:#4b5563;letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:6px">${ICO.palette(16,'#a78bfa')} Stream Layout (Formatter) ${ftTip('Controls how streams appear in Stremio. The <strong>formatter</strong> defines the layout of each stream result &mdash; what info is shown (codec, resolution, size, etc.) and how it&apos;s arranged. You can import custom formatters for different visual styles.')}</div>
+        <div class="ft-head" id="ft-layout">${ICO.palette(16,'#a78bfa')} Stream Layout (Formatter) ${ftTip('Controls how streams appear in Stremio. The <strong>formatter</strong> defines the layout of each stream result &mdash; what info is shown (codec, resolution, size, etc.) and how it&apos;s arranged. You can import custom formatters for different visual styles.')}</div>
         ${fmtDropdownHtml()}
         <button data-action="import-formatter" style="margin-top:10px;width:100%;padding:10px;border-radius:8px;border:1.5px dashed rgba(167,139,250,.3);background:transparent;color:#a78bfa;font-size:.78rem;font-weight:600;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='rgba(167,139,250,.6)'" onmouseout="this.style.borderColor='rgba(167,139,250,.3)'">${S.customFormatter ? '⟳ Replace Custom Formatter' : ICO.folder(14,'#a78bfa')+' Import Custom Formatter'}</button>
       </div>
 
       <div>
-        <div id="ft-subtitles" style="font-size:.72rem;font-weight:700;color:#4b5563;letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:6px">${ICO.globe(16,'#06b6d4')} Subtitles ${ftTip('Choose subtitle providers and languages. <strong>OpenSubtitles v3+</strong> (the default) has the largest database. <strong>AIOSubtitle</strong> is currently slow to respond, and hosts may refuse the save while it is enabled. <strong>SubDL</strong> is a fast alternative (requires a free API key from subdl.com). Select languages your household needs &mdash; this affects which subtitles are fetched.')}</div>
-        <div style="background:#111720;border:1.5px solid rgba(255,255,255,.08);border-radius:10px;padding:14px 16px">
+        <div class="ft-head" id="ft-subtitles">${ICO.globe(16,'#06b6d4')} Subtitles ${ftTip('Choose subtitle providers and languages. <strong>OpenSubtitles v3+</strong> (the default) has the largest database. <strong>SubDL</strong> is a fast alternative (requires a free API key from subdl.com). Select languages your household needs &mdash; this affects which subtitles are fetched.')}</div>
+        <div class="ft-box">
           <div style="font-size:.78rem;font-weight:600;color:#6b7280;margin-bottom:8px">Subtitle Sources</div>
           <div style="display:flex;flex-direction:column;gap:5px">
             ${[['opensubtitles-v3-plus','OpenSubtitles v3+','Largest database · default'],['subdl','SubDL','Needs a free SubDL API key']].map(([id,name,desc])=>{
               const on=(S.subtitleAddons||['opensubtitles-v3-plus']).includes(id);
               return `<div data-action="toggle-sub-addon" data-val="${id}" style="cursor:pointer;display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;border:1px solid ${on?'rgba(6,182,212,.35)':'rgba(255,255,255,.06)'};background:${on?'rgba(6,182,212,.05)':'transparent'};transition:all .15s">
                 <div class="chk-box" style="width:16px;height:16px;border-radius:4px;border:1.5px solid ${on?'#06b6d4':'#374151'};display:flex;align-items:center;justify-content:center;flex-shrink:0;background:${on?'#06b6d4':'transparent'}">${on?'<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#0d1117" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>':''}</div>
-                <div style="flex:1"><div class="opt-nm" style="font-size:.8rem;font-weight:600;color:${on?'#06b6d4':'#9ca3af'}">${name}</div><div style="font-size:.65rem;color:#4b5563">${desc}</div></div>
+                <div class="u-flex1"><div class="opt-nm" style="font-size:.8rem;font-weight:600;color:${on?'#06b6d4':'#9ca3af'}">${name}</div><div class="u-micro">${desc}</div></div>
               </div>`;
             }).join('')}
           </div>
           ${(S.subtitleAddons||[]).includes('subdl') ? `
           <div style="margin-top:10px;padding:10px 12px;background:rgba(6,182,212,.04);border:1px solid rgba(6,182,212,.15);border-radius:8px">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+            <div class="u-between6">
               <span style="font-size:.72rem;font-weight:600;color:#06b6d4">SubDL API Key</span>
               <a href="https://subdl.com/panel/api" target="_blank" rel="noopener noreferrer" style="font-size:.68rem;color:#06b6d4;text-decoration:none;font-weight:700;opacity:.7">Get key &rarr;</a>
             </div>
-            <div style="position:relative;display:flex;align-items:center">
+            <div class="u-relrow">
               <input class="name-input" id="cred_subdl" data-service="subdl" data-action="update-cred" type="password" autocapitalize="none" spellcheck="false" enterkeyhint="done" placeholder="Your SubDL API key"
                 value="${escH(S.creds.subdl || '')}" maxlength="120" style="padding-right:38px;font-size:.78rem">
               <button type="button" data-action="toggle-cred-vis" data-target="cred_subdl" title="Show / hide"
@@ -1762,15 +1762,15 @@ function renderAdvancedPanel() {
       </div>
 
       <div>
-        <div id="ft-catalogs" style="font-size:.72rem;font-weight:700;color:#4b5563;letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:6px">${ICO.compass(16,'#f97316')} Catalogs & Discovery ${ftTip('Adds <strong>browse catalogs</strong> to your Stremio home screen for discovering content. These don&apos;t affect stream quality &mdash; they just add new ways to find movies and shows (trending, by streaming service, anime databases, etc).')}</div>
-        <div style="background:#111720;border:1.5px solid rgba(255,255,255,.08);border-radius:10px;padding:14px 16px">
+        <div class="ft-head" id="ft-catalogs">${ICO.compass(16,'#f97316')} Catalogs & Discovery ${ftTip('Adds <strong>browse catalogs</strong> to your Stremio home screen for discovering content. These don&apos;t affect stream quality &mdash; they just add new ways to find movies and shows (trending, by streaming service, anime databases, etc).')}</div>
+        <div class="ft-box">
           <div style="font-size:.65rem;color:#4b5563;margin-bottom:10px;line-height:1.4">Add browse catalogs to your Stremio home screen for discovering content.</div>
           <div style="display:flex;flex-direction:column;gap:5px">
             ${[['tmdb-addon','TMDB Addon','Popular & trending movies/series'],['streaming-catalogs','Streaming Catalogs','Netflix, Disney+, etc.'],['anime-catalogs','Anime Catalogs','MAL, AniList, Kitsu'],['rpdb-catalogs','RPDB Catalogs','Release tracking & ratings'],['torrent-catalogs','Torrent Catalogs','Top seeded torrents']].map(([id,name,desc])=>{
               const on=(S.catalogs||['tmdb-addon']).includes(id);
               return `<div data-action="toggle-catalog" data-val="${id}" style="cursor:pointer;display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;border:1px solid ${on?'rgba(249,115,22,.35)':'rgba(255,255,255,.06)'};background:${on?'rgba(249,115,22,.05)':'transparent'};transition:all .15s">
                 <div class="chk-box" style="width:16px;height:16px;border-radius:4px;border:1.5px solid ${on?'#f97316':'#374151'};display:flex;align-items:center;justify-content:center;flex-shrink:0;background:${on?'#f97316':'transparent'}">${on?'<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#0d1117" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>':''}</div>
-                <div style="flex:1"><div class="opt-nm" style="font-size:.8rem;font-weight:600;color:${on?'#f97316':'#9ca3af'}">${name}</div><div style="font-size:.65rem;color:#4b5563">${desc}</div></div>
+                <div class="u-flex1"><div class="opt-nm" style="font-size:.8rem;font-weight:600;color:${on?'#f97316':'#9ca3af'}">${name}</div><div class="u-micro">${desc}</div></div>
               </div>`;
             }).join('')}
           </div>
@@ -1778,16 +1778,16 @@ function renderAdvancedPanel() {
       </div>
 
       <div>
-        <div style="font-size:.72rem;font-weight:700;color:#4b5563;letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:6px">${ICO.gear(16,'#64748b')} Resilience</div>
+        <div class="ft-head">${ICO.gear(16,'#64748b')} Resilience</div>
         ${prefCard('dedupMerge','Failover Streams','Keep deduplicated streams as fallbacks. If the primary stream fails, AIOStreams tries the next best match.')}
       </div>
 
       <div>
         <div style="font-size:.72rem;font-weight:700;color:#4b5563;letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px">Playback & Timing</div>
         ${prefCard('preloadEnabled','Preload first streams','Preload cached candidates to reduce wait time. Disable to reduce background requests.')}
-        <div style="margin-top:8px"><div style="font-size:.68rem;color:#6b7280;margin-bottom:5px">Autoplay method</div><div style="display:flex;gap:5px">${[['matchingFile','Matching file'],['matchingIndex','Matching index'],['firstFile','First file']].map(([v,l])=>`<button data-action="set-autoplay-method" data-val="${v}" style="flex:1;padding:6px;border-radius:7px;border:1px solid ${(S.autoPlayMethod||'matchingFile')===v?'rgba(0,212,255,.4)':'rgba(255,255,255,.08)'};background:${(S.autoPlayMethod||'matchingFile')===v?'rgba(0,212,255,.1)':'transparent'};color:${(S.autoPlayMethod||'matchingFile')===v?'#67e8f9':'#6b7280'};font-size:.65rem;cursor:pointer">${l}</button>`).join('')}</div></div>
-        <div style="margin-top:8px"><div style="font-size:.68rem;color:#6b7280;margin-bottom:5px">Global addon timeout</div><div style="display:flex;gap:5px">${[4000,6000,8000,10000].map(v=>`<button data-action="set-addon-timeout" data-val="${v}" style="flex:1;padding:6px;border-radius:7px;border:1px solid ${Number(S.addonTimeout||6000)===v?'rgba(0,212,255,.4)':'rgba(255,255,255,.08)'};background:${Number(S.addonTimeout||6000)===v?'rgba(0,212,255,.1)':'transparent'};color:${Number(S.addonTimeout||6000)===v?'#67e8f9':'#6b7280'};font-size:.65rem;cursor:pointer">${v/1000}s</button>`).join('')}</div></div>
-        <div style="margin-top:8px"><div style="font-size:.68rem;color:#6b7280;margin-bottom:5px">Bandwidth cap (Mbps) <span style="opacity:.6">— auto-limits bitrate to 80% of your speed</span></div><input type="number" min="1" max="10000" placeholder="e.g. 100" value="${Number(S.bandwidthMbps)||''}" data-action="set-bandwidth" style="width:100%;padding:7px 10px;border-radius:7px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.04);color:#e6edf3;font-size:.72rem;outline:none" /></div>
+        <div class="u-mt8"><div style="font-size:.68rem;color:#6b7280;margin-bottom:5px">Autoplay method</div><div class="u-row5">${[['matchingFile','Matching file'],['matchingIndex','Matching index'],['firstFile','First file']].map(([v,l])=>`<button data-action="set-autoplay-method" data-val="${v}" style="flex:1;padding:6px;border-radius:7px;border:1px solid ${(S.autoPlayMethod||'matchingFile')===v?'rgba(0,212,255,.4)':'rgba(255,255,255,.08)'};background:${(S.autoPlayMethod||'matchingFile')===v?'rgba(0,212,255,.1)':'transparent'};color:${(S.autoPlayMethod||'matchingFile')===v?'#67e8f9':'#6b7280'};font-size:.65rem;cursor:pointer">${l}</button>`).join('')}</div></div>
+        <div class="u-mt8"><div style="font-size:.68rem;color:#6b7280;margin-bottom:5px">Global addon timeout</div><div class="u-row5">${[4000,6000,8000,10000].map(v=>`<button data-action="set-addon-timeout" data-val="${v}" style="flex:1;padding:6px;border-radius:7px;border:1px solid ${Number(S.addonTimeout||6000)===v?'rgba(0,212,255,.4)':'rgba(255,255,255,.08)'};background:${Number(S.addonTimeout||6000)===v?'rgba(0,212,255,.1)':'transparent'};color:${Number(S.addonTimeout||6000)===v?'#67e8f9':'#6b7280'};font-size:.65rem;cursor:pointer">${v/1000}s</button>`).join('')}</div></div>
+        <div class="u-mt8"><div style="font-size:.68rem;color:#6b7280;margin-bottom:5px">Bandwidth cap (Mbps) <span class="u-dim">— auto-limits bitrate to 80% of your speed</span></div><input type="number" min="1" max="10000" placeholder="e.g. 100" value="${Number(S.bandwidthMbps)||''}" data-action="set-bandwidth" style="width:100%;padding:7px 10px;border-radius:7px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.04);color:#e6edf3;font-size:.72rem;outline:none" /></div>
       </div>
 
       <div>
@@ -2032,7 +2032,7 @@ function splashHtml() {
             <circle class="core-click-ring" cx="256" cy="256" r="86"/>
           </svg>
         </button>
-        <div class="hybrid-core-caption">One install writes: AIOStreams · AIOMetadata 74-of-91 catalogs · Cinemeta patch · subtitles<br><span style="opacity:.6">tap the core to support the project</span></div>
+        <div class="hybrid-core-caption">One install writes: AIOStreams · AIOMetadata 74-of-91 catalogs · Cinemeta patch · subtitles<br><span class="u-dim">tap the core to support the project</span></div>
       </div>
     </div>
 
@@ -2193,7 +2193,7 @@ function render() {
         ${resolutionLockNote()}
         ${hostCompatHtml()}
         ${backupTimelineHtml()}
-        <details class="rv-accord" style="margin-top:10px">
+        <details class="u-mt10 rv-accord">
           <summary class="rv-accord-hdr"><span class="rv-accord-ico"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span> Tools<span class="rv-arr">›</span></summary>
           <div class="rv-accord-body" style="display:flex;flex-direction:column;gap:8px">
             <button data-action="open-troubleshooter" style="width:100%;padding:10px;font-size:.78rem;font-weight:700;border-radius:10px;border:1px solid var(--th-yellow-border);background:var(--th-yellow-bg);color:var(--th-yellow);cursor:pointer;transition:background .15s;display:flex;align-items:center;justify-content:center;gap:6px">🔧 Troubleshooter — Fix Common Issues</button>
@@ -2225,7 +2225,7 @@ function render() {
           <div class="rv-section-body">
             ${S.service === 'p2p' || S.service === 'http' ? `
             <div style="margin-bottom:14px;font-size:.8rem;color:#8b949e;line-height:1.5">Free templates need manual import — we'll create a link and open AIOStreams for you.</div>
-            <button class="btn-manifest" id="btnAutoCreate" data-action="simple-install" data-target="app" style="margin-bottom:8px">${ICO.link(18,'currentColor')} Import to AIOStreams</button>
+            <button class="u-mb8 btn-manifest" id="btnAutoCreate" data-action="simple-install" data-target="app">${ICO.link(18,'currentColor')} Import to AIOStreams</button>
             <div id="aioResult"></div>` : `
             <div class="install-toggle" style="display:flex;border-radius:10px;border:1px solid var(--th-input-border);background:var(--th-input-bg);padding:3px;margin-bottom:14px;gap:2px">
               <button data-action="set-install-mode" data-mode="direct" class="install-toggle-btn${S.installMode==='direct'?' active':''}" style="flex:1;padding:8px 10px;border-radius:8px;border:none;font-size:.78rem;font-weight:700;cursor:pointer;transition:all .15s;${S.installMode==='direct'?'background:var(--th-accent-bg);color:var(--th-accent)':'background:transparent;color:var(--th-tx3)'}">${ICO.rocket(13,'currentColor')} Direct Install</button>
@@ -2251,15 +2251,15 @@ function render() {
                 <a href="https://www.stremio.com/register" target="_blank" rel="noopener noreferrer" style="font-size:.72rem;color:var(--th-tx3);text-decoration:none;transition:color .15s">Sign up at stremio.com</a>
               </div>
             </div>
-            <button class="btn-manifest" id="btnAutoCreate" data-action="simple-install" data-target="app" style="margin-bottom:8px">${ICO.rocket(18,'currentColor')} Install to Stremio</button>
+            <button class="u-mb8 btn-manifest" id="btnAutoCreate" data-action="simple-install" data-target="app">${ICO.rocket(18,'currentColor')} Install to Stremio</button>
             <div style="display:flex;align-items:center;gap:6px;justify-content:center;margin-top:2px;margin-bottom:8px;font-size:.68rem;color:#059669;font-weight:600">
               <span>🔐</span> <span>Safe Auth — Credentials are used locally to authenticate with Stremio API. Never stored or shared.</span>
             </div>
             <div id="aioResult"></div>
             ` : `
             <div style="margin-bottom:14px;font-size:.8rem;color:#8b949e;line-height:1.5">Creates your config on the fastest AIOStreams host and gives you an install link.</div>
-            <button class="btn-manifest" id="btnAutoCreate" data-action="simple-install" data-target="app" style="margin-bottom:8px">${ICO.rocket(18,'currentColor')} Deploy to Stremio</button>
-            <div style="display:flex;gap:8px">
+            <button class="u-mb8 btn-manifest" id="btnAutoCreate" data-action="simple-install" data-target="app">${ICO.rocket(18,'currentColor')} Deploy to Stremio</button>
+            <div class="u-row8">
               <button class="btn-manifest" data-action="simple-install" data-target="wuplay" style="flex:1;font-size:.82rem;padding:11px 10px;background:rgba(167,139,250,.10);border-color:rgba(167,139,250,.3);color:#a78bfa">${ICO.wuplay(16,'#a78bfa')} WuPlay</button>
               <button class="btn-manifest" data-action="simple-install" data-target="nuvio" style="flex:1;font-size:.82rem;padding:11px 10px;background:rgba(168,85,247,.08);border-color:rgba(168,85,247,.25);color:#c084fc">${ICO.nuvio(16)} Nuvio</button>
             </div>
@@ -2270,7 +2270,7 @@ function render() {
                 <span>Manual setup (existing config / self-hosted)</span>
                 <span style="font-size:.75rem;color:#374151">›</span>
               </summary>
-              <div style="margin-top:12px">
+              <div class="u-mt12">
             <div class="aio-fields" style="display:grid;gap:10px">
               <div class="name-row" style="margin-bottom:0">
                 <label>AIOStreams Host</label>
@@ -2286,7 +2286,7 @@ function render() {
                   value="${S.instanceHost==='custom'?escH(S.instanceUrl):''}" data-action="update-url" maxlength="200">
               </div>
               <div class="name-row" style="margin-bottom:0">
-                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+                <div class="u-between6">
                   <span style="color:#8b949e;font-size:.82rem;text-transform:uppercase;letter-spacing:.05em">Password</span>
                   <button type="button" data-action="gen-pwd" style="font-size:.82rem;color:#00d4ff;background:none;border:none;cursor:pointer;padding:0;font-weight:700">Generate →</button>
                 </div>
@@ -2321,7 +2321,7 @@ function render() {
                 <span style="font-size:.65rem;color:var(--th-tx3);margin-left:2px">${S.baseUuid ? '· active' : '· optional'}</span>
                 <span style="margin-left:auto;font-size:.72rem;color:var(--th-tx3)">›</span>
               </summary>
-              <div style="margin-top:10px">
+              <div class="u-mt10">
                 <div style="font-size:.72rem;color:var(--th-tx3);line-height:1.5;margin-bottom:10px">
                   If you've imported <strong style="color:var(--th-purple)">Core Builds Base — TorBox</strong>, enter its UUID here.
                   Your generated template will inherit all shared config from the parent — smaller JSON, instant propagation of base updates.
@@ -2355,7 +2355,7 @@ function render() {
                 <span>Already have a manifest URL?</span>
                 <span style="font-size:.75rem;color:#374151">›</span>
               </summary>
-              <div style="margin-top:10px">
+              <div class="u-mt10">
                 <div style="color:#6b7280;font-size:.76rem;margin-bottom:8px;line-height:1.45">Paste a manifest URL for instant install links:</div>
                 <input class="name-input" id="pasteManifest" type="url"
                   placeholder="https://aiostreams.elfhosted.com/stremio/uuid/password/manifest.json"
@@ -2372,7 +2372,7 @@ function render() {
             ${telemetryHtml()}
             <details id="fmtPickerDetails" class="rv-accord" style="margin-top:0;margin-bottom:12px">
               <summary class="rv-accord-hdr">
-                <span style="display:flex;align-items:center;gap:8px"><span>${ICO.palette(14,'currentColor')}</span> Stream Formatter <span style="font-weight:600;color:var(--th-tx5);text-transform:none;letter-spacing:0;font-size:.72rem">— ${label('formatter', S.formatter)}</span></span><span class="rv-arr">›</span>
+                <span class="u-rowc8"><span>${ICO.palette(14,'currentColor')}</span> Stream Formatter <span style="font-weight:600;color:var(--th-tx5);text-transform:none;letter-spacing:0;font-size:.72rem">— ${label('formatter', S.formatter)}</span></span><span class="rv-arr">›</span>
               </summary>
               <div class="rv-accord-body">${formatterPickerHtml()}</div>
             </details>
@@ -2474,7 +2474,7 @@ function render() {
               <span style="font-size:.74rem;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.06em">Language Preferences</span>
               <span style="font-size:.7rem;color:#00d4ff;font-weight:600">${(S.langs||['English']).map(escHtml).join(' · ')}</span>
             </div>
-            <div style="display:flex;align-items:center;gap:8px">
+            <div class="u-rowc8">
               ${S.langExclusive ? `<span style="font-size:.62rem;font-weight:700;padding:2px 6px;border-radius:4px;background:var(--th-accent-bg);color:var(--th-accent);border:1px solid rgba(0,212,255,.25)">EXCLUSIVE</span>` : ''}
               <span class="lang-chevron" style="font-size:.7rem;color:#374151;transition:transform .2s;transform:rotate(0deg)">›</span>
             </div>
@@ -2507,11 +2507,11 @@ function render() {
         <div style="color:#8b949e;font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">Debrid Service</div>
         ${debridInputs.map(inp => `
         <div class="name-row" style="margin-bottom:14px">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+          <div class="u-between6">
             <span style="color:#8b949e;font-size:.82rem;text-transform:uppercase;letter-spacing:.05em">${inp.label}</span>
             ${inp.url ? `<a href="${inp.url}" target="_blank" rel="noopener noreferrer" style="font-size:.83rem;color:#00d4ff;text-decoration:none;font-weight:700">Get key →</a>` : ''}
           </div>
-          <div style="position:relative;display:flex;align-items:center">
+          <div class="u-relrow">
             <input class="name-input" id="cred_${inp.id}" data-service="${inp.id}" data-action="update-cred" type="password" autocapitalize="none" spellcheck="false" enterkeyhint="done" placeholder="${inp.placeholder}"
               value="${escH(S.creds[inp.id] || '')}" maxlength="120" style="padding-right:38px">
             <button type="button" data-action="toggle-cred-vis" data-target="cred_${inp.id}" title="Show / hide"
@@ -2525,7 +2525,7 @@ function render() {
         ` : ''}
         <details id="tmdbDetails" style="border:1px solid rgba(255,255,255,.06);border-radius:10px;overflow:hidden;margin-top:${debridInputs.length?'0':'4'}px" ${S.tmdbToken||S.tmdbApiKey?'open':''}>
           <summary style="list-style:none;display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:11px 14px;background:rgba(255,255,255,.02);user-select:none">
-            <span style="display:flex;align-items:center;gap:8px">
+            <span class="u-rowc8">
               <span style="font-size:.75rem;font-weight:700;color:#8b949e;text-transform:uppercase;letter-spacing:.06em">TMDB Keys</span>
               <span style="font-size:.65rem;color:#4b5563;font-weight:600">optional</span>
               ${S.tmdbToken||S.tmdbApiKey?'<span style="font-size:.6rem;font-weight:700;padding:1px 6px;border-radius:3px;background:rgba(52,211,153,.12);color:#34d399;border:1px solid rgba(52,211,153,.3)">SET</span>':''}
@@ -2535,11 +2535,11 @@ function render() {
           <div style="padding:12px 14px;border-top:1px solid rgba(255,255,255,.04)">
             <div style="font-size:.72rem;color:#6b7280;line-height:1.5;margin-bottom:12px">Improves poster quality and metadata. Not required — AIOStreams works fine without it.</div>
             <div class="name-row" style="margin-bottom:14px">
-              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+              <div class="u-between6">
                 <span style="color:#8b949e;font-size:.82rem;text-transform:uppercase;letter-spacing:.05em">TMDB Read Access Token</span>
                 <a href="https://www.themoviedb.org/settings/api" target="_blank" rel="noopener noreferrer" style="font-size:.83rem;color:#00d4ff;text-decoration:none;font-weight:700">Get key →</a>
               </div>
-              <div style="position:relative;display:flex;align-items:center">
+              <div class="u-relrow">
                 <input class="name-input" id="tmdbIn" data-action="update-tmdb" type="password" autocapitalize="none" spellcheck="false" enterkeyhint="done" placeholder="eyJhbGciOiJSUzI1NiJ9…"
                   value="${escH(S.tmdbToken)}" maxlength="400" style="padding-right:38px">
                 <button type="button" data-action="toggle-cred-vis" data-target="tmdbIn" title="Show / hide"
@@ -2548,15 +2548,15 @@ function render() {
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                 </button>
               </div>
-              <div style="font-size:.72rem;color:#6b7280;margin-top:5px;line-height:1.45">The <strong style="color:#8b949e">long</strong> token starting with <code style="color:#8b949e;font-family:monospace">eyJ</code> — not the 32-character API Key.</div>
+              <div style="font-size:.72rem;color:#6b7280;margin-top:5px;line-height:1.45">The <strong class="u-tx2">long</strong> token starting with <code style="color:#8b949e;font-family:monospace">eyJ</code> — not the 32-character API Key.</div>
               <span class="cred-status" id="tmdbStatus" role="status" aria-live="polite"></span>
             </div>
             <div class="name-row">
-              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+              <div class="u-between6">
                 <span style="color:#8b949e;font-size:.82rem;text-transform:uppercase;letter-spacing:.05em">TMDB API Key</span>
                 <a href="https://www.themoviedb.org/settings/api" target="_blank" rel="noopener noreferrer" style="font-size:.83rem;color:#00d4ff;text-decoration:none;font-weight:700">Get key →</a>
               </div>
-              <div style="position:relative;display:flex;align-items:center">
+              <div class="u-relrow">
                 <input class="name-input" id="tmdbKeyIn" data-action="update-tmdb-key" type="password" autocapitalize="none" spellcheck="false" enterkeyhint="done" placeholder="abc123def456…"
                   value="${escH(S.tmdbApiKey)}" maxlength="60" style="padding-right:38px">
                 <button type="button" data-action="toggle-cred-vis" data-target="tmdbKeyIn" title="Show / hide"
@@ -2565,7 +2565,7 @@ function render() {
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                 </button>
               </div>
-              <div style="font-size:.72rem;color:#6b7280;margin-top:5px;line-height:1.45">The <strong style="color:#8b949e">32-character</strong> key — not the Read Access Token.</div>
+              <div style="font-size:.72rem;color:#6b7280;margin-top:5px;line-height:1.45">The <strong class="u-tx2">32-character</strong> key — not the Read Access Token.</div>
               <span class="cred-status" id="tmdbKeyStatus" role="status" aria-live="polite"></span>
             </div>
           </div>
@@ -2601,7 +2601,7 @@ function render() {
         ${def.id === 'device' ? `<button data-action="skip-device" style="width:100%;margin-top:10px;padding:9px 14px;background:transparent;border:1px dashed rgba(255,255,255,.1);border-radius:10px;color:#6b7280;font-size:.86rem;font-weight:600;cursor:pointer;transition:all .15s;letter-spacing:.02em" onmouseover="this.style.color='#6b7280';this.style.borderColor='rgba(255,255,255,.2)'" onmouseout="this.style.color='#4b5563';this.style.borderColor='rgba(255,255,255,.1)'">Skip — use standard settings →</button>` : ''}
         ${def.id === 'content' ? renderCacheMode() + renderMatchMode() + renderP2pToggle() : ''}
         ${def.id === 'content' ? `<button data-action="skip-content" style="width:100%;margin-top:10px;padding:9px 14px;background:transparent;border:1px dashed rgba(255,255,255,.1);border-radius:10px;color:#6b7280;font-size:.86rem;font-weight:600;cursor:pointer;transition:all .15s;letter-spacing:.02em" onmouseover="this.style.color='#6b7280';this.style.borderColor='rgba(255,255,255,.2)'" onmouseout="this.style.color='#4b5563';this.style.borderColor='rgba(255,255,255,.1)'">Skip — use Everything (safe default) →</button>` : ''}
-        ${def.id === 'service' ? `<button data-action="open-advanced" style="width:100%;margin-top:14px;padding:12px 16px;background:rgba(0,212,255,.04);border:1px solid rgba(0,212,255,.18);border-radius:11px;color:#67e8f9;font-size:.88rem;font-weight:700;cursor:pointer;letter-spacing:.05em;text-transform:uppercase;transition:all .18s;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px" onmouseover="this.style.background='rgba(0,212,255,.10)';this.style.borderColor='rgba(0,212,255,.35)'" onmouseout="this.style.background='rgba(0,212,255,.04)';this.style.borderColor='rgba(0,212,255,.18)'"><div style="display:flex;align-items:center;gap:8px">${ICO.gear(16,'#67e8f9')} Fine-Tune</div><div style="font-size:.68rem;font-weight:500;color:#4b5563;text-transform:none;letter-spacing:.01em;margin-top:1px">Audio · Video · Formatter</div></button>` : ''}
+        ${def.id === 'service' ? `<button data-action="open-advanced" style="width:100%;margin-top:14px;padding:12px 16px;background:rgba(0,212,255,.04);border:1px solid rgba(0,212,255,.18);border-radius:11px;color:#67e8f9;font-size:.88rem;font-weight:700;cursor:pointer;letter-spacing:.05em;text-transform:uppercase;transition:all .18s;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px" onmouseover="this.style.background='rgba(0,212,255,.10)';this.style.borderColor='rgba(0,212,255,.35)'" onmouseout="this.style.background='rgba(0,212,255,.04)';this.style.borderColor='rgba(0,212,255,.18)'"><div class="u-rowc8">${ICO.gear(16,'#67e8f9')} Fine-Tune</div><div style="font-size:.68rem;font-weight:500;color:#4b5563;text-transform:none;letter-spacing:.01em;margin-top:1px">Audio · Video · Formatter</div></button>` : ''}
       </div>`;
     nav.style.display = 'flex';
     const btnBack = document.getElementById('btnBack');
@@ -2629,9 +2629,9 @@ function syncNext() {
   const nextDef = step < STEPS ? DEFS[((S.quickStart && step === 2) || (S.simpleMode && step === 3)) ? STEPS - 1 : step] : null;
   const nextLabel = nextDef ? nextDef.title : null;
   if (step === STEPS) {
-    btn.innerHTML = `<span style="flex:1">Review &amp; Generate</span><span class="cta-arr">→</span>`;
+    btn.innerHTML = `<span class="u-flex1">Review &amp; Generate</span><span class="cta-arr">→</span>`;
   } else if (ok && nextLabel) {
-    btn.innerHTML = `<div style="flex:1"><div class="cta-step-lbl" style="font-size:.64rem;font-weight:700;color:#374151;letter-spacing:.07em;text-transform:uppercase;margin-bottom:1px">Next</div><div class="cta-step-val" style="font-size:.9rem;font-weight:800">${nextLabel}</div></div><span class="cta-arr">→</span>`;
+    btn.innerHTML = `<div class="u-flex1"><div class="cta-step-lbl" style="font-size:.64rem;font-weight:700;color:#374151;letter-spacing:.07em;text-transform:uppercase;margin-bottom:1px">Next</div><div class="cta-step-val" style="font-size:.9rem;font-weight:800">${nextLabel}</div></div><span class="cta-arr">→</span>`;
   } else if (!def.key) {
     btn.innerHTML = `<span style="flex:1;font-size:.92rem;font-weight:700">Continue</span><span class="cta-arr">→</span>`;
   } else {
@@ -3872,7 +3872,7 @@ function streamProxyCardHtml() {
       <div class="pref-body-inner"><div class="pref-title">Play through my proxy</div><div class="pref-desc">Route playback through your own MediaFlow Proxy or StremThru, for example to share one debrid IP across devices or get past ISP throttling. You need a proxy you run or rent.</div></div>
       <div class="pref-circle">${on?'<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#0d1117" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>':''}</div>
     </div>
-    ${on ? `<div style="margin-top:8px">
+    ${on ? `<div class="u-mt8">
       <label for="proxyKind" style="display:block;${label}">Proxy</label>
       <select id="proxyKind" data-action="set-proxy-id" style="${field}">${STREAM_PROXY_IDS.map(id => `<option value="${id}" ${id === px.id ? 'selected' : ''}>${STREAM_PROXY_INFO[id].label}</option>`).join('')}</select>
       ${px.id === 'builtin' ? `<div style="${label}">Uses the AIOStreams instance you install to as the proxy.</div>` : `<label for="proxyUrl" style="display:block;${label}">Address</label>
@@ -3880,9 +3880,9 @@ function streamProxyCardHtml() {
       <label for="proxyPassword" style="display:block;${label}">${escHtml(info.credential)}</label>
       <input id="proxyPassword" type="password" autocomplete="off" placeholder="${escHtml(info.credential)}" value="${escHtml(S.streamProxyPassword || '')}" data-action="update-proxy-password" style="${field}" />
       <div style="font-size:.62rem;color:var(--th-tx3);margin-top:4px;line-height:1.4">${escHtml(info.hint)} Saved on this device and written into the config you install; never put in share links.</div>
-      ${px.id === 'builtin' ? '' : `<label for="proxyPublicUrl" style="display:block;${label}">Public address <span style="opacity:.6">(optional, only if players reach the proxy at a different address)</span></label>
+      ${px.id === 'builtin' ? '' : `<label for="proxyPublicUrl" style="display:block;${label}">Public address <span class="u-dim">(optional, only if players reach the proxy at a different address)</span></label>
       <input id="proxyPublicUrl" type="url" inputmode="url" autocomplete="off" spellcheck="false" placeholder="https://proxy.example.com" value="${escHtml(px.publicUrl)}" data-action="update-proxy-public-url" style="${field}" />`}
-      <div style="${label}">Proxy streams from <span style="opacity:.6">(none picked = all)</span></div>
+      <div style="${label}">Proxy streams from <span class="u-dim">(none picked = all)</span></div>
       <div style="display:flex;flex-wrap:wrap;gap:5px">${chips}</div>
     </div>` : ''}
     <div id="proxyStatus" role="status" style="font-size:.66rem;line-height:1.4;margin-top:8px;color:${status.tone}">${escHtml(status.text)}</div>
@@ -4618,7 +4618,7 @@ function renderAddonFetchFallback(name, reason, safeMsg) {
   const safeTarget = escH(_lastInstall.target || '');
   return `<div style="margin-top:10px;padding:12px 14px;border-radius:10px;background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.25)">`+
     `<div style="font-size:.82rem;font-weight:700;color:#fbbf24;margin-bottom:6px">${ICO.warn(14,'#fbbf24')} Your config is valid — one addon couldn't be reached</div>`+
-    `<div style="font-size:.76rem;color:#8b949e;line-height:1.5;margin-bottom:8px">AIOStreams couldn't fetch the manifest for <strong style="color:#fbbf24">${safeName}</strong> — its backend is likely <strong>temporarily down</strong> (not a problem with your config). Save without it and re-add it later from AIOStreams → Addons when it's back.</div>`+
+    `<div style="font-size:.76rem;color:#8b949e;line-height:1.5;margin-bottom:8px">AIOStreams couldn't fetch the manifest for <strong class="u-yellow">${safeName}</strong> — its backend is likely <strong>temporarily down</strong> (not a problem with your config). Save without it and re-add it later from AIOStreams → Addons when it's back.</div>`+
     `<code style="font-size:.7rem;background:rgba(0,0,0,.3);padding:4px 8px;border-radius:4px;display:block;margin-bottom:8px;word-break:break-word;color:#f59e0b">${safeMsg}</code>`+
     `<div style="display:flex;gap:8px;flex-wrap:wrap">`+
     `<button data-action="save-without-addon" style="padding:8px 14px;border-radius:8px;border:1px solid rgba(245,158,11,.4);background:rgba(245,158,11,.12);color:#fbbf24;font-size:.78rem;font-weight:700;cursor:pointer">Save without ${k}</button>`+
@@ -4645,7 +4645,7 @@ function renderConfigRejectedDispatch(safeMsg, apiDetail) {
       `<button data-action="disable-stream-proxy" style="padding:8px 14px;border-radius:8px;border:1px solid rgba(245,158,11,.4);background:rgba(245,158,11,.12);color:#fbbf24;font-size:.78rem;font-weight:700;cursor:pointer">Turn the proxy off</button>`+
       `</div>`;
   }
-  return `<div style="margin-top:10px;padding:12px 14px;border-radius:10px;background:rgba(248,113,113,.06);border:1px solid rgba(248,113,113,.2)"><div style="font-size:.82rem;font-weight:700;color:#f87171;margin-bottom:6px">${ICO.warn(14,'#f87171')} Config rejected by AIOStreams</div><div style="font-size:.76rem;color:#8b949e;line-height:1.5;margin-bottom:8px"><code style="font-size:.72rem;background:rgba(0,0,0,.3);padding:4px 8px;border-radius:4px;display:block;margin-top:4px;word-break:break-word;color:#f87171">${safeMsg}</code></div><div style="display:flex;gap:8px"><button data-action="simple-install" style="padding:8px 16px;border-radius:8px;border:1px solid rgba(0,212,255,.3);background:rgba(0,212,255,.06);color:#00d4ff;font-size:.8rem;font-weight:700;cursor:pointer">Retry</button><button data-action="generate-dl" style="padding:8px 16px;border-radius:8px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.03);color:#9ca3af;font-size:.8rem;font-weight:700;cursor:pointer">Export JSON</button></div></div>`;
+  return `<div style="margin-top:10px;padding:12px 14px;border-radius:10px;background:rgba(248,113,113,.06);border:1px solid rgba(248,113,113,.2)"><div style="font-size:.82rem;font-weight:700;color:#f87171;margin-bottom:6px">${ICO.warn(14,'#f87171')} Config rejected by AIOStreams</div><div style="font-size:.76rem;color:#8b949e;line-height:1.5;margin-bottom:8px"><code style="font-size:.72rem;background:rgba(0,0,0,.3);padding:4px 8px;border-radius:4px;display:block;margin-top:4px;word-break:break-word;color:#f87171">${safeMsg}</code></div><div class="u-row8"><button data-action="simple-install" style="padding:8px 16px;border-radius:8px;border:1px solid rgba(0,212,255,.3);background:rgba(0,212,255,.06);color:#00d4ff;font-size:.8rem;font-weight:700;cursor:pointer">Retry</button><button data-action="generate-dl" style="padding:8px 16px;border-radius:8px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.03);color:#9ca3af;font-size:.8rem;font-weight:700;cursor:pointer">Export JSON</button></div></div>`;
 }
 
 // ── Host capability gate (Phase 4) ─────────────────────────────────────────────
@@ -4847,10 +4847,10 @@ function hostGateHtml() {
   // Kept, but not guaranteed to be accepted — distinct from a removal, and amber
   // rather than grey so it reads as "check this" not "we handled it".
   const warningLines = warnings.length
-    ? `<div class="hc-row"><span class="hc-name">May be rejected on save</span><span class="hc-status" style="color:#fbbf24">${warnings.length}</span></div><div class="hc-detail">${warnings.slice(0, 12).map(text => line(text, '#fbbf24')).join('')}</div>`
+    ? `<div class="hc-row"><span class="hc-name">May be rejected on save</span><span class="u-yellow hc-status">${warnings.length}</span></div><div class="hc-detail">${warnings.slice(0, 12).map(text => line(text, '#fbbf24')).join('')}</div>`
     : '';
   const removalLines = removals.length
-    ? `<div class="hc-row"><span class="hc-name">Removed from your export</span><span class="hc-status" style="color:#8b949e">${removals.length}</span></div><div class="hc-detail">${removals.slice(0, 12).map(text => line(text, '#8b949e')).join('')}${removals.length > 12 ? line(`+${removals.length - 12} more`, '#8b949e') : ''}</div>`
+    ? `<div class="hc-row"><span class="hc-name">Removed from your export</span><span class="u-tx2 hc-status">${removals.length}</span></div><div class="hc-detail">${removals.slice(0, 12).map(text => line(text, '#8b949e')).join('')}${removals.length > 12 ? line(`+${removals.length - 12} more`, '#8b949e') : ''}</div>`
     : '';
   return `<div class="hc-row"><span class="hc-name">${escHtml(caps.label)}</span><span class="hc-status" style="color:${caps.probed ? '#34d399' : '#fbbf24'}">${caps.probed ? `probed &middot; v${escHtml(caps.version || '?')}` : 'not probed'}</span></div>${gateLines ? `<div class="hc-detail">${gateLines}</div>` : ''}${warningLines}${removalLines}`;
 }
@@ -5025,7 +5025,7 @@ async function generate() {
       ? `<div style="margin-top:8px;padding:10px 12px;border-radius:10px;background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.28)">
            <div style="font-size:.78rem;font-weight:700;color:#f59e0b;display:flex;align-items:center;gap:6px">${ICO.warn(13,'#f59e0b')} This file contains your credentials</div>
            <div style="font-size:.72rem;color:#8b949e;line-height:1.5;margin-top:4px">
-             Keys for <b style="color:#e6edf3">${escHtml(secrets.join(', '))}</b> are saved in the downloaded JSON in plain text.
+             Keys for <b class="u-tx">${escHtml(secrets.join(', '))}</b> are saved in the downloaded JSON in plain text.
              It is safe to import into AIOStreams, but do not post it in Discord, Reddit or a GitHub issue.
              For help, use <b>Copy a safe feedback report</b> below instead.
            </div>
@@ -5069,7 +5069,7 @@ function showChangelog() {
     <div style="background:${_bg};border-radius:14px;border:1px solid ${_bdr};width:min(560px,92vw);max-height:82vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,.4);animation:scaleIn .2s ease">
       <div style="display:flex;align-items:center;gap:10px;padding:16px 20px;border-bottom:1px solid ${_bdr};flex-shrink:0">
         <span style="font-size:1rem">${ICO.newspaper(20,_acc)}</span>
-        <div style="flex:1">
+        <div class="u-flex1">
           <div style="font-weight:800;font-size:.95rem;color:${_txt}">Changelog</div>
           <div style="font-size:.68rem;color:${_dim}">${CHANGELOG.length} releases</div>
         </div>
@@ -5505,13 +5505,13 @@ function showDiffModal(oldCfg, newCfg, parsed, onApply, onCancel, importedConfli
   overlay.setAttribute('aria-label', 'Review template changes');
 
   const selectAllId = 'dfSelAll';
-  const selectAllHtml = sections.length > 1 ? '<div style="display:flex;align-items:center;gap:6px;margin-bottom:10px;padding:6px 10px;background:rgba(0,212,255,.04);border:1px solid rgba(0,212,255,.1);border-radius:8px"><label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:.72rem;color:#8b949e;user-select:none;flex:1"><input type="checkbox" id="'+selectAllId+'" checked style="accent-color:#00d4ff;width:14px;height:14px;cursor:pointer"> Select all sections</label><span style="font-size:.65rem;color:#4b5563">Uncheck to keep existing values; host and compatibility limits still apply</span></div>' : '';
+  const selectAllHtml = sections.length > 1 ? '<div style="display:flex;align-items:center;gap:6px;margin-bottom:10px;padding:6px 10px;background:rgba(0,212,255,.04);border:1px solid rgba(0,212,255,.1);border-radius:8px"><label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:.72rem;color:#8b949e;user-select:none;flex:1"><input type="checkbox" id="'+selectAllId+'" checked style="accent-color:#00d4ff;width:14px;height:14px;cursor:pointer"> Select all sections</label><span class="u-micro">Uncheck to keep existing values; host and compatibility limits still apply</span></div>' : '';
 
   const sectionsHtml = sections.length ? sections.map((sec, si) => {
     const countHtml = [];
-    if (sec.added) countHtml.push('<span style="color:#34d399">+'+sec.added+'</span>');
-    if (sec.removed) countHtml.push('<span style="color:#f87171">-'+sec.removed+'</span>');
-    if (sec.changed) countHtml.push('<span style="color:#fbbf24">~'+sec.changed+'</span>');
+    if (sec.added) countHtml.push('<span class="u-green">+'+sec.added+'</span>');
+    if (sec.removed) countHtml.push('<span class="u-red">-'+sec.removed+'</span>');
+    if (sec.changed) countHtml.push('<span class="u-yellow">~'+sec.changed+'</span>');
     const rowsHtml = sec.rows.map(r => {
       const cls = r.type === 'add' ? 'df-row-add' : r.type === 'rem' ? 'df-row-rem' : 'df-row-chg';
       const ico = r.type === 'add' ? '+' : r.type === 'rem' ? '&minus;' : '~';
@@ -5539,13 +5539,13 @@ function showDiffModal(oldCfg, newCfg, parsed, onApply, onCancel, importedConfli
     + '<button id="dfClose" style="background:none;border:none;color:#8b949e;font-size:1.3rem;cursor:pointer;padding:4px 8px;line-height:1" aria-label="Close">&times;</button></div>'
     + '<div class="df-body">'
     + '<div style="font-size:.72rem;color:#8b949e;margin-bottom:12px;line-height:1.5">'
-    + 'Detected <strong style="color:#e6edf3">'+detected.join(' / ')+'</strong>'+(parsed.name ? ' &mdash; <strong style="color:#e6edf3">'+esc(parsed.name)+'</strong>' : '')+'. Here\'s what changes when you upgrade to the latest configurator logic.</div>'
+    + 'Detected <strong class="u-tx">'+detected.join(' / ')+'</strong>'+(parsed.name ? ' &mdash; <strong class="u-tx">'+esc(parsed.name)+'</strong>' : '')+'. Here\'s what changes when you upgrade to the latest configurator logic.</div>'
     + importedConflictHtml
     + '<div class="df-summary">'
-    + '<div class="df-stat"><div class="df-stat-num" style="color:#34d399">'+totalAdded+'</div><div class="df-stat-label">Added</div></div>'
-    + '<div class="df-stat"><div class="df-stat-num" style="color:#f87171">'+totalRemoved+'</div><div class="df-stat-label">Removed</div></div>'
-    + '<div class="df-stat"><div class="df-stat-num" style="color:#fbbf24">'+totalChanged+'</div><div class="df-stat-label">Changed</div></div>'
-    + '<div class="df-stat"><div class="df-stat-num" style="color:#00d4ff">'+totalDiffs+'</div><div class="df-stat-label">Total</div></div></div>'
+    + '<div class="df-stat"><div class="u-green df-stat-num">'+totalAdded+'</div><div class="df-stat-label">Added</div></div>'
+    + '<div class="df-stat"><div class="u-red df-stat-num">'+totalRemoved+'</div><div class="df-stat-label">Removed</div></div>'
+    + '<div class="df-stat"><div class="u-yellow df-stat-num">'+totalChanged+'</div><div class="df-stat-label">Changed</div></div>'
+    + '<div class="df-stat"><div class="u-accent df-stat-num">'+totalDiffs+'</div><div class="df-stat-label">Total</div></div></div>'
     + selectAllHtml + sectionsHtml + '</div>'
     + '<div class="df-footer"><button class="df-btn df-btn-secondary" id="dfCancel">Cancel</button>'
     + '<button class="df-btn df-btn-primary" id="dfApply">'+(totalDiffs ? 'Apply &amp; Upgrade' : 'Continue Anyway')+'</button></div></div>';
@@ -5642,11 +5642,11 @@ function remoteUpdateBannerHtml() {
     return '<div style="padding:10px 14px;border-radius:10px;background:rgba(0,212,255,.06);border:1px solid rgba(0,212,255,.18);margin-bottom:12px;font-size:.72rem;color:#8b949e">Updated in this browser only. Download and re-import the JSON to apply it in AIOStreams. <button data-action="revert-update" style="margin-left:8px;background:none;border:0;color:var(--th-accent);cursor:pointer;font:inherit;text-decoration:underline">Undo local update</button></div>';
   }
   const p = _pendingUpdate;
-  const ch = p.changelog && p.changelog.length ? `<ul style="margin:6px 0 0;padding-left:16px">${p.changelog.map(e=>`<li style="font-size:.7rem;color:#8b949e;margin:2px 0"><b style="color:#00d4ff">v${escH(e.version)}</b>${e.body.length?` — ${escH(e.body.slice(0,3).join(' · '))}`:''}</li>`).join('')}</ul>` : '';
+  const ch = p.changelog && p.changelog.length ? `<ul style="margin:6px 0 0;padding-left:16px">${p.changelog.map(e=>`<li style="font-size:.7rem;color:#8b949e;margin:2px 0"><b class="u-accent">v${escH(e.version)}</b>${e.body.length?` — ${escH(e.body.slice(0,3).join(' · '))}`:''}</li>`).join('')}</ul>` : '';
   return `<div style="padding:10px 14px;border-radius:10px;background:rgba(0,212,255,.06);border:1px solid rgba(0,212,255,.18);margin-bottom:12px">
     <div style="display:flex;align-items:center;gap:10px">
       <span style="font-size:1.1rem">🔄</span>
-      <div style="flex:1">
+      <div class="u-flex1">
         <div style="font-size:.78rem;font-weight:700;color:#00d4ff">Update available: v${escH(p.from)} → v${escH(p.to)}</div>
         <div style="font-size:.7rem;color:#8b949e">${p.name ? escH(p.name) + ' ' : ''}has a newer version${ch ? '' : ' — update or rebuild to get it.'}</div>
         ${ch}
@@ -5721,10 +5721,10 @@ function showUpdateTemplateModal() {
     <div class="modal-box" role="dialog" aria-modal="true" aria-label="Update Existing Setup" style="max-width:480px">
       <button class="modal-close" id="updTplClose" aria-label="Close">×</button>
       <div class="modal-title" style="font-size:1.05rem">${ICO.refresh(18,'#00d4ff')} Update Existing Setup</div>
-      <div class="modal-sub" style="margin-bottom:8px">Paste your existing template JSON below. We'll show you exactly what changes before upgrading to the latest sort logic, regex patterns, and formatters, and flag safe rule conflicts before you apply anything.</div>
+      <div class="u-mb8 modal-sub">Paste your existing template JSON below. We'll show you exactly what changes before upgrading to the latest sort logic, regex patterns, and formatters, and flag safe rule conflicts before you apply anything.</div>
       <div style="background:rgba(0,212,255,.06);border:1px solid rgba(0,212,255,.12);border-radius:8px;padding:10px 12px;margin-bottom:12px;font-size:.72rem;color:#8b949e;line-height:1.5">
-        <strong style="color:#00d4ff">What gets updated:</strong> Sort criteria, regex patterns, PSE tiers, formatter, deduplicator settings, and filter expressions — rebuilt with the latest configurator logic. App-only updates may produce no configuration changes.<br>
-        <strong style="color:#00d4ff">What's preserved:</strong> Your existing scraper instances, options and local credentials are retained. Service, resolution, audio and content preferences are detected; unsupported host options are still removed.
+        <strong class="u-accent">What gets updated:</strong> Sort criteria, regex patterns, PSE tiers, formatter, deduplicator settings, and filter expressions — rebuilt with the latest configurator logic. App-only updates may produce no configuration changes.<br>
+        <strong class="u-accent">What's preserved:</strong> Your existing scraper instances, options and local credentials are retained. Service, resolution, audio and content preferences are detected; unsupported host options are still removed.
       </div>
       <textarea id="updTplInput" rows="8" placeholder='Paste your full template JSON here...' style="width:100%;box-sizing:border-box;background:#111720;border:1.5px solid rgba(255,255,255,.08);border-radius:8px;padding:10px 12px;color:#e6edf3;font-family:monospace;font-size:.72rem;resize:vertical;outline:none;line-height:1.4"></textarea>
       <div style="display:flex;gap:8px;margin-top:10px">
@@ -5793,12 +5793,12 @@ function showShortcutsModal() {
       <div class="modal-title" style="font-size:1rem">⌨️ Keyboard shortcuts</div>
       <div class="modal-sub" style="margin-bottom:12px">Speed up your config</div>
       <div style="display:grid;gap:8px;font-size:.78rem">
-        <div style="display:flex;justify-content:space-between;padding:8px 10px;border-radius:8px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06)"><span>Next step</span><kbd style="background:#111720;border:1px solid rgba(255,255,255,.1);border-bottom-width:2px;border-radius:5px;padding:2px 7px;font-size:.72rem">Enter</kbd></div>
-        <div style="display:flex;justify-content:space-between;padding:8px 10px;border-radius:8px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06)"><span>Back</span><kbd style="background:#111720;border:1px solid rgba(255,255,255,.1);border-bottom-width:2px;border-radius:5px;padding:2px 7px;font-size:.72rem">Esc</kbd></div>
-        <div style="display:flex;justify-content:space-between;padding:8px 10px;border-radius:8px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06)"><span>Navigate options</span><kbd style="background:#111720;border:1px solid rgba(255,255,255,.1);border-bottom-width:2px;border-radius:5px;padding:2px 7px;font-size:.72rem">↑ ↓ ← →</kbd></div>
-        <div style="display:flex;justify-content:space-between;padding:8px 10px;border-radius:8px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06)"><span>Show this help</span><kbd style="background:#111720;border:1px solid rgba(255,255,255,.1);border-bottom-width:2px;border-radius:5px;padding:2px 7px;font-size:.72rem">Ctrl + /</kbd></div>
-        <div style="display:flex;justify-content:space-between;padding:8px 10px;border-radius:8px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06)"><span>Filter services</span><kbd style="background:#111720;border:1px solid rgba(255,255,255,.1);border-bottom-width:2px;border-radius:5px;padding:2px 7px;font-size:.72rem">/ (in service picker)</kbd></div>
-        <div style="display:flex;justify-content:space-between;padding:8px 10px;border-radius:8px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06)"><span>Feature flags</span><code style="font-size:.70rem;color:#8b949e">localStorage.setItem('cb-flags','webVitals=1')</code></div>
+        <div class="kv-row"><span>Next step</span><kbd class="u-kbd">Enter</kbd></div>
+        <div class="kv-row"><span>Back</span><kbd class="u-kbd">Esc</kbd></div>
+        <div class="kv-row"><span>Navigate options</span><kbd class="u-kbd">↑ ↓ ← →</kbd></div>
+        <div class="kv-row"><span>Show this help</span><kbd class="u-kbd">Ctrl + /</kbd></div>
+        <div class="kv-row"><span>Filter services</span><kbd class="u-kbd">/ (in service picker)</kbd></div>
+        <div class="kv-row"><span>Feature flags</span><code style="font-size:.70rem;color:#8b949e">localStorage.setItem('cb-flags','webVitals=1')</code></div>
       </div>
       <div style="margin-top:12px;font-size:.70rem;color:#6b7280;line-height:1.5">Flags: <code>webVitals=1</code> enables CLS/LCP beacon, <code>hostCache=0</code> disables 5-min host cache.</div>
     </div>`;
@@ -5823,22 +5823,22 @@ function showRecommendedStackModal() {
       <div class="modal-sub" style="margin-bottom:12px">What Core Builds sets up for you, and what it leaves out</div>
       <div style="font-size:.78rem;line-height:1.6;color:#8b949e">
         <div style="background:rgba(0,212,255,.06);border:1px solid rgba(0,212,255,.12);border-radius:8px;padding:10px 12px;margin-bottom:12px">
-          <strong style="color:#00d4ff">Hosts:</strong> every public host runs the same upstream AIOStreams (2.35.x when last checked, Oct 2026). They differ in policy, not code: ElfHosted disables Torrentio, P2P and HTTP streams; Viren's nightly disables Torrentio. Pick yours in Advanced → Hosts.
+          <strong class="u-accent">Hosts:</strong> every public host runs the same upstream AIOStreams (2.35.x when last checked, Oct 2026). They differ in policy, not code: ElfHosted disables Torrentio, P2P and HTTP streams; Viren's nightly disables Torrentio. Pick yours in Advanced → Hosts.
         </div>
-        <div style="margin-bottom:10px"><strong style="color:#e6edf3">Debrid — pick one primary</strong><br>
+        <div class="u-mb10"><strong class="u-tx">Debrid — pick one primary</strong><br>
         TorBox, Real-Debrid, AllDebrid, Premiumize, Debrid-Link, EasyDebrid, Debrider, Offcloud and PikPak are all supported (Meteor has no PikPak support). Seedr works through MediaFusion only. No subscription? Choose P2P Free or HTTP Streams.</div>
-        <div style="margin-bottom:10px"><strong style="color:#e6edf3">Added automatically with a torrent debrid service</strong><br>
+        <div class="u-mb10"><strong class="u-tx">Added automatically with a torrent debrid service</strong><br>
         • <code>StremThru Torz</code> (TorBox) or <code>StremThru Store</code> (other debrids)<br>
         • <code>Comet</code>, <code>Meteor</code>, <code>MediaFusion</code> — torrent scrapers with debrid cache checks<br>
         • <code>Zilean</code> — DMM hashlists<br>
         • <code>Knaben</code> — indexer proxy for TPB, 1337x, YTS and Nyaa<br>
         • <code>EZTV</code>, <code>Torrent Galaxy</code> — TV and general torrent indexes<br>
         • <code>SeaDex</code> — best anime releases, ranked first for anime</div>
-        <div style="margin-bottom:10px"><strong style="color:#e6edf3">Optional</strong><br>
+        <div class="u-mb10"><strong class="u-tx">Optional</strong><br>
         Jackettio, Debridio (needs a key), EasyNews (usenet), Newznab indexers, and HTTP sources such as WebStreamr, Nuvio and Flix-Streams for setups without debrid.</div>
-        <div style="margin-bottom:10px"><strong style="color:#e6edf3">Left out on purpose</strong><br>
+        <div class="u-mb10"><strong class="u-tx">Left out on purpose</strong><br>
         Torrentio — blocked on ElfHosted and Viren's nightly at its developer's request. TorBox (addon), USA TV and Debridio Watchtower — retired upstream; AIOStreams refuses any config that contains them.</div>
-        <div style="margin-bottom:10px"><strong style="color:#e6edf3">Release filtering</strong><br>
+        <div class="u-mb10"><strong class="u-tx">Release filtering</strong><br>
         Ranked and excluded release patterns come from Vidhin05's Releases-Regex list, scored inline so every public host accepts them.</div>
       </div>
       <div style="margin-top:14px;display:flex;gap:8px">
@@ -6060,7 +6060,7 @@ function showManifestModal(manifestUrl, password, hostLabel, initialTab) {
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#3fb950" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
       </div>
       <div class="modal-title">Manifest Ready ${ICO.confetti(22,'#fbbf24')}</div>
-      <div class="modal-sub">${hostLabel ? `<span style="color:#3fb950">${esc(hostLabel)}</span> · ` : ''}Your config is live — install or copy below</div>
+      <div class="modal-sub">${hostLabel ? `<span class="u-green">${esc(hostLabel)}</span> · ` : ''}Your config is live — install or copy below</div>
       <div class="fmt-tabs" id="mFmtTabs">
         ${FMTS.map((f,i) => `<button class="fmt-tab${i===0?' active':''}" data-fi="${i}">${f.label}</button>`).join('')}
       </div>
@@ -6100,9 +6100,9 @@ function showManifestModal(manifestUrl, password, hostLabel, initialTab) {
           <button id="mTestStreams" style="font-size:.68rem;font-weight:700;padding:3px 10px;border-radius:5px;border:1px solid rgba(0,212,255,.25);background:rgba(0,212,255,.06);color:#00d4ff;cursor:pointer;transition:background .15s" onmouseover="this.style.background='rgba(0,212,255,.12)'" onmouseout="this.style.background='rgba(0,212,255,.06)'">Test streams</button>
         </div>
         <div style="font-size:.72rem;color:#8b949e;line-height:1.55">
-          <strong style="color:#e6edf3">1.</strong> Open Stremio and search for any movie or show<br>
-          <strong style="color:#e6edf3">2.</strong> Streams should appear with Core Builds sorting<br>
-          <strong style="color:#e6edf3">3.</strong> Save your password — you'll need it to edit settings later
+          <strong class="u-tx">1.</strong> Open Stremio and search for any movie or show<br>
+          <strong class="u-tx">2.</strong> Streams should appear with Core Builds sorting<br>
+          <strong class="u-tx">3.</strong> Save your password — you'll need it to edit settings later
         </div>
         <div style="margin-top:6px"><a href="../account-tools/" target="_blank" rel="noopener noreferrer" style="font-size:.68rem;color:#8b949e;text-decoration:none;transition:color .15s" onmouseover="this.style.color='#34d399'" onmouseout="this.style.color='#8b949e'">Back up your current addons first →</a></div>
         <div id="mTestResult" style="margin-top:6px;font-size:.72rem"></div>
@@ -6115,16 +6115,16 @@ function showManifestModal(manifestUrl, password, hostLabel, initialTab) {
           ${(() => {
             const cfg = buildFinal().config;
             const rows = [];
-            rows.push('<b style="color:#e6edf3">Host:</b> ' + esc(hostLabel));
-            rows.push('<b style="color:#e6edf3">Presets:</b> ' + (cfg.presets ? cfg.presets.filter(p=>p.enabled!==false).length + ' active' : 'inherited'));
-            rows.push('<b style="color:#e6edf3">ESEs:</b> ' + (cfg.excludedStreamExpressions ? cfg.excludedStreamExpressions.filter(e=>e.enabled!==false).length : '0'));
-            rows.push('<b style="color:#e6edf3">ISEs:</b> ' + (cfg.includedStreamExpressions ? cfg.includedStreamExpressions.filter(e=>e.enabled!==false).length : '0'));
-            rows.push('<b style="color:#e6edf3">PSEs:</b> ' + (cfg.preferredStreamExpressions ? cfg.preferredStreamExpressions.filter(e=>e.enabled!==false).length : '0'));
-            rows.push('<b style="color:#e6edf3">Sort keys:</b> ' + (cfg.sortCriteria?.global ? cfg.sortCriteria.global.length : 'inherited'));
-            rows.push('<b style="color:#e6edf3">Title matching:</b> ' + (cfg.titleMatching?.enabled ? '<span style="color:#34d399">on</span>' : '<span style="color:#f87171">off</span>'));
-            rows.push('<b style="color:#e6edf3">Year matching:</b> ' + (cfg.yearMatching?.enabled ? '<span style="color:#34d399">on</span>' : '<span style="color:#f87171">off</span>'));
-            rows.push('<b style="color:#e6edf3">Cache mode:</b> ' + (cfg.excludeUncached ? 'cached only' : cfg.excludeCached ? 'uncached only' : 'mixed'));
-            rows.push('<b style="color:#e6edf3">Stream pool:</b> ' + ({normal:'Normal',large:'Large',max:'Maximum'}[S.streamPool||'normal']) + ' (' + (cfg.maxResults || 'default') + ' max)');
+            rows.push('<b class="u-tx">Host:</b> ' + esc(hostLabel));
+            rows.push('<b class="u-tx">Presets:</b> ' + (cfg.presets ? cfg.presets.filter(p=>p.enabled!==false).length + ' active' : 'inherited'));
+            rows.push('<b class="u-tx">ESEs:</b> ' + (cfg.excludedStreamExpressions ? cfg.excludedStreamExpressions.filter(e=>e.enabled!==false).length : '0'));
+            rows.push('<b class="u-tx">ISEs:</b> ' + (cfg.includedStreamExpressions ? cfg.includedStreamExpressions.filter(e=>e.enabled!==false).length : '0'));
+            rows.push('<b class="u-tx">PSEs:</b> ' + (cfg.preferredStreamExpressions ? cfg.preferredStreamExpressions.filter(e=>e.enabled!==false).length : '0'));
+            rows.push('<b class="u-tx">Sort keys:</b> ' + (cfg.sortCriteria?.global ? cfg.sortCriteria.global.length : 'inherited'));
+            rows.push('<b class="u-tx">Title matching:</b> ' + (cfg.titleMatching?.enabled ? '<span class="u-green">on</span>' : '<span class="u-red">off</span>'));
+            rows.push('<b class="u-tx">Year matching:</b> ' + (cfg.yearMatching?.enabled ? '<span class="u-green">on</span>' : '<span class="u-red">off</span>'));
+            rows.push('<b class="u-tx">Cache mode:</b> ' + (cfg.excludeUncached ? 'cached only' : cfg.excludeCached ? 'uncached only' : 'mixed'));
+            rows.push('<b class="u-tx">Stream pool:</b> ' + ({normal:'Normal',large:'Large',max:'Maximum'}[S.streamPool||'normal']) + ' (' + (cfg.maxResults || 'default') + ' max)');
             return rows.join('<br>');
           })()}
         </div>
@@ -6134,8 +6134,8 @@ function showManifestModal(manifestUrl, password, hostLabel, initialTab) {
           <span>${ICO.rocket(13,'#8b949e')} Push to Stremio Library</span><span style="font-size:.7rem">›</span>
         </summary>
         <div style="margin-top:10px;display:flex;flex-direction:column;gap:8px">
-          <input id="stremioEmail" type="email" placeholder="Stremio email" autocomplete="email" inputmode="email" enterkeyhint="next" style="width:100%;box-sizing:border-box;background:#111720;border:1px solid rgba(255,255,255,.06);border-radius:8px;padding:9px 12px;color:#e6edf3;font-size:.82rem;outline:none">
-          <input id="stremioPassword" type="password" placeholder="Stremio password" autocomplete="current-password" enterkeyhint="go" autocapitalize="none" style="width:100%;box-sizing:border-box;background:#111720;border:1px solid rgba(255,255,255,.06);border-radius:8px;padding:9px 12px;color:#e6edf3;font-size:.82rem;outline:none">
+          <input class="ft-input" id="stremioEmail" type="email" placeholder="Stremio email" autocomplete="email" inputmode="email" enterkeyhint="next">
+          <input class="ft-input" id="stremioPassword" type="password" placeholder="Stremio password" autocomplete="current-password" enterkeyhint="go" autocapitalize="none">
           <button id="stremioInstallBtn" style="width:100%;padding:10px;border-radius:8px;border:1.5px solid rgba(0,212,255,.3);background:rgba(0,212,255,.07);color:#00d4ff;font-size:.9rem;font-weight:700;cursor:pointer;transition:all .15s">${ICO.download(14,'#00d4ff')} Log in &amp; Install</button>
           <div id="stremioInstallResult" style="font-size:.75rem"></div>
         </div>
@@ -6217,13 +6217,13 @@ function showManifestModal(manifestUrl, password, hostLabel, initialTab) {
     if (fi === 2) {
       helpEl.style.display = '';
       document.getElementById('mAppHelpTitle').textContent = 'WuPlay Setup';
-      document.getElementById('mAppHelpBody').innerHTML = '<strong style="color:#e6edf3">1.</strong> Manifest URL is <strong style="color:#3fb950">already copied</strong> to your clipboard<br><strong style="color:#e6edf3">2.</strong> Tap <strong style="color:#a78bfa">Open WuPlay</strong> below (or go to WuPlay → Addons)<br><strong style="color:#e6edf3">3.</strong> Tap <strong style="color:#a78bfa">Add Addon</strong> and paste the URL';
+      document.getElementById('mAppHelpBody').innerHTML = '<strong class="u-tx">1.</strong> Manifest URL is <strong class="u-green">already copied</strong> to your clipboard<br><strong class="u-tx">2.</strong> Tap <strong class="u-purple">Open WuPlay</strong> below (or go to WuPlay → Addons)<br><strong class="u-tx">3.</strong> Tap <strong class="u-purple">Add Addon</strong> and paste the URL';
       if (qrWrap) qrWrap.style.display = 'none';
       if (qrHint) qrHint.style.display = 'none';
     } else if (fi === 3) {
       helpEl.style.display = '';
       document.getElementById('mAppHelpTitle').textContent = 'Nuvio Setup';
-      document.getElementById('mAppHelpBody').innerHTML = '<strong style="color:#e6edf3">1.</strong> Manifest URL is <strong style="color:#3fb950">already copied</strong> to your clipboard<br><strong style="color:#e6edf3">2.</strong> Tap <strong style="color:#a78bfa">Open Nuvio</strong> below (or go to Nuvio → Account → Addons)<br><strong style="color:#e6edf3">3.</strong> Paste the URL in the addon field';
+      document.getElementById('mAppHelpBody').innerHTML = '<strong class="u-tx">1.</strong> Manifest URL is <strong class="u-green">already copied</strong> to your clipboard<br><strong class="u-tx">2.</strong> Tap <strong class="u-purple">Open Nuvio</strong> below (or go to Nuvio → Account → Addons)<br><strong class="u-tx">3.</strong> Paste the URL in the addon field';
       if (qrWrap) qrWrap.style.display = 'none';
       if (qrHint) qrHint.style.display = 'none';
     } else {
@@ -6284,7 +6284,7 @@ function showManifestModal(manifestUrl, password, hostLabel, initialTab) {
   document.getElementById('mTestStreams').addEventListener('click', async function() {
     const testBtn = this, resEl = document.getElementById('mTestResult');
     testBtn.disabled = true; testBtn.textContent = 'Testing…';
-    resEl.innerHTML = '<span style="color:#8b949e">Checking catalog…</span>';
+    resEl.innerHTML = '<span class="u-tx2">Checking catalog…</span>';
     const baseUrl = manifestUrl.replace(/\/manifest\.json$/, '');
     const testId = 'tt1375666';
     try {
@@ -6301,14 +6301,14 @@ function showManifestModal(manifestUrl, password, hostLabel, initialTab) {
       const data = await r.json();
       const count = data?.streams?.length || 0;
       if (count > 0) {
-        resEl.innerHTML = `<span style="color:#3fb950">${ICO.check(12,'#3fb950')} Found ${count} stream${count>1?'s':''} — your config is working!</span>`;
+        resEl.innerHTML = `<span class="u-green">${ICO.check(12,'#3fb950')} Found ${count} stream${count>1?'s':''} — your config is working!</span>`;
         testBtn.innerHTML = ICO.check(12,'currentColor') + ' Working'; testBtn.style.borderColor = 'rgba(63,185,80,.3)'; testBtn.style.color = '#3fb950';
       } else {
-        resEl.innerHTML = `<span style="color:#f59e0b">${ICO.warn(12,'#f59e0b')} 0 streams returned — check your API key and try again in a few minutes</span>`;
+        resEl.innerHTML = `<span class="u-amber">${ICO.warn(12,'#f59e0b')} 0 streams returned — check your API key and try again in a few minutes</span>`;
         testBtn.disabled = false; testBtn.textContent = 'Retry';
       }
     } catch(e) {
-      resEl.innerHTML = `<span style="color:#f87171">Could not reach the server — it may still be processing your config</span>`;
+      resEl.innerHTML = `<span class="u-red">Could not reach the server — it may still be processing your config</span>`;
       testBtn.disabled = false; testBtn.textContent = 'Retry';
     }
   });
@@ -6318,7 +6318,7 @@ function showManifestModal(manifestUrl, password, hostLabel, initialTab) {
     const password = document.getElementById('stremioPassword').value;
     const resEl    = document.getElementById('stremioInstallResult');
     const btn      = document.getElementById('stremioInstallBtn');
-    if (!email || !password) { resEl.innerHTML = `<span style="color:#f87171">Enter your Stremio email and password.</span>`; return; }
+    if (!email || !password) { resEl.innerHTML = `<span class="u-red">Enter your Stremio email and password.</span>`; return; }
     btn.disabled = true; btn.textContent = 'Signing in…'; resEl.innerHTML = '';
     try {
       const SAPI = 'https://api.strem.io/api/';
@@ -6341,10 +6341,10 @@ function showManifestModal(manifestUrl, password, hostLabel, initialTab) {
         if (!setData?.result) throw new Error(stremioErrText(setData?.error, 'Install failed.'));
       }
       btn.innerHTML = ICO.check(12,'currentColor') + ' Installed!'; btn.style.borderColor = 'rgba(63,185,80,.4)'; btn.style.color = '#3fb950'; btn.style.background = 'rgba(63,185,80,.07)';
-      resEl.innerHTML = already ? `<span style="color:#f59e0b">Already in your library.</span>` : `<span style="color:#3fb950">Done — reopen Stremio to see it.</span>`;
+      resEl.innerHTML = already ? `<span class="u-amber">Already in your library.</span>` : `<span class="u-green">Done — reopen Stremio to see it.</span>`;
     } catch(err) {
       btn.disabled = false; btn.innerHTML = ICO.download(14,'#00d4ff') + ' Log in & Install';
-      resEl.innerHTML = `<span style="color:#f87171">${esc(err.message || 'Something went wrong')}</span>`;
+      resEl.innerHTML = `<span class="u-red">${esc(err.message || 'Something went wrong')}</span>`;
     }
   });
 }
@@ -6373,7 +6373,7 @@ function showApiReminder(onContinue) {
             <span class="rem-field-name">${inp.label}</span>
             <a href="${inp.url}" target="_blank" rel="noopener noreferrer" class="rem-field-link">Get key →</a>
           </div>
-          <div style="position:relative;display:flex;align-items:center">
+          <div class="u-relrow">
             <input class="rem-input" id="rem_${inp.id}" data-service="${inp.id}" data-action="update-cred"
               type="password"
               placeholder="${inp.placeholder}"
@@ -6455,15 +6455,15 @@ function simpleFinishHtml() {
       </div>
       ${renderOutputProfilePicker({ compact:true })}
       ${outputProfileAuditHtml()}
-      ${(() => { const hint = DEVICE_BANDWIDTH_HINTS[S.device]; if (!hint) return ''; const bw = calculateBitrateLimit(hint.recommended); return `<div style="background:rgba(0,212,255,.03);border:1px solid rgba(0,212,255,.12);border-radius:8px;padding:10px 14px;margin-bottom:14px;display:flex;align-items:center;gap:10px"><span style="font-size:1.1rem">📶</span><div style="flex:1"><div style="font-size:.72rem;font-weight:700;color:#9ca3af">Bandwidth hint for your device</div><div style="font-size:.68rem;color:#6b7280;line-height:1.4">Recommended: <strong style="color:#00d4ff">${hint.recommended} Mbps+</strong> — ${hint.reason}. Safe bitrate cap: <strong style="color:#e6edf3">${bw.label}</strong> (${bw.description})</div></div></div>`; })()}
+      ${(() => { const hint = DEVICE_BANDWIDTH_HINTS[S.device]; if (!hint) return ''; const bw = calculateBitrateLimit(hint.recommended); return `<div style="background:rgba(0,212,255,.03);border:1px solid rgba(0,212,255,.12);border-radius:8px;padding:10px 14px;margin-bottom:14px;display:flex;align-items:center;gap:10px"><span style="font-size:1.1rem">📶</span><div class="u-flex1"><div style="font-size:.72rem;font-weight:700;color:#9ca3af">Bandwidth hint for your device</div><div style="font-size:.68rem;color:#6b7280;line-height:1.4">Recommended: <strong class="u-accent">${hint.recommended} Mbps+</strong> — ${hint.reason}. Safe bitrate cap: <strong class="u-tx">${bw.label}</strong> (${bw.description})</div></div></div>`; })()}
       ${needed.length ? `<div style="margin-bottom:14px">
         ${needed.map(inp => `
-        <div class="name-row" style="margin-bottom:10px">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+        <div class="u-mb10 name-row">
+          <div class="u-between4">
             <span style="color:#8b949e;font-size:.78rem;font-weight:700;letter-spacing:.04em">${inp.label}</span>
             ${inp.url ? `<a href="${inp.url}" target="_blank" rel="noopener noreferrer" style="font-size:.76rem;color:#00d4ff;text-decoration:none;font-weight:700">Get key →</a>` : ''}
           </div>
-          <div style="position:relative;display:flex;align-items:center">
+          <div class="u-relrow">
             <input class="name-input" id="cred_${inp.id}" data-service="${inp.id}" data-action="update-cred" type="password" autocapitalize="none" spellcheck="false" enterkeyhint="done" placeholder="${inp.placeholder}"
               value="${escH(S.creds[inp.id] || '')}" maxlength="120" style="padding-right:38px">
             <button type="button" data-action="toggle-cred-vis" data-target="cred_${inp.id}" title="Show / hide"
@@ -6477,7 +6477,7 @@ function simpleFinishHtml() {
       </div>` : ''}
       <div style="border:1px solid ${S.tmdbToken||S.tmdbApiKey?'rgba(52,211,153,.25)':'rgba(251,191,36,.25)'};border-radius:10px;overflow:hidden;margin-bottom:14px;background:${S.tmdbToken||S.tmdbApiKey?'rgba(52,211,153,.03)':'rgba(251,191,36,.03)'}">
         <div style="padding:11px 14px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,.04)">
-          <span style="display:flex;align-items:center;gap:8px">
+          <span class="u-rowc8">
             <span style="font-size:.75rem;font-weight:700;color:${S.tmdbToken||S.tmdbApiKey?'#34d399':'#fbbf24'};text-transform:uppercase;letter-spacing:.06em">${S.tmdbToken||S.tmdbApiKey?ICO.check(12,'#34d399')+' TMDB Connected':ICO.bolt(12,'#fbbf24')+' TMDB Key'}</span>
             ${S.tmdbToken||S.tmdbApiKey?'':'<span style="font-size:.6rem;font-weight:700;padding:1px 6px;border-radius:3px;background:rgba(251,191,36,.12);color:#fbbf24;border:1px solid rgba(251,191,36,.3)">RECOMMENDED</span>'}
           </span>
@@ -6485,9 +6485,9 @@ function simpleFinishHtml() {
         ${S.tmdbToken||S.tmdbApiKey ? '' : `<div style="padding:10px 14px;font-size:.72rem;color:#9ca3af;line-height:1.6;border-bottom:1px solid rgba(255,255,255,.04)">
           <div style="font-weight:700;color:#e6edf3;margin-bottom:4px">Without a TMDB key, TMDB-powered filters are switched off automatically:</div>
           <div style="display:flex;flex-direction:column;gap:2px;margin-bottom:8px">
-            <span>× <b style="color:#fbbf24">Title matching</b> — similar names are not cross-checked</span>
-            <span>× <b style="color:#fbbf24">Year matching</b> — remakes and reboots are not cross-checked</span>
-            <span>× <b style="color:#fbbf24">Digital release filtering</b> — release dates are not checked</span>
+            <span>× <b class="u-yellow">Title matching</b> — similar names are not cross-checked</span>
+            <span>× <b class="u-yellow">Year matching</b> — remakes and reboots are not cross-checked</span>
+            <span>× <b class="u-yellow">Digital release filtering</b> — release dates are not checked</span>
           </div>
           <div style="font-weight:700;color:#e6edf3;margin-bottom:4px">How to get a free TMDB key (2 min):</div>
           <div style="display:flex;flex-direction:column;gap:2px">
@@ -6497,12 +6497,12 @@ function simpleFinishHtml() {
           </div>
         </div>`}
         <div style="padding:12px 14px">
-          <div class="name-row" style="margin-bottom:10px">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+          <div class="u-mb10 name-row">
+            <div class="u-between4">
               <span style="color:#8b949e;font-size:.78rem;font-weight:700;letter-spacing:.04em">Read Access Token</span>
               <a href="https://www.themoviedb.org/settings/api" target="_blank" rel="noopener noreferrer" style="font-size:.76rem;color:#00d4ff;text-decoration:none;font-weight:700">Get key →</a>
             </div>
-            <div style="position:relative;display:flex;align-items:center">
+            <div class="u-relrow">
               <input class="name-input" id="tmdbIn" data-action="update-tmdb" type="password" autocapitalize="none" spellcheck="false" enterkeyhint="done" placeholder="eyJhbGciOiJSUzI1NiJ9…"
                 value="${escH(S.tmdbToken)}" maxlength="400" style="padding-right:38px">
               <button type="button" data-action="toggle-cred-vis" data-target="tmdbIn" title="Show / hide"
@@ -6515,11 +6515,11 @@ function simpleFinishHtml() {
             <span class="cred-status" id="tmdbStatus" role="status" aria-live="polite">${tmdbHint('token', S.tmdbToken)}</span>
           </div>
           <div class="name-row">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+            <div class="u-between4">
               <span style="color:#8b949e;font-size:.78rem;font-weight:700;letter-spacing:.04em">API Key</span>
               <a href="https://www.themoviedb.org/settings/api" target="_blank" rel="noopener noreferrer" style="font-size:.76rem;color:#00d4ff;text-decoration:none;font-weight:700">Get key →</a>
             </div>
-            <div style="position:relative;display:flex;align-items:center">
+            <div class="u-relrow">
               <input class="name-input" id="tmdbKeyIn" data-action="update-tmdb-key" type="password" autocapitalize="none" spellcheck="false" enterkeyhint="done" placeholder="abc123def456…"
                 value="${escH(S.tmdbApiKey)}" maxlength="60" style="padding-right:38px">
               <button type="button" data-action="toggle-cred-vis" data-target="tmdbKeyIn" title="Show / hide"
@@ -6535,7 +6535,7 @@ function simpleFinishHtml() {
       </div>
       <details style="border:1px solid rgba(255,255,255,.06);border-radius:10px;overflow:hidden;margin-bottom:14px">
         <summary style="list-style:none;display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:11px 14px;background:rgba(255,255,255,.02);user-select:none">
-          <span style="display:flex;align-items:center;gap:8px">
+          <span class="u-rowc8">
             ${ICO.gear(14,'#8b949e')}
             <span style="font-size:.75rem;font-weight:700;color:#8b949e;text-transform:uppercase;letter-spacing:.06em">Fine-tune</span>
             <span style="font-size:.65rem;color:#4b5563;font-weight:600">optional</span>
@@ -6551,13 +6551,13 @@ function simpleFinishHtml() {
           </div>
           <div>
             <div style="font-size:.72rem;font-weight:700;color:#8b949e;margin-bottom:6px">Dedup matching</div>
-            <div style="display:flex;gap:6px">
+            <div class="u-row6">
               ${[['strict','Strict'],['balanced','Balanced'],['relaxed','Relaxed']].map(([v,l]) => `<button data-action="set-simple-match" data-val="${v}" data-active="${S.matchMode===v}" style="flex:1;padding:5px 10px;border-radius:7px;font-size:.72rem;font-weight:700;cursor:pointer;transition:all .15s;border:1px solid ${S.matchMode===v?'rgba(0,212,255,.4)':'rgba(255,255,255,.08)'};background:${S.matchMode===v?'rgba(0,212,255,.1)':'transparent'};color:${S.matchMode===v?'#00d4ff':'#6b7280'}">${l}</button>`).join('')}
             </div>
           </div>
           <div>
             <div style="font-size:.72rem;font-weight:700;color:#8b949e;margin-bottom:6px">Cache mode</div>
-            <div style="display:flex;gap:6px">
+            <div class="u-row6">
               ${[['mixed','Mixed'],['cached','Cached only'],['uncached','Uncached only']].map(([v,l]) => `<button data-action="set-simple-cache" data-val="${v}" data-active="${S.cacheMode===v}" style="flex:1;padding:5px 10px;border-radius:7px;font-size:.72rem;font-weight:700;cursor:pointer;transition:all .15s;border:1px solid ${S.cacheMode===v?'rgba(0,212,255,.4)':'rgba(255,255,255,.08)'};background:${S.cacheMode===v?'rgba(0,212,255,.1)':'transparent'};color:${S.cacheMode===v?'#00d4ff':'#6b7280'}">${l}</button>`).join('')}
             </div>
           </div>
@@ -6566,7 +6566,7 @@ function simpleFinishHtml() {
               <span style="font-size:.72rem;font-weight:700;color:#8b949e">Stream pool</span>
               <span style="font-size:.6rem;color:#4b5563;font-weight:600">${streamPoolSummary()}</span>
             </div>
-            <div style="display:flex;gap:6px">
+            <div class="u-row6">
               ${streamPoolChoices().map(([v,l,c]) => `<button data-action="set-simple-pool" data-val="${v}" data-active="${(S.streamPool||'normal')===v}" style="flex:1;padding:7px 10px 5px;border-radius:7px;font-size:.72rem;font-weight:700;cursor:pointer;transition:all .15s;border:1px solid ${(S.streamPool||'normal')===v?'rgba(0,212,255,.4)':'rgba(255,255,255,.08)'};background:${(S.streamPool||'normal')===v?'rgba(0,212,255,.1)':'transparent'};color:${(S.streamPool||'normal')===v?'#00d4ff':'#6b7280'};line-height:1.3">${l}<br><span style="font-size:.6rem;font-weight:600;opacity:.7">${c}</span></button>`).join('')}
             </div>
             <div style="font-size:.65rem;color:#4b5563;margin-top:4px;line-height:1.4">More streams = better quality picks but slower load</div>
@@ -6592,7 +6592,7 @@ function simpleFinishHtml() {
         <input class="name-input" id="nameIn" type="text" placeholder="${escH(S.name)}" value="${escH(S.name)}" data-action="update-name" maxlength="60">
       </div>
       ${isFree ? `
-      <button class="btn-manifest" id="btnAio" data-action="simple-install" data-target="app" style="margin-bottom:8px">${ICO.link(18,'currentColor')} Import to AIOStreams</button>
+      <button class="u-mb8 btn-manifest" id="btnAio" data-action="simple-install" data-target="app">${ICO.link(18,'currentColor')} Import to AIOStreams</button>
       <div style="font-size:.74rem;color:#6b7280;text-align:center;margin-top:8px;line-height:1.5">Free templates need manual import — we'll create a link and open AIOStreams for you.</div>
       <div id="aioResult"></div>` : `
       <div class="install-toggle" style="display:flex;border-radius:10px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.02);padding:3px;margin-bottom:12px;gap:2px">
@@ -6614,10 +6614,10 @@ function simpleFinishHtml() {
         </div>
         <button type="button" data-action="create-stremio-account" style="align-self:flex-start;font-size:.7rem;color:#00d4ff;background:none;border:none;cursor:pointer;padding:0;font-weight:600;opacity:.8">Create random account →</button>
       </div>
-      <button class="btn-manifest" id="btnAio" data-action="simple-install" data-target="app" style="margin-bottom:8px">${ICO.rocket(18,'currentColor')} Install to Stremio</button>
+      <button class="u-mb8 btn-manifest" id="btnAio" data-action="simple-install" data-target="app">${ICO.rocket(18,'currentColor')} Install to Stremio</button>
       ` : `
-      <button class="btn-manifest" id="btnAio" data-action="simple-install" data-target="app" style="margin-bottom:8px">${ICO.rocket(18,'currentColor')} Deploy to Stremio</button>
-      <div style="display:flex;gap:8px">
+      <button class="u-mb8 btn-manifest" id="btnAio" data-action="simple-install" data-target="app">${ICO.rocket(18,'currentColor')} Deploy to Stremio</button>
+      <div class="u-row8">
         <button class="btn-manifest" data-action="simple-install" data-target="wuplay" style="flex:1;font-size:.82rem;padding:11px 10px;background:rgba(167,139,250,.10);border-color:rgba(167,139,250,.3);color:#a78bfa">${ICO.wuplay(16,'#a78bfa')} WuPlay</button>
         <button class="btn-manifest" data-action="simple-install" data-target="nuvio" style="flex:1;font-size:.82rem;padding:11px 10px;background:rgba(168,85,247,.08);border-color:rgba(168,85,247,.25);color:#c084fc">${ICO.nuvio(16)} Nuvio</button>
       </div>
@@ -6847,7 +6847,7 @@ function healthScoreHtml() {
         <div style="font-size:.62rem;color:#4b5563;margin-top:2px">${r.breakdown.filter(b=>b.points===b.max).length}/${r.breakdown.length} checks passed</div>
       </div>
     </div>
-    <details style="margin-top:10px"><summary style="list-style:none;cursor:pointer;font-size:.68rem;font-weight:600;color:#4b5563;display:flex;align-items:center;gap:4px"><span style="font-size:.55rem">▶</span> Breakdown</summary>
+    <details class="u-mt10"><summary style="list-style:none;cursor:pointer;font-size:.68rem;font-weight:600;color:#4b5563;display:flex;align-items:center;gap:4px"><span style="font-size:.55rem">▶</span> Breakdown</summary>
     <div style="margin-top:6px;padding-top:6px;border-top:1px solid rgba(255,255,255,.04)">${rows}</div></details>
   </div>`;
 }
@@ -6883,7 +6883,7 @@ function versionBannerHtml() {
   if (!v || !v.outdated) return remote;
   return `<div style="padding:10px 14px;border-radius:10px;background:rgba(0,212,255,.05);border:1px solid rgba(0,212,255,.15);margin-bottom:12px;display:flex;align-items:center;gap:10px">
     <span style="font-size:1.1rem">🔄</span>
-    <div style="flex:1">
+    <div class="u-flex1">
       <div style="font-size:.78rem;font-weight:700;color:#00d4ff">Update Available</div>
       <div style="font-size:.7rem;color:#8b949e">${v.message}${v.daysOld ? ` · ${v.daysOld} days old` : ''}</div>
     </div>
@@ -7493,7 +7493,7 @@ function showExpressLane() {
           <option value="custom"${S.instanceHost==='custom'?' selected':''}>Custom / self-hosted (set its URL in Advanced)</option>
         </select>
       </div>
-      <button type="button" id="expressExtrasBtn" class="additional-services-btn" style="width:100%;margin-top:8px;display:flex;align-items:center;gap:10px;padding:11px 13px;border-radius:11px;border:1px solid rgba(255,255,255,.09);background:#0e1621;color:#c9d5df;cursor:pointer;text-align:left"><span style="font-size:1rem;color:#a78bfa">＋</span><span style="flex:1"><b style="display:block;font-size:.72rem">Additional services &amp; scrapers</b><span style="display:block;font-size:.6rem;color:#718093;margin-top:1px">Debridio, Debrider, Usenet, indexers and more</span></span><span id="expressExtrasCount" style="font-size:.6rem;font-weight:900;color:#67e8f9"></span><span>→</span></button>
+      <button type="button" id="expressExtrasBtn" class="additional-services-btn" style="width:100%;margin-top:8px;display:flex;align-items:center;gap:10px;padding:11px 13px;border-radius:11px;border:1px solid rgba(255,255,255,.09);background:#0e1621;color:#c9d5df;cursor:pointer;text-align:left"><span style="font-size:1rem;color:#a78bfa">＋</span><span class="u-flex1"><b style="display:block;font-size:.72rem">Additional services &amp; scrapers</b><span style="display:block;font-size:.6rem;color:#718093;margin-top:1px">Debridio, Debrider, Usenet, indexers and more</span></span><span id="expressExtrasCount" style="font-size:.6rem;font-weight:900;color:#67e8f9"></span><span>→</span></button>
     </div>
     <div class="fastlane-section"><div class="fastlane-label">2 · Streams shown ${ftTip('<strong>Cached only</strong> = instant play; nothing that still needs downloading appears at all. <strong>Mixed</strong> also shows torrents your debrid must fetch first — those stall on a “downloading to debrid” screen the first time. Fast profile implies Cached-only until you change it here.')}</div>
       <div class="fastlane-grid services cols-2">
@@ -7517,22 +7517,22 @@ function showExpressLane() {
       <button type="button" class="fastlane-customize" data-express-customize="">Customize every setting →</button>
     </div>
     <details class="fastlane-optional"><summary style="cursor:pointer;color:#8b949e;font-weight:700;letter-spacing:.04em;text-transform:uppercase">Optional</summary>
-      <div style="margin-top:8px"><div style="font-size:.64rem;font-weight:800;color:#8b949e;letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px">Performance profile</div>
+      <div class="u-mt8"><div style="font-size:.64rem;font-weight:800;color:#8b949e;letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px">Performance profile</div>
         <div class="fastlane-grid services cols-3">${[['fast','Fast','1080p · cached first'],['balanced','Balanced','4K · sensible pool'],['maximum','Maximum','4K · largest pool']].map(([v,n,d])=>`<button type="button" class="fastlane-choice${state.profile===v?' active':''}" data-express-profile="${v}"><b>${n}</b><span>${d}</span></button>`).join('')}</div>
       </div>
-      <div style="margin-top:8px"><div style="font-size:.64rem;font-weight:800;color:#8b949e;letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px">Device</div>
+      <div class="u-mt8"><div style="font-size:.64rem;font-weight:800;color:#8b949e;letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px">Device</div>
         <div class="fastlane-grid services devices cols-4">${[['generic','Standard'],['shield','NVIDIA Shield'],['firestick-4kmax','Fire Stick 4K Max'],['googletv','Google TV'],['samsung','Samsung TV'],['onn','onn 4K'],['appletv-new','Apple TV 4K'],['windows','Windows PC']].map(([v,n])=>`<button type="button" class="fastlane-choice${state.device===v?' active':''}" data-express-device="${v}"><b>${n}</b></button>`).join('')}</div>
       </div>
-      <div style="margin-top:8px"><div style="font-size:.64rem;font-weight:800;color:#8b949e;letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px">Resolution</div>
+      <div class="u-mt8"><div style="font-size:.64rem;font-weight:800;color:#8b949e;letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px">Resolution</div>
         <div class="fastlane-grid services cols-3">${[['4k','4K','2160p primary · 1080p fallback'],['1080p','1080p','Excludes 4K'],['mixed','Mixed','Adaptive · no hard caps']].map(([v,n,d])=>`<button type="button" class="fastlane-choice${state.resolution===v?' active':''}" data-express-res="${v}"><b>${n}</b><span>${d}</span></button>`).join('')}</div>
       </div>
-      <label style="display:flex;align-items:flex-start;gap:8px;cursor:pointer;margin-top:8px"><input type="checkbox" id="expressFullStack" ${S.installAIOMeta !== false?'checked':''} style="margin-top:2px"><span style="color:#c9d5df"><b style="color:#e6edf3">Full stack</b><br><span style="color:#8b949e">Install AIOMetadata + patch Cinemeta for better posters and catalogs.</span></span></label>
-      <label style="display:flex;align-items:flex-start;gap:8px;cursor:pointer;margin-top:8px"><input type="checkbox" id="expressClean" ${S.cleanInstall?'checked':''} style="margin-top:2px"><span style="color:#c9d5df"><b style="color:#e6edf3">Clean reinstall</b><br><span style="color:#8b949e">Remove previous Core Builds addons from your Stremio account.</span></span></label>
-      <div style="margin-top:8px"><input class="fastlane-field" id="expressTmdb" type="password" autocomplete="off" spellcheck="false" placeholder="TMDB Read Access Token (optional — improves matching)" value="${escH(S.tmdbToken||'')}" style="width:100%"></div>
+      <label style="display:flex;align-items:flex-start;gap:8px;cursor:pointer;margin-top:8px"><input type="checkbox" id="expressFullStack" ${S.installAIOMeta !== false?'checked':''} style="margin-top:2px"><span style="color:#c9d5df"><b class="u-tx">Full stack</b><br><span class="u-tx2">Install AIOMetadata + patch Cinemeta for better posters and catalogs.</span></span></label>
+      <label style="display:flex;align-items:flex-start;gap:8px;cursor:pointer;margin-top:8px"><input type="checkbox" id="expressClean" ${S.cleanInstall?'checked':''} style="margin-top:2px"><span style="color:#c9d5df"><b class="u-tx">Clean reinstall</b><br><span class="u-tx2">Remove previous Core Builds addons from your Stremio account.</span></span></label>
+      <div class="u-mt8"><input class="fastlane-field" id="expressTmdb" type="password" autocomplete="off" spellcheck="false" placeholder="TMDB Read Access Token (optional — improves matching)" value="${escH(S.tmdbToken||'')}" style="width:100%"></div>
     </details>
     <div class="fastlane-foot">
       <div id="expressSummary" class="fastlane-summary"></div>
-      <button class="fastlane-go" id="expressGo" style="width:100%">Install in ~30 seconds</button><div id="aioResult" style="margin-top:10px"></div><button id="btnAutoCreate" style="display:none" aria-hidden="true"></button></div>
+      <button class="fastlane-go" id="expressGo" style="width:100%">Install in ~30 seconds</button><div class="u-mt10" id="aioResult"></div><button id="btnAutoCreate" style="display:none" aria-hidden="true"></button></div>
   </div>`;
   document.body.appendChild(overlay);
   try { history.pushState({ ...(history.state || {}), expressLane: true }, ''); } catch(e) {}
@@ -7563,7 +7563,7 @@ function showExpressLane() {
     const tgtName = { app:'Stremio', nuvio:'Nuvio', wuplay:'WuPlay', manifest:'Manifest URL' }[state.target] || 'Stremio';
     const cacheName = S.cacheMode === 'cached' ? '⚡ Cached only' : S.cacheMode === 'uncached' ? 'Uncached only' : 'Mixed cache (uncached may download first)';
     const fsOn = document.getElementById('expressFullStack')?.checked;
-    elSum.innerHTML = `${escHtml(svcName)} → ${escHtml(tgtName)} · ${profName} · ${escHtml(resName)} · <b style="color:${S.cacheMode==='cached'?'#34d399':'#fbbf24'}">${cacheName}</b> · host ${escHtml(HOST_LABEL_MAP[S.instanceHost] || S.instanceHost || 'auto')}${fsOn ? ' · <span style="color:#a78bfa">+ full stack (AIOMetadata + Cinemeta patch)</span>' : ''}`;
+    elSum.innerHTML = `${escHtml(svcName)} → ${escHtml(tgtName)} · ${profName} · ${escHtml(resName)} · <b style="color:${S.cacheMode==='cached'?'#34d399':'#fbbf24'}">${cacheName}</b> · host ${escHtml(HOST_LABEL_MAP[S.instanceHost] || S.instanceHost || 'auto')}${fsOn ? ' · <span class="u-purple">+ full stack (AIOMetadata + Cinemeta patch)</span>' : ''}`;
   };
   refreshExpressSummary();
   document.getElementById('expressFullStack')?.addEventListener('change', refreshExpressSummary);
@@ -7735,16 +7735,16 @@ async function runExpressInstall(p) {
       if (importUrl) {
         saveLastGen();
         const configureUrl = HOST_BASE_URLS[nuvioHost.id] + '/stremio/configure?template=' + encodeURIComponent(importUrl);
-        result.innerHTML = `<div class="import-success" style="margin-top:12px"><strong>Nuvio template ready — host: ${escHtml(nuvioHost.label || HOST_LABEL_MAP[nuvioHost.id] || nuvioHost.id)}</strong><div style="font-size:.78rem;margin:8px 0;line-height:1.6">Connect TorBox in <strong>Nuvio → Connected Services</strong>, not with a key in AIOStreams.<br>Import this template into AIOStreams, set a password and save. Then copy its <strong>manifest URL</strong> into Nuvio. The link below is a public template import link, not a manifest; credentials including TMDB are removed.</div><div class="inst-chips"><a href="${escH(configureUrl)}" target="_blank" rel="noopener noreferrer" class="inst-chip inst-chip-import">▶ ${escHtml(HOST_LABEL_MAP[nuvioHost.id] || nuvioHost.id)}</a></div><div class="manifest-url" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.72rem;padding:8px 10px;cursor:pointer" data-action="copy-manifest" data-url="${escH(importUrl)}">${escHtml(importUrl)}</div></div>`;
+        result.innerHTML = `<div class="u-mt12 import-success"><strong>Nuvio template ready — host: ${escHtml(nuvioHost.label || HOST_LABEL_MAP[nuvioHost.id] || nuvioHost.id)}</strong><div style="font-size:.78rem;margin:8px 0;line-height:1.6">Connect TorBox in <strong>Nuvio → Connected Services</strong>, not with a key in AIOStreams.<br>Import this template into AIOStreams, set a password and save. Then copy its <strong>manifest URL</strong> into Nuvio. The link below is a public template import link, not a manifest; credentials including TMDB are removed.</div><div class="inst-chips"><a href="${escH(configureUrl)}" target="_blank" rel="noopener noreferrer" class="inst-chip inst-chip-import">▶ ${escHtml(HOST_LABEL_MAP[nuvioHost.id] || nuvioHost.id)}</a></div><div class="manifest-url" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.72rem;padding:8px 10px;cursor:pointer" data-action="copy-manifest" data-url="${escH(importUrl)}">${escHtml(importUrl)}</div></div>`;
       } else {
-        result.innerHTML = '<div class="import-success import-error" style="margin-top:12px"><strong>Could not create a Nuvio import link</strong><div style="font-size:.78rem;margin:6px 0">Download this Nuvio template and import it manually into AIOStreams.</div><button type="button" id="downloadNuvioJson" class="df-btn df-btn-secondary">Export Nuvio JSON</button></div>';
+        result.innerHTML = '<div class="u-mt12 import-success import-error"><strong>Could not create a Nuvio import link</strong><div style="font-size:.78rem;margin:6px 0">Download this Nuvio template and import it manually into AIOStreams.</div><button type="button" id="downloadNuvioJson" class="df-btn df-btn-secondary">Export Nuvio JSON</button></div>';
         document.getElementById('downloadNuvioJson')?.addEventListener('click', () => downloadJsonFile(tmpl, 'core-nuvio-torbox-instant.json'));
       }
     } catch (err) {
       const errDiv = document.createElement('div');
       errDiv.className = 'import-success import-error';
       errDiv.style.cssText = 'margin-top:12px';
-      errDiv.innerHTML = '<strong style="color:#f87171">Nuvio generation failed</strong>';
+      errDiv.innerHTML = '<strong class="u-red">Nuvio generation failed</strong>';
       const detail = document.createElement('div');
       detail.style.cssText = 'color:#6b7280;font-size:.78rem';
       detail.textContent = String(err?.message || err);
@@ -7814,12 +7814,12 @@ function showFeedbackReportModal() {
   overlay.innerHTML = `<div class="fastlane-panel" role="dialog" aria-modal="true" aria-labelledby="feedbackReportTitle" style="max-width:620px">
     <div class="fastlane-head"><div class="fastlane-head-copy"><div class="fastlane-kicker">Safe support report</div><div class="fastlane-title" id="feedbackReportTitle">Copy a sanitized feedback report</div><div class="fastlane-sub">Only share the copied text. This tool never includes API keys, passwords, JSON, UUIDs, manifest URLs, or raw configuration data.</div></div><button class="fastlane-close" id="feedbackReportClose" aria-label="Close">✕</button></div>
     <div style="padding:0 20px 18px;display:flex;flex-direction:column;gap:11px">
-      <label style="font-size:.75rem;font-weight:700;color:#c9d1d9">Content type<select id="feedbackContentType" class="fastlane-field" style="margin-top:5px"><option value="Series">Series</option><option value="Movie">Movie</option><option value="Anime">Anime</option><option value="Other / not sure">Other / not sure</option></select></label>
-      <label style="font-size:.75rem;font-weight:700;color:#c9d1d9">Exact title + episode<input id="feedbackTitleEpisode" class="fastlane-field" maxlength="160" placeholder="Example: Title S02E03" style="margin-top:5px"></label>
-      <label style="font-size:.75rem;font-weight:700;color:#c9d1d9">Did any AIOStreams addon return streams?<select id="feedbackAddonStreams" class="fastlane-field" style="margin-top:5px"><option value="Not sure">Not sure</option><option value="Yes">Yes</option><option value="No">No</option></select></label>
-      <label style="font-size:.75rem;font-weight:700;color:#c9d1d9">Visible error text, if any<textarea id="feedbackVisibleError" maxlength="240" placeholder="Paste only the visible error text — URLs are redacted" style="margin-top:5px;width:100%;min-height:70px;resize:vertical;background:#0b0f16;color:#e6edf3;border:1px solid rgba(255,255,255,.12);border-radius:7px;padding:8px;font:inherit"></textarea></label>
+      <label class="u-strong">Content type<select id="feedbackContentType" class="fastlane-field" style="margin-top:5px"><option value="Series">Series</option><option value="Movie">Movie</option><option value="Anime">Anime</option><option value="Other / not sure">Other / not sure</option></select></label>
+      <label class="u-strong">Exact title + episode<input id="feedbackTitleEpisode" class="fastlane-field" maxlength="160" placeholder="Example: Title S02E03" style="margin-top:5px"></label>
+      <label class="u-strong">Did any AIOStreams addon return streams?<select id="feedbackAddonStreams" class="fastlane-field" style="margin-top:5px"><option value="Not sure">Not sure</option><option value="Yes">Yes</option><option value="No">No</option></select></label>
+      <label class="u-strong">Visible error text, if any<textarea id="feedbackVisibleError" maxlength="240" placeholder="Paste only the visible error text — URLs are redacted" style="margin-top:5px;width:100%;min-height:70px;resize:vertical;background:#0b0f16;color:#e6edf3;border:1px solid rgba(255,255,255,.12);border-radius:7px;padding:8px;font:inherit"></textarea></label>
       <pre id="feedbackReportPreview" class="diag-pre" style="margin:0;white-space:pre-wrap"></pre>
-      <div style="display:flex;gap:8px"><button id="feedbackReportCopy" class="fastlane-go" style="margin:0;flex:1">Copy sanitized report</button><button id="feedbackReportCancel" class="fastlane-close" style="position:static;width:auto;height:auto;padding:10px 14px;border:1px solid rgba(255,255,255,.12);border-radius:8px">Cancel</button></div>
+      <div class="u-row8"><button id="feedbackReportCopy" class="fastlane-go" style="margin:0;flex:1">Copy sanitized report</button><button id="feedbackReportCancel" class="fastlane-close" style="position:static;width:auto;height:auto;padding:10px 14px;border:1px solid rgba(255,255,255,.12);border-radius:8px">Cancel</button></div>
     </div>
   </div>`;
   document.body.appendChild(overlay);
@@ -7894,10 +7894,10 @@ async function simpleInstall(target) {
     btn.disabled = false; btn.innerHTML = origHtml;
     if (importUrl) {
       saveLastGen();
-      result.innerHTML = `<div class="import-success" style="margin-top:12px"><strong style="color:#e6edf3">Tap an instance to import your free template:</strong><div style="color:#6b7280;font-size:.8rem;margin:6px 0 10px"><strong style="color:#e6edf3">1.</strong> Tap an instance below to open AIOStreams<br><strong style="color:#e6edf3">2.</strong> Your template loads automatically<br><strong style="color:#e6edf3">3.</strong> Set a password and click Save</div>${instanceChips(importUrl)}<div style="color:#4b5563;font-size:.74rem;margin:8px 0 4px">Or copy this URL and paste it on your AIOStreams configure page → Import:</div><div style="display:flex;gap:6px;align-items:stretch"><div class="manifest-url" style="flex:1;min-width:0;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" data-action="copy-manifest" data-url="${importUrl.replace(/"/g,'&quot;')}" title="Click to copy">${escHtml(importUrl)}</div><button data-action="copy-manifest" data-url="${importUrl.replace(/"/g,'&quot;')}" style="flex-shrink:0;padding:0 12px;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.28);border-radius:6px;color:#00d4ff;font-size:.8rem;font-weight:700;cursor:pointer;white-space:nowrap">Copy</button></div><div style="font-size:.72rem;color:#6b7280;margin-top:8px">⏳ This link can expire — keep the downloaded JSON as a backup.</div></div>`;
+      result.innerHTML = `<div class="u-mt12 import-success"><strong class="u-tx">Tap an instance to import your free template:</strong><div class="u-note"><strong class="u-tx">1.</strong> Tap an instance below to open AIOStreams<br><strong class="u-tx">2.</strong> Your template loads automatically<br><strong class="u-tx">3.</strong> Set a password and click Save</div>${instanceChips(importUrl)}<div style="color:#4b5563;font-size:.74rem;margin:8px 0 4px">Or copy this URL and paste it on your AIOStreams configure page → Import:</div><div class="u-row6s"><div class="manifest-url" style="flex:1;min-width:0;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" data-action="copy-manifest" data-url="${importUrl.replace(/"/g,'&quot;')}" title="Click to copy">${escHtml(importUrl)}</div><button data-action="copy-manifest" data-url="${importUrl.replace(/"/g,'&quot;')}" style="flex-shrink:0;padding:0 12px;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.28);border-radius:6px;color:#00d4ff;font-size:.8rem;font-weight:700;cursor:pointer;white-space:nowrap">Copy</button></div><div class="u-hint">⏳ This link can expire — keep the downloaded JSON as a backup.</div></div>`;
       showToast('Tap an instance chip to import your template');
     } else {
-      result.innerHTML = `<div class="import-success import-error" style="margin-top:12px"><strong style="color:#f87171">Could not reach any paste service</strong><div style="color:#6b7280;font-size:.8rem;margin:6px 0 10px;line-height:1.5">Download the JSON and import it manually into AIOStreams.</div><div style="display:flex;gap:10px;justify-content:center"><button data-action="simple-install" style="padding:8px 16px;border-radius:8px;border:1px solid rgba(0,212,255,.3);background:rgba(0,212,255,.06);color:#00d4ff;font-size:.8rem;font-weight:700;cursor:pointer">Retry</button><button data-action="generate-dl" style="padding:8px 16px;border-radius:8px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.03);color:#9ca3af;font-size:.8rem;font-weight:700;cursor:pointer">Export JSON</button></div></div>`;
+      result.innerHTML = `<div class="u-mt12 import-success import-error"><strong class="u-red">Could not reach any paste service</strong><div style="color:#6b7280;font-size:.8rem;margin:6px 0 10px;line-height:1.5">Download the JSON and import it manually into AIOStreams.</div><div style="display:flex;gap:10px;justify-content:center"><button data-action="simple-install" style="padding:8px 16px;border-radius:8px;border:1px solid rgba(0,212,255,.3);background:rgba(0,212,255,.06);color:#00d4ff;font-size:.8rem;font-weight:700;cursor:pointer">Retry</button><button data-action="generate-dl" style="padding:8px 16px;border-radius:8px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.03);color:#9ca3af;font-size:.8rem;font-weight:700;cursor:pointer">Export JSON</button></div></div>`;
     }
     return;
   }
@@ -7962,7 +7962,7 @@ async function simpleInstall(target) {
           );
           btn.disabled = false; btn.innerHTML = origHtml;
           // Steps and errors come back from the network: escape before they reach innerHTML.
-          const stackHtml = stackResult.steps.length ? `<div style="margin-top:8px;padding:8px 10px;border-radius:6px;background:rgba(52,211,153,.04);border:1px solid rgba(52,211,153,.1);font-size:.72rem;color:#8b949e;line-height:1.6">${stackResult.steps.map(escHtml).join('<br>')}${stackResult.errors.length ? '<br>' + stackResult.errors.map(e=>`<span style="color:#f87171">⚠ ${escHtml(e)}</span>`).join('<br>') : ''}</div>` : '';
+          const stackHtml = stackResult.steps.length ? `<div style="margin-top:8px;padding:8px 10px;border-radius:6px;background:rgba(52,211,153,.04);border:1px solid rgba(52,211,153,.1);font-size:.72rem;color:#8b949e;line-height:1.6">${stackResult.steps.map(escHtml).join('<br>')}${stackResult.errors.length ? '<br>' + stackResult.errors.map(e=>`<span class="u-red">⚠ ${escHtml(e)}</span>`).join('<br>') : ''}</div>` : '';
           if (installed === 'already') {
             result.innerHTML = `<div style="margin-top:10px;padding:12px 14px;border-radius:10px;background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.2)"><div style="font-size:.82rem;font-weight:700;color:#fbbf24;margin-bottom:4px">${ICO.check(14,'#fbbf24')} Already installed</div><div style="font-size:.78rem;color:#8b949e">This addon is already in your Stremio library. Reopen Stremio to refresh.</div>${stackHtml}</div>`;
           } else {
@@ -8012,13 +8012,13 @@ async function simpleInstall(target) {
           const preview = val.length > 32 ? val.slice(0, 14) + '…' + val.slice(-8) : val;
           return `<div style="display:flex;align-items:center;gap:6px;margin-top:5px"><span style="font-size:.68rem;color:#6b7280;flex-shrink:0;min-width:76px">${inp.label}</span><div style="flex:1;font-family:monospace;font-size:.63rem;color:#9ca3af;background:rgba(0,0,0,.25);border-radius:4px;padding:3px 7px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${val}">${preview}</div><button data-action="copy-manifest" data-url="${val}" style="flex-shrink:0;padding:2px 8px;background:rgba(0,212,255,.08);border:1px solid rgba(0,212,255,.2);border-radius:4px;color:#00d4ff;font-size:.72rem;font-weight:700;cursor:pointer;white-space:nowrap">Copy</button></div>`;
         }).join('');
-        credBlock = `<div style="margin-top:10px;padding:10px 12px;border-radius:8px;background:rgba(245,158,11,.04);border:1px solid rgba(245,158,11,.14)"><div style="font-size:.72rem;font-weight:800;color:#fbbf24;letter-spacing:.06em;margin-bottom:3px">${ICO.warn(12,'#fbbf24')} RE-ENTER THESE IN AIOSTREAMS → SERVICES AFTER IMPORT</div><div style="font-size:.72rem;color:#8b949e;margin-bottom:7px">Your credentials were <strong style="color:#fbbf24">stripped from the import URL</strong>. After importing, go to <strong style="color:#e6edf3">Services</strong> and paste each key back in.</div>${rows}</div>`;
+        credBlock = `<div style="margin-top:10px;padding:10px 12px;border-radius:8px;background:rgba(245,158,11,.04);border:1px solid rgba(245,158,11,.14)"><div style="font-size:.72rem;font-weight:800;color:#fbbf24;letter-spacing:.06em;margin-bottom:3px">${ICO.warn(12,'#fbbf24')} RE-ENTER THESE IN AIOSTREAMS → SERVICES AFTER IMPORT</div><div style="font-size:.72rem;color:#8b949e;margin-bottom:7px">Your credentials were <strong class="u-yellow">stripped from the import URL</strong>. After importing, go to <strong class="u-tx">Services</strong> and paste each key back in.</div>${rows}</div>`;
       }
-      result.innerHTML = `<div class="import-success" style="margin-top:12px"><strong style="color:#e6edf3">All hosts unreachable — tap an instance to import instead:</strong><div style="color:#6b7280;font-size:.8rem;margin:6px 0 10px"><strong style="color:#e6edf3">1.</strong> Tap an instance below to open AIOStreams<br><strong style="color:#e6edf3">2.</strong> Your template loads automatically<br><strong style="color:#e6edf3">3.</strong> Set a password and click Save</div>${instanceChips(importUrl)}<div style="color:#4b5563;font-size:.74rem;margin:8px 0 4px">Or copy this URL and paste it on your AIOStreams configure page → Import:</div><div style="display:flex;gap:6px;align-items:stretch"><div class="manifest-url" style="flex:1;min-width:0;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" data-action="copy-manifest" data-url="${importUrl.replace(/"/g,'&quot;')}" title="Click to copy">${escHtml(importUrl)}</div><button data-action="copy-manifest" data-url="${importUrl.replace(/"/g,'&quot;')}" style="flex-shrink:0;padding:0 12px;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.28);border-radius:6px;color:#00d4ff;font-size:.8rem;font-weight:700;cursor:pointer;white-space:nowrap">Copy</button></div><div style="font-size:.72rem;color:#6b7280;margin-top:8px">⏳ This link can expire — keep the downloaded JSON as a backup.</div>${credBlock}</div>`;
+      result.innerHTML = `<div class="u-mt12 import-success"><strong class="u-tx">All hosts unreachable — tap an instance to import instead:</strong><div class="u-note"><strong class="u-tx">1.</strong> Tap an instance below to open AIOStreams<br><strong class="u-tx">2.</strong> Your template loads automatically<br><strong class="u-tx">3.</strong> Set a password and click Save</div>${instanceChips(importUrl)}<div style="color:#4b5563;font-size:.74rem;margin:8px 0 4px">Or copy this URL and paste it on your AIOStreams configure page → Import:</div><div class="u-row6s"><div class="manifest-url" style="flex:1;min-width:0;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" data-action="copy-manifest" data-url="${importUrl.replace(/"/g,'&quot;')}" title="Click to copy">${escHtml(importUrl)}</div><button data-action="copy-manifest" data-url="${importUrl.replace(/"/g,'&quot;')}" style="flex-shrink:0;padding:0 12px;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.28);border-radius:6px;color:#00d4ff;font-size:.8rem;font-weight:700;cursor:pointer;white-space:nowrap">Copy</button></div><div class="u-hint">⏳ This link can expire — keep the downloaded JSON as a backup.</div>${credBlock}</div>`;
       showToast('Tap an instance chip to import your template');
     } else {
-      result.innerHTML = `<div class="import-success import-error" style="margin-top:12px">
-        <strong style="color:#f87171">Could not reach any host or paste service</strong>
+      result.innerHTML = `<div class="u-mt12 import-success import-error">
+        <strong class="u-red">Could not reach any host or paste service</strong>
         <div style="color:#6b7280;font-size:.8rem;margin:6px 0 10px;line-height:1.5">All methods failed. Download the JSON and import it manually into AIOStreams.</div>
         <div style="display:flex;gap:10px;justify-content:center">
           <button data-action="simple-install" style="padding:8px 16px;border-radius:8px;border:1px solid rgba(0,212,255,.3);background:rgba(0,212,255,.06);color:#00d4ff;font-size:.8rem;font-weight:700;cursor:pointer">Retry</button>
@@ -8219,7 +8219,7 @@ function updateUuidValidation(val) {
   input.style.borderColor = ok ? '#22c55e' : '#f87171';
   status.innerHTML = ok
     ? '<span style="color:#22c55e;font-weight:700">' + ICO.check(12,'#22c55e') + ' Valid UUID — Saved</span>'
-    : '<span style="color:#f87171">Invalid format — must be xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx</span>';
+    : '<span class="u-red">Invalid format — must be xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx</span>';
 }
 
 function onPasteManifest(val) {
@@ -8248,12 +8248,12 @@ function tmdbHint(field, val) {
   if (!v) return '';
   const looksToken = v.startsWith('eyJ');
   const looksKey = /^[a-f0-9]{32}$/i.test(v);
-  if (field === 'token' && looksKey) return '<span style="color:#f59e0b">' + ICO.warn(12,'#f59e0b') + ' That is the 32-character API Key — this field wants the long Read Access Token (starts with eyJ).</span>';
-  if (field === 'token' && !looksToken && v.length >= 20) return '<span style="color:#f59e0b">' + ICO.warn(12,'#f59e0b') + ' Read Access Tokens start with eyJ — this does not look like one.</span>';
-  if (field === 'token' && looksToken && v.length >= 100) return '<span style="color:#34d399">' + ICO.check(12,'#34d399') + ' Looks like a valid Read Access Token</span>';
-  if (field === 'key' && looksToken) return '<span style="color:#f59e0b">' + ICO.warn(12,'#f59e0b') + ' That is the Read Access Token — this field wants the 32-character API Key.</span>';
-  if (field === 'key' && !looksKey && v.length >= 24) return '<span style="color:#f59e0b">' + ICO.warn(12,'#f59e0b') + ' API Keys are exactly 32 characters (letters and numbers) — this does not look like one.</span>';
-  if (field === 'key' && looksKey) return '<span style="color:#34d399">' + ICO.check(12,'#34d399') + ' Looks like a valid API Key</span>';
+  if (field === 'token' && looksKey) return '<span class="u-amber">' + ICO.warn(12,'#f59e0b') + ' That is the 32-character API Key — this field wants the long Read Access Token (starts with eyJ).</span>';
+  if (field === 'token' && !looksToken && v.length >= 20) return '<span class="u-amber">' + ICO.warn(12,'#f59e0b') + ' Read Access Tokens start with eyJ — this does not look like one.</span>';
+  if (field === 'token' && looksToken && v.length >= 100) return '<span class="u-green">' + ICO.check(12,'#34d399') + ' Looks like a valid Read Access Token</span>';
+  if (field === 'key' && looksToken) return '<span class="u-amber">' + ICO.warn(12,'#f59e0b') + ' That is the Read Access Token — this field wants the 32-character API Key.</span>';
+  if (field === 'key' && !looksKey && v.length >= 24) return '<span class="u-amber">' + ICO.warn(12,'#f59e0b') + ' API Keys are exactly 32 characters (letters and numbers) — this does not look like one.</span>';
+  if (field === 'key' && looksKey) return '<span class="u-green">' + ICO.check(12,'#34d399') + ' Looks like a valid API Key</span>';
   return '';
 }
 
@@ -8399,16 +8399,16 @@ async function createImportUrl() {
       }).join('');
       credBlock = `<div class="cred-remind" style="margin-top:10px;padding:10px 12px;border-radius:8px;background:rgba(245,158,11,.04);border:1px solid rgba(245,158,11,.14)">
         <div class="cr-hdr" style="font-size:.72rem;font-weight:800;color:#fbbf24;letter-spacing:.06em;margin-bottom:3px">${ICO.warn(12,'#fbbf24')} RE-ENTER THESE IN AIOSTREAMS → SERVICES AFTER IMPORT</div>
-        <div style="font-size:.72rem;color:#8b949e;margin-bottom:7px">Your debrid credentials were <strong style="color:#fbbf24">stripped from the import URL</strong>. Once AIOStreams has loaded your template, go to <strong style="color:#e6edf3">Services</strong> and paste each key back in.</div>
+        <div style="font-size:.72rem;color:#8b949e;margin-bottom:7px">Your debrid credentials were <strong class="u-yellow">stripped from the import URL</strong>. Once AIOStreams has loaded your template, go to <strong class="u-tx">Services</strong> and paste each key back in.</div>
         ${rows}
       </div>`;
     }
 
-    result.innerHTML = `<div class="import-success" style="margin-top:10px"><strong>▶ Tap your instance to load the template into AIOStreams</strong><div style="color:#6b7280;font-size:.79rem;margin:4px 0 8px"><strong style="color:#e6edf3">This is not a Stremio link</strong> — it loads your settings into AIOStreams so you can get a manifest. <strong style="color:#fbbf24">Debrid credentials are stripped</strong>; you'll re-enter them in AIOStreams after import.</div>${instanceChips(url)}<div style="color:#4b5563;font-size:.74rem;margin:8px 0 4px">Or copy this URL and paste it on your AIOStreams configure page → Import button:</div><div style="display:flex;gap:6px;align-items:stretch"><div class="manifest-url" style="flex:1;min-width:0;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" data-action="copy-manifest" data-url="${url.replace(/"/g,'&quot;')}" title="Click to copy">${escHtml(url)}</div><button data-action="copy-manifest" data-url="${url.replace(/"/g,'&quot;')}" style="flex-shrink:0;padding:0 12px;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.28);border-radius:6px;color:#00d4ff;font-size:.8rem;font-weight:700;cursor:pointer;white-space:nowrap;transition:background .15s" onmouseover="this.style.background='rgba(0,212,255,.2)'" onmouseout="this.style.background='rgba(0,212,255,.1)'">Copy URL</button></div><div style="font-size:.72rem;color:#6b7280;margin-top:8px">⏳ This link expires after 30 days — keep the downloaded JSON as a backup.</div>${credBlock}</div>`;
+    result.innerHTML = `<div class="u-mt10 import-success"><strong>▶ Tap your instance to load the template into AIOStreams</strong><div style="color:#6b7280;font-size:.79rem;margin:4px 0 8px"><strong class="u-tx">This is not a Stremio link</strong> — it loads your settings into AIOStreams so you can get a manifest. <strong class="u-yellow">Debrid credentials are stripped</strong>; you'll re-enter them in AIOStreams after import.</div>${instanceChips(url)}<div style="color:#4b5563;font-size:.74rem;margin:8px 0 4px">Or copy this URL and paste it on your AIOStreams configure page → Import button:</div><div class="u-row6s"><div class="manifest-url" style="flex:1;min-width:0;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" data-action="copy-manifest" data-url="${url.replace(/"/g,'&quot;')}" title="Click to copy">${escHtml(url)}</div><button data-action="copy-manifest" data-url="${url.replace(/"/g,'&quot;')}" style="flex-shrink:0;padding:0 12px;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.28);border-radius:6px;color:#00d4ff;font-size:.8rem;font-weight:700;cursor:pointer;white-space:nowrap;transition:background .15s" onmouseover="this.style.background='rgba(0,212,255,.2)'" onmouseout="this.style.background='rgba(0,212,255,.1)'">Copy URL</button></div><div class="u-hint">⏳ This link expires after 30 days — keep the downloaded JSON as a backup.</div>${credBlock}</div>`;
     showToast('Click an instance chip to auto-import your template');
   } else {
     logError('deploy', 'Paste service blocked or timed out', { service: S.service });
-    result.innerHTML = `<div class="import-success import-error" style="margin-top:10px"><strong style="color:#f87171">Paste service blocked or timed out</strong><div style="color:#6b7280;font-size:.79rem;margin-top:4px">The upload failed — CORS block, rate limit, or paste.rs downtime. Use ⬇ Download instead, then import the file in AIOStreams.</div></div>`;
+    result.innerHTML = `<div class="u-mt10 import-success import-error"><strong class="u-red">Paste service blocked or timed out</strong><div style="color:#6b7280;font-size:.79rem;margin-top:4px">The upload failed — CORS block, rate limit, or paste.rs downtime. Use ⬇ Download instead, then import the file in AIOStreams.</div></div>`;
     showToast('Paste service unreachable', true);
   }
 }
@@ -8486,16 +8486,16 @@ async function openInAIOStreams() {
               const preview = val.length > 32 ? val.slice(0, 14) + '…' + val.slice(-8) : val;
               return `<div style="display:flex;align-items:center;gap:6px;margin-top:5px"><span style="font-size:.68rem;color:#6b7280;flex-shrink:0;min-width:76px">${inp.label}</span><div style="flex:1;font-family:monospace;font-size:.63rem;color:#9ca3af;background:rgba(0,0,0,.25);border-radius:4px;padding:3px 7px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${val}">${preview}</div><button data-action="copy-manifest" data-url="${val}" style="flex-shrink:0;padding:2px 8px;background:rgba(0,212,255,.08);border:1px solid rgba(0,212,255,.2);border-radius:4px;color:#00d4ff;font-size:.72rem;font-weight:700;cursor:pointer;white-space:nowrap">Copy</button></div>`;
             }).join('');
-            credBlock = `<div style="margin-top:10px;padding:10px 12px;border-radius:8px;background:rgba(245,158,11,.04);border:1px solid rgba(245,158,11,.14)"><div style="font-size:.72rem;font-weight:800;color:#fbbf24;letter-spacing:.06em;margin-bottom:3px">${ICO.warn(12,'#fbbf24')} RE-ENTER THESE IN AIOSTREAMS → SERVICES AFTER IMPORT</div><div style="font-size:.72rem;color:#8b949e;margin-bottom:7px">Your credentials were <strong style="color:#fbbf24">stripped from the import URL</strong>. After importing, go to <strong style="color:#e6edf3">Services</strong> and paste each key back in.</div>${rows}</div>`;
+            credBlock = `<div style="margin-top:10px;padding:10px 12px;border-radius:8px;background:rgba(245,158,11,.04);border:1px solid rgba(245,158,11,.14)"><div style="font-size:.72rem;font-weight:800;color:#fbbf24;letter-spacing:.06em;margin-bottom:3px">${ICO.warn(12,'#fbbf24')} RE-ENTER THESE IN AIOSTREAMS → SERVICES AFTER IMPORT</div><div style="font-size:.72rem;color:#8b949e;margin-bottom:7px">Your credentials were <strong class="u-yellow">stripped from the import URL</strong>. After importing, go to <strong class="u-tx">Services</strong> and paste each key back in.</div>${rows}</div>`;
           }
-          result.innerHTML = `<div class="import-success" style="margin-top:12px"><strong style="color:#e6edf3">One-click wasn't available — here's the quick import instead:</strong><div style="color:#6b7280;font-size:.8rem;margin:6px 0 10px"><strong style="color:#e6edf3">1.</strong> Tap an instance below to open AIOStreams<br><strong style="color:#e6edf3">2.</strong> Your template loads automatically<br><strong style="color:#e6edf3">3.</strong> Set a password and click Save</div>${instanceChips(importUrl)}<div style="color:#4b5563;font-size:.74rem;margin:8px 0 4px">Or copy this URL and paste it on your AIOStreams configure page → Import:</div><div style="display:flex;gap:6px;align-items:stretch"><div class="manifest-url" style="flex:1;min-width:0;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" data-action="copy-manifest" data-url="${importUrl.replace(/"/g,'&quot;')}" title="Click to copy">${escHtml(importUrl)}</div><button data-action="copy-manifest" data-url="${importUrl.replace(/"/g,'&quot;')}" style="flex-shrink:0;padding:0 12px;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.28);border-radius:6px;color:#00d4ff;font-size:.8rem;font-weight:700;cursor:pointer;white-space:nowrap">Copy</button></div><div style="font-size:.72rem;color:#6b7280;margin-top:8px">⏳ This link can expire — keep the downloaded JSON as a backup.</div>${credBlock}</div>`;
+          result.innerHTML = `<div class="u-mt12 import-success"><strong class="u-tx">One-click wasn't available — here's the quick import instead:</strong><div class="u-note"><strong class="u-tx">1.</strong> Tap an instance below to open AIOStreams<br><strong class="u-tx">2.</strong> Your template loads automatically<br><strong class="u-tx">3.</strong> Set a password and click Save</div>${instanceChips(importUrl)}<div style="color:#4b5563;font-size:.74rem;margin:8px 0 4px">Or copy this URL and paste it on your AIOStreams configure page → Import:</div><div class="u-row6s"><div class="manifest-url" style="flex:1;min-width:0;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" data-action="copy-manifest" data-url="${importUrl.replace(/"/g,'&quot;')}" title="Click to copy">${escHtml(importUrl)}</div><button data-action="copy-manifest" data-url="${importUrl.replace(/"/g,'&quot;')}" style="flex-shrink:0;padding:0 12px;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.28);border-radius:6px;color:#00d4ff;font-size:.8rem;font-weight:700;cursor:pointer;white-space:nowrap">Copy</button></div><div class="u-hint">⏳ This link can expire — keep the downloaded JSON as a backup.</div>${credBlock}</div>`;
           showToast('Tap an instance chip to import your template');
         } else {
-          result.innerHTML = `<div class="import-success import-error" style="margin-top:12px"><strong style="color:#f87171">All Hosts Unreachable</strong><div style="color:#6b7280;font-size:.8rem;margin:6px 0 10px">Couldn't connect directly or create an import link. Try again in a minute, or use the manual options.</div><button data-action="show-full-review" style="padding:8px 14px;border-radius:8px;border:1px solid rgba(0,212,255,.3);background:rgba(0,212,255,.06);color:#00d4ff;font-size:.78rem;font-weight:700;cursor:pointer">Show manual setup options →</button></div>`;
+          result.innerHTML = `<div class="u-mt12 import-success import-error"><strong class="u-red">All Hosts Unreachable</strong><div class="u-note">Couldn't connect directly or create an import link. Try again in a minute, or use the manual options.</div><button data-action="show-full-review" style="padding:8px 14px;border-radius:8px;border:1px solid rgba(0,212,255,.3);background:rgba(0,212,255,.06);color:#00d4ff;font-size:.78rem;font-weight:700;cursor:pointer">Show manual setup options →</button></div>`;
         }
       } else {
         resetBtn(origHtml);
-        result.innerHTML = `<div class="import-success import-error" style="margin-top:12px"><strong style="color:#f87171">All Hosts Unreachable</strong><div style="color:#6b7280;font-size:.8rem;margin:6px 0 10px">All hosts timed out or refused the connection (CORS, rate limit, or downtime). Use <strong style="color:#8b949e">Step 1 — Import to AIOStreams</strong> or <strong style="color:#8b949e">Download</strong> instead.</div></div>`;
+        result.innerHTML = `<div class="u-mt12 import-success import-error"><strong class="u-red">All Hosts Unreachable</strong><div class="u-note">All hosts timed out or refused the connection (CORS, rate limit, or downtime). Use <strong class="u-tx2">Step 1 — Import to AIOStreams</strong> or <strong class="u-tx2">Download</strong> instead.</div></div>`;
       }
     }
     return;
@@ -8514,7 +8514,7 @@ async function openInAIOStreams() {
 
   /* No UUID, not auto or custom — guide to get UUID */
   if (!uuid && !isCustom && !isAuto) {
-    result.innerHTML = `<div class="import-success import-info" style="margin-top:12px"><strong style="color:#e6edf3">No UUID entered</strong><div style="color:#6b7280;font-size:.8rem;margin:6px 0 2px">Sign in to your AIOStreams instance, copy your UUID from the configure page and paste it above.</div><div style="color:#4b5563;font-size:.77rem;margin:6px 0 4px">Or use <strong style="color:#8b949e">Import to AIOStreams</strong> above — click a chip below to open AIOStreams and import in one click:</div>${instanceChips()}</div>`;
+    result.innerHTML = `<div class="u-mt12 import-success import-info"><strong class="u-tx">No UUID entered</strong><div style="color:#6b7280;font-size:.8rem;margin:6px 0 2px">Sign in to your AIOStreams instance, copy your UUID from the configure page and paste it above.</div><div style="color:#4b5563;font-size:.77rem;margin:6px 0 4px">Or use <strong class="u-tx2">Import to AIOStreams</strong> above — click a chip below to open AIOStreams and import in one click:</div>${instanceChips()}</div>`;
     return;
   }
 
@@ -8549,12 +8549,12 @@ async function openInAIOStreams() {
       }
       logError('deploy', 'Connection failed to host', { host: S.instanceHost, error: e.message });
       resetBtn(origHtml);
-      result.innerHTML = `<div class="import-success import-error" style="margin-top:12px"><strong style="color:#f87171">Connection Failed</strong><div style="color:#6b7280;font-size:.8rem;margin:6px 0 10px">Host timed out or refused the connection (CORS, rate limit, or downtime). Use <strong style="color:#8b949e">Step 1 — Import to AIOStreams</strong> or <strong style="color:#8b949e">Download</strong> instead.</div></div>`;
+      result.innerHTML = `<div class="u-mt12 import-success import-error"><strong class="u-red">Connection Failed</strong><div class="u-note">Host timed out or refused the connection (CORS, rate limit, or downtime). Use <strong class="u-tx2">Step 1 — Import to AIOStreams</strong> or <strong class="u-tx2">Download</strong> instead.</div></div>`;
     }
     return;
   }
 
-  result.innerHTML = `<div class="import-success import-info" style="margin-top:12px"><strong style="color:#e6edf3">Enter a password to proceed</strong><div style="color:#6b7280;font-size:.8rem;margin:6px 0 4px">Set a password above to generate or save your config. Or use <strong style="color:#8b949e">Import to AIOStreams</strong> above.</div></div>`;
+  result.innerHTML = `<div class="u-mt12 import-success import-info"><strong class="u-tx">Enter a password to proceed</strong><div style="color:#6b7280;font-size:.8rem;margin:6px 0 4px">Set a password above to generate or save your config. Or use <strong class="u-tx2">Import to AIOStreams</strong> above.</div></div>`;
 }
 
 window.toggleTheme = toggleTheme;

@@ -1,4 +1,10 @@
 export const CHANGELOG = [
+  { v:'3.23', date:'Oct 23 2026', items:[
+    'Light mode reads properly — text, panels and key hints that were coloured for the dark theme now follow whichever theme you use. In light mode, Fine-Tune’s audio, video, subtitle and catalog panels used to stay dark inside a white page, and the keyboard-shortcut keys were dark boxes with unreadable text; both are fixed. Dark mode looks the same as before.',
+    'One set of colours under the hood — 282 hard-coded styles became shared classes built on the theme colours, so new screens pick up both themes automatically. A test now stops hard-coded inline styles from growing back.',
+    'Subtitles help no longer mentions AIOSubtitle — the addon was removed in 3.18, but the Fine-Tune tooltip still described it.',
+    'Generated output unchanged — every config the configurator and the CLI build is byte-for-byte what 3.22 produced; only the version stamp moves.',
+  ]},
   { v:'3.22', date:'Oct 23 2026', items:[
     'Quick install reaches every setting — a new Defaults we’ll use list shows what Quick install leaves at its default: audio, size and quality, stream cards, subtitles and catalogs. Tap one and the full builder opens at that setting, with your service, key, device, quality and install target already filled in, so nothing is lost when you move from Quick to Custom. Install from Review when you are done.',
     'Customize every setting — the link under the list opens all of Fine-Tune the same way.',

@@ -1,14 +1,33 @@
 ---
-title: "What's New — Configurator v3.22"
+title: "What's New — Configurator v3.23"
 sidebarTitle: "What's New"
-description: "Latest Core Builds Configurator releases (v3.22 and earlier), auto-generated from the in-app changelog."
+description: "Latest Core Builds Configurator releases (v3.23 and earlier), auto-generated from the in-app changelog."
 ---
 
 # What's New in the Configurator
 
-This page is regenerated from `configurator/src/data/changelog.js` by `scripts/sync-docs.py`, so it always reflects the latest shipped configurator version (currently **v3.22**).
+This page is regenerated from `configurator/src/data/changelog.js` by `scripts/sync-docs.py`, so it always reflects the latest shipped configurator version (currently **v3.23**).
 
 For the template-suite release log, see the [Changelog](https://corebuilds-docs.docsalot.dev/changelog).
+
+## Configurator v3.23 (Oct 23 2026)
+
+<CardGroup cols={2}>
+  <Card title="Light mode reads properly" icon="sparkles">
+    text, panels and key hints that were coloured for the dark theme now follow whichever theme you use. In light mode, Fine-Tune’s audio, video, subtitle and catalog panels used to stay dark inside a white page, and the keyboard-shortcut keys were dark boxes with unreadable text; both are fixed. Dark mode looks the same as before.
+  </Card>
+  <Card title="One set of colours under the hood" icon="bolt">
+    282 hard-coded styles became shared classes built on the theme colours, so new screens pick up both themes automatically. A test now stops hard-coded inline styles from growing back.
+  </Card>
+  <Card title="Subtitles help no longer mentions AIOSubtitle" icon="shield-check">
+    the addon was removed in 3.18, but the Fine-Tune tooltip still described it.
+  </Card>
+  <Card title="Generated output unchanged" icon="sliders">
+    every config the configurator and the CLI build is byte-for-byte what 3.22 produced; only the version stamp moves.
+  </Card>
+</CardGroup>
+
+---
 
 ## Configurator v3.22 (Oct 23 2026)
 
@@ -59,18 +78,5 @@ For the template-suite release log, see the [Changelog](https://corebuilds-docs.
   </Card>
   <Card title="Generated output unchanged" icon="gauge">
     every config the configurator and the CLI build is byte-for-byte what 3.19 produced; only the version stamp moves.
-  </Card>
-</CardGroup>
-
----
-
-## Configurator v3.19 (Oct 23 2026)
-
-<CardGroup cols={2}>
-  <Card title="PenguPlay as a backup source" icon="sparkles">
-    Fine-Tune → Extras offers PenguPlay, the HTTP stream addon Tam-Taro’s setups also carry. Paste the personal manifest URL from your pengu.uk account and it joins your build after every other stream source, serving streams only, so it fills gaps without leading. Without a URL that ends in /manifest.json nothing is added, since AIOStreams refuses the save otherwise. Hosts that block HTTP streams, ElfHosted among them, do not offer it. The URL stays on your device and in the config you install, never in share links.
-  </Card>
-  <Card title="Generated output unchanged" icon="bolt">
-    builds without PenguPlay are byte-for-byte what 3.18 produced; only the version stamp moves.
   </Card>
 </CardGroup>

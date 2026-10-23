@@ -49,3 +49,26 @@
 [data-theme='light'] [data-action='set-simple-quality'],[data-theme='light'] [data-action='set-simple-resfirst']{background:#fff!important;border-color:#cfd8e2!important;color:#536170!important}[data-theme='light'] [data-action='set-simple-quality'][data-active='true'],[data-theme='light'] [data-action='set-simple-resfirst'][data-active='true']{background:#e5f1ff!important;border-color:#6aa7e8!important;color:#075ebd!important}
 [data-theme='light'] .fmt-scroll-card>div[style*='border-top']{color:#526170!important;border-color:#d5dde5!important}
 [data-theme='light'] .additional-services-btn{background:#fff!important;background-image:none!important;border-color:#d5dde5!important;color:#1f2933!important}[data-theme='light'] .additional-services-btn span{color:#526170!important}[data-theme='light'] .additional-services-btn b{color:#1f2933!important}
+/* Shared utility classes (v3.23 styling clean-up). These replace 273 repeated
+   inline style="" strings in app.js. Colours come from the theme tokens, so text
+   that was hard-coded for the dark theme now follows light mode as well. They
+   sit in the last layer because the inline styles they replace beat every
+   earlier rule; keep them here. */
+.u-tx{color:var(--th-tx)}.u-tx2{color:var(--th-tx2)}.u-tx3{color:var(--th-tx3)}.u-tx4{color:var(--th-tx4)}
+.u-red{color:var(--th-red)}.u-yellow{color:var(--th-yellow)}.u-green{color:var(--th-green)}.u-purple{color:var(--th-purple)}.u-accent{color:var(--th-accent)}
+.u-amber{color:#f59e0b}[data-theme='light'] .u-amber{color:#b45309}
+.u-flex1{flex:1}.u-dim{opacity:.6}
+.u-mt8{margin-top:8px}.u-mt10{margin-top:10px}.u-mt12{margin-top:12px}.u-mb8{margin-bottom:8px}.u-mb10{margin-bottom:10px}
+.u-row5{display:flex;gap:5px}.u-row6{display:flex;gap:6px}.u-row8{display:flex;gap:8px}.u-row6s{display:flex;gap:6px;align-items:stretch}
+.u-rowc8{display:flex;align-items:center;gap:8px}.u-relrow{position:relative;display:flex;align-items:center}.u-pr38{padding-right:38px}
+.u-between4,.u-between6{display:flex;justify-content:space-between;align-items:center}.u-between4{margin-bottom:4px}.u-between6{margin-bottom:6px}
+.u-trunc{flex:1;min-width:0;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.u-note{color:var(--th-tx3);font-size:.8rem;margin:6px 0 10px}.u-note-tight{color:var(--th-tx3);font-size:.8rem;margin:6px 0 2px;line-height:1.5}
+.u-hint{font-size:.72rem;color:var(--th-tx3);margin-top:8px}.u-micro{font-size:.65rem;color:var(--th-tx4)}
+.u-strong{font-size:.75rem;font-weight:700;color:#c9d1d9}[data-theme='light'] .u-strong{color:#1f2328}
+.u-kbd{background:var(--th-card-alt);border:1px solid var(--th-border-strong);border-bottom-width:2px;border-radius:5px;padding:2px 7px;font-size:.72rem}
+.ft-head{font-size:.72rem;font-weight:700;color:#4b5563;letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+[data-theme='light'] .ft-head{color:#57606a}
+.kv-row{display:flex;justify-content:space-between;padding:8px 10px;border-radius:8px;background:var(--th-input-bg);border:1px solid var(--th-border)}
+.ft-box{background:var(--th-card-alt);border:1.5px solid var(--th-border-strong);border-radius:10px;padding:14px 16px}
+.ft-input{width:100%;box-sizing:border-box;background:var(--th-card-alt);border:1px solid var(--th-border);border-radius:8px;padding:9px 12px;color:var(--th-tx);font-size:.82rem;outline:none}
