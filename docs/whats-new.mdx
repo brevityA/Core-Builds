@@ -1,14 +1,36 @@
 ---
-title: "What's New — Configurator v3.19"
+title: "What's New — Configurator v3.20"
 sidebarTitle: "What's New"
-description: "Latest Core Builds Configurator releases (v3.19 and earlier), auto-generated from the in-app changelog."
+description: "Latest Core Builds Configurator releases (v3.20 and earlier), auto-generated from the in-app changelog."
 ---
 
 # What's New in the Configurator
 
-This page is regenerated from `configurator/src/data/changelog.js` by `scripts/sync-docs.py`, so it always reflects the latest shipped configurator version (currently **v3.19**).
+This page is regenerated from `configurator/src/data/changelog.js` by `scripts/sync-docs.py`, so it always reflects the latest shipped configurator version (currently **v3.20**).
 
 For the template-suite release log, see the [Changelog](https://corebuilds-docs.docsalot.dev/changelog).
+
+## Configurator v3.20 (Oct 23 2026)
+
+<CardGroup cols={2}>
+  <Card title="Two ways in, on the first screen" icon="sparkles">
+    Quick install and Custom build now sit side by side under the headline, where a phone shows them without scrolling. The Advanced Builder used to be a small grey link at the bottom edge of the screen; it is now Custom build, an equal card. Update an existing setup, Import a config, Setup Genie and the tour are text links right beneath them.
+  </Card>
+  <Card title="No pop-up on a first visit" icon="bolt">
+    the tour used to cover the landing before you had seen it. It now opens only when you pick Take the tour.
+  </Card>
+  <Card title="Resume from the top" icon="shield-check">
+    a saved build’s Continue where you left off banner moved above the headline, so on a phone it is on the first screen instead of below the fold.
+  </Card>
+  <Card title="Mode button no longer covers the help button" icon="sliders">
+    the light/dark switch sat on top of the chat button in the bottom-right corner. It now sits just above it, on desktop and phone.
+  </Card>
+  <Card title="Generated output unchanged" icon="gauge">
+    every config the configurator and the CLI build is byte-for-byte what 3.19 produced; only the version stamp moves.
+  </Card>
+</CardGroup>
+
+---
 
 ## Configurator v3.19 (Oct 23 2026)
 
@@ -110,18 +132,5 @@ For the template-suite release log, see the [Changelog](https://corebuilds-docs.
   </Card>
   <Card title="About 1,800 lines of dead code removed" icon="layers">
     an install modal nothing opened, a Quick Start overlay no button reached, six leftover patch notes, six unused debug scripts, an unused catalog module, about 300 style rules nothing matched (22 KB), and handlers for buttons that no longer exist. The Changelog and template-diff dialogs are now announced to screen readers as dialogs.
-  </Card>
-</CardGroup>
-
----
-
-## Configurator v3.16 (Oct 3 2026)
-
-<CardGroup cols={2}>
-  <Card title="Builds save again: subtitles now default to OpenSubtitles v3+" icon="sparkles">
-    AIOSubtitle, the subtitle source every build used by default, now takes about 12 seconds to answer. AIOStreams loads every add-on before it saves, so hosts refused the whole save with 'Failed to fetch manifest for AIOSubtitle: 502 - Bad Gateway'. New builds use OpenSubtitles v3+, which answers in under a second, and saved sessions still on the old default move over automatically. AIOSubtitle stays available, labelled as slow.
-  </Card>
-  <Card title="SubDL without a key no longer blocks the save" icon="bolt">
-    AIOStreams requires a SubDL API key, but the configurator included SubDL even when the key field was empty, and the save was refused. SubDL is now only added once a key is entered; until then the build uses OpenSubtitles v3+, so it always has subtitles.
   </Card>
 </CardGroup>

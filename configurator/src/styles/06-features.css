@@ -10,8 +10,9 @@
 [data-theme='light'] .fastlane-panel{background:#fff;border-color:#cfd8e2;box-shadow:0 28px 80px rgba(32,48,64,.2)}[data-theme='light'] .fastlane-choice{background:#f6f8fa;border-color:#d7dee5;color:#5f6c78}[data-theme='light'] .fastlane-choice.active{background:rgba(9,105,218,.07);border-color:rgba(9,105,218,.42);color:#1c252d;box-shadow:inset 3px 0 #0969da}[data-theme='light'] .fastlane-field{background:#fff;border-color:#cdd5de;color:#1c252d}[data-theme='light'] .diag-pre{background:#f6f8fa;border-color:#d7dee5;color:#45525e}
 @media(max-width:640px){.fastlane-panel{padding:18px 14px;border-radius:16px}.fastlane-grid.apps{grid-template-columns:1fr 1fr}.fastlane-grid.services{grid-template-columns:1fr 1fr}.fastlane-grid.profiles{grid-template-columns:1fr}.fastlane-choice{min-height:54px}.fastlane-field{font-size:16px}.diag-actions{flex-direction:column}}
 /* Keep the mode control clear of the Core Builds wordmark, version badge, and phone navigation. */
-#themeToggle{top:auto!important;left:auto!important;right:max(12px,env(safe-area-inset-right))!important;bottom:max(12px,env(safe-area-inset-bottom))!important}
-@media(max-width:599px){#themeToggle{right:max(10px,env(safe-area-inset-right))!important;bottom:max(76px,calc(env(safe-area-inset-bottom) + 66px))!important}}
+/* Above the 52px contact button (bottom 20px), not on top of it. */
+#themeToggle{top:auto!important;left:auto!important;right:max(20px,env(safe-area-inset-right))!important;bottom:max(84px,calc(env(safe-area-inset-bottom) + 84px))!important}
+@media(max-width:599px){#themeToggle{right:max(27px,env(safe-area-inset-right))!important;bottom:max(84px,calc(env(safe-area-inset-bottom) + 84px))!important}}
 @media(max-height:520px) and (orientation:landscape){#themeToggle{right:max(8px,env(safe-area-inset-right))!important;bottom:max(8px,env(safe-area-inset-bottom))!important}}
 
 /* Quick Install contextual credential links */
