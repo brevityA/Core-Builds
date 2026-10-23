@@ -129,3 +129,16 @@ a.core-tool-door:focus-visible{outline:2px solid #67e8f9;outline-offset:3px}
   #expressLaneModal .fastlane-summary{font-size:.74rem}
   [data-theme='light'] #expressLaneModal .fastlane-head,[data-theme='light'] #expressLaneModal .fastlane-foot{background:#fff}
 }
+/* "Defaults we'll use" in Quick install (v3.22): what Quick leaves at its default,
+   each row opening the Fine-Tune section that changes it. */
+.fastlane-defaults{display:flex;flex-direction:column;border:1px solid var(--ui-line,rgba(255,255,255,.09));border-radius:12px;overflow:hidden}
+.fastlane-default{appearance:none;font:inherit;display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:10px;min-height:44px;padding:9px 12px;border:0;border-top:1px solid var(--ui-line,rgba(255,255,255,.07));background:#0e1621;color:#c9d5df;cursor:pointer;text-align:left}
+.fastlane-default:first-child{border-top:0}
+.fastlane-default:hover,.fastlane-default:focus-visible{background:#12202c;outline:none}
+.fastlane-default-name{font-size:.72rem;font-weight:800}
+.fastlane-default-val{font-size:.68rem;color:#8b98a9;text-align:right;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fastlane-default-go{color:var(--th-accent);font-size:1rem}
+.fastlane-customize{appearance:none;font:inherit;margin-top:8px;padding:6px 0;border:0;background:none;color:var(--th-accent);font-size:.74rem;font-weight:800;cursor:pointer}
+[data-theme='light'] .fastlane-default{background:#f6f8fa;color:#1f2933}
+[data-theme='light'] .fastlane-default-val{color:#57606a}
+@media(max-width:640px){#expressLaneModal .fastlane-default{min-height:56px;padding:12px 16px}#expressLaneModal .fastlane-default-name{font-size:.95rem}#expressLaneModal .fastlane-default-val{font-size:.82rem}#expressLaneModal .fastlane-customize{font-size:.9rem;min-height:44px}}

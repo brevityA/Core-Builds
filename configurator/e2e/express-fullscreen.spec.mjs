@@ -75,3 +75,37 @@ test('other dialogs keep their own close button on a phone', async ({ page }, te
   const box = await extras.locator('.fastlane-panel').boundingBox();
   expect(box.y).toBeGreaterThan(0); // still a bottom sheet, not full screen
 });
+
+// Quick → Custom hand-off (v3.22): a "Defaults we'll use" row carries what Quick
+// install collected into the builder, opens Fine-Tune at that section, and lands
+// on Review so the install happens there.
+test('a Defaults row opens Custom build with the Quick picks kept', async ({ page }) => {
+  await fresh(page);
+  await page.locator('#splashStart [data-action="open-express-lane"]').click();
+  await page.locator('[data-express-service="realdebrid"]').click();
+  await page.locator('[data-express-cred="realdebrid"]').fill('rd-test-key');
+  await page.locator('[data-express-customize="ft-layout"]').click();
+
+  await expect(page.locator('#expressLaneModal')).toHaveCount(0);
+  await expect(page.locator('#advancedDrawer')).toBeVisible();
+  await expect(page.locator('#advancedDrawer #ft-layout')).toBeInViewport();
+  const saved = await page.evaluate(() => JSON.parse(localStorage.getItem('coreBuild') || '{}'));
+  expect(saved.service).toBe('realdebrid');
+  expect(saved.multiServices).toContain('realdebrid');
+  expect(saved.simpleMode).toBe(false);
+  expect(saved.creds?.realdebrid).toBe('rd-test-key');
+
+  await page.locator('#advancedDrawer [data-action="close-advanced"]').click();
+  await expect(page.locator('#advancedDrawer')).toHaveCount(0);
+  await expect(page.locator('#btnNext, [data-action="auto-create"], #btnAutoCreate').first()).toBeAttached();
+  await page.goBack();
+  await expect(page.locator('#splashStart')).toBeVisible();
+});
+
+test('Customize every setting opens Fine-Tune at the top', async ({ page }) => {
+  await fresh(page);
+  await page.locator('#splashStart [data-action="open-express-lane"]').click();
+  await page.locator('#expressLaneModal .fastlane-customize').click();
+  await expect(page.locator('#advancedDrawer')).toBeVisible();
+  await expect(page.locator('#advancedDrawer [data-action="close-advanced"]')).toBeInViewport();
+});
