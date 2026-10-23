@@ -1,14 +1,27 @@
 ---
-title: "What's New — Configurator v3.18"
+title: "What's New — Configurator v3.19"
 sidebarTitle: "What's New"
-description: "Latest Core Builds Configurator releases (v3.18 and earlier), auto-generated from the in-app changelog."
+description: "Latest Core Builds Configurator releases (v3.19 and earlier), auto-generated from the in-app changelog."
 ---
 
 # What's New in the Configurator
 
-This page is regenerated from `configurator/src/data/changelog.js` by `scripts/sync-docs.py`, so it always reflects the latest shipped configurator version (currently **v3.18**).
+This page is regenerated from `configurator/src/data/changelog.js` by `scripts/sync-docs.py`, so it always reflects the latest shipped configurator version (currently **v3.19**).
 
 For the template-suite release log, see the [Changelog](https://corebuilds-docs.docsalot.dev/changelog).
+
+## Configurator v3.19 (Oct 23 2026)
+
+<CardGroup cols={2}>
+  <Card title="PenguPlay as a backup source" icon="sparkles">
+    Fine-Tune → Extras offers PenguPlay, the HTTP stream addon Tam-Taro’s setups also carry. Paste the personal manifest URL from your pengu.uk account and it joins your build after every other stream source, serving streams only, so it fills gaps without leading. Without a URL that ends in /manifest.json nothing is added, since AIOStreams refuses the save otherwise. Hosts that block HTTP streams, ElfHosted among them, do not offer it. The URL stays on your device and in the config you install, never in share links.
+  </Card>
+  <Card title="Generated output unchanged" icon="bolt">
+    builds without PenguPlay are byte-for-byte what 3.18 produced; only the version stamp moves.
+  </Card>
+</CardGroup>
+
+---
 
 ## Configurator v3.18 (Oct 22 2026)
 
@@ -110,24 +123,5 @@ For the template-suite release log, see the [Changelog](https://corebuilds-docs.
   </Card>
   <Card title="SubDL without a key no longer blocks the save" icon="bolt">
     AIOStreams requires a SubDL API key, but the configurator included SubDL even when the key field was empty, and the save was refused. SubDL is now only added once a key is entered; until then the build uses OpenSubtitles v3+, so it always has subtitles.
-  </Card>
-</CardGroup>
-
----
-
-## Configurator v3.15 (Oct 3 2026)
-
-<CardGroup cols={2}>
-  <Card title="Built against AIOStreams 2.35.7" icon="sparkles">
-    the configurator’s schema was still read from AIOStreams 2.34.1, while every public host had moved to 2.35.4 or later. It is now read from the 2.35.7 release, which is also the new default compatibility target. Upstream only added things between the two (two new add-ons, five new settings), so no setting the configurator writes changed meaning. 2.35.4 and 2.35.5, which Wizaardd, ATBP and Omni’s run, have the same schema as 2.35.7.
-  </Card>
-  <Card title="Generated configs now say they target 2.35.7" icon="bolt">
-    besides the usual version stamp (coreBuildsVersion 3.14 to 3.15), the only change in generated output is the compatibility-target stamp in the template metadata (coreBuildsAIOStreamsTarget), which moves from 2.34.1 to 2.35.7. Filters, sorting, scrapers and formatting are byte-for-byte the same, so re-importing changes nothing AIOStreams acts on. Saved sessions that picked a target keep it.
-  </Card>
-  <Card title="Names and settings from links can no longer inject page markup" icon="shield-check">
-    a template name, a custom formatter label, an unrecognised setting from a shared link or imported config, and entries in the local backup history were written into the page as HTML. A crafted link could have run script in the configurator. They are now escaped wherever they are shown, and help tooltips keep their text out of the page attributes. Found by CodeQL; all 11 of its 'DOM text reinterpreted as HTML' alerts are fixed.
-  </Card>
-  <Card title="Upstream watch re-pinned" icon="sliders">
-    the AIOStreams contract watcher had flagged additive drift since September 26 (#770). It is re-pinned, and its source extraction no longer depends on GitHub’s API, which some networks refuse.
   </Card>
 </CardGroup>

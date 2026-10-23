@@ -16,6 +16,7 @@ export const PROVIDER_CREDENTIALS = {
   pikpakPass:    { label: 'PikPak Password',        placeholder: 'your-password',                       url: 'https://mypikpak.com/', linkLabel: 'Open account' },
   seedr:         { label: 'Seedr Encoded Token (from MediaFusion)', placeholder: 'paste the token MediaFusion gives you', url: 'https://mediafusion.elfhosted.com/configure', linkLabel: 'Authorise at MediaFusion' },
   debrider:      { label: 'Debrider API Key',       placeholder: 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',     url: 'https://debrider.io/', linkLabel: 'Open dashboard' },
+  penguplay:     { label: 'PenguPlay Manifest URL', placeholder: 'https://…/manifest.json', url: 'https://pengu.uk', linkLabel: 'Sign in and copy it' },
   streamnzb:     { label: 'StreamNZB Manifest URL', placeholder: 'https://your-streamnzb-instance/manifest.json', url: '', linkLabel: 'Use your manifest URL' },
   nzbnoob:       { label: 'NZBnoob API Key',        placeholder: 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',     url: 'https://nzbnoob.com', linkLabel: 'Get key' },
   althub:        { label: 'altHUB API Key',          placeholder: 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',     url: 'https://althub.co.za', linkLabel: 'Get key' },

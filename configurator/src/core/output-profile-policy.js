@@ -82,7 +82,7 @@ const EXPLICIT_STREAM_TYPES = new Set([
 // included so Stable/Balanced do not filter them back out
 // the moment a user switches them on.
 const OPTIONAL_EXTRAS_STREAM_TYPES = new Set([
-  'knaben', 'zilean', 'neko-bt', 'sootio', 'webstreamr', 'yastream',
+  'knaben', 'zilean', 'neko-bt', 'sootio', 'webstreamr', 'yastream', 'penguplay',
   // 17 safe add-ons (v2.34.1 audit — all isSimpleTogglePreset, lowercased, torbox-search removed in v2.32)
   'anime-kitsu', 'bitmagnet', 'brazuca-torrents',
   'content-deep-dive', 'debridio-tmdb', 'debridio-tvdb',

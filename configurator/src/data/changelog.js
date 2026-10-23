@@ -1,4 +1,8 @@
 export const CHANGELOG = [
+  { v:'3.19', date:'Oct 23 2026', items:[
+    'PenguPlay as a backup source — Fine-Tune → Extras offers PenguPlay, the HTTP stream addon Tam-Taro’s setups also carry. Paste the personal manifest URL from your pengu.uk account and it joins your build after every other stream source, serving streams only, so it fills gaps without leading. Without a URL that ends in /manifest.json nothing is added, since AIOStreams refuses the save otherwise. Hosts that block HTTP streams, ElfHosted among them, do not offer it. The URL stays on your device and in the config you install, never in share links.',
+    'Generated output unchanged — builds without PenguPlay are byte-for-byte what 3.18 produced; only the version stamp moves.',
+  ]},
   { v:'3.18', date:'Oct 22 2026', items:[
     'Templates save on AIOStreams 2.36 again — AIOStreams 2.36.0 removed the AIOSubtitle addon and refuses any config that includes it, and 52 Core Builds templates did, so every host on 2.36 (seven of the eight public ones, ElfHosted included) refused them with “AIO Subtitle has been removed”. They now use OpenSubtitles v3+, the configurator’s default since 3.16. Re-import your template to pick up the fix.',
     'AIOSubtitle leaves Fine-Tune — its addon is no longer hosted. A saved AIOSubtitle choice moves to OpenSubtitles v3+ and your other subtitle sources stay; a config you import or update has it removed before install.',

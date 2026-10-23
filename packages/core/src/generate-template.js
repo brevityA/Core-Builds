@@ -18,7 +18,7 @@ import { getSelPolicy } from './sel-policy.js';
 import { rankedSelPolicy } from './ranked-sel-policy.js';
 import { SCORE_IQR_GUARD } from './sel-iqr-policy.js';
 import { sanitizeAioEnumArrays } from './schema.js';
-import { OPTIONAL_SCRAPER_DEFS, presetRole } from './scrapers.js';
+import { OPTIONAL_SCRAPER_DEFS, presetRole, withPenguplay } from './scrapers.js';
 import { requireNuvioInstantHost } from './nuvio-hosts.js';
 import { NUVIO_ADDONS } from './nuvio-torbox-instant.js';
 import { applyOutputProfile, resolveOutputProfile, DEFAULT_AIOSTREAMS_VERSION } from './output-profile-policy.js';
@@ -732,7 +732,7 @@ export function generateTemplate(rawInput = {}, options = {}) {
   const useBase = !!(input.baseUuid && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(input.baseUuid).trim()));
 
   const globalTimeout = Number(input.addonTimeout) || 6000;
-  const normalizedPresets = assertAddonPolicy(addonPolicy(normalizedInput, buildPresets(input), { defaultTimeout: globalTimeout }));
+  const normalizedPresets = assertAddonPolicy(addonPolicy(normalizedInput, withPenguplay(buildPresets(input), input.optionalScrapers, input.credentials?.penguplay), { defaultTimeout: globalTimeout }));
   const activePresets = normalizedPresets.presets;
 
   const name = (input.name || '').trim() || buildDefaultName(input);

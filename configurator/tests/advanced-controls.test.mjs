@@ -8,7 +8,7 @@ test('playback controls are stateful and wired to generated config',()=>{
  assert.ok(app.includes("addonTimeout:6000"));
  assert.ok(app.includes("method:S.autoPlayMethod||'matchingFile'"));
  assert.ok(app.includes("enabled:S.preloadEnabled!==false"));
- assert.ok(app.includes('addonPolicy(input, presets()'));
+ assert.ok(app.includes('addonPolicy(input, S._nuvioInstant ? presets() : withPenguplay(presets()'));
 });
 test('partial exports use explicit allowlists and strip service credentials',()=>{
  assert.ok(app.includes('const PARTIAL_EXPORT_FIELDS'));

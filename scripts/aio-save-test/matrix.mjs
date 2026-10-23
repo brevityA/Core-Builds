@@ -12,7 +12,7 @@ const BASE = eval('(' + spec.slice(spec.indexOf('const BASE = ') + 13, spec.inde
 const required = JSON.parse(readFileSync(new URL('./required.json', import.meta.url), 'utf8'));
 const DUMMY_CREDS = { torbox: 'k', realdebrid: 'k', alldebrid: 'k', premiumize: 'k', debridlink: 'k', offcloud: 'k', offcloudEmail: 'e@x.invalid', offcloudPass: 'p',
   easynews: 'u', easynewsPass: 'p', nzbgeek: 'k', debridio: 'k', easydebrid: 'k', pikpak: 'e@x.invalid', pikpakPass: 'p', seedr: 't', debrider: 'k',
-  streamnzb: 'https://dummy.invalid/manifest.json', subdl: 'k', nzbnoob: 'k', althub: 'k', usenetcrawler: 'k', drunkenslug: 'k', nzbfinder: 'k',
+  streamnzb: 'https://dummy.invalid/manifest.json', penguplay: `http://127.0.0.1:${process.env.STUB_PORT || 4100}/penguplay/manifest.json`, subdl: 'k', nzbnoob: 'k', althub: 'k', usenetcrawler: 'k', drunkenslug: 'k', nzbfinder: 'k',
   jackett: 'k', jackettUrl: 'https://dummy.invalid', prowlarr: 'k', prowlarrUrl: 'https://dummy.invalid', nzbhydra: 'https://dummy.invalid', nzbhydraApiKey: 'k' };
 
 const SERVICES = ['torbox-pro', 'torbox-ess', 'realdebrid', 'alldebrid', 'premiumize', 'debridlink', 'easydebrid', 'debrider', 'offcloud', 'pikpak', 'seedr', 'debridio', 'easynews', 'usenet', 'p2p', 'http'];
