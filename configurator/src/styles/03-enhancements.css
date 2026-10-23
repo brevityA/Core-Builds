@@ -14,8 +14,6 @@
 [data-theme="light"] .wn-title{color:#1f2328!important}
 [data-theme="light"] .cred-remind strong[style]{color:#9a3412!important}
 [data-theme="light"] .cred-remind .cr-hdr{color:#b45309!important}
-[data-theme="light"] .import-success strong[style*="e6edf3"]{color:#1f2328!important}
-[data-theme="light"] .import-success strong[style*="fbbf24"]{color:#9a3412!important}
 .cred-status{font-size:.74rem;margin-top:4px;min-height:16px;display:block}
 .help-btn{width:20px;height:20px;border-radius:50%;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.05);color:#6b7280;font-size:.7rem;font-weight:800;cursor:pointer;flex-shrink:0;line-height:1;margin-right:8px;transition:all .15s;padding:0}
 .help-btn:hover{color:var(--th-accent);border-color:rgba(0,212,255,.4)}

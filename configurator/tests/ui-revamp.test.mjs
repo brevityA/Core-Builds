@@ -53,7 +53,8 @@ test('splash preview wall ships honest, layout-stable images', () => {
 // ── ratchets: baselines measured at the revamp commit; only shrink ──
 // 2026-09-21: microcopy +1 for livePayloadHtml+shortcuts+recommendedStack modals, brandHex +2 for same modals (uses var() where possible but SVG fill requires hex)
 // Updated to honest current counts; future PRs should lower, not raise.
-const BASELINE = { cssImportant: 442, cssBrandRgba: 241, appMicrocopy: 117, appBrandHex: 127 };
+// v3.23 styling clean-up: 282 repeated inline styles became token classes in 07-menu-parity.css.
+const BASELINE = { cssImportant: 434, cssBrandRgba: 218, appMicrocopy: 111, appBrandHex: 116, appInlineStyles: 746 };
 const count = (s, re) => (s.match(re) || []).length;
 
 test('!important stays a floor, not a ceiling — CSS total may not grow', () => {
@@ -69,6 +70,20 @@ test('brand-tinted rgba stays scoped; new surfaces use the token with color-mix 
 test('app.js microcopy may not get smaller than it already is', () => {
   const n = count(app, /font-size:\.([0-6][0-9]?)rem/g);
   assert.ok(n <= BASELINE.appMicrocopy, `sub-.7rem inline fonts grew to ${n} (baseline ${BASELINE.appMicrocopy}) — the 17px phone root scales these; do not add more`);
+});
+
+test('app.js inline style="" attributes do not grow — add a class in 07-menu-parity.css instead', () => {
+  // A hard-coded colour in an inline style ignores the theme; the classes use the tokens, so light mode follows.
+  const n = count(app, /style="/g);
+  assert.ok(n <= BASELINE.appInlineStyles, `inline style attributes grew to ${n} (baseline ${BASELINE.appInlineStyles})`);
+});
+
+test('the shared utility classes take their colours from the theme tokens', () => {
+  const parity = css('07-menu-parity.css');
+  for (const [cls, token] of [['u-tx', '--th-tx'], ['u-tx2', '--th-tx2'], ['u-tx3', '--th-tx3'], ['u-red', '--th-red'], ['u-yellow', '--th-yellow'], ['u-green', '--th-green'], ['u-accent', '--th-accent']]) {
+    assert.match(parity, new RegExp(`\\.${cls}\\{color:var\\(${token}\\)\\}`), cls);
+  }
+  assert.match(parity, /\.ft-box\{background:var\(--th-card-alt\)/, 'Fine-Tune panels follow the theme');
 });
 
 test('app.js brand hex (SVG fills etc.) does not grow — CSS tokens cannot reach fill attributes', () => {
