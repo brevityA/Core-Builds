@@ -46,7 +46,7 @@ const STEPS = 6;
 // workflow) the raw x.y here expands to x.y.0 in package.json / versions.json and
 // the release tag; the built badge drops the trailing .0. At the 2026-09-06
 // audit the release tag was v3.7.0 while this said 3.1 — they must move together.
-const CONFIGURATOR_VERSION = '3.19';
+const CONFIGURATOR_VERSION = '3.20';
 // Set to a collector endpoint to enable the opt-in anonymous usage ping (service+device+resolution only).
 // Leave empty to keep the feature fully disabled and hidden.
 const USAGE_BEACON_URL = '';
@@ -1978,11 +1978,40 @@ function splashHtml() {
       </div>
     </div>
 
+    <!-- A saved build is resumed from the first screen (v3.20): above the hero, not below the fold. -->
+    ${hadSavedState && _savedStep > 0 ? `<div class="hybrid-session continue-banner">
+      ${versionBannerHtml()}
+      <div style="flex:1;min-width:180px"><div style="font-size:.76rem;font-weight:800;color:#00d4ff">Continue where you left off</div><div style="font-size:.66rem;color:#6b7280;margin-top:2px">Step ${Number(_savedStep)||1} of 6${S.service ? ' · ' + label('service', S.service) : ''}</div></div>
+      <button data-action="continue-session" class="splash-cta-continue" style="padding:8px 14px;background:rgba(0,212,255,.15);border:1px solid rgba(0,212,255,.35);border-radius:8px;color:#00d4ff;font-size:.76rem;font-weight:800;cursor:pointer">Resume</button>
+      <button data-action="start-fresh" class="splash-cta-discard" style="padding:6px 9px;background:transparent;border:1px solid rgba(255,255,255,.1);border-radius:7px;color:#6b7280;cursor:pointer" title="Discard saved session">&#10005;</button>
+      ${S.service && S.device && S.resolution ? `<button data-action="quick-reinstall" style="padding:8px 13px;background:rgba(52,211,153,.07);border:1px solid rgba(52,211,153,.22);border-radius:8px;color:#34d399;font-size:.72rem;font-weight:800;cursor:pointer">${ICO.bolt(14,'#34d399')} Previous settings → Install</button>` : ''}
+    </div>` : ''}
     <div class="hybrid-hero">
       <div class="splash-anim splash-anim-d2">
         <div class="hybrid-eyebrow">AIOStreams template configurator</div>
         <h1>Build streams<br>with intent.</h1>
-        <div class="hybrid-lede">Choose your service, device, and preferences. Core Builds turns them into a checked <strong>AIOStreams template</strong> — and can write the whole stack (AIOStreams + AIOMetadata + a Cinemeta patch + subtitles) <strong>straight into your Stremio account</strong>. No JSON editing either way.</div>
+        <div class="hybrid-lede">Pick your service and device. Core Builds writes a checked <strong>AIOStreams setup</strong> and can install the whole stack <strong>straight into your Stremio account</strong>. No JSON editing.</div>
+        <!-- Two equal ways in (v3.20 redesign). Quick install opens the Express lane;
+             Custom build opens the full builder. Same data-actions as before, so the
+             #express / #advanced deep links, the tour and every spec keep working. -->
+        <div class="splash-start" id="splashStart" role="group" aria-label="Start a build">
+          <button type="button" class="start-card start-quick" data-action="open-express-lane">
+            <span class="start-card-icon">${ICO.bolt(20,'currentColor')}</span>
+            <span class="start-card-title">Quick install</span>
+            <span class="start-card-desc">Service &rarr; device &rarr; resolution &rarr; key &rarr; Deploy. Working streams in about 30 seconds.</span>
+          </button>
+          <button type="button" class="start-card start-custom" data-action="custom-start">
+            <span class="start-card-icon">${ICO.gear(20,'currentColor')}</span>
+            <span class="start-card-title">Custom build</span>
+            <span class="start-card-desc">Every setting: audio, languages, subtitles, filters, ranking and stream cards.</span>
+          </button>
+        </div>
+        <div class="splash-start-more" id="splashAltRoutes">
+          <button data-action="update-template" class="splash-tertiary-btn">Update an existing setup</button>
+          <button data-action="paste-manifest-splash" class="splash-tertiary-btn">Import a config</button>
+          <a href="../tools/genies/" class="splash-tertiary-btn">Setup Genie</a>
+          <button data-action="open-tutorial" class="splash-tertiary-btn">Take the tour</button>
+        </div>
         <div class="hybrid-trust"><span><i></i> Runs locally</span><span><i></i> Open source · MIT</span><span><i></i> Build without a login — or push it in one click</span></div>
         <div class="splash-stats" id="splashStats"></div>
         <div class="hybrid-subnote">Core Stable by default · 6s addon timeout · keys go only to the host you choose</div>
@@ -2006,13 +2035,6 @@ function splashHtml() {
       </div>
     </div>
 
-    ${hadSavedState && _savedStep > 0 ? `<div class="hybrid-session continue-banner">
-      ${versionBannerHtml()}
-      <div style="flex:1;min-width:180px"><div style="font-size:.76rem;font-weight:800;color:#00d4ff">Continue where you left off</div><div style="font-size:.66rem;color:#6b7280;margin-top:2px">Step ${Number(_savedStep)||1} of 6${S.service ? ' · ' + label('service', S.service) : ''}</div></div>
-      <button data-action="continue-session" class="splash-cta-continue" style="padding:8px 14px;background:rgba(0,212,255,.15);border:1px solid rgba(0,212,255,.35);border-radius:8px;color:#00d4ff;font-size:.76rem;font-weight:800;cursor:pointer">Resume</button>
-      <button data-action="start-fresh" class="splash-cta-discard" style="padding:6px 9px;background:transparent;border:1px solid rgba(255,255,255,.1);border-radius:7px;color:#6b7280;cursor:pointer" title="Discard saved session">&#10005;</button>
-      ${S.service && S.device && S.resolution ? `<button data-action="quick-reinstall" style="padding:8px 13px;background:rgba(52,211,153,.07);border:1px solid rgba(52,211,153,.22);border-radius:8px;color:#34d399;font-size:.72rem;font-weight:800;cursor:pointer">${ICO.bolt(14,'#34d399')} Previous settings → Install</button>` : ''}
-    </div>` : ''}
 
     <div class="hybrid-services splash-anim splash-anim-d3">
       <div class="hybrid-services-label">Your service</div>
@@ -2031,25 +2053,10 @@ function splashHtml() {
       </div></div>`}
 
     ${hadSavedState ? '' : remoteUpdateBannerHtml()}
-    <div class="hybrid-section-head splash-anim splash-anim-d4"><div><h2>Express install</h2><p>The whole job is five steps: service &rarr; device &rarr; resolution &rarr; key &rarr; Deploy.</p></div><p class="hybrid-section-index">01 / Workflow</p></div>
-    <div class="splash-doors splash-anim splash-anim-d4" id="splashDoors">
-      <div class="splash-door fastlane-door" data-action="open-express-lane" tabindex="0" role="button"><div class="splash-door-icon">${ICO.bolt(22,'#00d4ff')}</div><div class="splash-door-text"><div class="splash-door-title">Express Install <span class="splash-door-tag fastlane-badge">One-click · full-stack</span></div><div class="splash-door-desc">Service &rarr; device &rarr; resolution &rarr; key &rarr; Deploy — working streams in about 30 seconds. The account push writes every addon on every device; a failed login still hands you the manifest URL, and old installs are replaced only when you tick it.</div></div></div>
-    </div>
-    <!-- Express-first IA (2026-09-06 audit): the other routes stay one click away
-         as secondary text links — same data-actions, so #advanced / #update
-         deep links, the tour and every spec that clicks them still work. The
-         Setup Genie card is gone from the landing; the route itself is
-         unchanged and still linked here and from All Core Tools. -->
-    <div class="splash-tertiary splash-anim splash-anim-d4" id="splashAltRoutes" style="margin-top:10px">
-      <button data-action="custom-start" class="splash-tertiary-btn">Advanced Builder</button>
-      <button data-action="update-template" class="splash-tertiary-btn">Update Existing Setup</button>
-      <a href="../tools/genies/" class="splash-tertiary-btn">Setup Genie</a>
-    </div>
-
-    <div class="hybrid-section-head splash-anim splash-anim-d5"><div><h2>Ready-Made Setups</h2><p>Opinionated presets for common setups.</p></div><p class="hybrid-section-index">02 / Presets</p></div>
+    <div class="hybrid-section-head splash-anim splash-anim-d5"><div><h2>Ready-Made Setups</h2><p>Opinionated presets for common setups.</p></div><p class="hybrid-section-index">01 / Presets</p></div>
     <div class="splash-presets splash-anim splash-anim-d5" id="splashPresets">${splashPresetsHtml(_splashSvc)}</div>
 
-    <div class="hybrid-section-head splash-anim splash-anim-d6"><div><h2>What the streams will look like</h2><p>Not adjectives — these are the real cards AIOStreams draws with each formatter, generated from the same templates this configurator writes.</p></div><p class="hybrid-section-index">03 / Preview</p></div>
+    <div class="hybrid-section-head splash-anim splash-anim-d6"><div><h2>What the streams will look like</h2><p>Not adjectives — these are the real cards AIOStreams draws with each formatter, generated from the same templates this configurator writes.</p></div><p class="hybrid-section-index">02 / Preview</p></div>
     <div class="hybrid-wall splash-anim splash-anim-d6" aria-label="Formatter previews">
       <figure><img src="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/family-v4-preview.svg" width="800" height="334" loading="lazy" alt="Real stream card preview — Family v4 — the default"><figcaption><b>Family v4</b><span>the default</span></figcaption></figure>
       <figure><img src="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/apex-v2-preview.svg" width="800" height="334" loading="lazy" alt="Real stream card preview — Apex v2 — detail-rich"><figcaption><b>Apex v2</b><span>detail-rich</span></figcaption></figure>
@@ -2059,7 +2066,7 @@ function splashHtml() {
       <figure><img src="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/core-syntax-v3-preview.svg" width="800" height="334" loading="lazy" alt="Real stream card preview — Core Syntax V3"><figcaption><b>Core Syntax V3</b><span></span></figcaption></figure>
     </div>
 
-    <div class="hybrid-section-head splash-anim splash-anim-d6"><div><h2>Utilities</h2><p>Back up or explore the Core tool suite.</p></div><p class="hybrid-section-index">04 / Tools</p></div>
+    <div class="hybrid-section-head splash-anim splash-anim-d6"><div><h2>Utilities</h2><p>Back up or explore the Core tool suite.</p></div><p class="hybrid-section-index">03 / Tools</p></div>
     <div class="splash-doors splash-anim splash-anim-d6">
       <a class="splash-door core-tool-door" href="../account-tools/" target="_blank" rel="noopener noreferrer"><div class="splash-door-icon">${ICO.download(22,'#34d399')}</div><div class="splash-door-text"><div class="splash-door-title">Back Up Addons <span class="splash-door-tag" style="background:rgba(52,211,153,.1);color:#34d399;border:1px solid rgba(52,211,153,.2)">Read-only</span></div><div class="splash-door-desc">View and download your current Stremio addon setup. Nothing is changed.</div></div></a>
       <a class="splash-door core-tool-door" href="../tools/genies/nuvio-stacks.html"><div class="splash-door-icon"><span style="font-size:20px;line-height:1" aria-hidden="true">🧞</span></div><div class="splash-door-text"><div class="splash-door-title">Nuvio Stack Genie <span class="splash-door-tag" style="background:rgba(168,85,247,.12);color:#c4b5fd;border:1px solid rgba(168,85,247,.28)">Cross-app</span></div><div class="splash-door-desc">Guided profiles &amp; add-ons for Nuvio — pick a stack, get install links.</div></div></a>
@@ -2639,8 +2646,8 @@ const TUT_STEPS = [
   { id:'welcome' },
   {
     id:'paths', badge:'Step 1 of 7', title:'Choose the Right Path',
-    desc:'Use <strong>Quick Install</strong> for the shortest setup: app, providers, credentials, and a performance profile in one place.<br><br><span class="hl">Advanced Builder</span> exposes every filter and formatter. <span class="gold">Update Existing Setup</span> imports an older template. Guided Setup remains available below for a step-by-step route.',
-    target:'.splash-doors', arrow:'top', nextLabel:'Next'
+    desc:'<strong>Quick install</strong> is the shortest setup: service, device, resolution and key, then Deploy.<br><br><span class="hl">Custom build</span> exposes every filter and stream card. <span class="gold">Update an existing setup</span> brings an older template up to date, and <strong>Import a config</strong> starts from one you already have.',
+    target:'#splashStart', arrow:'top', nextLabel:'Next'
   },
   {
     id:'sources', badge:'Step 2 of 7', title:'Choose One or More Providers',
@@ -2655,11 +2662,11 @@ const TUT_STEPS = [
   {
     id:'quick', badge:'Step 4 of 7', title:'Quick Install',
     desc:'Quick Install asks only what is required. Choose Stremio, Nuvio, WuPlay, or another app; select multiple providers; then pick <strong>Fast & Light</strong>, <strong>Balanced</strong>, or <strong>Maximum Quality</strong>.<br><br>Credential fields appear only for selected providers.',
-    target:'.splash-doors [data-action="open-express-lane"]', arrow:'top', nextLabel:'Next'
+    target:'#splashStart [data-action="open-express-lane"]', arrow:'top', nextLabel:'Next'
   },
   {
-    id:'guided', badge:'Step 5 of 7', title:'Guided Setup and Advanced Builder',
-    desc:'<strong>Guided Setup</strong> walks through Sources, Device, Video Quality, Content Preferences, Accounts & Keys, and Review & Install.<br><br><span class="hl">Advanced Builder</span> adds detailed audio, video, formatter, subtitles, catalogs, proxy, matching, and filtering controls. Safe defaults are used when you skip an option.',
+    id:'guided', badge:'Step 5 of 7', title:'Guided Setup and Custom build',
+    desc:'<strong>Guided Setup</strong> walks through Sources, Device, Video Quality, Content Preferences, Accounts & Keys, and Review & Install.<br><br><span class="hl">Custom build</span> adds detailed audio, video, formatter, subtitles, catalogs, proxy, matching, and filtering controls. Safe defaults are used when you skip an option.',
     center:true, nextLabel:'Next'
   },
   {
@@ -2669,8 +2676,8 @@ const TUT_STEPS = [
   },
   {
     id:'start', badge:'Step 7 of 7', title:'Ready to Build',
-    desc:'For most people, start with <strong>Quick Install</strong>. Choose Guided Setup if you want help with each decision, or Advanced Builder when you already know the exact formats and filters you need.',
-    target:'.splash-doors [data-action="open-express-lane"]', arrow:'top', nextLabel:'Open Express Install'
+    desc:'For most people, start with <strong>Quick install</strong>. Choose Guided Setup if you want help with each decision, or Custom build when you already know the exact formats and filters you need.',
+    target:'#splashStart [data-action="open-express-lane"]', arrow:'top', nextLabel:'Open Quick install'
   },
 ];
 let _tutStep = -1;
@@ -2868,11 +2875,8 @@ document.addEventListener('DOMContentLoaded', () => {
       } catch(e) { logError('badge-builder-handoff', e.message); }
     }, 350);
   }
-  if (!hadSavedState && !_sharedImport && !_genieRoute && !_badgeBuilderRoute && !localStorage.getItem('cb_tut_seen')) {
-    // no tutorial over a genie hand-off — the genie IS the onboarding; popping the tour
-    // over the express modal we just opened was the review P1 finding.
-    setTimeout(() => tutGo(0), 1000);
-  }
+  // No tour over the landing on a first visit (v3.20): it covered the page before the
+  // visitor had seen it. "Take the tour" under the two entry cards opens it on demand.
   if (COUNTER_URL) {
     fetch(COUNTER_URL + '/api/stats').then(r => r.json()).then(d => {
       const el = document.getElementById('splashStats');
