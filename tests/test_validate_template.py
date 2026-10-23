@@ -6,7 +6,7 @@ the expected outcome — no shared global state between calls.
 import json
 from pathlib import Path
 import pytest
-from validate_templates import validate_template
+from validate_templates import REMOVED_PRESETS_IN_2_36, validate_template
 
 
 # ── JSON Parsing ──────────────────────────────────────────────
@@ -602,6 +602,15 @@ def _write_at_lane(tmp_path, data, lane):
 
 
 class TestCurrentHostAcceptanceGates:
+    def test_removed_preset_list_matches_the_pinned_2_36_fixture(self):
+        fixture_path = Path(__file__).resolve().parents[1] / "configurator/tests/upstream/preset-resources-2.36.0.json"
+        fixture = json.loads(fixture_path.read_text(encoding="utf-8"))
+        removed = {
+            preset_id for preset_id, details in fixture["presets"].items()
+            if details.get("removed")
+        }
+        assert set(REMOVED_PRESETS_IN_2_36) == removed
+
     def test_active_lane_rejects_disabled_preset_removed_in_2_36(self, tmp_path, base_template):
         t = base_template(presets=[{
             "type": "aiosubtitle", "instanceId": "p1", "enabled": False,

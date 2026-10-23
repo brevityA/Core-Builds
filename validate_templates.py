@@ -159,6 +159,7 @@ REMOVED_PRESETS_IN_2_36 = frozenset({
     'aiosubtitle', 'argentina-tv', 'usa-tv', 'nuvio-streams',
     'debridio-watchtower', 'debridio-tv', 'debridio-ic4a', 'astream',
     'streamasia', 'streamfusion', 'baguettio', 'subhero', 'ai-companion',
+    'torbox', 'torbox-search',
 })
 
 # Mirrors configurator/src/core/install-policy.js at the 2.36 pin. EasyNews,
@@ -285,7 +286,9 @@ def validate_template(fpath):
     if is_core and not is_legacy and not is_deprecated:
         removed_2_36 = sorted({
             p.get('type') for p in presets_list
-            if isinstance(p, dict) and p.get('type') in REMOVED_PRESETS_IN_2_36
+            if (isinstance(p, dict) and p.get('type') in REMOVED_PRESETS_IN_2_36
+                # torbox-search has the more precise v2.32/legacy-lane gate above.
+                and p.get('type') != 'torbox-search')
         })
         for ptype in removed_2_36:
             err(name, f"contains preset '{ptype}' removed in AIOStreams 2.36 — disabled presets are rejected too; remove it from active lanes")
