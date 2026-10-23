@@ -70,6 +70,29 @@ def test_whats_new_matches_config_changelog():
     assert top and top in page, f"top configurator version {top} not reflected in docs/whats-new.mdx"
 
 
+def test_mintlify_pages_do_not_use_html_comments():
+    """Mintlify rejects <!-- --> in MDX when the containing page is deployed."""
+    offenders = []
+    for page in (ROOT / "docs").rglob("*.mdx"):
+        for lineno, line in enumerate(page.read_text(encoding="utf-8").splitlines(), start=1):
+            if "<!--" in line:
+                offenders.append(f"{page.relative_to(ROOT)}:{lineno}")
+    assert offenders == [], f"HTML comments break Mintlify MDX parsing: {offenders}"
+
+
+def test_managed_mintlify_regions_use_mdx_comment_markers():
+    """sync-docs must preserve parseable markers when regenerating these pages."""
+    cases = [
+        ("docs/changelog.mdx", sync.CHANGELOG_BEGIN, sync.CHANGELOG_END, "AUTO:RECENT_RELEASES"),
+        ("docs/roadmap.mdx", sync.ROADMAP_BEGIN, sync.ROADMAP_END, "AUTO:SHIPPED"),
+    ]
+    for relative, begin, end, marker_name in cases:
+        assert begin == "{/* " + marker_name + ":BEGIN */}"
+        assert end == "{/* " + marker_name + ":END */}"
+        page = (ROOT / relative).read_text(encoding="utf-8")
+        assert begin in page and end in page
+
+
 def test_nav_lists_generated_pages():
     """The three generated pages must remain in the Mintlify nav (else they 404)."""
     nav = json.loads((ROOT / "docs" / "docs.json").read_text(encoding="utf-8"))

@@ -152,6 +152,23 @@ LEGACY_TORBOX_SEARCH_COMPATIBILITY = {
     'maximumAIOStreamsVersion': '2.31.1',
 }
 
+# AIOStreams 2.36 rejects these preset IDs even when the preset is disabled.
+# Keep the explicit Legacy/Deprecated lanes as historical snapshots; active Core
+# lanes must not ship a config the pinned host cannot save.
+REMOVED_PRESETS_IN_2_36 = frozenset({
+    'aiosubtitle', 'argentina-tv', 'usa-tv', 'nuvio-streams',
+    'debridio-watchtower', 'debridio-tv', 'debridio-ic4a', 'astream',
+    'streamasia', 'streamfusion', 'baguettio', 'subhero', 'ai-companion',
+})
+
+# Mirrors configurator/src/core/install-policy.js at the 2.36 pin. EasyNews,
+# Seedr and Put.io deliberately do not back AIOStreams' Library preset.
+LIBRARY_CAPABLE_SERVICE_IDS = frozenset({
+    'aiostreams', 'alldebrid', 'altmount', 'debrider', 'debridlink',
+    'easydebrid', 'nzbdav', 'offcloud', 'pikpak', 'premiumize',
+    'realdebrid', 'stremthru_newz', 'torbox', 'torrin',
+})
+
 # Intentional language policies reviewed by maintainers. New combinations still warn.
 REVIEWED_REQUIRED_LANGUAGES = {
     ('English', 'Original', 'Dual Audio', 'Multi', 'Dubbed', 'Unknown'),
@@ -265,6 +282,14 @@ def validate_template(fpath):
         else:
             warn(name, "contains legacy 'torbox-search' preset (community template — not Core-owned)")
 
+    if is_core and not is_legacy and not is_deprecated:
+        removed_2_36 = sorted({
+            p.get('type') for p in presets_list
+            if isinstance(p, dict) and p.get('type') in REMOVED_PRESETS_IN_2_36
+        })
+        for ptype in removed_2_36:
+            err(name, f"contains preset '{ptype}' removed in AIOStreams 2.36 — disabled presets are rejected too; remove it from active lanes")
+
     # ── regexOverrides entry shape (strict-schema hosts — issue #671) ─────────
     # Every override entry requires string `pattern` + `name` and numeric `score`.
     # A score-only stub (pattern removed during a whitelist sync) fails host-side
@@ -336,8 +361,27 @@ def validate_template(fpath):
     _NEEDS_SERVICE = {'seadex', 'sootio'}
     enabled_types = {p.get('type') for p in presets_list if isinstance(p, dict) and p.get('enabled')}
     svc_list = c.get('services', []) if isinstance(c, dict) else []
-    enabled_svcs = {sv.get('id') for sv in svc_list if isinstance(sv, dict) and sv.get('enabled')}
+    enabled_svcs = {sv.get('id') for sv in svc_list if isinstance(sv, dict) and sv.get('enabled') is not False}
     debridish = enabled_svcs & {'torbox','realdebrid','alldebrid','premiumize','debridlink','offcloud','easydebrid','pikpak','seedr','easynews'}
+
+    # Library is generated from enabled services. AIOStreams rejects the whole
+    # save when an enabled Library has no supported service to back it.
+    has_library = any(
+        isinstance(p, dict) and p.get('type') == 'library' and p.get('enabled') is not False
+        for p in presets_list
+    )
+    if (is_core and not is_legacy and not is_deprecated and has_library
+            and not enabled_svcs & LIBRARY_CAPABLE_SERVICE_IDS):
+        err(name, "enabled Library preset requires a Library-capable enabled service (EasyNews alone is not sufficient)")
+
+    # These templates are documented as AllDebrid-only. Enabling TorBox here is
+    # not a harmless placeholder: service-less presets query the enabled service.
+    if is_core and 'AllDebrid' in path.parts and not is_legacy and not is_deprecated:
+        if 'alldebrid' not in enabled_svcs:
+            err(name, "AllDebrid lane must enable the 'alldebrid' service")
+        if 'torbox' in enabled_svcs:
+            err(name, "AllDebrid-only lane must not enable the 'torbox' service")
+
     for p in presets_list:
         if isinstance(p, dict) and p.get('enabled') is True and p.get('type') in _NEEDS_SERVICE and not debridish:
             err(name, f"enabled preset '{(p.get('options') or {}).get('name') or p.get('type')}' requires a torrent-capable service, none enabled (v2.33 rejection class)")
@@ -531,6 +575,15 @@ def validate_template(fpath):
                 err(name, f"preset '{ptype}': name is required, got None")
         if ptype == 'aiosubtitle' and not opts.get('languages'):
             err(name, f"preset 'aiosubtitle': languages is required, got None")
+        if ptype == 'seadex' and not is_legacy and not is_deprecated and not opts.get('name'):
+            err(name, "preset 'seadex': name is required, got None")
+        # Unlike the enabled-only credential floor above, upstream validates the
+        # NZBHydra endpoint even for a disabled preset. Never invent a placeholder
+        # endpoint: ship it only once a real api.url can be configured.
+        if ptype == 'nzbhydra' and not is_legacy and not is_deprecated:
+            api = opts.get('api')
+            if not isinstance(api, dict) or not str(api.get('url') or '').strip():
+                err(name, "preset 'nzbhydra': api.url is required even when disabled")
         # AIOStreams rejects Peerflix without this explicit boolean. `false` is
         # valid and must not be checked with truthiness.
         if ptype == 'peerflix' and not isinstance(opts.get('useMultipleInstances'), bool):
@@ -550,6 +603,10 @@ def validate_template(fpath):
     # ── Groups ────────────────────────────────────────────────
     groups = _obj(c, 'groups', name, warn)
     dynamic_fetching = _obj(c, 'dynamicAddonFetching', name, warn)
+    dynamic_condition = dynamic_fetching.get('condition', '')
+    if (not is_legacy and not is_deprecated and isinstance(dynamic_condition, str)
+            and 'totalCachedStreams' in dynamic_condition):
+        err(name, "dynamicAddonFetching.condition uses undefined 'totalCachedStreams'; use cached(totalStreams) with totalStreams instead")
     if (is_core_builds_template and groups.get('enabled')
             and dynamic_fetching.get('enabled')):
         err(name, "Groups and Dynamic fetching cannot both be enabled in a Core Builds template")

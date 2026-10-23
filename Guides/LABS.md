@@ -8,12 +8,12 @@ Nightly / Labs templates test new ideas before they're promoted to stable. They 
 
 | Template | Version | Resolution | Base |
 |---|---|---|---|
-| **4K Apex Labs** | v0.15.6 | 4K + 1080p | 4K Apex |
-| **Stream Labs** | v0.10.6 | 1080p | Stream |
-| **All-Rounder Labs** | v0.4.6 | 1080p | Stream + Anime |
-| **4K Essential Labs** | v0.6.6 | 4K + 1080p | 4K Essential |
-| **Essential Labs** | v0.4.6 | 1080p | Essential |
-| **Anime 4K Labs** | v0.3.3 | 4K + 1080p | Anime 4K |
+| **4K Apex Labs** | v0.15.7 | 4K + 1080p | 4K Apex |
+| **Stream Labs** | v0.10.7 | 1080p | Stream |
+| **All-Rounder Labs** | v0.4.7 | 1080p | Stream + Anime |
+| **4K Essential Labs** | v0.6.7 | 4K + 1080p | 4K Essential |
+| **Essential Labs** | v0.4.7 | 1080p | Essential |
+| **Anime 4K Labs** | v0.3.4 | 4K + 1080p | Anime 4K |
 
 ---
 
@@ -111,7 +111,7 @@ These features were introduced in earlier Labs versions and remain active:
 | **rseMatched() tiers** | v0.9.0 | Ranked regex entries as named matchers for tier-guarded kills |
 | **Bitrate Floor ESEs** | v0.11.0 | 4K + 1080p REMUX bitrate floors (now runtime-aware in v0.14.0) |
 | **Private tracker kill** | v0.12.0 | Hard-excludes results from private trackers |
-| **totalCachedStreams DAF** | v0.12.0 | Dynamic addon fetching exits on cached stream count |
+| **Cached-count DAF** | v0.12.0 | Dynamic addon fetching exits on `cached(totalStreams)` count |
 | **Strict year+title matching** | v0.13.0 | Tighter match criteria for content identification |
 | **SeaDex Best PSE tier** | v0.13.0 | Dedicated PSE tier for SeaDex best-rated releases |
 

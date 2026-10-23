@@ -5,13 +5,18 @@
     "description": "Core Nexus 4K for AllDebrid. IQR Tukey fence bitrate PSEs · DV/HDR priority · TrueHD/Atmos · uncapped bitrate. Requires AllDebrid account.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "0.4.15",
+    "version": "0.4.16",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
     "sourceUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/AllDebrid/core-nexus-4k-alldebrid.json",
     "changelogUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md",
     "changelog": [
+      {
+        "date": "2026-10-23",
+        "version": "0.4.16",
+        "content": "Service selection corrected: AllDebrid is now enabled and TorBox disabled, matching this AllDebrid-only template. TorBox was previously enabled by mistake. Credentials remain empty for the user to supply; filters, sorting, and formatter settings are unchanged."
+      },
       {
         "date": "2026-10-22",
         "version": "0.4.15",
@@ -1920,7 +1925,7 @@
       },
       {
         "id": "alldebrid",
-        "enabled": false,
+        "enabled": true,
         "credentials": {}
       },
       {
@@ -1935,7 +1940,7 @@
       },
       {
         "id": "torbox",
-        "enabled": true,
+        "enabled": false,
         "credentials": {}
       },
       {

@@ -5,13 +5,18 @@
     "description": "4K AllDebrid build with Essential-grade ESE stack. IQR Tukey fence PSEs, HDR/DV Priority, Usenet Propagation Guard, AI Upscale Exclusion, and availability-safe episode-pack fallback. No TorBox required — AllDebrid only.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "0.1.6",
+    "version": "0.1.7",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
     "sourceUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/AllDebrid/core-nexus-4k-alldebrid-essential.json",
     "changelogUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md",
     "changelog": [
+      {
+        "date": "2026-10-23",
+        "version": "0.1.7",
+        "content": "Service selection corrected: AllDebrid is now enabled. This template previously had no enabled service, so AIOStreams refused its Library preset. Credentials remain empty for the user to supply; filters, sorting, and formatter settings are unchanged."
+      },
       {
         "date": "2026-10-22",
         "version": "0.1.6",
@@ -2056,7 +2061,7 @@
       },
       {
         "id": "alldebrid",
-        "enabled": false,
+        "enabled": true,
         "credentials": {}
       },
       {

@@ -2,10 +2,10 @@
   "metadata": {
     "id": "brevity.core-nexus-speed-easynews",
     "name": "Core Nexus Speed EasyNews",
-    "description": "Speed-optimised 1080p build for EasyNews subscribers — no TorBox required. Streams exclusively from EasyNews Usenet cache for near-instant playback. Three fast scrapers: Library, Zilean, Meteor with Usenet enabled. SDR only, WEB-DL preferred, BluRay and Remux blocked. Timeouts at 3500ms, 10 results max. Requires an active EasyNews subscription.",
+    "description": "Speed-optimised 1080p build for EasyNews subscribers — no TorBox required. Streams exclusively from EasyNews Usenet cache for near-instant playback. Two fast scrapers: Zilean and Meteor with Usenet enabled. SDR only, WEB-DL preferred, BluRay and Remux blocked. Timeouts at 3500ms, 10 results max. Requires an active EasyNews subscription.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "2.10.14",
+    "version": "2.10.15",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -17,6 +17,11 @@
       "v232Action": "remove legacy preset; configure the separate Newznab endpoint only after validation"
     },
     "changelog": [
+      {
+        "date": "2026-10-23",
+        "version": "2.10.15",
+        "content": "Added the required SeaDex option name and disabled Library on this EasyNews-only build. AIOStreams validates SeaDex names even while the preset is disabled, and its Library preset requires a Library-capable service (EasyNews is not one). No enabled scraper, filter, sort, or formatter behaviour changes."
+      },
       {
         "date": "2026-10-22",
         "version": "2.10.14",
@@ -121,7 +126,7 @@
       {
         "type": "library",
         "instanceId": "lib-1",
-        "enabled": true,
+        "enabled": false,
         "options": {
           "name": "Library",
           "timeout": 3500,
@@ -213,6 +218,7 @@
         "type": "seadex",
         "enabled": false,
         "options": {
+          "name": "SeaDex",
           "timeout": 4000
         },
         "instanceId": "ef327b2f-95f1-412e-8bd6-b95ba249c6ef",

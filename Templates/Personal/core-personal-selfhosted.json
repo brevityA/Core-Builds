@@ -5,12 +5,19 @@
     "description": "Self-hosted variant of Core Personal. Synced regex scoring via Core Builds URL (requires self-hosted AIOStreams with TEMPLATE_URLS whitelist). Split cached/uncached sort criteria. SDR override neutralizes -25 penalty. TorBox Pro · WEB-DL · DD+/AAC · SDR · HEVC/AV1/AVC.",
     "source": "external",
     "author": "Personal",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
     "sourceUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Personal/core-personal-selfhosted.json",
-    "changelogUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md"
+    "changelogUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md",
+    "changelog": [
+      {
+        "date": "2026-10-23",
+        "version": "1.0.2",
+        "content": "Removed the AIOSubtitle preset, which AIOStreams 2.36.0 refuses even though this template already carries OpenSubtitles v3+. The existing OpenSubtitles instance and all filters, sorting, and formatter settings are unchanged."
+      }
+    ]
   },
   "config": {
     "trusted": false,
@@ -1315,18 +1322,6 @@
           "sources": "all",
           "includeAiTranslated": false,
           "movieHashPlusAutoAdjustment": true
-        }
-      },
-      {
-        "type": "aiosubtitle",
-        "enabled": true,
-        "instanceId": "7888a452-aef9-4638-b22e-eff127993e56",
-        "options": {
-          "name": "AIOSubtitle",
-          "timeout": 5000,
-          "languages": [
-            "en"
-          ]
         }
       }
     ],

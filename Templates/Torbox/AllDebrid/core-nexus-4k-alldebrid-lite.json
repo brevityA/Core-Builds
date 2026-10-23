@@ -5,13 +5,18 @@
     "description": "4K AllDebrid Lite. DV/HDR · TrueHD/Atmos · Relaxed filtering. No TorBox required. Requires AllDebrid account.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "0.2.15",
+    "version": "0.2.16",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
     "sourceUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/AllDebrid/core-nexus-4k-alldebrid-lite.json",
     "changelogUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md",
     "changelog": [
+      {
+        "date": "2026-10-23",
+        "version": "0.2.16",
+        "content": "Service selection corrected: AllDebrid is now enabled and TorBox disabled, matching this AllDebrid-only template. TorBox was previously enabled by mistake. Credentials remain empty for the user to supply; filters, sorting, and formatter settings are unchanged."
+      },
       {
         "date": "2026-10-22",
         "version": "0.2.15",
@@ -1848,7 +1853,7 @@
       },
       {
         "id": "alldebrid",
-        "enabled": false,
+        "enabled": true,
         "credentials": {}
       },
       {
@@ -1863,7 +1868,7 @@
       },
       {
         "id": "torbox",
-        "enabled": true,
+        "enabled": false,
         "credentials": {}
       },
       {

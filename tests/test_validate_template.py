@@ -339,6 +339,45 @@ class TestPresets:
         errors, _, _ = validate_template(path)
         assert not any("stremthruStore" in e for e in errors)
 
+    def test_disabled_seadex_still_requires_a_name(self, write_template, base_template):
+        t = base_template(presets=[{
+            "type": "seadex", "instanceId": "p1", "enabled": False,
+            "options": {"timeout": 4000}
+        }])
+        path = write_template(t)
+        errors, _, _ = validate_template(path)
+        assert any("seadex" in e and "name is required" in e for e in errors)
+
+    def test_disabled_seadex_with_name_has_no_name_error(self, write_template, base_template):
+        t = base_template(presets=[{
+            "type": "seadex", "instanceId": "p1", "enabled": False,
+            "options": {"timeout": 4000, "name": "SeaDex"}
+        }])
+        path = write_template(t)
+        errors, _, _ = validate_template(path)
+        assert not any("name is required" in e for e in errors)
+
+    def test_disabled_nzbhydra_still_requires_an_endpoint(self, write_template, base_template):
+        t = base_template(presets=[{
+            "type": "nzbhydra", "instanceId": "p1", "enabled": False,
+            "options": {"name": "NZBHydra", "timeout": 6000}
+        }])
+        path = write_template(t)
+        errors, _, _ = validate_template(path)
+        assert any("nzbhydra" in e and "api.url" in e for e in errors)
+
+    def test_disabled_nzbhydra_with_endpoint_has_no_endpoint_error(self, write_template, base_template):
+        t = base_template(presets=[{
+            "type": "nzbhydra", "instanceId": "p1", "enabled": False,
+            "options": {
+                "name": "NZBHydra", "timeout": 6000,
+                "api": {"url": "https://indexer.invalid/api", "apiKey": "dummy"}
+            }
+        }])
+        path = write_template(t)
+        errors, _, _ = validate_template(path)
+        assert not any("api.url" in e for e in errors)
+
     def test_aiosubtitle_missing_languages_errors(self, write_template, base_template):
         t = base_template(presets=[{
             "type": "aiosubtitle", "instanceId": "p1", "enabled": True,
@@ -447,6 +486,28 @@ class TestGroups:
         assert not any("stale" in e for e in errors)
 
 
+# ── Dynamic addon fetching ───────────────────────────────────
+
+class TestDynamicAddonFetching:
+    def test_undefined_total_cached_streams_variable_errors(self, write_template, base_template):
+        t = base_template(dynamicAddonFetching={
+            "enabled": True,
+            "condition": "count(resolution(totalCachedStreams, '2160p')) >= 5"
+        })
+        path = write_template(t)
+        errors, _, _ = validate_template(path)
+        assert any("totalCachedStreams" in e and "cached(totalStreams)" in e for e in errors)
+
+    def test_cached_total_streams_condition_is_accepted(self, write_template, base_template):
+        t = base_template(dynamicAddonFetching={
+            "enabled": True,
+            "condition": "count(cached(resolution(totalStreams, '2160p'))) >= 5"
+        })
+        path = write_template(t)
+        errors, _, _ = validate_template(path)
+        assert not any("totalCachedStreams" in e for e in errors)
+
+
 # ── Deduplicator ──────────────────────────────────────────────
 
 class TestDeduplicator:
@@ -538,6 +599,70 @@ def _write_at_lane(tmp_path, data, lane):
     p = d / "lane-gate-test.json"
     p.write_text(json.dumps(data))
     return str(p)
+
+
+class TestCurrentHostAcceptanceGates:
+    def test_active_lane_rejects_disabled_preset_removed_in_2_36(self, tmp_path, base_template):
+        t = base_template(presets=[{
+            "type": "aiosubtitle", "instanceId": "p1", "enabled": False,
+            "options": {"name": "AIOSubtitle", "timeout": 4000, "languages": ["en"]}
+        }])
+        path = _write_at_lane(tmp_path, t, "Templates/Personal")
+        errors, _, _ = validate_template(path)
+        assert any("removed in AIOStreams 2.36" in e for e in errors)
+
+    def test_legacy_lane_keeps_2_36_removed_preset_as_history(self, tmp_path, base_template):
+        t = base_template(presets=[{
+            "type": "aiosubtitle", "instanceId": "p1", "enabled": False,
+            "options": {"name": "AIOSubtitle", "timeout": 4000, "languages": ["en"]}
+        }])
+        path = _write_at_lane(tmp_path, t, "Templates/Legacy/v2.31.1")
+        errors, _, _ = validate_template(path)
+        assert not any("removed in AIOStreams 2.36" in e for e in errors)
+
+    @pytest.mark.parametrize("services", [[], [{"id": "easynews", "enabled": True}]])
+    def test_library_requires_a_capable_service(self, tmp_path, base_template, services):
+        t = base_template(
+            presets=[{
+                "type": "library", "instanceId": "lib", "enabled": True,
+                "options": {"name": "Library", "timeout": 3000}
+            }],
+            services=services,
+        )
+        path = _write_at_lane(tmp_path, t, "Templates/Torbox/Speed")
+        errors, _, _ = validate_template(path)
+        assert any("Library-capable enabled service" in e for e in errors)
+
+    def test_alldebrid_can_back_library(self, tmp_path, base_template):
+        t = base_template(
+            presets=[{
+                "type": "library", "instanceId": "lib", "enabled": True,
+                "options": {"name": "Library", "timeout": 3000}
+            }],
+            services=[{"id": "alldebrid", "enabled": True}],
+        )
+        path = _write_at_lane(tmp_path, t, "Templates/Torbox/Speed")
+        errors, _, _ = validate_template(path)
+        assert not any("Library-capable" in e for e in errors)
+
+    def test_alldebrid_lane_rejects_torbox_copy_paste(self, tmp_path, base_template):
+        t = base_template(services=[
+            {"id": "alldebrid", "enabled": False},
+            {"id": "torbox", "enabled": True},
+        ])
+        path = _write_at_lane(tmp_path, t, "Templates/Torbox/AllDebrid")
+        errors, _, _ = validate_template(path)
+        assert any("must enable the 'alldebrid' service" in e for e in errors)
+        assert any("must not enable the 'torbox' service" in e for e in errors)
+
+    def test_alldebrid_lane_accepts_alldebrid(self, tmp_path, base_template):
+        t = base_template(services=[
+            {"id": "alldebrid", "enabled": True},
+            {"id": "torbox", "enabled": False},
+        ])
+        path = _write_at_lane(tmp_path, t, "Templates/Torbox/AllDebrid")
+        errors, _, _ = validate_template(path)
+        assert not any("AllDebrid" in e for e in errors)
 
 
 class TestSilentNoResultsGate:

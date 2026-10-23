@@ -11,6 +11,7 @@ Auto-generated from [`CHANGELOG.md`](https://github.com/brevityA/Core-Builds/blo
 
 | Version | Date | Highlights |
 | --- | --- | --- |
+| v3.12.1 | 2026-10-23 | Remaining AIOStreams 2.36 save follow-ups (18 templates, one patch bump each) — the four Personal templates no longer ca… |
 | v3.12.0 | 2026-10-22 | 52 templates refused on AIOStreams 2.36 (AIOSubtitle removed) — AIOStreams 2.36.0 marks the aiosubtitle preset removed (… |
 | v3.11.0 | 2026-10-22 | Inline regex re-synced to upstream Vidhin05 (43 templates, one bump each) — hosts accept a regex only on an exact string… |
 | v3.10.0 | 2026-10-13 | Host-preload collection drops the nested Deprecated lane — sync_template_collection.py checked only the first path part … |
@@ -24,7 +25,6 @@ Auto-generated from [`CHANGELOG.md`](https://github.com/brevityA/Core-Builds/blo
 | v3.5.2 | 2026-08-02 | Core Builds CLI published to npm — npm install -g core-builds for generate, validate, diff, and info commands. Same @cor… |
 | v3.5.1 | 2026-07-31 | Capability-based device profiles (Configurator v2.87) — Android Mobile, Android TV / Google TV, Samsung Tizen, LG webOS,… |
 | v3.5.0 | 2026-07-29 | SEL Engine v2 (Configurator v2.86 + all 72 templates via synced expressions) — perGroup() QR balance replaces 8 verbose … |
-| v3.4.0 | 2026-07-26 | Core Nexus Mixed template (Templates/Torbox/Single/core-nexus-mixed.json) — adaptive multi-resolution build for niche an… |
 <!-- AUTO:ROOT_COMPLETED:END -->
 
 > **Shipped-then-removed:** Audio Pinnacle PSE and HDR/DV Priority PSE shipped at v2.84 and were **removed in v3.2.8** (REMUX-ranking fix). Do not re-implement.

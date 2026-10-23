@@ -2,10 +2,10 @@
   "metadata": {
     "id": "core-nexus-stream-labs",
     "name": "Core Nexus Stream Labs",
-    "description": "Experimental Nightly. Tests: template directives (__if/__value interpolation) — optional scrapers (MediaFusion, SeaDex) toggled at import; dynamicAddonFetching thresholds configurable at import. Hybrid regex+SEL architecture. v0.10.0: Private Tracker Kill (uncached private streams), DAF totalCachedStreams fix, Unknown Resolution/Quality Kill catalog exemption (15y+ content). Based on Stream.",
+    "description": "Experimental Nightly. Tests: template directives (__if/__value interpolation) — optional scrapers (MediaFusion, SeaDex) toggled at import; dynamicAddonFetching thresholds configurable at import. Hybrid regex+SEL architecture. v0.10.0: Private Tracker Kill (uncached private streams), DAF cached-count fix, Unknown Resolution/Quality Kill catalog exemption (15y+ content). Based on Stream.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "0.10.6",
+    "version": "0.10.7",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -56,6 +56,11 @@
     },
     "changelog": [
       {
+        "date": "2026-10-23",
+        "version": "0.10.7",
+        "content": "Dynamic addon fetching now counts cached(resolution(totalStreams, …)) instead of referencing totalCachedStreams, which AIOStreams does not expose to exit conditions. Thresholds, timeouts, and import-time input placeholders are unchanged."
+      },
+      {
         "date": "2026-10-22",
         "version": "0.10.6",
         "content": "Subtitles moved from AIOSubtitle to OpenSubtitles v3+: AIOStreams 2.36.0 removed the AIOSubtitle preset (its addon is no longer hosted), and every host on 2.36 refused this template with \"AIO Subtitle has been removed\". Same languages; no filter/sort/formatter changes."
@@ -82,7 +87,7 @@
     "showChanges": true,
     "addonName": "Core Nexus Stream Labs 🧪",
     "addonLogo": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/core_icon.svg",
-    "addonDescription": "Nightly Labs v0.10.0 — runtime bitrate floors · anime lang passthrough · latestSeason packs · age sort · subtitle PSE · cachedAnime/uncachedAnime sorts · Private Tracker Kill (uncached private streams excluded); DAF totalCachedStreams fix; Unknown Resolution/Quality Kill catalog exemption (15y+ content bypasses kill when pool is thin). Report findings in the Nightly thread.",
+    "addonDescription": "Nightly Labs v0.10.0 — runtime bitrate floors · anime lang passthrough · latestSeason packs · age sort · subtitle PSE · cachedAnime/uncachedAnime sorts · Private Tracker Kill (uncached private streams excluded); DAF cached-count fix; Unknown Resolution/Quality Kill catalog exemption (15y+ content bypasses kill when pool is thin). Report findings in the Nightly thread.",
     "appliedTemplates": [
       {
         "id": "core-nexus-torbox-exclusive",
@@ -1220,7 +1225,7 @@
     "selOverrides": [],
     "dynamicAddonFetching": {
       "enabled": true,
-      "condition": "count(resolution(totalCachedStreams, '1080p')) >= {{inputs.exitThreshold}} or totalTimeTaken > {{inputs.maxWaitMs}}"
+      "condition": "count(cached(resolution(totalStreams, '1080p'))) >= {{inputs.exitThreshold}} or totalTimeTaken > {{inputs.maxWaitMs}}"
     },
     "groups": {
       "enabled": false,
