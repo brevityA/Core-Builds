@@ -5,7 +5,7 @@
     "description": "Self-hosted variant of the 4K Apex flagship. Identical ESE/PSE/ISE stack. Uses synced ranked regex URL instead of inline patterns — auto-updates, 27 KB lighter. Requires Core Builds regex URL whitelisted on instance.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "0.1.1",
+    "version": "0.1.2",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -15,7 +15,14 @@
       "legacyTorboxSearch": true,
       "maximumAIOStreamsVersion": "2.31.1",
       "v232Action": "remove legacy preset; configure the separate Newznab endpoint only after validation"
-    }
+    },
+    "changelog": [
+      {
+        "date": "2026-10-23",
+        "version": "0.1.2",
+        "content": "Subtitles moved from AIOSubtitle to OpenSubtitles v3+: AIOStreams 2.36.0 removed the AIOSubtitle preset and refuses configs that carry it. Language, timeout, enabled state, filters, sorting, and formatter settings are unchanged."
+      }
+    ]
   },
   "config": {
     "trusted": false,
@@ -1611,15 +1618,21 @@
         ]
       },
       {
-        "type": "aiosubtitle",
-        "instanceId": "aio-sub-1",
+        "type": "opensubtitles-v3-plus",
+        "instanceId": "osub-v3-1",
         "enabled": true,
         "options": {
+          "name": "OpenSubtitles v3+",
           "timeout": 4000,
-          "name": "AIOSubtitle",
-          "languages": [
+          "resources": [
+            "subtitles"
+          ],
+          "language": [
             "en"
-          ]
+          ],
+          "sources": "all",
+          "includeAiTranslated": false,
+          "movieHashPlusAutoAdjustment": true
         }
       }
     ],

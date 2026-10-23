@@ -2,10 +2,10 @@
   "metadata": {
     "id": "core-nexus-all-rounder-labs",
     "name": "Core Nexus All-Rounder Labs",
-    "description": "Nightly Labs build — single template for live-action TV, movies, and anime. Uses isAnime + hasSeaDex conditional PSEs to switch between anime and live-action quality tiers dynamically. Includes SeaDex, AnimeTosho, NekoBT, Meteor, Comet, MediaFusion, and all LABS features. v0.4.0: Private Tracker Kill for uncached private streams, DAF totalCachedStreams fix, catalog-content exemptions on Unknown Resolution/Quality Kills (15y+). Not a daily driver.",
+    "description": "Nightly Labs build — single template for live-action TV, movies, and anime. Uses isAnime + hasSeaDex conditional PSEs to switch between anime and live-action quality tiers dynamically. Includes SeaDex, AnimeTosho, NekoBT, Meteor, Comet, MediaFusion, and all LABS features. v0.4.0: Private Tracker Kill for uncached private streams, DAF cached-count fix, catalog-content exemptions on Unknown Resolution/Quality Kills (15y+). Not a daily driver.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "0.4.6",
+    "version": "0.4.7",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -51,6 +51,11 @@
     ],
     "changelog": [
       {
+        "date": "2026-10-23",
+        "version": "0.4.7",
+        "content": "Dynamic addon fetching now counts cached(resolution(totalStreams, …)) instead of referencing totalCachedStreams, which AIOStreams does not expose to exit conditions. Thresholds, timeouts, and import-time input placeholders are unchanged."
+      },
+      {
         "date": "2026-10-22",
         "version": "0.4.6",
         "content": "Anime Tosho moved to its community continuation (anime-tosho-new): the original feed stopped taking releases on 2026-05-09 and shuts down in October 2026. Needs AIOStreams 2.36.0 or later, the first release where the new preset no longer asks for an API key. Same name, options and instance ID. Drops a stale v2.31.1-only compatibility marker (this template has no TorBox Search preset). Subtitles moved from AIOSubtitle to OpenSubtitles v3+: AIOStreams 2.36.0 removed the AIOSubtitle preset (its addon is no longer hosted), and every host on 2.36 refused this template with \"AIO Subtitle has been removed\". Same languages; no filter/sort/formatter changes."
@@ -77,7 +82,7 @@
     "showChanges": true,
     "addonName": "Core Nexus All-Rounder Labs 🧪",
     "addonLogo": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/core_icon.svg",
-    "addonDescription": "Nightly Labs v0.4.0 — anime lang passthrough · latestSeason packs · age sort · subtitle PSE · cachedAnime/uncachedAnime sorts · Private Tracker Kill (uncached private streams removed), DAF totalCachedStreams fix, Unknown Resolution/Quality Kills now exempt catalog content (15y+). Report findings in the Nightly thread.",
+    "addonDescription": "Nightly Labs v0.4.0 — anime lang passthrough · latestSeason packs · age sort · subtitle PSE · cachedAnime/uncachedAnime sorts · Private Tracker Kill (uncached private streams removed), DAF cached-count fix, Unknown Resolution/Quality Kills now exempt catalog content (15y+). Report findings in the Nightly thread.",
     "appliedTemplates": [
       {
         "id": "core-nexus-torbox-exclusive",
@@ -1232,7 +1237,7 @@
     "selOverrides": [],
     "dynamicAddonFetching": {
       "enabled": true,
-      "condition": "count(resolution(totalCachedStreams, '1080p')) >= {{inputs.exitThreshold}} or totalTimeTaken > {{inputs.maxWaitMs}}"
+      "condition": "count(cached(resolution(totalStreams, '1080p'))) >= {{inputs.exitThreshold}} or totalTimeTaken > {{inputs.maxWaitMs}}"
     },
     "groups": {
       "enabled": false,

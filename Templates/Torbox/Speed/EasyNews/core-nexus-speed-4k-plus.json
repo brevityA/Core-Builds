@@ -5,7 +5,7 @@
     "description": "Speed-optimised 4K build for TorBox Essential and EasyNews subscribers. Lean sources: Library, Comet, and Zilean — the four fastest, delivering cached results in 2–3 seconds. 2160p priority · DV and HDR10+ · TrueHD/Atmos · files up to 150 GB. SeaDex best-release enforced for anime. Requires active TorBox Essential and EasyNews subscriptions.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "2.10.15",
+    "version": "2.10.16",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -17,6 +17,11 @@
       "v232Action": "remove legacy preset; configure the separate Newznab endpoint only after validation"
     },
     "changelog": [
+      {
+        "date": "2026-10-23",
+        "version": "2.10.16",
+        "content": "Added the required SeaDex option name. AIOStreams 2.36.0 validates it even while SeaDex is disabled and otherwise refuses the whole save. SeaDex remains disabled; no other settings change."
+      },
       {
         "date": "2026-10-22",
         "version": "2.10.15",
@@ -213,6 +218,7 @@
         "type": "seadex",
         "enabled": false,
         "options": {
+          "name": "SeaDex",
           "timeout": 4000
         },
         "instanceId": "ecf45540-ab17-4239-add1-32744edbd8aa",

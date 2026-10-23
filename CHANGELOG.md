@@ -1,5 +1,17 @@
 # Changelog
 
+## 3.12.1 (2026-10-23)
+
+### Fixed
+- **Remaining AIOStreams 2.36 save follow-ups (18 templates, one patch bump each)** — the four Personal templates no longer carry the removed AIOSubtitle preset: three drop a duplicate because OpenSubtitles v3+ was already present, and Apex Self-Hosted moves to OpenSubtitles v3+ with the same language and timeout. The host-preload collection is regenerated so it serves the same fixed templates.
+- **Speed and Base save blockers removed** — both Speed EasyNews-lane templates gain the SeaDex option name that AIOStreams requires even while SeaDex is disabled. EasyNews-only Speed also disables Library because EasyNews cannot back that preset, and Base Config drops its disabled, endpoint-less NZBHydra entry instead of inventing a nonfunctional endpoint.
+- **Nightly dynamic fetching uses upstream variables (6 templates)** — all six Labs conditions replace the undefined `totalCachedStreams` constant with `cached(resolution(totalStreams, …))`. Existing thresholds, timeouts, and import-time input placeholders are unchanged, so the four directive-based templates still resolve through AIOStreams' template importer.
+- **AllDebrid service selection corrected (5 templates)** — every AllDebrid-only template now enables AllDebrid and disables TorBox. Four had TorBox enabled by mistake; 4K Essential had no enabled service, which also made its Library preset unacceptable. Credentials remain empty for the user to supply.
+- **Validator covers the observed host refusals** — active Core lanes now fail validation for presets removed in 2.36 (including disabled entries), missing SeaDex names, disabled NZBHydra presets without `api.url`, undefined `totalCachedStreams` exit conditions, Library without a capable enabled service, and TorBox/AllDebrid service-selection drift in the AllDebrid lane. Regression tests cover each rule.
+
+### Docs
+- **Mintlify MDX comments repaired** — the managed regions in `docs/changelog.mdx` and `docs/roadmap.mdx` now use `{/* … */}` instead of HTML `<!-- … -->` comments, which made Mintlify reject both pages and skip the v3.18 documentation deployment. `sync-docs.py` emits the same MDX-safe markers, and tests reject HTML comments anywhere in the Mintlify pages.
+
 ## 3.12.0 (2026-10-22)
 
 ### Fixed

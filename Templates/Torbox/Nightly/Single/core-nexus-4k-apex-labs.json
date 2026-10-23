@@ -2,8 +2,8 @@
   "metadata": {
     "id": "core-nexus-4k-apex-labs",
     "name": "Core Nexus 4K Apex Labs",
-    "version": "0.15.6",
-    "description": "Nightly Labs v0.15.0 — runtime-aware bitrate floors, anime language passthrough, latestSeason pack logic, age sort key, subtitle preference PSE, cachedAnime/uncachedAnime sorts, private tracker kill, totalCachedStreams DAF, catalog-aware Unknown kills, strict year+title matching, SeaDex Best PSE, Score IQR Guard, perGroup() ESEs, Indexer Diversity, elite group pins. Based on 4K Apex v0.4.16.",
+    "version": "0.15.7",
+    "description": "Nightly Labs v0.15.0 — runtime-aware bitrate floors, anime language passthrough, latestSeason pack logic, age sort key, subtitle preference PSE, cachedAnime/uncachedAnime sorts, private tracker kill, cached-count DAF, catalog-aware Unknown kills, strict year+title matching, SeaDex Best PSE, Score IQR Guard, perGroup() ESEs, Indexer Diversity, elite group pins. Based on 4K Apex v0.4.16.",
     "sourceUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-4k-apex-labs.json",
     "source": "external",
     "author": "Branding-Brevity",
@@ -17,6 +17,11 @@
       "v232Action": "remove legacy preset; configure the separate Newznab endpoint only after validation"
     },
     "changelog": [
+      {
+        "date": "2026-10-23",
+        "version": "0.15.7",
+        "content": "Dynamic addon fetching now counts cached(resolution(totalStreams, …)) instead of referencing totalCachedStreams, which AIOStreams does not expose to exit conditions. Thresholds, timeouts, and import-time input placeholders are unchanged."
+      },
       {
         "date": "2026-10-22",
         "version": "0.15.6",
@@ -44,7 +49,7 @@
     "showChanges": true,
     "addonName": "Core Nexus 4K Apex Labs 🧪",
     "addonLogo": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/core_icon.svg",
-    "addonDescription": "Nightly Labs v0.15.0 — runtime bitrate floors · anime language passthrough · latestSeason packs · age sort · subtitle PSE · cachedAnime/uncachedAnime sorts · private tracker kill · totalCachedStreams DAF · catalog Unknown kills · strict year+title · SeaDex Best · Score IQR Guard · perGroup() · Indexer Diversity · Elite pins.",
+    "addonDescription": "Nightly Labs v0.15.0 — runtime bitrate floors · anime language passthrough · latestSeason packs · age sort · subtitle PSE · cachedAnime/uncachedAnime sorts · private tracker kill · cached-count DAF · catalog Unknown kills · strict year+title · SeaDex Best · Score IQR Guard · perGroup() · Indexer Diversity · Elite pins.",
     "excludedResolutions": [
       "144p",
       "240p",
@@ -1081,7 +1086,7 @@
     "selOverrides": [],
     "dynamicAddonFetching": {
       "enabled": true,
-      "condition": "count(resolution(totalCachedStreams,'2160p')) >= 5 or totalTimeTaken > 5000"
+      "condition": "count(cached(resolution(totalStreams, '2160p'))) >= 5 or totalTimeTaken > 5000"
     },
     "groups": {
       "enabled": false,

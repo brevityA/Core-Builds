@@ -443,14 +443,15 @@ def main():
 # plus a What's-New page and a roadmap "Shipped" table that were hand-updated and
 # stopped being updated. The functions below regenerate the *index* parts from the
 # canonical sources so they can never freeze, while curated prose stays hand-edited
-# inside managed regions (<!-- AUTO:* --> markers).
+# inside managed regions. Mintlify pages use MDX comments: HTML <!-- --> markers
+# make its parser reject the whole page when one of these files is deployed.
 
 import datetime as _dt
 
-CHANGELOG_BEGIN = "<!-- AUTO:RECENT_RELEASES:BEGIN -->"
-CHANGELOG_END = "<!-- AUTO:RECENT_RELEASES:END -->"
-ROADMAP_BEGIN = "<!-- AUTO:SHIPPED:BEGIN -->"
-ROADMAP_END = "<!-- AUTO:SHIPPED:END -->"
+CHANGELOG_BEGIN = "{/* AUTO:RECENT_RELEASES:BEGIN */}"
+CHANGELOG_END = "{/* AUTO:RECENT_RELEASES:END */}"
+ROADMAP_BEGIN = "{/* AUTO:SHIPPED:BEGIN */}"
+ROADMAP_END = "{/* AUTO:SHIPPED:END */}"
 ROOT_ROADMAP_BEGIN = "<!-- AUTO:ROOT_COMPLETED:BEGIN -->"
 ROOT_ROADMAP_END = "<!-- AUTO:ROOT_COMPLETED:END -->"
 TOOLS_WN_BEGIN = "<!-- AUTO:TOOLS_WHATSNEW:BEGIN -->"

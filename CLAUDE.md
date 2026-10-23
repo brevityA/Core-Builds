@@ -513,7 +513,7 @@ Meteor ≤ 5, Comet ≤ 5, MediaFusion ≤ 4, EZTV ≤ 3, HdHub ≤ 3, Torrent G
 
 ---
 
-## Active Template Inventory (as of v3.12.0)
+## Active Template Inventory (as of v3.12.1)
 
 ### Single (TorBox Pro)
 - `Single/core-nexus-4k-apex.json` v0.9.6 — flagship 4K, IQR PSEs, pow() decay, 5s dynamic fetching cap, Score IQR Guard, elite group pins, perGroup() Extra Cached
@@ -540,14 +540,14 @@ Meteor ≤ 5, Comet ≤ 5, MediaFusion ≤ 4, EZTV ≤ 3, HdHub ≤ 3, Torrent G
 - `Speed/TorBox/core-nexus-speed-lite.json` v2.10.5
 
 ### Speed (EasyNews)
-- `Speed/EasyNews/core-nexus-speed-4k-plus.json` v2.10.15 — EasyNews 4K, davex preset (disabled by default)
-- `Speed/EasyNews/core-nexus-speed-easynews.json` v2.10.14 — EasyNews 1080p, davex preset (disabled by default)
+- `Speed/EasyNews/core-nexus-speed-4k-plus.json` v2.10.16 — EasyNews 4K, davex preset (disabled by default)
+- `Speed/EasyNews/core-nexus-speed-easynews.json` v2.10.15 — EasyNews 1080p, davex preset (disabled by default)
 
 ### AllDebrid
-- `AllDebrid/core-nexus-4k-alldebrid.json` v0.4.15 — 4K with IQR PSEs, Score IQR Guard, elite group pins, perGroup() Extra Cached
-- `AllDebrid/core-nexus-4k-alldebrid-lite.json` v0.2.15 — 4K CB-style
-- `AllDebrid/core-nexus-alldebrid.json` v0.2.15 — 1080p
-- `AllDebrid/core-nexus-alldebrid-lite.json` v0.2.15 — 1080p lite
+- `AllDebrid/core-nexus-4k-alldebrid.json` v0.4.16 — 4K with IQR PSEs, Score IQR Guard, elite group pins, perGroup() Extra Cached
+- `AllDebrid/core-nexus-4k-alldebrid-lite.json` v0.2.16 — 4K CB-style
+- `AllDebrid/core-nexus-alldebrid.json` v0.2.16 — 1080p
+- `AllDebrid/core-nexus-alldebrid-lite.json` v0.2.16 — 1080p lite
 
 ### Hybrid
 - `Hybrid/core-nexus-4k-hybrid.json` v2.12.15 — TorBox + RD, service() priority PSEs, IQR, Score IQR Guard, elite group pins, perGroup() Extra Cached, dedup tiebreakers (after_addon), NZBGeek preset (disabled by default)
@@ -571,12 +571,12 @@ Meteor ≤ 5, Comet ≤ 5, MediaFusion ≤ 4, EZTV ≤ 3, HdHub ≤ 3, Torrent G
 
 ### Nightly (gitignored — force-add to commit)
 - `Nightly/AppleTV/core-nexus-apple-tv-4k.json` v0.2.13 — DV Profile 5/8, AV1 excluded, SeaDex ISE, REPACK ISE
-- `Nightly/Essential/core-nexus-4k-essential-labs.json` v0.6.6 — Essential 4K experimental, ESE v2.0 (Protect Library, SeaDex Duplicates, rseMatched tier guards, Low Quality filter), Bitrate Floor ESEs (4K+1080p REMUX, runtime-aware), perGroup() Extra Cached, anime language passthrough, subtitle PSE, cachedAnime/uncachedAnime sort, age sort key
-- `Nightly/Essential/core-nexus-essential-labs.json` v0.4.6 — Essential 1080p experimental, ESE v2.0 (Protect Library, SeaDex Duplicates, Low Quality filter), perGroup() Extra Cached, anime language passthrough, subtitle PSE, cachedAnime/uncachedAnime sort, age sort key
-- `Nightly/Single/core-nexus-4k-apex-labs.json` v0.15.6 — ESE v2.0 (Protect Library, SeaDex Duplicates, rseMatched tier guards, Low Quality filter), Score IQR Guard, perGroup() dedup, Indexer Diversity, Bad Dual Audio Groups, elite group pins, Bitrate Floor ESEs (4K+1080p REMUX, runtime-aware), anime language passthrough, latestSeason season pack kill, subtitle PSE, cachedAnime/uncachedAnime sort, age sort key
-- `Nightly/Single/core-nexus-stream-labs.json` v0.10.6 — ESE v2.0 (Protect Library, SeaDex Duplicates, Low Quality filter), perGroup() prototypes, dynamicAddonFetching, StreamNZB preset, Bitrate Floor ESEs (1080p REMUX AV1 kill + 8Mbps floor, runtime-aware), anime language passthrough, subtitle PSE, cachedAnime/uncachedAnime sort, age sort key
-- `Nightly/Single/core-nexus-all-rounder-labs.json` v0.4.6 — ESE v2.0 (Protect Library, SeaDex Duplicates, rseMatched tier guards, Low Quality filter), isAnime+hasSeaDex conditional PSEs, anime+live-action scrapers, anime language passthrough, subtitle PSE, cachedAnime/uncachedAnime sort, age sort key, all LABS features
-- `Nightly/Anime/core-nexus-anime-4k-labs.json` v0.3.3 — ESE v2.0 (Protect Library, SeaDex Duplicates, rseMatched tier guards, Low Quality filter), Score IQR Guard, perGroup() dedup, Indexer Diversity, hasSeaDex conditional tiers, anime elite pins, anime language passthrough, subtitle PSE, cachedAnime/uncachedAnime sort, age sort key
+- `Nightly/Essential/core-nexus-4k-essential-labs.json` v0.6.7 — Essential 4K experimental, ESE v2.0 (Protect Library, SeaDex Duplicates, rseMatched tier guards, Low Quality filter), Bitrate Floor ESEs (4K+1080p REMUX, runtime-aware), perGroup() Extra Cached, anime language passthrough, subtitle PSE, cachedAnime/uncachedAnime sort, age sort key
+- `Nightly/Essential/core-nexus-essential-labs.json` v0.4.7 — Essential 1080p experimental, ESE v2.0 (Protect Library, SeaDex Duplicates, Low Quality filter), perGroup() Extra Cached, anime language passthrough, subtitle PSE, cachedAnime/uncachedAnime sort, age sort key
+- `Nightly/Single/core-nexus-4k-apex-labs.json` v0.15.7 — ESE v2.0 (Protect Library, SeaDex Duplicates, rseMatched tier guards, Low Quality filter), Score IQR Guard, perGroup() dedup, Indexer Diversity, Bad Dual Audio Groups, elite group pins, Bitrate Floor ESEs (4K+1080p REMUX, runtime-aware), anime language passthrough, latestSeason season pack kill, subtitle PSE, cachedAnime/uncachedAnime sort, age sort key
+- `Nightly/Single/core-nexus-stream-labs.json` v0.10.7 — ESE v2.0 (Protect Library, SeaDex Duplicates, Low Quality filter), perGroup() prototypes, dynamicAddonFetching, StreamNZB preset, Bitrate Floor ESEs (1080p REMUX AV1 kill + 8Mbps floor, runtime-aware), anime language passthrough, subtitle PSE, cachedAnime/uncachedAnime sort, age sort key
+- `Nightly/Single/core-nexus-all-rounder-labs.json` v0.4.7 — ESE v2.0 (Protect Library, SeaDex Duplicates, rseMatched tier guards, Low Quality filter), isAnime+hasSeaDex conditional PSEs, anime+live-action scrapers, anime language passthrough, subtitle PSE, cachedAnime/uncachedAnime sort, age sort key, all LABS features
+- `Nightly/Anime/core-nexus-anime-4k-labs.json` v0.3.4 — ESE v2.0 (Protect Library, SeaDex Duplicates, rseMatched tier guards, Low Quality filter), Score IQR Guard, perGroup() dedup, Indexer Diversity, hasSeaDex conditional tiers, anime elite pins, anime language passthrough, subtitle PSE, cachedAnime/uncachedAnime sort, age sort key
 
 ---
 
