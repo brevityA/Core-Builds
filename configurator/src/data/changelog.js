@@ -1,4 +1,9 @@
 export const CHANGELOG = [
+  { v:'3.21', date:'Oct 23 2026', items:[
+    'Quick install is a full-screen page on phones — it used to open as a pop-up over the landing, with two-column grids of small cards. On a phone it now fills the screen: one column of full-width rows you can tap easily, larger text, and the Install button pinned to the bottom so it is always in reach. Desktop keeps the centred panel.',
+    'Back closes Quick install — the new Back button at the top, or your phone’s own Back button, returns to the landing. The system Back button used to leave the site.',
+    'Generated output unchanged — every config the configurator and the CLI build is byte-for-byte what 3.20 produced; only the version stamp moves.',
+  ]},
   { v:'3.20', date:'Oct 23 2026', items:[
     'Two ways in, on the first screen — Quick install and Custom build now sit side by side under the headline, where a phone shows them without scrolling. The Advanced Builder used to be a small grey link at the bottom edge of the screen; it is now Custom build, an equal card. Update an existing setup, Import a config, Setup Genie and the tour are text links right beneath them.',
     'No pop-up on a first visit — the tour used to cover the landing before you had seen it. It now opens only when you pick Take the tour.',
