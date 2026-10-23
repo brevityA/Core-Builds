@@ -377,6 +377,21 @@ class TestPresets:
         path = write_template(t)
         errors, _, _ = validate_template(path)
         assert not any("api.url" in e for e in errors)
+        assert not any("api.apiKey" in e for e in errors)
+
+    @pytest.mark.parametrize("api_key", [None, "   "])
+    def test_disabled_nzbhydra_requires_a_nonblank_api_key(self, write_template, base_template, api_key):
+        api = {"url": "https://indexer.invalid/api"}
+        if api_key is not None:
+            api["apiKey"] = api_key
+        t = base_template(presets=[{
+            "type": "nzbhydra", "instanceId": "p1", "enabled": False,
+            "options": {"name": "NZBHydra", "timeout": 6000, "api": api}
+        }])
+        path = write_template(t)
+        errors, _, _ = validate_template(path)
+        assert not any("api.url" in e for e in errors)
+        assert any("nzbhydra" in e and "api.apiKey" in e for e in errors)
 
     def test_aiosubtitle_missing_languages_errors(self, write_template, base_template):
         t = base_template(presets=[{
@@ -629,7 +644,11 @@ class TestCurrentHostAcceptanceGates:
         errors, _, _ = validate_template(path)
         assert not any("removed in AIOStreams 2.36" in e for e in errors)
 
-    @pytest.mark.parametrize("services", [[], [{"id": "easynews", "enabled": True}]])
+    @pytest.mark.parametrize("services", [
+        [],
+        [{"id": "easynews", "enabled": True}],
+        [{"id": "alldebrid"}],  # Omitted enabled is disabled upstream.
+    ])
     def test_library_requires_a_capable_service(self, tmp_path, base_template, services):
         t = base_template(
             presets=[{
@@ -663,6 +682,12 @@ class TestCurrentHostAcceptanceGates:
         errors, _, _ = validate_template(path)
         assert any("must enable the 'alldebrid' service" in e for e in errors)
         assert any("must not enable the 'torbox' service" in e for e in errors)
+
+    def test_alldebrid_lane_rejects_omitted_enabled_flag(self, tmp_path, base_template):
+        t = base_template(services=[{"id": "alldebrid"}])
+        path = _write_at_lane(tmp_path, t, "Templates/Torbox/AllDebrid")
+        errors, _, _ = validate_template(path)
+        assert any("must enable the 'alldebrid' service" in e for e in errors)
 
     def test_alldebrid_lane_accepts_alldebrid(self, tmp_path, base_template):
         t = base_template(services=[

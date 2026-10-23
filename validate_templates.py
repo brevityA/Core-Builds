@@ -364,7 +364,9 @@ def validate_template(fpath):
     _NEEDS_SERVICE = {'seadex', 'sootio'}
     enabled_types = {p.get('type') for p in presets_list if isinstance(p, dict) and p.get('enabled')}
     svc_list = c.get('services', []) if isinstance(c, dict) else []
-    enabled_svcs = {sv.get('id') for sv in svc_list if isinstance(sv, dict) and sv.get('enabled') is not False}
+    # Service.enabled is optional in the schema, but upstream's usable-service
+    # filter requires it to be truthy. An omitted flag is therefore disabled.
+    enabled_svcs = {sv.get('id') for sv in svc_list if isinstance(sv, dict) and sv.get('enabled') is True}
     debridish = enabled_svcs & {'torbox','realdebrid','alldebrid','premiumize','debridlink','offcloud','easydebrid','pikpak','seedr','easynews'}
 
     # Library is generated from enabled services. AIOStreams rejects the whole
@@ -581,12 +583,15 @@ def validate_template(fpath):
         if ptype == 'seadex' and not is_legacy and not is_deprecated and not opts.get('name'):
             err(name, "preset 'seadex': name is required, got None")
         # Unlike the enabled-only credential floor above, upstream validates the
-        # NZBHydra endpoint even for a disabled preset. Never invent a placeholder
-        # endpoint: ship it only once a real api.url can be configured.
+        # NZBHydra endpoint even for a disabled preset. Hosts without preconfigured
+        # NZBHydra credentials require both values. Never invent placeholders:
+        # ship the preset only once a real endpoint and API key can be configured.
         if ptype == 'nzbhydra' and not is_legacy and not is_deprecated:
             api = opts.get('api')
             if not isinstance(api, dict) or not str(api.get('url') or '').strip():
                 err(name, "preset 'nzbhydra': api.url is required even when disabled")
+            if not isinstance(api, dict) or not str(api.get('apiKey') or '').strip():
+                err(name, "preset 'nzbhydra': api.apiKey is required even when disabled on hosts without preconfigured credentials")
         # AIOStreams rejects Peerflix without this explicit boolean. `false` is
         # valid and must not be checked with truthiness.
         if ptype == 'peerflix' and not isinstance(opts.get('useMultipleInstances'), bool):

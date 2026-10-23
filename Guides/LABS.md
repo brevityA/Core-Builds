@@ -111,7 +111,7 @@ These features were introduced in earlier Labs versions and remain active:
 | **rseMatched() tiers** | v0.9.0 | Ranked regex entries as named matchers for tier-guarded kills |
 | **Bitrate Floor ESEs** | v0.11.0 | 4K + 1080p REMUX bitrate floors (now runtime-aware in v0.14.0) |
 | **Private tracker kill** | v0.12.0 | Hard-excludes results from private trackers |
-| **Cached-count DAF** | v0.12.0 | Dynamic addon fetching exits on `cached(totalStreams)` count |
+| **Cached-count DAF** | v0.12.0 | Dynamic addon fetching exits when the selected resolution has enough cached streams: `count(cached(resolution(totalStreams, …)))` |
 | **Strict year+title matching** | v0.13.0 | Tighter match criteria for content identification |
 | **SeaDex Best PSE tier** | v0.13.0 | Dedicated PSE tier for SeaDex best-rated releases |
 
