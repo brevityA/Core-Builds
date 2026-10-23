@@ -59,6 +59,7 @@ const PRESET_CREDENTIALS = Object.freeze({
   jackett: ['jackett', 'jackettApiKey'],
   prowlarr: ['prowlarr', 'prowlarrApiKey'],
   streamnzb: ['streamnzb', 'url'],
+  penguplay: ['penguplay', 'manifestUrl'],
   'debridio-tmdb': ['debridio', 'debridioApiKey'],
   'debridio-tvdb': ['debridio', 'debridioApiKey'],
   'debridio-watchtower': ['debridio', 'debridioApiKey'],

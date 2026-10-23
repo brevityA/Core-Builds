@@ -12,6 +12,7 @@ export const OPTIONAL_SCRAPER_DEFS = [
   { id:'nzbhydra', label:'NZBHydra2', desc:'Usenet meta-search — aggregates all your indexers', presetType:'nzbhydra', cat:'usenet', color:'#10b981', credKey:'nzbhydra' },
   { id:'neko-bt', label:'NekoBT', desc:'nekoBT anime torrents · debrid-cached search', presetType:'neko-bt', cat:'debrid', color:'#f472b6' },
   { id:'sootio', label:'Sootio', desc:'Multi-indexer debrid scraper · 10 HTTP providers', presetType:'sootio', cat:'debrid', color:'#22d3ee' },
+  { id:'penguplay', label:'PenguPlay', desc:'HTTP backup source · paste your pengu.uk manifest URL', presetType:'penguplay', cat:'http', credKey:'penguplay', color:'#38bdf8' },
   { id:'webstreamr', label:'WebStreamr', desc:'HTTP streaming-site scraper · no debrid needed', presetType:'webstreamr', cat:'debrid', color:'#84cc16' },
   { id:'yastream', label:'YaStream', desc:'Asian catalogs + streams (kisskh, OneTouchTV, iDrama)', presetType:'yastream', cat:'debrid', color:'#eab308' },
   // ── Simple-toggle add-ons, audited against upstream required options. Removed 2026-10-02:
@@ -38,4 +39,28 @@ export const OPTIONAL_SCRAPER_DEFS = [
 export function presetRole(def, byCategory) {
   if (def?.resources) return { resources: [...def.resources], ...(def.category ? { category: def.category } : {}) };
   return byCategory[def?.cat] || { resources: ['stream'] };
+}
+
+// PenguPlay signs users in on its own site (pengu.uk), so AIOStreams needs the personal
+// manifest URL it hands out. Upstream refuses the whole save when that URL is not an
+// http(s) link ending in /manifest.json, so anything else leaves PenguPlay out. It is a
+// backup: streams only (its catalogs, meta and subtitles stay off), emitted after every
+// other stream source.
+export function penguplayPreset(manifestUrl) {
+  const raw = typeof manifestUrl === 'string' ? manifestUrl.trim() : '';
+  let url;
+  try { url = new URL(raw); } catch { return null; }
+  if (!['http:', 'https:'].includes(url.protocol) || !url.pathname.endsWith('/manifest.json')) return null;
+  return { type:'penguplay', instanceId:'pengu-1', enabled:true, options:{ name:'PenguPlay', manifestUrl:raw, timeout:7000, resources:['stream'], mediaTypes:[] }, resources:['stream'] };
+}
+
+// Insert PenguPlay (when picked and its URL is usable) after the last stream source,
+// ahead of subtitles and catalogs, so every lane gets it in the backup slot.
+export function withPenguplay(presets, optionalScrapers, manifestUrl) {
+  const pengu = (optionalScrapers || []).includes('penguplay') ? penguplayPreset(manifestUrl) : null;
+  if (!pengu || presets.some(p => p?.type === 'penguplay')) return presets;
+  const streams = p => [...(p?.resources || []), ...(p?.options?.resources || [])].includes('stream');
+  let at = -1;
+  presets.forEach((p, i) => { if (streams(p)) at = i; });
+  return [...presets.slice(0, at + 1), pengu, ...presets.slice(at + 1)];
 }
