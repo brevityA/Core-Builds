@@ -74,7 +74,7 @@ test('app.js microcopy may not get smaller than it already is', () => {
 
 test('app.js inline style="" attributes do not grow — add a class in 07-menu-parity.css instead', () => {
   // A hard-coded colour in an inline style ignores the theme; the classes use the tokens, so light mode follows.
-  const n = count(app, /style="/g);
+  const n = count(app, /\bstyle\s*=\s*["']/gi);   // either quote, optional spaces
   assert.ok(n <= BASELINE.appInlineStyles, `inline style attributes grew to ${n} (baseline ${BASELINE.appInlineStyles})`);
 });
 
