@@ -1,133 +1,76 @@
 ---
-title: "What's New — Configurator v3.18"
+title: "What's New — Configurator v3.22"
 sidebarTitle: "What's New"
-description: "Latest Core Builds Configurator releases (v3.18 and earlier), auto-generated from the in-app changelog."
+description: "Latest Core Builds Configurator releases (v3.22 and earlier), auto-generated from the in-app changelog."
 ---
 
 # What's New in the Configurator
 
-This page is regenerated from `configurator/src/data/changelog.js` by `scripts/sync-docs.py`, so it always reflects the latest shipped configurator version (currently **v3.18**).
+This page is regenerated from `configurator/src/data/changelog.js` by `scripts/sync-docs.py`, so it always reflects the latest shipped configurator version (currently **v3.22**).
 
 For the template-suite release log, see the [Changelog](https://corebuilds-docs.docsalot.dev/changelog).
 
-## Configurator v3.18 (Oct 22 2026)
+## Configurator v3.22 (Oct 23 2026)
 
 <CardGroup cols={2}>
-  <Card title="Templates save on AIOStreams 2.36 again" icon="sparkles">
-    AIOStreams 2.36.0 removed the AIOSubtitle addon and refuses any config that includes it, and 52 Core Builds templates did, so every host on 2.36 (seven of the eight public ones, ElfHosted included) refused them with “AIO Subtitle has been removed”. They now use OpenSubtitles v3+, the configurator’s default since 3.16. Re-import your template to pick up the fix.
+  <Card title="Quick install reaches every setting" icon="sparkles">
+    a new Defaults we’ll use list shows what Quick install leaves at its default: audio, size and quality, stream cards, subtitles and catalogs. Tap one and the full builder opens at that setting, with your service, key, device, quality and install target already filled in, so nothing is lost when you move from Quick to Custom. Install from Review when you are done.
   </Card>
-  <Card title="AIOSubtitle leaves Fine-Tune" icon="bolt">
-    its addon is no longer hosted. A saved AIOSubtitle choice moves to OpenSubtitles v3+ and your other subtitle sources stay; a config you import or update has it removed before install.
+  <Card title="Customize every setting" icon="bolt">
+    the link under the list opens all of Fine-Tune the same way.
   </Card>
-  <Card title="Retired addons are never sent" icon="shield-check">
-    AIOStreams 2.36.0 retired 15 addons, among them Argentina TV, USA TV, Nuvio Streams, Debridio WatchTower and AIOSubtitle. Argentina TV is no longer offered, and any of the 15 found in an imported or updated config is dropped before install instead of getting it refused.
-  </Card>
-  <Card title="Anime Tosho moves to its live feed" icon="sliders">
-    the original Anime Tosho stopped taking releases on May 9 and its feed shuts down this month, so Anime builds were about to lose their anime source. Anime and Movies + Anime builds now use the community continuation (anime-tosho-new in AIOStreams 2.36), as do the nine Anime and Labs templates. It needs AIOStreams 2.36.0, which seven of the eight public hosts run: builds carrying it are not sent to Omni’s (2.35.9, now marked legacy), and picking the 2.35.7 target keeps the old source.
-  </Card>
-  <Card title="Pinned to AIOStreams 2.36.0" icon="gauge">
-    the schema the configurator checks against, and its default compatibility target, move from 2.35.7 to 2.36.0, the release ElfHosted and most hosts run. Sessions saved on the old 2.35.7 default move with it; a target you picked yourself is kept.
-  </Card>
-  <Card title="Stream proxy that works" icon="wand">
-    Fine-Tune has a Stream Proxy section again, and AIOStreams now applies it: MediaFlow Proxy, StremThru or the AIOStreams built-in proxy, with its address, password and the services to route. The old toggle sent no address and no on switch, so it never proxied anything. AIOStreams checks the proxy when you save; if it cannot reach it, the configurator says so and offers to turn it off. The password stays on your device and in the config you install, never in share links.
-  </Card>
-  <Card title="Updates keep your proxy" icon="layers">
-    installing after importing your live config replaced a proxy you had set up in AIOStreams with an empty one. It is now carried over, and updating from a Core Builds template keeps yours.
-  </Card>
-  <Card title="Sources serve only streams" icon="bug">
-    AIOStreams runs a source with everything it supports unless the config narrows it, and the configurator’s limit never reached it. Torrentio, StremThru Store and Peerflix added debrid-library catalogs to your home screen, Sootio and Flix-Streams catalogs, YaStream catalogs and subtitles. They now serve streams only, and TMDB Collections serves only its catalogs.
-  </Card>
-  <Card title="Live TV shows its channels" icon="sparkles">
-    USA TV Next was limited to streams, but its channels are browsed in catalogs, so switching it on added nothing to browse. It keeps its catalogs now. Content Deep Dive is sent as the stream companion it is, and Doctor Who Universe keeps its streams.
-  </Card>
-  <Card title="Template directory versions are current" icon="bolt">
-    the docs page showed 22 of its 43 templates with old version numbers (Windows Ultrawide read v0.2.4 against v0.2.13). Every heading now updates with its template.
-  </Card>
-  <Card title="The unlinked V3 prototype is gone" icon="shield-check">
-    an unfinished second configurator was still published at /configurator/rebuild/ though nothing linked to it. It is removed, and twelve dated audit and plan documents moved from the repository root into archive/.
+  <Card title="Generated output unchanged" icon="shield-check">
+    every config the configurator and the CLI build is byte-for-byte what 3.21 produced; only the version stamp moves.
   </Card>
 </CardGroup>
 
 ---
 
-## Configurator v3.17 (Oct 22 2026)
+## Configurator v3.21 (Oct 23 2026)
 
 <CardGroup cols={2}>
-  <Card title="ElfHosted saves refused" icon="sparkles">
-    fixed. Since about Oct 15 every config exported from the configurator was refused with '1 regexes are not allowed'. Vidhin05 added the SumVision release group to one of the two Generated Dynamic HDR patterns, and hosts accept a regex only when it matches their allowlist character for character, so the copy every build carried stopped counting as allowed. Removing that row let a save through, which is how it was reported. The pattern is now re-derived verbatim from upstream across the configurator, the CLI, the shared filter files and 43 templates, each of which bumps so the update banner offers the fixed copy; the same pass carries the other upstream edit (SiCFoI added to LQ (Release Title) (Radarr)). Checked against a real AIOStreams with ElfHosted's current rules: 0 of 388 builds saved before, 388 of 388 after. On Oct 22 Vidhin05 edited Radarr Web T1–T3, Sonarr Web T2, FLUX and TrueHD Exclude Groups (monkee and CMRG added, SiGMA and DON dropped, FLUX made case-sensitive). Every build that carries the inline regex list shipped five strings ElfHosted no longer allows, so saves were refused again. All copies now match upstream character for character. The re-sync tool had skipped the FLUX edit because it ignored regex flags, and it never covered the CLI's own copies, where an outdated BR-DISK filter had also been left behind; both are fixed and now checked.
+  <Card title="Quick install is a full-screen page on phones" icon="sparkles">
+    it used to open as a pop-up over the landing, with two-column grids of small cards. On a phone it now fills the screen: one column of full-width rows you can tap easily, larger text, and the Install button pinned to the bottom so it is always in reach. Desktop keeps the centred panel.
   </Card>
-  <Card title="Core Stable is now the default" icon="bolt">
-    every build starts on Core Stable, the profile Express already used: predictable fetching, minimal rules and a clean stream card. Choosing the Apex IQR or Apex Mixed engine still selects Advanced or Labs, and a profile you pick yourself is kept. A saved session left on automatic moves from Balanced to Core Stable on its next export; pick Balanced in Review to keep the old behaviour. The landing page now says which profile you start on, instead of promising a preload Core Stable does not do.
+  <Card title="Back closes Quick install" icon="bolt">
+    the new Back button at the top, or your phone’s own Back button, returns to the landing. The system Back button used to leave the site.
   </Card>
-  <Card title="Choices Core Stable cannot use now say so" icon="shield-check">
-    Core Stable replaces the stream card, the sort order and auto-play, so choosing a card style, Library Boost or an auto-play method used to change nothing. On an automatic build that choice now moves you to Balanced, which honours it, and a notice says why; a profile you picked yourself is never overridden. The foreign-language filter and preloading run only on Advanced and Labs, and now say that instead of silently doing nothing. The stream pool, which sizes fetching only Advanced and Labs do, is hidden on the quick-setup finish screen under Core Stable.
-  </Card>
-  <Card title="Bandwidth cap works" icon="sliders">
-    the Mbps box in Fine-Tune accepted a number and threw it away: nothing stored it, so the bitrate limit never applied. Typing your speed now caps bitrate at 80% of it on every profile, as the box always said.
-  </Card>
-  <Card title="Express installs to WuPlay or another app show their result" icon="gauge">
-    after the install, the manifest link opened underneath the Express panel, so it looked as if nothing had happened. Express now closes first and the link appears on top.
-  </Card>
-  <Card title="Resolution First works on Core Stable" icon="wand">
-    Core Stable used its own fixed sort order and ignored the toggle. It now puts resolution first when you turn it on; Quality First still wins if both are on, as on every other profile. The CLI also stops ignoring Quality First on Core Stable builds.
-  </Card>
-  <Card title="Hide 4K and Hide Dolby Vision work on every profile" icon="layers">
-    both were written only as stream rules, which Core Stable and Balanced replace with their own, so on the default build the toggles did nothing. They now use AIOStreams' native resolution and visual-tag filters, which every profile keeps.
-  </Card>
-  <Card title="Core Stable keeps the sources you chose" icon="bug">
-    it trims scrapers to a lean set, but now keeps MediaFusion when Seedr is selected (its only supporter) and AnimeTosho for Anime content, so neither choice can end up with no source at all.
-  </Card>
-  <Card title="Valid stream rules are no longer reported as blocked" icon="sparkles">
-    the host check and the Template Inspector marked any rule using not() as refused by ElfHosted and ForTheWeak. AIOStreams accepts not() on every host. The Inspector's one-click repair rewrote not( as negate(, which needs two stream lists and always fails, so it broke the rules it claimed to fix. Both are gone, along with a warning that a config without the Vidhin05 link 'may not be whitelisted': hosts check each pattern against their own list, whatever links the config carries.
-  </Card>
-  <Card title="Family setup says what it really does" icon="bolt">
-    the guided setup promised 'age gates on from day one', but AIOStreams cannot filter by age rating. The family path sets up a separate kids profile, a PIN and an adult-title filter, and now says exactly that. The unused age-rating setting is removed.
-  </Card>
-  <Card title="Stream Proxy toggle removed" icon="shield-check">
-    it never proxied anything. AIOStreams proxies only when it has a MediaFlow address and password, which the builder never asked for, so the toggle just listed service names. Set a proxy up in AIOStreams itself.
-  </Card>
-  <Card title="Exports drop two fields AIOStreams never read" icon="sliders">
-    presets carried a resources list beside their options, which AIOStreams strips on save (it reads options.resources), and StremThru Store carried a multiple-instances option only StremThru Torz reads. AIOStreams runs these configs exactly as before.
-  </Card>
-  <Card title="Tools page links open the right screen" icon="gauge">
-    Health Score, Troubleshooter and the full changelog link all landed on the configurator home, because the site root redirects without keeping the #section. They now link straight to the configurator, and #changelog opens the changelog.
-  </Card>
-  <Card title="The drift watcher now names the entry that broke" icon="wand">
-    it opened an issue on Oct 15 but listed two other changes. Upstream gives both Generated Dynamic HDR patterns the same name, and the watcher keyed entries by name alone, so the second hid any change to the first. Repeated names are now told apart, and an issue says when a changed pattern is one every generated config ships, which means saves are being refused already. The save test's copy of ElfHosted's allowlist was also two weeks stale, still holding the old text, which is why it stayed green; it is refreshed.
-  </Card>
-  <Card title="About 1,800 lines of dead code removed" icon="layers">
-    an install modal nothing opened, a Quick Start overlay no button reached, six leftover patch notes, six unused debug scripts, an unused catalog module, about 300 style rules nothing matched (22 KB), and handlers for buttons that no longer exist. The Changelog and template-diff dialogs are now announced to screen readers as dialogs.
+  <Card title="Generated output unchanged" icon="shield-check">
+    every config the configurator and the CLI build is byte-for-byte what 3.20 produced; only the version stamp moves.
   </Card>
 </CardGroup>
 
 ---
 
-## Configurator v3.16 (Oct 3 2026)
+## Configurator v3.20 (Oct 23 2026)
 
 <CardGroup cols={2}>
-  <Card title="Builds save again: subtitles now default to OpenSubtitles v3+" icon="sparkles">
-    AIOSubtitle, the subtitle source every build used by default, now takes about 12 seconds to answer. AIOStreams loads every add-on before it saves, so hosts refused the whole save with 'Failed to fetch manifest for AIOSubtitle: 502 - Bad Gateway'. New builds use OpenSubtitles v3+, which answers in under a second, and saved sessions still on the old default move over automatically. AIOSubtitle stays available, labelled as slow.
+  <Card title="Two ways in, on the first screen" icon="sparkles">
+    Quick install and Custom build now sit side by side under the headline, where a phone shows them without scrolling. The Advanced Builder used to be a small grey link at the bottom edge of the screen; it is now Custom build, an equal card. Update an existing setup, Import a config, Setup Genie and the tour are text links right beneath them.
   </Card>
-  <Card title="SubDL without a key no longer blocks the save" icon="bolt">
-    AIOStreams requires a SubDL API key, but the configurator included SubDL even when the key field was empty, and the save was refused. SubDL is now only added once a key is entered; until then the build uses OpenSubtitles v3+, so it always has subtitles.
+  <Card title="No pop-up on a first visit" icon="bolt">
+    the tour used to cover the landing before you had seen it. It now opens only when you pick Take the tour.
+  </Card>
+  <Card title="Resume from the top" icon="shield-check">
+    a saved build’s Continue where you left off banner moved above the headline, so on a phone it is on the first screen instead of below the fold.
+  </Card>
+  <Card title="Mode button no longer covers the help button" icon="sliders">
+    the light/dark switch sat on top of the chat button in the bottom-right corner. It now sits just above it, on desktop and phone.
+  </Card>
+  <Card title="Generated output unchanged" icon="gauge">
+    every config the configurator and the CLI build is byte-for-byte what 3.19 produced; only the version stamp moves.
   </Card>
 </CardGroup>
 
 ---
 
-## Configurator v3.15 (Oct 3 2026)
+## Configurator v3.19 (Oct 23 2026)
 
 <CardGroup cols={2}>
-  <Card title="Built against AIOStreams 2.35.7" icon="sparkles">
-    the configurator’s schema was still read from AIOStreams 2.34.1, while every public host had moved to 2.35.4 or later. It is now read from the 2.35.7 release, which is also the new default compatibility target. Upstream only added things between the two (two new add-ons, five new settings), so no setting the configurator writes changed meaning. 2.35.4 and 2.35.5, which Wizaardd, ATBP and Omni’s run, have the same schema as 2.35.7.
+  <Card title="PenguPlay as a backup source" icon="sparkles">
+    Fine-Tune → Extras offers PenguPlay, the HTTP stream addon Tam-Taro’s setups also carry. Paste the personal manifest URL from your pengu.uk account and it joins your build after every other stream source, serving streams only, so it fills gaps without leading. Without a URL that ends in /manifest.json nothing is added, since AIOStreams refuses the save otherwise. Hosts that block HTTP streams, ElfHosted among them, do not offer it. The URL stays on your device and in the config you install, never in share links.
   </Card>
-  <Card title="Generated configs now say they target 2.35.7" icon="bolt">
-    besides the usual version stamp (coreBuildsVersion 3.14 to 3.15), the only change in generated output is the compatibility-target stamp in the template metadata (coreBuildsAIOStreamsTarget), which moves from 2.34.1 to 2.35.7. Filters, sorting, scrapers and formatting are byte-for-byte the same, so re-importing changes nothing AIOStreams acts on. Saved sessions that picked a target keep it.
-  </Card>
-  <Card title="Names and settings from links can no longer inject page markup" icon="shield-check">
-    a template name, a custom formatter label, an unrecognised setting from a shared link or imported config, and entries in the local backup history were written into the page as HTML. A crafted link could have run script in the configurator. They are now escaped wherever they are shown, and help tooltips keep their text out of the page attributes. Found by CodeQL; all 11 of its 'DOM text reinterpreted as HTML' alerts are fixed.
-  </Card>
-  <Card title="Upstream watch re-pinned" icon="sliders">
-    the AIOStreams contract watcher had flagged additive drift since September 26 (#770). It is re-pinned, and its source extraction no longer depends on GitHub’s API, which some networks refuse.
+  <Card title="Generated output unchanged" icon="bolt">
+    builds without PenguPlay are byte-for-byte what 3.18 produced; only the version stamp moves.
   </Card>
 </CardGroup>

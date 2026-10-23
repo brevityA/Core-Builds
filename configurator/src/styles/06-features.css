@@ -10,8 +10,9 @@
 [data-theme='light'] .fastlane-panel{background:#fff;border-color:#cfd8e2;box-shadow:0 28px 80px rgba(32,48,64,.2)}[data-theme='light'] .fastlane-choice{background:#f6f8fa;border-color:#d7dee5;color:#5f6c78}[data-theme='light'] .fastlane-choice.active{background:rgba(9,105,218,.07);border-color:rgba(9,105,218,.42);color:#1c252d;box-shadow:inset 3px 0 #0969da}[data-theme='light'] .fastlane-field{background:#fff;border-color:#cdd5de;color:#1c252d}[data-theme='light'] .diag-pre{background:#f6f8fa;border-color:#d7dee5;color:#45525e}
 @media(max-width:640px){.fastlane-panel{padding:18px 14px;border-radius:16px}.fastlane-grid.apps{grid-template-columns:1fr 1fr}.fastlane-grid.services{grid-template-columns:1fr 1fr}.fastlane-grid.profiles{grid-template-columns:1fr}.fastlane-choice{min-height:54px}.fastlane-field{font-size:16px}.diag-actions{flex-direction:column}}
 /* Keep the mode control clear of the Core Builds wordmark, version badge, and phone navigation. */
-#themeToggle{top:auto!important;left:auto!important;right:max(12px,env(safe-area-inset-right))!important;bottom:max(12px,env(safe-area-inset-bottom))!important}
-@media(max-width:599px){#themeToggle{right:max(10px,env(safe-area-inset-right))!important;bottom:max(76px,calc(env(safe-area-inset-bottom) + 66px))!important}}
+/* Above the 52px contact button (bottom 20px), not on top of it. */
+#themeToggle{top:auto!important;left:auto!important;right:max(20px,env(safe-area-inset-right))!important;bottom:max(84px,calc(env(safe-area-inset-bottom) + 84px))!important}
+@media(max-width:599px){#themeToggle{right:max(27px,env(safe-area-inset-right))!important;bottom:max(84px,calc(env(safe-area-inset-bottom) + 84px))!important}}
 @media(max-height:520px) and (orientation:landscape){#themeToggle{right:max(8px,env(safe-area-inset-right))!important;bottom:max(8px,env(safe-area-inset-bottom))!important}}
 
 /* Quick Install contextual credential links */
@@ -88,3 +89,56 @@ a.core-tool-door:focus-visible{outline:2px solid #67e8f9;outline-offset:3px}
    exclusion is intended behaviour, just easy to walk into unknowingly. */
 .res-lock-note{margin-top:10px;padding:9px 12px;border-radius:10px;border:1px solid rgba(251,191,36,.22);background:rgba(251,191,36,.06);color:#d7c69a;font-size:.72rem;line-height:1.5}
 .res-lock-note b{color:#fbbf24;font-weight:800}
+/* Express lane layout (v3.21). Its grid columns, Optional drawer and footer were
+   inline styles; as classes the phone layout below can change them without
+   !important. */
+.fastlane-express{max-width:640px}
+.fastlane-grid.cols-2{grid-template-columns:1fr 1fr}.fastlane-grid.cols-3{grid-template-columns:repeat(3,1fr)}.fastlane-grid.cols-4{grid-template-columns:repeat(4,1fr)}
+.fastlane-optional{margin:0 22px 8px;font-size:.74rem}
+.fastlane-foot{padding:0 22px 18px}
+.fastlane-summary{font-size:.62rem;color:#718093;text-align:center;margin-bottom:8px;line-height:1.6}
+#expressLaneModal .fastlane-back{display:none}
+/* On phones it is a full-screen page: edge to edge, a sticky header with Back,
+   one column of full-width rows and Install pinned to the bottom. Scoped to the
+   Express lane; the other dialogs sharing .fastlane-panel stay bottom sheets
+   (07-menu-parity skips this lane rather than being overridden). */
+@media(max-width:640px){
+  #expressLaneModal.fastlane-overlay{padding:0;align-items:stretch;background:var(--th-bg)}
+  #expressLaneModal .fastlane-express{width:100%;max-width:none;height:100dvh;max-height:none;border:0;border-radius:0;box-shadow:none;padding:0 16px;overscroll-behavior:contain}
+  #expressLaneModal .fastlane-head{position:sticky;top:0;z-index:2;flex-wrap:wrap;gap:4px 10px;margin:0 -16px 6px;padding:max(10px,env(safe-area-inset-top)) 16px 12px;background:linear-gradient(180deg,#0f1822 82%,rgba(15,24,34,0))}
+  #expressLaneModal .fastlane-back{display:inline-flex;align-items:center;min-height:44px;padding:0 4px;border:0;background:none;color:var(--th-accent);font-size:1rem;font-weight:800;cursor:pointer}
+  #expressLaneModal .fastlane-close{display:none}
+  #expressLaneModal .fastlane-head-copy{flex-basis:100%}
+  #expressLaneModal .fastlane-title{font-size:1.45rem}
+  #expressLaneModal .fastlane-sub{font-size:.88rem}
+  #expressLaneModal .fastlane-section{margin-top:22px}
+  #expressLaneModal .fastlane-label{font-size:.74rem;margin-bottom:10px;color:#8b98a9}
+  #expressLaneModal .fastlane-grid.services{grid-template-columns:1fr;gap:10px}
+  #expressLaneModal .fastlane-grid.services.devices{grid-template-columns:1fr 1fr}
+  #expressLaneModal .fastlane-choice{min-height:64px;padding:14px 16px;border-radius:14px}
+  #expressLaneModal .fastlane-choice b{font-size:1rem}
+  #expressLaneModal .fastlane-choice span{font-size:.8rem;margin-top:3px}
+  #expressLaneModal .fastlane-credential-head label{font-size:.88rem}
+  #expressLaneModal .fastlane-get-key{font-size:.8rem;padding:6px 10px}
+  #expressLaneModal .fastlane-field{min-height:52px}
+  #expressLaneModal .fastlane-pair{flex-direction:column}
+  #expressLaneModal .fastlane-optional{margin:22px 0 8px;font-size:.88rem}
+  #expressLaneModal .fastlane-optional summary{min-height:44px;display:flex;align-items:center}
+  #expressLaneModal .fastlane-foot{position:sticky;bottom:0;z-index:2;margin:16px -16px 0;padding:14px 16px max(14px,env(safe-area-inset-bottom));background:linear-gradient(0deg,#0f1822 82%,rgba(15,24,34,0))}
+  #expressLaneModal .fastlane-foot .fastlane-go{margin-top:0;min-height:56px;font-size:1rem}
+  #expressLaneModal .fastlane-summary{font-size:.74rem}
+  [data-theme='light'] #expressLaneModal .fastlane-head,[data-theme='light'] #expressLaneModal .fastlane-foot{background:#fff}
+}
+/* "Defaults we'll use" in Quick install (v3.22): what Quick leaves at its default,
+   each row opening the Fine-Tune section that changes it. */
+.fastlane-defaults{display:flex;flex-direction:column;border:1px solid var(--ui-line,rgba(255,255,255,.09));border-radius:12px;overflow:hidden}
+.fastlane-default{appearance:none;font:inherit;display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:10px;min-height:44px;padding:9px 12px;border:0;border-top:1px solid var(--ui-line,rgba(255,255,255,.07));background:#0e1621;color:#c9d5df;cursor:pointer;text-align:left}
+.fastlane-default:first-child{border-top:0}
+.fastlane-default:hover,.fastlane-default:focus-visible{background:#12202c;outline:none}
+.fastlane-default-name{font-size:.72rem;font-weight:800}
+.fastlane-default-val{font-size:.68rem;color:#8b98a9;text-align:right;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fastlane-default-go{color:var(--th-accent);font-size:1rem}
+.fastlane-customize{appearance:none;font:inherit;margin-top:8px;padding:6px 0;border:0;background:none;color:var(--th-accent);font-size:.74rem;font-weight:800;cursor:pointer}
+[data-theme='light'] .fastlane-default{background:#f6f8fa;color:#1f2933}
+[data-theme='light'] .fastlane-default-val{color:#57606a}
+@media(max-width:640px){#expressLaneModal .fastlane-default{min-height:56px;padding:12px 16px}#expressLaneModal .fastlane-default-name{font-size:.95rem}#expressLaneModal .fastlane-default-val{font-size:.82rem}#expressLaneModal .fastlane-customize{font-size:.9rem;min-height:44px}}

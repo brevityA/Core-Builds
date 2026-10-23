@@ -1,4 +1,25 @@
 export const CHANGELOG = [
+  { v:'3.22', date:'Oct 23 2026', items:[
+    'Quick install reaches every setting — a new Defaults we’ll use list shows what Quick install leaves at its default: audio, size and quality, stream cards, subtitles and catalogs. Tap one and the full builder opens at that setting, with your service, key, device, quality and install target already filled in, so nothing is lost when you move from Quick to Custom. Install from Review when you are done.',
+    'Customize every setting — the link under the list opens all of Fine-Tune the same way.',
+    'Generated output unchanged — every config the configurator and the CLI build is byte-for-byte what 3.21 produced; only the version stamp moves.',
+  ]},
+  { v:'3.21', date:'Oct 23 2026', items:[
+    'Quick install is a full-screen page on phones — it used to open as a pop-up over the landing, with two-column grids of small cards. On a phone it now fills the screen: one column of full-width rows you can tap easily, larger text, and the Install button pinned to the bottom so it is always in reach. Desktop keeps the centred panel.',
+    'Back closes Quick install — the new Back button at the top, or your phone’s own Back button, returns to the landing. The system Back button used to leave the site.',
+    'Generated output unchanged — every config the configurator and the CLI build is byte-for-byte what 3.20 produced; only the version stamp moves.',
+  ]},
+  { v:'3.20', date:'Oct 23 2026', items:[
+    'Two ways in, on the first screen — Quick install and Custom build now sit side by side under the headline, where a phone shows them without scrolling. The Advanced Builder used to be a small grey link at the bottom edge of the screen; it is now Custom build, an equal card. Update an existing setup, Import a config, Setup Genie and the tour are text links right beneath them.',
+    'No pop-up on a first visit — the tour used to cover the landing before you had seen it. It now opens only when you pick Take the tour.',
+    'Resume from the top — a saved build’s Continue where you left off banner moved above the headline, so on a phone it is on the first screen instead of below the fold.',
+    'Mode button no longer covers the help button — the light/dark switch sat on top of the chat button in the bottom-right corner. It now sits just above it, on desktop and phone.',
+    'Generated output unchanged — every config the configurator and the CLI build is byte-for-byte what 3.19 produced; only the version stamp moves.',
+  ]},
+  { v:'3.19', date:'Oct 23 2026', items:[
+    'PenguPlay as a backup source — Fine-Tune → Extras offers PenguPlay, the HTTP stream addon Tam-Taro’s setups also carry. Paste the personal manifest URL from your pengu.uk account and it joins your build after every other stream source, serving streams only, so it fills gaps without leading. Without a URL that ends in /manifest.json nothing is added, since AIOStreams refuses the save otherwise. Hosts that block HTTP streams, ElfHosted among them, do not offer it. The URL stays on your device and in the config you install, never in share links.',
+    'Generated output unchanged — builds without PenguPlay are byte-for-byte what 3.18 produced; only the version stamp moves.',
+  ]},
   { v:'3.18', date:'Oct 22 2026', items:[
     'Templates save on AIOStreams 2.36 again — AIOStreams 2.36.0 removed the AIOSubtitle addon and refuses any config that includes it, and 52 Core Builds templates did, so every host on 2.36 (seven of the eight public ones, ElfHosted included) refused them with “AIO Subtitle has been removed”. They now use OpenSubtitles v3+, the configurator’s default since 3.16. Re-import your template to pick up the fix.',
     'AIOSubtitle leaves Fine-Tune — its addon is no longer hosted. A saved AIOSubtitle choice moves to OpenSubtitles v3+ and your other subtitle sources stay; a config you import or update has it removed before install.',

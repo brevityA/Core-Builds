@@ -290,6 +290,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .opt-scraper-badge-usenet{background:#06b6d418;color:#06b6d4;border:1px solid #06b6d430}
 .opt-scraper-badge-debrid{background:#22c55e18;color:#22c55e;border:1px solid #22c55e30}
 .opt-scraper-badge-noaccount{background:#8b5cf618;color:#8b5cf6;border:1px solid #8b5cf630}
+.opt-scraper-badge-http{background:#38bdf818;color:#38bdf8;border:1px solid #38bdf830}
 .opt-scraper-card-ck{position:absolute;top:8px;right:8px;width:18px;height:18px;border-radius:50%;border:1.5px solid rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;transition:border-color .2s,background .2s}
 .opt-scraper-card[data-active="true"] .opt-scraper-card-ck{border-color:#e8a33a;background:#e8a33a}
 .opt-scraper-card[data-active="true"] .opt-scraper-card-ck svg{opacity:1}

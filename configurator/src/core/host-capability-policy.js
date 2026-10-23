@@ -199,6 +199,11 @@ export function hostOptionGate(capabilities) {
       option: 'service:http', scope: 'service', action: 'hide',
       reason: reasonFor(capabilities, 'streamType', `HTTP streams are disabled on ${label}`),
     });
+    // PenguPlay serves only HTTP streams, so on such a host it would add nothing.
+    gate.push({
+      option: 'preset:penguplay', scope: 'addon', action: 'hide',
+      reason: reasonFor(capabilities, 'streamType', `HTTP streams are disabled on ${label}`),
+    });
   }
   for (const preset of capabilities.disabledPresetIds) {
     gate.push({

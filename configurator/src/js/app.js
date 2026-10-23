@@ -1,7 +1,7 @@
 import { ICO } from '../data/icons.js';
 import { CHANGELOG } from '../data/changelog.js';
 import { FORMATTERS, AUDIO_HELP } from '../data/formatters.js';
-import { OPTIONAL_SCRAPER_DEFS, presetRole } from '../data/scrapers.js';
+import { OPTIONAL_SCRAPER_DEFS, presetRole, withPenguplay } from '../data/scrapers.js';
 import { HOST_BASE_URLS, HOST_LABEL_MAP, HOST_META, MIN_AIOSTREAMS_VERSION } from '../data/hosts.js';
 import { DEVICE_AUDIO_DEFAULTS, DEVICE_FORCE_LIMITED_AUDIO, DEVICE_AV1_SAFE, DEVICE_DV_SAFE, POPULAR_DEVICE_IDS, DEVICE_PROFILES } from '../data/devices.js';
 import { CAROUSEL_SVCS } from '../data/services.js';
@@ -46,7 +46,7 @@ const STEPS = 6;
 // workflow) the raw x.y here expands to x.y.0 in package.json / versions.json and
 // the release tag; the built badge drops the trailing .0. At the 2026-09-06
 // audit the release tag was v3.7.0 while this said 3.1 — they must move together.
-const CONFIGURATOR_VERSION = '3.18';
+const CONFIGURATOR_VERSION = '3.22';
 // Set to a collector endpoint to enable the opt-in anonymous usage ping (service+device+resolution only).
 // Leave empty to keep the feature fully disabled and hidden.
 const USAGE_BEACON_URL = '';
@@ -356,6 +356,7 @@ let _expressProbeSeq = 0;
 // The Express lane keeps its service pick in a closure-local `state`; the host
 // chip's capability verdict needs it, so mirror it here while the lane is open.
 let _expressLaneService = null;
+let _expressLanePop = false;   // set while closeLane() unwinds its own history entry
 async function probeExpressHost() {
   const chip = document.getElementById('expressHostChip');
   const sel = document.getElementById('expressHost');
@@ -450,7 +451,7 @@ async function selectHealthyHost(timeout=4000) {
 // Cloudflare Worker CORS proxy — see cloudflare-worker/README.md for deployment.
 // Set to '' to disable and fall back to direct-only fetches.
 const CORS_PROXY = 'https://core-builds-cors-proxy.tlorenzato26.workers.dev';
-const S = { service:null, device:null, resolution:null, audio:'limited', bandwidthMbps:0, content:null, name:'', multiServices:[], sizeLimit:'unlimited', formatter:'family-v4', p2pEnabled:false, qualityFirst:false, resolutionFirst:false, foreignLangKill:true, matchMode:'balanced', exclude4K:false, excludeDV:false, tmdbToken:'', tmdbApiKey:'', creds:{torbox:'',realdebrid:'',alldebrid:'',premiumize:'',debridlink:'',offcloud:'',easynews:'',easynewsPass:'',nzbgeek:'',debridio:'',debrider:'',nzbnoob:'',althub:'',usenetcrawler:'',drunkenslug:'',nzbfinder:'',jackett:'',prowlarr:'',subdl:''}, instanceHost:'elfhosted', instanceUrl:'', instanceUuid:'', instancePassword:'', baseUuid:'', basePassword:'', quickStart:false, langs: ['English'], langExclusive: false, cacheMode: 'mixed', streamPool: 'normal', pseArch: 'standard', telemetryOk: false, simpleMode: false, outputProfile:'auto', aiostreamsVersion:DEFAULT_AIOSTREAMS_VERSION, installMode: 'direct', stremioEmail: '', stremioPassword: '', subtitleLangs: ['en'], subtitleAddons: ['opensubtitles-v3-plus'], streamProxy: { ...DEFAULT_STREAM_PROXY, proxiedServices: [], proxiedAddons: [] }, streamProxyPassword: '', catalogs: ['tmdb-addon'], dedupMerge: false, optionalScrapers: [], cleanInstall: false, quickProfile: 'balanced', preloadEnabled:true, autoPlayMethod:'matchingFile', addonTimeout:6000, patchCinemeta:false, installAIOMeta:false, libraryBoost:'default', nzbFailover:false, nzbFailoverPosition:'after-torrents', maxFailoverNzbs:3 };
+const S = { service:null, device:null, resolution:null, audio:'limited', bandwidthMbps:0, content:null, name:'', multiServices:[], sizeLimit:'unlimited', formatter:'family-v4', p2pEnabled:false, qualityFirst:false, resolutionFirst:false, foreignLangKill:true, matchMode:'balanced', exclude4K:false, excludeDV:false, tmdbToken:'', tmdbApiKey:'', creds:{torbox:'',realdebrid:'',alldebrid:'',premiumize:'',debridlink:'',offcloud:'',easynews:'',easynewsPass:'',nzbgeek:'',debridio:'',debrider:'',nzbnoob:'',althub:'',usenetcrawler:'',drunkenslug:'',nzbfinder:'',jackett:'',prowlarr:'',subdl:'',penguplay:''}, instanceHost:'elfhosted', instanceUrl:'', instanceUuid:'', instancePassword:'', baseUuid:'', basePassword:'', quickStart:false, langs: ['English'], langExclusive: false, cacheMode: 'mixed', streamPool: 'normal', pseArch: 'standard', telemetryOk: false, simpleMode: false, outputProfile:'auto', aiostreamsVersion:DEFAULT_AIOSTREAMS_VERSION, installMode: 'direct', stremioEmail: '', stremioPassword: '', subtitleLangs: ['en'], subtitleAddons: ['opensubtitles-v3-plus'], streamProxy: { ...DEFAULT_STREAM_PROXY, proxiedServices: [], proxiedAddons: [] }, streamProxyPassword: '', catalogs: ['tmdb-addon'], dedupMerge: false, optionalScrapers: [], cleanInstall: false, quickProfile: 'balanced', preloadEnabled:true, autoPlayMethod:'matchingFile', addonTimeout:6000, patchCinemeta:false, installAIOMeta:false, libraryBoost:'default', nzbFailover:false, nzbFailoverPosition:'after-torrents', maxFailoverNzbs:3 };
 // A clean template update must not inherit unrelated wizard/experimental flags.
 const INITIAL_STATE = cloneUpdateValue(S);
 function replaceState(nextState) {
@@ -1117,7 +1118,7 @@ function renderOpts(def) {
     }).join('');
     const scraperCards = OPTIONAL_SCRAPER_DEFS.map(d => {
       const active = S.optionalScrapers.includes(d.id);
-      const catLabel = d.cat === 'debrid' ? 'Debrid' : d.cat === 'usenet' ? 'Usenet' : d.cat;
+      const catLabel = d.cat === 'debrid' ? 'Debrid' : d.cat === 'usenet' ? 'Usenet' : d.cat === 'http' ? 'HTTP' : d.cat;
       // Same gate the service cards above use, for the same reason: presets() emits
       // nothing for some of these on some routes, so an ungated card lets you tick it,
       // keeps it ticked, and exports a config without it. The reasons mirror the
@@ -1652,12 +1653,12 @@ function renderAdvancedPanel() {
       ${renderOutputProfilePicker()}
 
       <div>
-        <div style="font-size:.72rem;font-weight:700;color:#4b5563;letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:6px">${ICO.speaker(16,'#f59e0b')} Sound Profile ${ftTip('Controls which <strong>audio codecs</strong> are allowed in your streams. <strong>Auto</strong> lets the device profile decide and drops lossless formats (TrueHD, DTS-HD MA) on devices that cannot pass them through. <strong>Full Lossless</strong> keeps everything, for home-theatre setups with a capable receiver.')}</div>
+        <div id="ft-audio" style="font-size:.72rem;font-weight:700;color:#4b5563;letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:6px">${ICO.speaker(16,'#f59e0b')} Sound Profile ${ftTip('Controls which <strong>audio codecs</strong> are allowed in your streams. <strong>Auto</strong> lets the device profile decide and drops lossless formats (TrueHD, DTS-HD MA) on devices that cannot pass them through. <strong>Full Lossless</strong> keeps everything, for home-theatre setups with a capable receiver.')}</div>
         <div style="display:flex;flex-direction:column;gap:7px">${audioRows}</div>
       </div>
 
       <div>
-        <div style="font-size:.72rem;font-weight:700;color:#4b5563;letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:6px">${ICO.video(16,'#ec4899')} Video Preferences ${ftTip('<strong>Size Limit</strong> caps per-file size. <strong>Quality vs Resolution</strong> decides ranking priority &mdash; quality prefers REMUX/WEB-DL over raw resolution. <strong>Exclude 4K</strong> removes 2160p for bandwidth saving. <strong>Exclude DV</strong> removes Dolby Vision streams that cause purple/green tint on unsupported screens.')}</div>
+        <div id="ft-video" style="font-size:.72rem;font-weight:700;color:#4b5563;letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:6px">${ICO.video(16,'#ec4899')} Video Preferences ${ftTip('<strong>Size Limit</strong> caps per-file size. <strong>Quality vs Resolution</strong> decides ranking priority &mdash; quality prefers REMUX/WEB-DL over raw resolution. <strong>Exclude 4K</strong> removes 2160p for bandwidth saving. <strong>Exclude DV</strong> removes Dolby Vision streams that cause purple/green tint on unsupported screens.')}</div>
         <div style="background:#111720;border:1.5px solid rgba(255,255,255,.08);border-radius:10px;padding:14px 16px;margin-bottom:8px">
           <div style="font-size:.78rem;font-weight:600;color:#6b7280;margin-bottom:10px">Size Limit</div>
           <div style="display:flex;gap:5px">${sizePills}</div>
@@ -1714,13 +1715,13 @@ function renderAdvancedPanel() {
       </div>
 
       <div>
-        <div style="font-size:.72rem;font-weight:700;color:#4b5563;letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:6px">${ICO.palette(16,'#a78bfa')} Stream Layout (Formatter) ${ftTip('Controls how streams appear in Stremio. The <strong>formatter</strong> defines the layout of each stream result &mdash; what info is shown (codec, resolution, size, etc.) and how it&apos;s arranged. You can import custom formatters for different visual styles.')}</div>
+        <div id="ft-layout" style="font-size:.72rem;font-weight:700;color:#4b5563;letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:6px">${ICO.palette(16,'#a78bfa')} Stream Layout (Formatter) ${ftTip('Controls how streams appear in Stremio. The <strong>formatter</strong> defines the layout of each stream result &mdash; what info is shown (codec, resolution, size, etc.) and how it&apos;s arranged. You can import custom formatters for different visual styles.')}</div>
         ${fmtDropdownHtml()}
         <button data-action="import-formatter" style="margin-top:10px;width:100%;padding:10px;border-radius:8px;border:1.5px dashed rgba(167,139,250,.3);background:transparent;color:#a78bfa;font-size:.78rem;font-weight:600;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='rgba(167,139,250,.6)'" onmouseout="this.style.borderColor='rgba(167,139,250,.3)'">${S.customFormatter ? '⟳ Replace Custom Formatter' : ICO.folder(14,'#a78bfa')+' Import Custom Formatter'}</button>
       </div>
 
       <div>
-        <div style="font-size:.72rem;font-weight:700;color:#4b5563;letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:6px">${ICO.globe(16,'#06b6d4')} Subtitles ${ftTip('Choose subtitle providers and languages. <strong>OpenSubtitles v3+</strong> (the default) has the largest database. <strong>AIOSubtitle</strong> is currently slow to respond, and hosts may refuse the save while it is enabled. <strong>SubDL</strong> is a fast alternative (requires a free API key from subdl.com). Select languages your household needs &mdash; this affects which subtitles are fetched.')}</div>
+        <div id="ft-subtitles" style="font-size:.72rem;font-weight:700;color:#4b5563;letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:6px">${ICO.globe(16,'#06b6d4')} Subtitles ${ftTip('Choose subtitle providers and languages. <strong>OpenSubtitles v3+</strong> (the default) has the largest database. <strong>AIOSubtitle</strong> is currently slow to respond, and hosts may refuse the save while it is enabled. <strong>SubDL</strong> is a fast alternative (requires a free API key from subdl.com). Select languages your household needs &mdash; this affects which subtitles are fetched.')}</div>
         <div style="background:#111720;border:1.5px solid rgba(255,255,255,.08);border-radius:10px;padding:14px 16px">
           <div style="font-size:.78rem;font-weight:600;color:#6b7280;margin-bottom:8px">Subtitle Sources</div>
           <div style="display:flex;flex-direction:column;gap:5px">
@@ -1761,7 +1762,7 @@ function renderAdvancedPanel() {
       </div>
 
       <div>
-        <div style="font-size:.72rem;font-weight:700;color:#4b5563;letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:6px">${ICO.compass(16,'#f97316')} Catalogs & Discovery ${ftTip('Adds <strong>browse catalogs</strong> to your Stremio home screen for discovering content. These don&apos;t affect stream quality &mdash; they just add new ways to find movies and shows (trending, by streaming service, anime databases, etc).')}</div>
+        <div id="ft-catalogs" style="font-size:.72rem;font-weight:700;color:#4b5563;letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:6px">${ICO.compass(16,'#f97316')} Catalogs & Discovery ${ftTip('Adds <strong>browse catalogs</strong> to your Stremio home screen for discovering content. These don&apos;t affect stream quality &mdash; they just add new ways to find movies and shows (trending, by streaming service, anime databases, etc).')}</div>
         <div style="background:#111720;border:1.5px solid rgba(255,255,255,.08);border-radius:10px;padding:14px 16px">
           <div style="font-size:.65rem;color:#4b5563;margin-bottom:10px;line-height:1.4">Add browse catalogs to your Stremio home screen for discovering content.</div>
           <div style="display:flex;flex-direction:column;gap:5px">
@@ -1978,11 +1979,40 @@ function splashHtml() {
       </div>
     </div>
 
+    <!-- A saved build is resumed from the first screen (v3.20): above the hero, not below the fold. -->
+    ${hadSavedState && _savedStep > 0 ? `<div class="hybrid-session continue-banner">
+      ${versionBannerHtml()}
+      <div style="flex:1;min-width:180px"><div style="font-size:.76rem;font-weight:800;color:#00d4ff">Continue where you left off</div><div style="font-size:.66rem;color:#6b7280;margin-top:2px">Step ${Number(_savedStep)||1} of 6${S.service ? ' · ' + label('service', S.service) : ''}</div></div>
+      <button data-action="continue-session" class="splash-cta-continue" style="padding:8px 14px;background:rgba(0,212,255,.15);border:1px solid rgba(0,212,255,.35);border-radius:8px;color:#00d4ff;font-size:.76rem;font-weight:800;cursor:pointer">Resume</button>
+      <button data-action="start-fresh" class="splash-cta-discard" style="padding:6px 9px;background:transparent;border:1px solid rgba(255,255,255,.1);border-radius:7px;color:#6b7280;cursor:pointer" title="Discard saved session">&#10005;</button>
+      ${S.service && S.device && S.resolution ? `<button data-action="quick-reinstall" style="padding:8px 13px;background:rgba(52,211,153,.07);border:1px solid rgba(52,211,153,.22);border-radius:8px;color:#34d399;font-size:.72rem;font-weight:800;cursor:pointer">${ICO.bolt(14,'#34d399')} Previous settings → Install</button>` : ''}
+    </div>` : ''}
     <div class="hybrid-hero">
       <div class="splash-anim splash-anim-d2">
         <div class="hybrid-eyebrow">AIOStreams template configurator</div>
         <h1>Build streams<br>with intent.</h1>
-        <div class="hybrid-lede">Choose your service, device, and preferences. Core Builds turns them into a checked <strong>AIOStreams template</strong> — and can write the whole stack (AIOStreams + AIOMetadata + a Cinemeta patch + subtitles) <strong>straight into your Stremio account</strong>. No JSON editing either way.</div>
+        <div class="hybrid-lede">Pick your service and device. Core Builds writes a checked <strong>AIOStreams setup</strong> and can install the whole stack <strong>straight into your Stremio account</strong>. No JSON editing.</div>
+        <!-- Two equal ways in (v3.20 redesign). Quick install opens the Express lane;
+             Custom build opens the full builder. Same data-actions as before, so the
+             #express / #advanced deep links, the tour and every spec keep working. -->
+        <div class="splash-start" id="splashStart" role="group" aria-label="Start a build">
+          <button type="button" class="start-card start-quick" data-action="open-express-lane">
+            <span class="start-card-icon">${ICO.bolt(20,'currentColor')}</span>
+            <span class="start-card-title">Quick install</span>
+            <span class="start-card-desc">Service &rarr; device &rarr; resolution &rarr; key &rarr; Deploy. Working streams in about 30 seconds.</span>
+          </button>
+          <button type="button" class="start-card start-custom" data-action="custom-start">
+            <span class="start-card-icon">${ICO.gear(20,'currentColor')}</span>
+            <span class="start-card-title">Custom build</span>
+            <span class="start-card-desc">Every setting: audio, languages, subtitles, filters, ranking and stream cards.</span>
+          </button>
+        </div>
+        <div class="splash-start-more" id="splashAltRoutes">
+          <button data-action="update-template" class="splash-tertiary-btn">Update an existing setup</button>
+          <button data-action="paste-manifest-splash" class="splash-tertiary-btn">Import a config</button>
+          <a href="../tools/genies/" class="splash-tertiary-btn">Setup Genie</a>
+          <button data-action="open-tutorial" class="splash-tertiary-btn">Take the tour</button>
+        </div>
         <div class="hybrid-trust"><span><i></i> Runs locally</span><span><i></i> Open source · MIT</span><span><i></i> Build without a login — or push it in one click</span></div>
         <div class="splash-stats" id="splashStats"></div>
         <div class="hybrid-subnote">Core Stable by default · 6s addon timeout · keys go only to the host you choose</div>
@@ -2006,13 +2036,6 @@ function splashHtml() {
       </div>
     </div>
 
-    ${hadSavedState && _savedStep > 0 ? `<div class="hybrid-session continue-banner">
-      ${versionBannerHtml()}
-      <div style="flex:1;min-width:180px"><div style="font-size:.76rem;font-weight:800;color:#00d4ff">Continue where you left off</div><div style="font-size:.66rem;color:#6b7280;margin-top:2px">Step ${Number(_savedStep)||1} of 6${S.service ? ' · ' + label('service', S.service) : ''}</div></div>
-      <button data-action="continue-session" class="splash-cta-continue" style="padding:8px 14px;background:rgba(0,212,255,.15);border:1px solid rgba(0,212,255,.35);border-radius:8px;color:#00d4ff;font-size:.76rem;font-weight:800;cursor:pointer">Resume</button>
-      <button data-action="start-fresh" class="splash-cta-discard" style="padding:6px 9px;background:transparent;border:1px solid rgba(255,255,255,.1);border-radius:7px;color:#6b7280;cursor:pointer" title="Discard saved session">&#10005;</button>
-      ${S.service && S.device && S.resolution ? `<button data-action="quick-reinstall" style="padding:8px 13px;background:rgba(52,211,153,.07);border:1px solid rgba(52,211,153,.22);border-radius:8px;color:#34d399;font-size:.72rem;font-weight:800;cursor:pointer">${ICO.bolt(14,'#34d399')} Previous settings → Install</button>` : ''}
-    </div>` : ''}
 
     <div class="hybrid-services splash-anim splash-anim-d3">
       <div class="hybrid-services-label">Your service</div>
@@ -2031,25 +2054,10 @@ function splashHtml() {
       </div></div>`}
 
     ${hadSavedState ? '' : remoteUpdateBannerHtml()}
-    <div class="hybrid-section-head splash-anim splash-anim-d4"><div><h2>Express install</h2><p>The whole job is five steps: service &rarr; device &rarr; resolution &rarr; key &rarr; Deploy.</p></div><p class="hybrid-section-index">01 / Workflow</p></div>
-    <div class="splash-doors splash-anim splash-anim-d4" id="splashDoors">
-      <div class="splash-door fastlane-door" data-action="open-express-lane" tabindex="0" role="button"><div class="splash-door-icon">${ICO.bolt(22,'#00d4ff')}</div><div class="splash-door-text"><div class="splash-door-title">Express Install <span class="splash-door-tag fastlane-badge">One-click · full-stack</span></div><div class="splash-door-desc">Service &rarr; device &rarr; resolution &rarr; key &rarr; Deploy — working streams in about 30 seconds. The account push writes every addon on every device; a failed login still hands you the manifest URL, and old installs are replaced only when you tick it.</div></div></div>
-    </div>
-    <!-- Express-first IA (2026-09-06 audit): the other routes stay one click away
-         as secondary text links — same data-actions, so #advanced / #update
-         deep links, the tour and every spec that clicks them still work. The
-         Setup Genie card is gone from the landing; the route itself is
-         unchanged and still linked here and from All Core Tools. -->
-    <div class="splash-tertiary splash-anim splash-anim-d4" id="splashAltRoutes" style="margin-top:10px">
-      <button data-action="custom-start" class="splash-tertiary-btn">Advanced Builder</button>
-      <button data-action="update-template" class="splash-tertiary-btn">Update Existing Setup</button>
-      <a href="../tools/genies/" class="splash-tertiary-btn">Setup Genie</a>
-    </div>
-
-    <div class="hybrid-section-head splash-anim splash-anim-d5"><div><h2>Ready-Made Setups</h2><p>Opinionated presets for common setups.</p></div><p class="hybrid-section-index">02 / Presets</p></div>
+    <div class="hybrid-section-head splash-anim splash-anim-d5"><div><h2>Ready-Made Setups</h2><p>Opinionated presets for common setups.</p></div><p class="hybrid-section-index">01 / Presets</p></div>
     <div class="splash-presets splash-anim splash-anim-d5" id="splashPresets">${splashPresetsHtml(_splashSvc)}</div>
 
-    <div class="hybrid-section-head splash-anim splash-anim-d6"><div><h2>What the streams will look like</h2><p>Not adjectives — these are the real cards AIOStreams draws with each formatter, generated from the same templates this configurator writes.</p></div><p class="hybrid-section-index">03 / Preview</p></div>
+    <div class="hybrid-section-head splash-anim splash-anim-d6"><div><h2>What the streams will look like</h2><p>Not adjectives — these are the real cards AIOStreams draws with each formatter, generated from the same templates this configurator writes.</p></div><p class="hybrid-section-index">02 / Preview</p></div>
     <div class="hybrid-wall splash-anim splash-anim-d6" aria-label="Formatter previews">
       <figure><img src="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/family-v4-preview.svg" width="800" height="334" loading="lazy" alt="Real stream card preview — Family v4 — the default"><figcaption><b>Family v4</b><span>the default</span></figcaption></figure>
       <figure><img src="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/apex-v2-preview.svg" width="800" height="334" loading="lazy" alt="Real stream card preview — Apex v2 — detail-rich"><figcaption><b>Apex v2</b><span>detail-rich</span></figcaption></figure>
@@ -2059,7 +2067,7 @@ function splashHtml() {
       <figure><img src="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/core-syntax-v3-preview.svg" width="800" height="334" loading="lazy" alt="Real stream card preview — Core Syntax V3"><figcaption><b>Core Syntax V3</b><span></span></figcaption></figure>
     </div>
 
-    <div class="hybrid-section-head splash-anim splash-anim-d6"><div><h2>Utilities</h2><p>Back up or explore the Core tool suite.</p></div><p class="hybrid-section-index">04 / Tools</p></div>
+    <div class="hybrid-section-head splash-anim splash-anim-d6"><div><h2>Utilities</h2><p>Back up or explore the Core tool suite.</p></div><p class="hybrid-section-index">03 / Tools</p></div>
     <div class="splash-doors splash-anim splash-anim-d6">
       <a class="splash-door core-tool-door" href="../account-tools/" target="_blank" rel="noopener noreferrer"><div class="splash-door-icon">${ICO.download(22,'#34d399')}</div><div class="splash-door-text"><div class="splash-door-title">Back Up Addons <span class="splash-door-tag" style="background:rgba(52,211,153,.1);color:#34d399;border:1px solid rgba(52,211,153,.2)">Read-only</span></div><div class="splash-door-desc">View and download your current Stremio addon setup. Nothing is changed.</div></div></a>
       <a class="splash-door core-tool-door" href="../tools/genies/nuvio-stacks.html"><div class="splash-door-icon"><span style="font-size:20px;line-height:1" aria-hidden="true">🧞</span></div><div class="splash-door-text"><div class="splash-door-title">Nuvio Stack Genie <span class="splash-door-tag" style="background:rgba(168,85,247,.12);color:#c4b5fd;border:1px solid rgba(168,85,247,.28)">Cross-app</span></div><div class="splash-door-desc">Guided profiles &amp; add-ons for Nuvio — pick a stack, get install links.</div></div></a>
@@ -2639,8 +2647,8 @@ const TUT_STEPS = [
   { id:'welcome' },
   {
     id:'paths', badge:'Step 1 of 7', title:'Choose the Right Path',
-    desc:'Use <strong>Quick Install</strong> for the shortest setup: app, providers, credentials, and a performance profile in one place.<br><br><span class="hl">Advanced Builder</span> exposes every filter and formatter. <span class="gold">Update Existing Setup</span> imports an older template. Guided Setup remains available below for a step-by-step route.',
-    target:'.splash-doors', arrow:'top', nextLabel:'Next'
+    desc:'<strong>Quick install</strong> is the shortest setup: service, device, resolution and key, then Deploy.<br><br><span class="hl">Custom build</span> exposes every filter and stream card. <span class="gold">Update an existing setup</span> brings an older template up to date, and <strong>Import a config</strong> starts from one you already have.',
+    target:'#splashStart', arrow:'top', nextLabel:'Next'
   },
   {
     id:'sources', badge:'Step 2 of 7', title:'Choose One or More Providers',
@@ -2655,11 +2663,11 @@ const TUT_STEPS = [
   {
     id:'quick', badge:'Step 4 of 7', title:'Quick Install',
     desc:'Quick Install asks only what is required. Choose Stremio, Nuvio, WuPlay, or another app; select multiple providers; then pick <strong>Fast & Light</strong>, <strong>Balanced</strong>, or <strong>Maximum Quality</strong>.<br><br>Credential fields appear only for selected providers.',
-    target:'.splash-doors [data-action="open-express-lane"]', arrow:'top', nextLabel:'Next'
+    target:'#splashStart [data-action="open-express-lane"]', arrow:'top', nextLabel:'Next'
   },
   {
-    id:'guided', badge:'Step 5 of 7', title:'Guided Setup and Advanced Builder',
-    desc:'<strong>Guided Setup</strong> walks through Sources, Device, Video Quality, Content Preferences, Accounts & Keys, and Review & Install.<br><br><span class="hl">Advanced Builder</span> adds detailed audio, video, formatter, subtitles, catalogs, proxy, matching, and filtering controls. Safe defaults are used when you skip an option.',
+    id:'guided', badge:'Step 5 of 7', title:'Guided Setup and Custom build',
+    desc:'<strong>Guided Setup</strong> walks through Sources, Device, Video Quality, Content Preferences, Accounts & Keys, and Review & Install.<br><br><span class="hl">Custom build</span> adds detailed audio, video, formatter, subtitles, catalogs, proxy, matching, and filtering controls. Safe defaults are used when you skip an option.',
     center:true, nextLabel:'Next'
   },
   {
@@ -2669,8 +2677,8 @@ const TUT_STEPS = [
   },
   {
     id:'start', badge:'Step 7 of 7', title:'Ready to Build',
-    desc:'For most people, start with <strong>Quick Install</strong>. Choose Guided Setup if you want help with each decision, or Advanced Builder when you already know the exact formats and filters you need.',
-    target:'.splash-doors [data-action="open-express-lane"]', arrow:'top', nextLabel:'Open Express Install'
+    desc:'For most people, start with <strong>Quick install</strong>. Choose Guided Setup if you want help with each decision, or Custom build when you already know the exact formats and filters you need.',
+    target:'#splashStart [data-action="open-express-lane"]', arrow:'top', nextLabel:'Open Quick install'
   },
 ];
 let _tutStep = -1;
@@ -2868,11 +2876,8 @@ document.addEventListener('DOMContentLoaded', () => {
       } catch(e) { logError('badge-builder-handoff', e.message); }
     }, 350);
   }
-  if (!hadSavedState && !_sharedImport && !_genieRoute && !_badgeBuilderRoute && !localStorage.getItem('cb_tut_seen')) {
-    // no tutorial over a genie hand-off — the genie IS the onboarding; popping the tour
-    // over the express modal we just opened was the review P1 finding.
-    setTimeout(() => tutGo(0), 1000);
-  }
+  // No tour over the landing on a first visit (v3.20): it covered the page before the
+  // visitor had seen it. "Take the tour" under the two entry cards opens it on demand.
   if (COUNTER_URL) {
     fetch(COUNTER_URL + '/api/stats').then(r => r.json()).then(d => {
       const el = document.getElementById('splashStats');
@@ -2891,6 +2896,10 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   try { history.replaceState({ step: step }, ''); } catch(e) {}
   window.addEventListener('popstate', (e) => {
+    // The Express lane's own history entry: Back closes the lane and leaves the page as it was.
+    if (_expressLanePop) { _expressLanePop = false; return; }
+    const lane = document.getElementById('expressLaneModal');
+    if (lane?._closeLane) { lane._closeLane(true); return; }
     const m = document.getElementById('manifestModal'); if (m) m.remove();
     showAdvanced = false;
     step = (e.state && typeof e.state.step === 'number') ? e.state.step : 0;
@@ -4473,7 +4482,7 @@ function build() {
   const useBase = !!(S.baseUuid && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(S.baseUuid.trim()));
 
   const globalTimeout = Number(S.addonTimeout)||6000;
-  const normalizedPresets = assertAddonPolicy(addonPolicy(input, presets(), { defaultTimeout: globalTimeout }));
+  const normalizedPresets = assertAddonPolicy(addonPolicy(input, S._nuvioInstant ? presets() : withPenguplay(presets(), S.optionalScrapers, S.creds.penguplay), { defaultTimeout: globalTimeout }));
   const activePresets = mergeImportedPresets(normalizedPresets.presets, S._importedPresets, {
     optionalScrapers: S.optionalScrapers || [], creds: S.creds || {},
     multiServices: S.multiServices, catalogs: S.catalogs, subtitleAddons: S.subtitleAddons,
@@ -7456,15 +7465,22 @@ function showExpressLane() {
   };
   const overlay = document.createElement('div');
   const prevFocus = document.activeElement;
-  const closeLane = () => { _expressLaneService = null; overlay.remove(); document.removeEventListener('keydown', expressLaneEscKey); if (prevFocus && prevFocus.focus) prevFocus.focus(); };
+  // On a phone the lane is a full-screen page, so the system Back button must close it
+  // rather than leave the site: opening pushes a history entry, popstate closes the lane.
+  const closeLane = (fromHistory = false) => {
+    if (!overlay.isConnected) return;   // two click listeners can both ask; close once
+    _expressLaneService = null; overlay.remove(); document.removeEventListener('keydown', expressLaneEscKey); if (prevFocus && prevFocus.focus) prevFocus.focus();
+    if (!fromHistory && history.state?.expressLane) { _expressLanePop = true; try { history.back(); } catch(e) { _expressLanePop = false; } }
+  };
+  overlay._closeLane = closeLane;
   const expressLaneEscKey = (e) => { if (e.key === 'Escape') closeLane(); };
   document.addEventListener('keydown', expressLaneEscKey);
   overlay.addEventListener('click', (e) => { if (e.target === overlay || e.target.closest('#expressClose')) closeLane(); }, { once:false });
   overlay.dataset.bound = '1';
   overlay.id = 'expressLaneModal';
   overlay.className = 'fastlane-overlay';
-  overlay.innerHTML = `<div class="fastlane-panel" role="dialog" aria-modal="true" aria-labelledby="expressTitle" style="max-width:640px">
-    <div class="fastlane-head"><div class="fastlane-head-copy"><div class="fastlane-kicker">Express install</div><div class="fastlane-title" id="expressTitle">Working streams in about 30 seconds.</div><div class="fastlane-sub">Pick your debrid, connect Stremio, done. Core Builds picks sensible defaults — fine-tune any of it later in Advanced.</div></div><button class="fastlane-close" id="expressClose" aria-label="Close">✕</button></div>
+  overlay.innerHTML = `<div class="fastlane-panel fastlane-express" role="dialog" aria-modal="true" aria-labelledby="expressTitle">
+    <div class="fastlane-head"><button class="fastlane-back" type="button" data-express-back aria-label="Back">&larr; Back</button><div class="fastlane-head-copy"><div class="fastlane-kicker">Express install</div><div class="fastlane-title" id="expressTitle">Working streams in about 30 seconds.</div><div class="fastlane-sub">Pick your debrid, connect Stremio, done. Everything else has a sensible default — change any of them under Defaults we’ll use.</div></div><button class="fastlane-close" id="expressClose" aria-label="Close">✕</button></div>
     <div class="fastlane-section"><div class="fastlane-label">1 · Debrid service</div>
       <div class="fastlane-grid services">${EXPRESS_SERVICES.map(([v,n,d])=>`<button type="button" class="fastlane-choice${state.service===v?' active':''}" data-express-service="${v}"><b>${n}</b><span>${d}</span></button>`).join('')}</div>
       <div id="expressCreds">${renderCreds()}</div>
@@ -7480,7 +7496,7 @@ function showExpressLane() {
       <button type="button" id="expressExtrasBtn" class="additional-services-btn" style="width:100%;margin-top:8px;display:flex;align-items:center;gap:10px;padding:11px 13px;border-radius:11px;border:1px solid rgba(255,255,255,.09);background:#0e1621;color:#c9d5df;cursor:pointer;text-align:left"><span style="font-size:1rem;color:#a78bfa">＋</span><span style="flex:1"><b style="display:block;font-size:.72rem">Additional services &amp; scrapers</b><span style="display:block;font-size:.6rem;color:#718093;margin-top:1px">Debridio, Debrider, Usenet, indexers and more</span></span><span id="expressExtrasCount" style="font-size:.6rem;font-weight:900;color:#67e8f9"></span><span>→</span></button>
     </div>
     <div class="fastlane-section"><div class="fastlane-label">2 · Streams shown ${ftTip('<strong>Cached only</strong> = instant play; nothing that still needs downloading appears at all. <strong>Mixed</strong> also shows torrents your debrid must fetch first — those stall on a “downloading to debrid” screen the first time. Fast profile implies Cached-only until you change it here.')}</div>
-      <div class="fastlane-grid services" style="grid-template-columns:1fr 1fr">
+      <div class="fastlane-grid services cols-2">
         <button type="button" class="fastlane-choice${S.cacheMode!=='cached' && S.cacheMode!=='uncached'?' active':''}" data-express-cache="mixed"><b>Mixed</b><span>Cached first · uncached can download first</span></button>
         <button type="button" class="fastlane-choice${S.cacheMode==='cached'?' active':''}" data-express-cache="cached"><b>⚡ Cached only</b><span>Instant play guaranteed — uncached hidden</span></button>
         ${S.cacheMode==='uncached' ? '<div style="font-size:.6rem;color:#fbbf24;margin-top:6px">Advanced is set to “Uncached only” — Express will honor it unless you pick here.</div>' : ''}
@@ -7489,35 +7505,54 @@ function showExpressLane() {
     <div class="fastlane-section"><div class="fastlane-label">3 · Install to</div>
       <div class="fastlane-grid services">${[['app','Stremio','Recommended — direct install'],['nuvio','Nuvio','Manifest URL'],['wuplay','WuPlay','Manifest URL'],['manifest','Other app','Copy manifest']].map(([v,n,d])=>`<button type="button" class="fastlane-choice${state.target===v?' active':''}" data-express-target="${v}"><b>${n}</b><span>${d}</span></button>`).join('')}</div>
       <div id="expressStremio"${state.target==='app'?'':' style="display:none"'}>
-        <div style="display:flex;gap:8px;margin-top:10px">
+        <div class="fastlane-pair" style="display:flex;gap:8px;margin-top:10px">
           <input class="fastlane-field" id="stremioEmailInline" type="email" autocomplete="username" placeholder="Stremio email" value="${escH(S.stremioEmail||'')}" style="flex:1">
           <input class="fastlane-field" id="stremioPasswordInline" type="password" autocomplete="current-password" placeholder="Stremio password" value="${escH(S.stremioPassword||'')}" style="flex:1">
         </div>
         <button type="button" data-action="create-stremio-account" style="margin-top:6px;font-size:.74rem;color:var(--th-accent);background:none;border:none;cursor:pointer;padding:0;font-weight:600">Create random account →</button>
       </div>
     </div>
-    <details style="margin:0 22px 8px;font-size:.74rem"><summary style="cursor:pointer;color:#8b949e;font-weight:700;letter-spacing:.04em;text-transform:uppercase">Optional</summary>
+    <div class="fastlane-section"><div class="fastlane-label">Defaults we’ll use</div>
+      <div class="fastlane-defaults" id="expressDefaults">${expressDefaultRows().map(([sec, name, val]) => `<button type="button" class="fastlane-default" data-express-customize="${sec}"><span class="fastlane-default-name">${name}</span><span class="fastlane-default-val">${val}</span><span class="fastlane-default-go" aria-hidden="true">›</span></button>`).join('')}</div>
+      <button type="button" class="fastlane-customize" data-express-customize="">Customize every setting →</button>
+    </div>
+    <details class="fastlane-optional"><summary style="cursor:pointer;color:#8b949e;font-weight:700;letter-spacing:.04em;text-transform:uppercase">Optional</summary>
       <div style="margin-top:8px"><div style="font-size:.64rem;font-weight:800;color:#8b949e;letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px">Performance profile</div>
-        <div class="fastlane-grid services" style="grid-template-columns:repeat(3,1fr)">${[['fast','Fast','1080p · cached first'],['balanced','Balanced','4K · sensible pool'],['maximum','Maximum','4K · largest pool']].map(([v,n,d])=>`<button type="button" class="fastlane-choice${state.profile===v?' active':''}" data-express-profile="${v}"><b>${n}</b><span>${d}</span></button>`).join('')}</div>
+        <div class="fastlane-grid services cols-3">${[['fast','Fast','1080p · cached first'],['balanced','Balanced','4K · sensible pool'],['maximum','Maximum','4K · largest pool']].map(([v,n,d])=>`<button type="button" class="fastlane-choice${state.profile===v?' active':''}" data-express-profile="${v}"><b>${n}</b><span>${d}</span></button>`).join('')}</div>
       </div>
       <div style="margin-top:8px"><div style="font-size:.64rem;font-weight:800;color:#8b949e;letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px">Device</div>
-        <div class="fastlane-grid services" style="grid-template-columns:repeat(4,1fr)">${[['generic','Standard'],['shield','NVIDIA Shield'],['firestick-4kmax','Fire Stick 4K Max'],['googletv','Google TV'],['samsung','Samsung TV'],['onn','onn 4K'],['appletv-new','Apple TV 4K'],['windows','Windows PC']].map(([v,n])=>`<button type="button" class="fastlane-choice${state.device===v?' active':''}" data-express-device="${v}"><b>${n}</b></button>`).join('')}</div>
+        <div class="fastlane-grid services devices cols-4">${[['generic','Standard'],['shield','NVIDIA Shield'],['firestick-4kmax','Fire Stick 4K Max'],['googletv','Google TV'],['samsung','Samsung TV'],['onn','onn 4K'],['appletv-new','Apple TV 4K'],['windows','Windows PC']].map(([v,n])=>`<button type="button" class="fastlane-choice${state.device===v?' active':''}" data-express-device="${v}"><b>${n}</b></button>`).join('')}</div>
       </div>
       <div style="margin-top:8px"><div style="font-size:.64rem;font-weight:800;color:#8b949e;letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px">Resolution</div>
-        <div class="fastlane-grid services" style="grid-template-columns:repeat(3,1fr)">${[['4k','4K','2160p primary · 1080p fallback'],['1080p','1080p','Excludes 4K'],['mixed','Mixed','Adaptive · no hard caps']].map(([v,n,d])=>`<button type="button" class="fastlane-choice${state.resolution===v?' active':''}" data-express-res="${v}"><b>${n}</b><span>${d}</span></button>`).join('')}</div>
+        <div class="fastlane-grid services cols-3">${[['4k','4K','2160p primary · 1080p fallback'],['1080p','1080p','Excludes 4K'],['mixed','Mixed','Adaptive · no hard caps']].map(([v,n,d])=>`<button type="button" class="fastlane-choice${state.resolution===v?' active':''}" data-express-res="${v}"><b>${n}</b><span>${d}</span></button>`).join('')}</div>
       </div>
       <label style="display:flex;align-items:flex-start;gap:8px;cursor:pointer;margin-top:8px"><input type="checkbox" id="expressFullStack" ${S.installAIOMeta !== false?'checked':''} style="margin-top:2px"><span style="color:#c9d5df"><b style="color:#e6edf3">Full stack</b><br><span style="color:#8b949e">Install AIOMetadata + patch Cinemeta for better posters and catalogs.</span></span></label>
       <label style="display:flex;align-items:flex-start;gap:8px;cursor:pointer;margin-top:8px"><input type="checkbox" id="expressClean" ${S.cleanInstall?'checked':''} style="margin-top:2px"><span style="color:#c9d5df"><b style="color:#e6edf3">Clean reinstall</b><br><span style="color:#8b949e">Remove previous Core Builds addons from your Stremio account.</span></span></label>
       <div style="margin-top:8px"><input class="fastlane-field" id="expressTmdb" type="password" autocomplete="off" spellcheck="false" placeholder="TMDB Read Access Token (optional — improves matching)" value="${escH(S.tmdbToken||'')}" style="width:100%"></div>
     </details>
-    <div style="padding:0 22px 18px">
-      <div id="expressSummary" style="font-size:.62rem;color:#718093;text-align:center;margin-bottom:8px;line-height:1.6"></div>
+    <div class="fastlane-foot">
+      <div id="expressSummary" class="fastlane-summary"></div>
       <button class="fastlane-go" id="expressGo" style="width:100%">Install in ~30 seconds</button><div id="aioResult" style="margin-top:10px"></div><button id="btnAutoCreate" style="display:none" aria-hidden="true"></button></div>
   </div>`;
   document.body.appendChild(overlay);
+  try { history.pushState({ ...(history.state || {}), expressLane: true }, ''); } catch(e) {}
   document.getElementById('expressHost')?.addEventListener('change', e => { S.instanceHost = e.target.value; saveState(); probeExpressHost(); refreshExpressSummary(); });
   _expressLaneService = state.service;
   probeExpressHost();
+  // Everything Quick install collects, read from the lane as it stands.
+  const expressPayload = () => ({
+    service: state.service,
+    target: state.target,
+    creds: Object.fromEntries([...overlay.querySelectorAll('[data-express-cred]')].map(i => [i.dataset.expressCred, i.value.trim()])),
+    stremioEmail: document.getElementById('stremioEmailInline')?.value.trim() || '',
+    stremioPassword: document.getElementById('stremioPasswordInline')?.value || '',
+    fullStack: document.getElementById('expressFullStack')?.checked !== false,
+    clean: document.getElementById('expressClean')?.checked === true,
+    tmdb: document.getElementById('expressTmdb')?.value.trim() || '',
+    extras: { services: state.extras, scrapers: state.scrapers },
+    profile: state.profile, device: state.device, resolution: state.resolution,
+    cacheMode: S.cacheMode,
+  });
   // Truthful-at-a-glance chorus above the Install button — every pick lands in it.
   const refreshExpressSummary = () => {
     const elSum = document.getElementById('expressSummary');
@@ -7533,7 +7568,7 @@ function showExpressLane() {
   refreshExpressSummary();
   document.getElementById('expressFullStack')?.addEventListener('change', refreshExpressSummary);
   overlay.addEventListener('click', e => {
-    if (e.target === overlay || e.target.closest('#expressClose')) { closeLane(); return; }
+    if (e.target === overlay || e.target.closest('#expressClose') || e.target.closest('[data-express-back]')) { closeLane(); return; }
     const svcBtn = e.target.closest('[data-express-service]');
     if (svcBtn) {
       state.service = svcBtn.dataset.expressService;
@@ -7602,20 +7637,25 @@ function showExpressLane() {
       });
       return;
     }
+    const customizeBtn = e.target.closest('[data-express-customize]');
+    if (customizeBtn) {
+      const hostSel = document.getElementById('expressHost');
+      if (hostSel) S.instanceHost = hostSel.value;
+      applyExpressChoices(expressPayload());
+      S.simpleMode = false; S.quickStart = false;
+      closeLane(true);
+      // Replace the lane's history entry with the builder's, so Back from here returns to the landing.
+      step = STEPS;
+      try { history.replaceState({ step }, ''); } catch(err) {}
+      saveState(); render(); window.scrollTo(0, 0);
+      openAdvancedDrawer(document.querySelector('[data-action="open-advanced"]'));
+      const target = customizeBtn.dataset.expressCustomize && document.getElementById(customizeBtn.dataset.expressCustomize);
+      if (target) requestAnimationFrame(() => target.scrollIntoView({ block: 'start' }));
+      showToast('Your Quick install choices are kept — change anything, then install from Review');
+      return;
+    }
     if (e.target.closest('#expressGo')) {
-      const payload = {
-        service: state.service,
-        target: state.target,
-        creds: Object.fromEntries([...overlay.querySelectorAll('[data-express-cred]')].map(i => [i.dataset.expressCred, i.value.trim()])),
-        stremioEmail: document.getElementById('stremioEmailInline')?.value.trim() || '',
-        stremioPassword: document.getElementById('stremioPasswordInline')?.value || '',
-        fullStack: document.getElementById('expressFullStack')?.checked !== false,
-        clean: document.getElementById('expressClean')?.checked === true,
-        tmdb: document.getElementById('expressTmdb')?.value.trim() || '',
-        extras: { services: state.extras, scrapers: state.scrapers },
-        profile: state.profile, device: state.device, resolution: state.resolution,
-        cacheMode: S.cacheMode,
-      };
+      const payload = expressPayload();
       const hostSel = document.getElementById('expressHost');
       if (hostSel) {
         S.instanceHost = hostSel.value;   // explicit host choice is honored — resolveInstallHost() never silently fails over
@@ -7629,18 +7669,15 @@ function showExpressLane() {
   document.getElementById('expressClose').focus();
 }
 
-async function runExpressInstall(p) {
+// Quick install picks → builder state. Shared by the install itself and by the
+// hand-off into Custom build, so a setting changed there starts from what Quick chose.
+function applyExpressChoices(p) {
   const isFree = p.service === 'p2p';
-  if (p.target === 'app' && !isFree) {
-    if (!p.stremioEmail || !p.stremioPassword) { showToast('Add your Stremio login or create a random account', true); return; }
-    S.stremioEmail = p.stremioEmail; S.stremioPassword = p.stremioPassword;
-  }
   applyQuickProfile(p.profile || 'balanced');
   if (p.cacheMode) S.cacheMode = p.cacheMode;   // explicit "Streams shown" pick outranks the profile's bundled default
   if (p.device) S.device = p.device;
   if (p.resolution) S.resolution = p.resolution;
   S.service = p.service;
-  S.p2pEnabled = isFree;
   const extrasSvc = p.extras?.services || [];
   const extrasScr = p.extras?.scrapers || [];
   S.multiServices = [...new Set([...(isFree ? ['p2p'] : [p.service]), ...extrasSvc])];
@@ -7649,13 +7686,37 @@ async function runExpressInstall(p) {
   // Extra services push the config into multi-service mode so their presets emit.
   S.service = deriveService() || S.service;
   S.content = 'all';
-  S.installMode = 'direct';
-  S.quickStart = true;
   Object.assign(S.creds, p.creds);
   S.patchCinemeta = p.fullStack;
   S.installAIOMeta = p.fullStack;
   S.cleanInstall = p.clean;
   if (p.tmdb) { S.tmdbToken = p.tmdb; S.tmdbApiKey = p.tmdb; }
+  if (p.stremioEmail) S.stremioEmail = p.stremioEmail;
+  if (p.stremioPassword) S.stremioPassword = p.stremioPassword;   // in memory only; saveState() never writes it
+}
+
+// The rows under "Defaults we'll use": what Quick install leaves at its default,
+// each opening the Fine-Tune section that changes it.
+function expressDefaultRows() {
+  const subs = (S.subtitleAddons || []).length ? `${(S.subtitleLangs || ['en']).map(l => String(l).toUpperCase()).join(', ')} · ${(S.subtitleAddons || []).length} source${(S.subtitleAddons || []).length > 1 ? 's' : ''}` : 'Off';
+  return [
+    ['ft-audio', 'Audio', label('audio', S.audio)],
+    ['ft-video', 'Size and quality', `${S.sizeLimit === 'unlimited' || !S.sizeLimit ? 'No size limit' : escHtml(String(S.sizeLimit))}${S.exclude4K ? ' · no 4K' : ''}${S.excludeDV ? ' · no Dolby Vision' : ''}`],
+    ['ft-layout', 'Stream cards', label('formatter', S.formatter || 'family-v4')],
+    ['ft-subtitles', 'Subtitles', escHtml(subs)],
+    ['ft-catalogs', 'Catalogs', `${(S.catalogs || []).length} on`],
+  ];
+}
+
+async function runExpressInstall(p) {
+  const isFree = p.service === 'p2p';
+  if (p.target === 'app' && !isFree) {
+    if (!p.stremioEmail || !p.stremioPassword) { showToast('Add your Stremio login or create a random account', true); return; }
+    S.stremioEmail = p.stremioEmail; S.stremioPassword = p.stremioPassword;
+  }
+  applyExpressChoices(p);
+  S.installMode = 'direct';
+  S.quickStart = true;
   // Route targets: app -> Direct Install; nuvio/wuplay/manifest -> manifest URL
   // (nuvio uses the dedicated instant route so its template is Nuvio-shaped).
   if (p.target === 'nuvio') {
