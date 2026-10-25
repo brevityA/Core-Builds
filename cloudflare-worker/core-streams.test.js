@@ -375,7 +375,7 @@ test('Library of Congress direct stream is included only for the exact Stremio f
   assert.ok(loc);
   assert.equal(loc.url, 'https://tile.loc.gov/storage-services/service/mbrs/ntscrm/00015143/00015143.mp4');
   assert.ok(requested.includes('https://v3-cinemeta.strem.io/meta/movie/tt0205480.json'));
-  assert.ok(!requested.some((url) => url.includes('tile.loc.gov')), 'Worker returns the direct LOC URL; it does not fetch or relay movie bytes');
+  assert.ok(!requested.some((url) => new URL(url).hostname === 'tile.loc.gov'), 'Worker returns the direct LOC URL; it does not fetch or relay movie bytes');
 });
 
 test('Internet Archive adapter returns only exact-title, year-matched, uploader-declared open MP4 files', async () => {
