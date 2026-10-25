@@ -51,5 +51,5 @@ jobs:
           npm ci
           npm test
 
-      - name: Test Cloudflare worker
-        run: node --test cloudflare-worker/worker.test.js
+      - name: Test Cloudflare worker and Core Streams addon
+        run: node --test cloudflare-worker/*.test.js

@@ -39,8 +39,8 @@ jobs:
       - uses: actions/setup-node@v7
         with:
           node-version: 20
-      - name: Worker unit tests
-        run: node --test cloudflare-worker/worker.test.js
+      - name: Worker and Core Streams unit tests
+        run: node --test cloudflare-worker/*.test.js
       - name: Wrangler dry-run (bundle + config validation, no upload)
         working-directory: cloudflare-worker
         run: npx --yes wrangler@4 deploy --dry-run --outdir /tmp/wr-out ${{ github.event.inputs.environment == 'staging' && '--env staging' || '' }}
@@ -142,7 +142,7 @@ jobs:
           for i in $(seq 1 12); do
             v=$(curl -sf "${{ needs.deploy.outputs.base_url }}/healthz" | node -pe 'JSON.parse(require("fs").readFileSync(0,"utf8")).version' 2>/dev/null || true)
             echo "attempt $i: version=$v"
-            [ "$v" = "2026-09-17" ] && exit 0
+            [ "$v" = "2026-10-25" ] && exit 0
             sleep 5
           done
           echo "::warning::healthz never reported the expected version — smoke will run in strict mode and fail if the deploy is stale"

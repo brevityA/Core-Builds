@@ -45,7 +45,7 @@ const enc = (s) => encodeURIComponent(s);
 // EXPECTED_VERSION below (used by the deploy workflow's post-deploy gate).
 // Named rather than dated, so the two cannot drift apart on the next bump.
 const STRICT = args.includes('--strict');
-const EXPECTED_VERSION = '2026-09-17';
+const EXPECTED_VERSION = '2026-10-25';
 
 async function main() {
   console.log(`Core Builds worker smoke — ${BASE}\n`);
@@ -65,6 +65,20 @@ async function main() {
     }
   } catch (e) {
     check('GET /healthz → 200', false, String(e.message || e));
+  }
+
+  // Optional Core Streams manifest check. The install token is never printed.
+  const coreStreamsToken = process.env.CORE_STREAMS_INSTALL_TOKEN;
+  if (coreStreamsToken) {
+    try {
+      const r = await get(`${BASE}/core-streams/${encodeURIComponent(coreStreamsToken)}/manifest.json`);
+      let m = null; try { m = JSON.parse(r.text); } catch {}
+      check('Core Streams manifest is installed', r.status === 200 && m?.name === 'Core Streams' && Array.isArray(m?.resources) && m.resources.includes('stream'), `http ${r.status}`);
+    } catch (e) {
+      check('Core Streams manifest is installed', false, String(e.message || e));
+    }
+  } else {
+    console.log('WARN  CORE_STREAMS_INSTALL_TOKEN not set — private Core Streams manifest check skipped.');
   }
 
   // 1. stats endpoint: the public surface is exactly {visits, generates}.

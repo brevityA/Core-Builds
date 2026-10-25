@@ -391,7 +391,7 @@ test('proxy: non-status proxy GET stays no-store', async () => {
   assert.equal(res.headers.get('cache-control'), 'no-store');
 });
 
-test('proxy: only /proxy/api/v1/status and /t/ get ACAO * (stream probes echo strict origin)', async () => {
+test('CORS: public status/paste and private-token Core Streams routes get ACAO *; AIO stream probes stay strict', async () => {
   global.fetch = async () => new Response('{}', { status: 200, headers: { 'Content-Type': 'application/json' } });
   // status probe — public read
   const status = await worker.fetch(new Request(`https://w.example/proxy/api/v1/status?host=${ELFH}`, { headers: { Origin: 'https://aio.atbphosting.com' } }), {}, { waitUntil: () => {} });
@@ -1342,6 +1342,65 @@ test('hardening: allowlisted lane scopes apply to the whole ALLOWED_HOSTS set (n
   assert.equal(upstream, 0);
 });
 
+test('Core Streams: private manifest route returns a Stremio stream manifest', async () => {
+  const token = 'a'.repeat(32);
+  const req = new Request(`https://worker.example/core-streams/${token}/manifest.json`, {
+    headers: { Origin: 'https://untrusted.example' },
+  });
+  const res = await worker.fetch(req, { CORE_STREAMS_INSTALL_TOKEN: token }, ctxSync);
+  assert.equal(res.status, 200);
+  assert.equal(res.headers.get('Access-Control-Allow-Origin'), '*');
+  assert.equal(res.headers.get('Cache-Control'), 'no-store');
+  const manifest = await res.json();
+  assert.equal(manifest.name, 'Core Streams');
+  assert.deepEqual(manifest.resources, ['stream']);
+  assert.deepEqual(manifest.types, ['movie', 'series']);
+});
+
+test('Core Streams: install token is required and failed auth does not reach sources', async () => {
+  let upstream = 0;
+  const priorFetch = global.fetch;
+  global.fetch = async () => { upstream++; return new Response('{"streams":[]}'); };
+  try {
+    const req = new Request(`https://worker.example/core-streams/${'b'.repeat(32)}/stream/movie/tt0133093.json`);
+    const res = await worker.fetch(req, { CORE_STREAMS_INSTALL_TOKEN: 'a'.repeat(32) }, ctxSync);
+    assert.equal(res.status, 404);
+    assert.equal(upstream, 0);
+  } finally {
+    global.fetch = priorFetch;
+  }
+});
+
+test('Core Streams: stream route uses bounded source rate limiting and returns streams', async () => {
+  const token = 'c'.repeat(32);
+  const priorFetch = global.fetch;
+  const urls = [];
+  global.fetch = async (input, init) => {
+    urls.push(String(input));
+    assert.equal(init.redirect, 'manual');
+    return new Response(JSON.stringify({ streams: [{ infoHash: 'd'.repeat(40), name: 'cached source' }] }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  };
+  try {
+    const req = new Request(`https://worker.example/core-streams/${token}/stream/movie/tt0133093.json?host=https%3A%2F%2Fevil.example`, {
+      headers: { 'cf-connecting-ip': '198.51.100.20', Origin: 'https://untrusted.example' },
+    });
+    const env = {
+      CORE_STREAMS_INSTALL_TOKEN: token,
+      RL_PROXY_CUSTOM: { limit: async () => ({ success: true }) },
+    };
+    const res = await worker.fetch(req, env, ctxSync);
+    assert.equal(res.status, 200);
+    assert.equal(res.headers.get('Access-Control-Allow-Origin'), '*');
+    assert.equal(urls.length, 4, 'three fixed torrent add-ons and the bounded Cinemeta title lookup are requested');
+    assert.deepEqual((await res.json()).streams.map((stream) => stream.infoHash), ['d'.repeat(40)]);
+  } finally {
+    global.fetch = priorFetch;
+  }
+});
+
 // Badge Builder posted its pack to `/upload` for as long as that file has existed.
 // The worker has never had that route — the upload silently 404'd and fell through
 // to paste.rs, so the feature "worked" while never touching our own worker. Nothing
@@ -1361,7 +1420,7 @@ test('every worker URL referenced in the repo names a route the worker serves', 
   // Routes the worker answers. Exact paths, plus the two prefix families.
   const EXACT = new Set(['/api/generate', '/api/stats', '/api/visit', '/app/version',
     '/contact', '/devices/register', '/healthz', '/paste']);
-  const PREFIX = ['/proxy', '/stremio/', '/t/'];
+  const PREFIX = ['/proxy', '/stremio/', '/t/', '/core-streams/'];
   const served = (path) => EXACT.has(path) || PREFIX.some((pre) => path.startsWith(pre));
 
   const referenced = [...new Set(out.split('\n').filter(Boolean)

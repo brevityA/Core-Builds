@@ -90,6 +90,59 @@ curl -s https://<worker>.workers.dev/healthz -H "Authorization: Bearer $ADMIN_TO
 The same `Authorization: Bearer $ADMIN_TOKEN` header unlocks the full
 `/api/stats` payload (see Routes below).
 
+## Core Streams (private Stremio add-on)
+
+Core Streams is an independent Stremio stream-list add-on served by this Worker. It federates bounded stream-result requests to Torrentio and TorrentsDB, queries the Stremio Public Domain Movies add-on for movie torrent results, includes a carefully filtered Internet Archive source for matching movie MP4s with an uploader-declared CC0/Public Domain Mark/CC BY/CC BY-SA license, includes four exact-match Library of Congress films from a collection explicitly declared public domain by LOC, includes the publisher's official Blender Open Movies PeerTube source for six explicitly mapped titles: Big Buck Bunny, Elephants Dream, Sintel, Tears of Steel, Glass Half, and Coffee Run, and supports one optional operator-configured Stremio-compatible source. Configured sources may return validated native YouTube video IDs (`ytId`) as well as HTTPS URLs or torrent hashes; Stremio's YouTube-capable clients resolve those IDs without Core Streams fetching or proxying video. It does not depend on AIOStreams and never relays media bytes. The `/proxy/*` AIOStreams lane remains unchanged. Internet Archive license metadata is uploader-declared and not independently verified; the Public Domain Movies add-on's classification is not a guarantee of public-domain status in Australia or another viewer's country. These are discovery filters, not legal clearance or a guarantee that a file plays.
+
+### Use it
+
+1. **Create a private install token and store it on the Worker** (never commit or post it):
+   ```bash
+   cd cloudflare-worker
+   CORE_STREAMS_INSTALL_TOKEN=$(openssl rand -hex 32)
+   printf '%s' "$CORE_STREAMS_INSTALL_TOKEN" | npx wrangler secret put CORE_STREAMS_INSTALL_TOKEN --env=""
+   ```
+2. *(Optional)* Configure a compatible Stremio stream add-on as described below.
+3. **Deploy the Worker code.** After the code is merged to `main`, the existing deploy workflow handles it; to deploy this checkout manually, run `npx wrangler deploy --env=""` from `cloudflare-worker/` (or deploy with `--env staging` first).
+4. **Build the install link** using your Worker base URL:
+   ```bash
+   printf 'https://core-builds-cors-proxy.tlorenzato26.workers.dev/core-streams/%s/manifest.json\n' "$CORE_STREAMS_INSTALL_TOKEN"
+   ```
+   Replace the base URL if your Worker has a different account subdomain.
+5. In Stremio, open **Add-ons → Install from URL** (wording varies by client), paste the link and install. Share the link only with the friends you intend to allow; it is a bearer credential.
+
+To revoke access, replace the `CORE_STREAMS_INSTALL_TOKEN` Worker secret and redeploy/reinstall using the new link. For local `wrangler dev`, put `CORE_STREAMS_INSTALL_TOKEN=<64 hex chars>` in the ignored `cloudflare-worker/.dev.vars` file.
+
+Movie/episode lookups are rate-limited using the existing `RL_PROXY_CUSTOM` lane. Torrentio, TorrentsDB, the movie-only Public Domain Movies add-on, and any configured add-on have a 5.5-second timeout; open-media metadata lookups are separately bounded to 4 seconds and 768 KiB per JSON response. Each source has an isolate-local circuit breaker: after three consecutive failures it is skipped for 30 seconds while other sources keep running.
+
+The Public Domain Movies endpoint currently returns torrent hashes from its curated collection. Its results carry a warning to verify local public-domain status: the add-on does not establish copyright status for Australia or every other territory.
+
+The Internet Archive adapter handles movies only, requires an exact normalized title/year match from Cinemeta and item metadata, and returns MP4 files only when the item has an explicit allowlisted CC0, Public Domain Mark, CC BY, or CC BY-SA license URL. It filters restricted files and excludes non-commercial/no-derivatives license variants. The license declaration is uploader-supplied, not independently verified; results include the item, creator, license and caveat.
+
+The LOC source is limited to four static mappings from the *Before and After the Great Earthquake and Fire* collection: A Trip Down Market Street Before the Fire (`tt0205480`, 1906), Panoramic View of the Golden Gate (`tt0366872`, 1902), Bird's-Eye View of San Francisco, Cal., from a Balloon (`tt0309365`, 1902), and San Francisco Earthquake & Fire: April 18, 1906 (`tt1811321`, 1906). Each is guarded by exact Cinemeta title/year (one catalog-title alias is explicit), pinned to its official LOC MP4 path, and linked to the item and collection rights statement, which says those collection contents are public domain and free to use and reuse. The returned record notes the preserved viewing-copy duration; some editions are shorter than the IMDb/Cinemeta duration. This is an official collection statement, not legal advice for every territory.
+
+Blender Open Movies is statically mapped only for six exact IMDb/title/year matches: Big Buck Bunny (`tt1254207`), Elephants Dream (`tt0807840`), Sintel (`tt1727587`), Tears of Steel (`tt2285752`), Glass Half (`tt5243642`), and Coffee Run (`tt13716914`). Official account/channel, exact title, public status, license evidence and publisher MP4 checks are required. Each entry carries its own rights-page attribution (Big Buck Bunny and Glass Half CC BY 3.0; Elephants Dream CC BY 2.5; Sintel and Tears of Steel CC BY 3.0; Coffee Run CC BY 4.0). Four PeerTube records report unknown license metadata; that is accepted only for these statically mapped titles where the canonical Blender project page independently states the license. This is not a general PeerTube license exception.
+
+These are best-effort per-isolate controls, not global guarantees. `.mp4` does not prove a supported codec/container profile. The Internet Archive documents H.264 video, AAC audio, `yuv420p`, and a front-loaded `moov` atom for MP4 web playback, but Core Streams does not inspect media bytes. Codec compatibility and actual playback remain untested until checked in the target Stremio client.
+
+### Optional configured stream add-on
+
+If you have a Stremio-compatible stream add-on manifest URL and its terms allow forwarding its stream results, store the URL as a Worker secret:
+
+```bash
+npx wrangler secret put CORE_STREAMS_HTTP_SOURCE_MANIFEST --env=""
+```
+
+Use the add-on's **manifest URL**, not its configure page. HTTPS required; no query string, fragment, userinfo, explicit port, IP literal, or reserved hostname. Configuration tokens may be in path segments. This secret is shared by everyone using the Core Streams install token; do not configure a personal service credential for friends unless the service explicitly permits that. PenguPlay has not been live-integrated or verified—the supplied configure URL requires sign-in before the personal install URL is available. The optional source can also return a Stremio-native `ytId`; this enables a compatible YouTube add-on such as a privately operated YouStream instance to pass video IDs to Stremio's own YouTube player. It does not make YouTube search results rights-cleared: use only source add-ons and videos you are authorized to access, and do not share a personal YouTube API key through a multi-user Core Streams install. For direct streams, only HTTPS links are accepted. Playback request headers are restricted to `Accept`, `Accept-Language`, `Origin`, `Referer`, and `User-Agent`; cookies, authorization, and fixed `Range` headers are intentionally stripped.
+
+Core Streams remains a bounded aggregator, not a new indexer scraper or debrid resolver: public add-on availability and overlap can change, the Archive source covers only exact-title/year matching movies with uploader-declared open-license MP4s, IMDb movie/episode IDs are accepted, and a failed source is skipped while others may still return results. It does not provide mainstream catalogue coverage through the Archive and does not prove playback from a stream-list response. See **[CORE-STREAMS-RESEARCH.md](./CORE-STREAMS-RESEARCH.md)** for provider research, Cloudflare constraints, and known gaps.
+
+Tests:
+
+```bash
+node --test cloudflare-worker/*.test.js
+```
+
 ## Wire it into the configurator
 
 1. Set `CORS_PROXY` in `configurator/src/js/app.js` to the Worker URL above.
@@ -127,6 +180,8 @@ Set `CORS_PROXY = ''` to disable the proxy and fall back to direct-fetch-only.
 | `/contact` | POST | Discord webhook relay | 5/min (binding) + 5/h (KV, if bound) | Origin allowlist, 16 KB body cap |
 | `/paste` | POST | store template / badge pack | 10/min | ≤512 KB, two shapes only, 30-day TTL |
 | `/t/:id` | GET | read paste | 60/min | `ACAO: *`, `no-store` |
+| `/core-streams/:token/manifest.json` | GET | private Stremio add-on manifest | none | token is a bearer secret; `ACAO: *`, `no-store` |
+| `/core-streams/:token/stream/{movie|series}/{imdb-id}.json` | GET | Torrentio + TorrentsDB + movie-only Public Domain Movies + optional configured add-on (HTTPS, torrent, or native YouTube ID); open-media lookup via Cinemeta/Internet Archive, four LOC films, and six mapped Blender films | 20/min/IP | ≤10 total upstream requests worst case and ≤6 concurrent; add-on timeout 5.5 s / metadata timeout 4 s; per-source isolate-local breakers; no media relay; `ACAO: *`, `no-store` |
 | `/proxy<path>?host=` | GET/POST/PATCH | allowlisted lane | 60/min | every allowlisted host is scoped to its own surface — AIOStreams hosts: `GET /api/v1/status`, `POST/PATCH /api/v1/user[/id]`, `GET /stremio/<uuid>/<pwd>/{manifest.json,stream/*/*.json}` (origin form) or `GET /stream/*/*.json` (manifest-base form); `api.wuplay.app`: `GET /app/version`, `POST /devices/register`, `GET/POST/PATCH /sync/**` and is the **only** host that receives `Authorization`; `api.torbox.app`: `GET /v1/api/speedtest`. An allowlisted host matching no scope is refused |
 | `/proxy<path>?host=` | GET/POST/PATCH | custom lane | 20/min | `https://` origin → `GET /api/v1/status`, `POST/PATCH /api/v1/user[/id]` (same bounded id shape as the allowlisted lane, so a self-hosted config can be updated in place); manifest base → `GET /stream/*/*.json`; no IP literals, no userinfo/port/query, no dotless or reserved names (`.local .internal .lan .corp .home .test .example .invalid .onion .arpa`) |
 
