@@ -32,6 +32,7 @@ import { isNewer, parseChangelogRange, shouldCheck, normalizeTemplateMeta } from
 import { AIOSTREAMS_COMPATIBILITY_TARGETS, DEFAULT_AIOSTREAMS_VERSION, OUTPUT_PROFILES, OUTPUT_PROFILE_INFO, resolveOutputProfile, applyOutputProfile, profileVerdictForChoice } from '../core/output-profile-policy.js';
 import { hasLibraryCapableService, hasTorrentDebridService, hasEnabledService, USENET_INDEXER_SERVICE_IDS, DEBRIDIO_SERVICE_IDS, missingDirectInstallCredentials } from '../core/install-policy.js';
 import { hostRoutingDecision, autoRoutableHostKeys, hostPickerLabel } from '../core/host-routing.js';
+import { chillLinkFromStremioManifest, chillLinkGate, chillLinkVersionDecision } from '../core/chilllink-policy.js';
 import { collectRegexPatternSet, regexAccessDecision } from '../core/regex-access-policy.js';
 import { inspectTemplateComplexity, findFeatureConflicts, validateOutputProfileBudget } from '../core/feature-conflict-policy.js';
 import { buildFeedbackReport } from '../core/feedback-report-policy.js';
@@ -46,7 +47,7 @@ const STEPS = 6;
 // workflow) the raw x.y here expands to x.y.0 in package.json / versions.json and
 // the release tag; the built badge drops the trailing .0. At the 2026-09-06
 // audit the release tag was v3.7.0 while this said 3.1 — they must move together.
-const CONFIGURATOR_VERSION = '3.23';
+const CONFIGURATOR_VERSION = '3.24';
 // Set to a collector endpoint to enable the opt-in anonymous usage ping (service+device+resolution only).
 // Leave empty to keep the feature fully disabled and hidden.
 const USAGE_BEACON_URL = '';
@@ -2262,6 +2263,7 @@ function render() {
             <div class="u-row8">
               <button class="btn-manifest" data-action="simple-install" data-target="wuplay" style="flex:1;font-size:.82rem;padding:11px 10px;background:rgba(167,139,250,.10);border-color:rgba(167,139,250,.3);color:#a78bfa">${ICO.wuplay(16,'#a78bfa')} WuPlay</button>
               <button class="btn-manifest" data-action="simple-install" data-target="nuvio" style="flex:1;font-size:.82rem;padding:11px 10px;background:rgba(168,85,247,.08);border-color:rgba(168,85,247,.25);color:#c084fc">${ICO.nuvio(16)} Nuvio</button>
+              <button class="btn-manifest btn-chillio" data-action="simple-install" data-target="chillio" title="ChillLink URL for the Chillio app">${ICO.chillio(16,'#fb923c')} Chillio</button>
             </div>
             <div id="aioResult"></div>
             `}`}
@@ -2823,7 +2825,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Express' free card id is 'p2p' while builder S says 'free' — translate explicitly (review P2);
         // lane vocabulary is local here so nothing depends on declaration order of EXPRESS_SERVICES.
         const EXPRESS_SVC_MAP = { torbox:'torbox-pro', realdebrid:'realdebrid', alldebrid:'alldebrid', premiumize:'premiumize', none:'p2p' };
-        window.__genieHandoff = { app: ['nuvio','wuplay','manifest'].includes(h.app) ? h.app : 'app',
+        window.__genieHandoff = { app: ['nuvio','wuplay','chillio','manifest'].includes(h.app) ? h.app : 'app',
           service: EXPRESS_SVC_MAP[h.service] || null };
         _genieRoute = h.route === 'advanced' ? 'advanced' : 'express';
       }
@@ -6027,13 +6029,18 @@ function showManifestModal(manifestUrl, password, hostLabel, initialTab) {
   const ex = document.getElementById('manifestModal');
   if (ex) ex.remove();
 
+  // ChillLink shares the uuid/encryptedPassword with the Stremio manifest but
+  // lives at /chilllink/<uuid>/<epwd>. Keyless manifests have no password
+  // segment, so the Chillio tab is hidden for them (null derivation).
+  const chillUrl = chillLinkFromStremioManifest(manifestUrl);
   const FMTS = [
     { key:'app',    label:'Stremio App', getUrl: u => u.replace(/^https?:\/\//, 'stremio://'), action:'link' },
     { key:'web',    label:'Web',         getUrl: u => `https://web.stremio.com/#/addons?addon=${encodeURIComponent(u)}`, action:'link' },
     { key:'wuplay',  label:'WuPlay',       getUrl: u => u, action:'open', configUrl:'https://config.wuplay.app/#addons' },
     { key:'nuvio',   label:'Nuvio',        getUrl: u => u, action:'open', configUrl:'https://nuvio.tv/account?tab=addons' },
-    { key:'manifest',label:'Manifest URL', getUrl: u => u, action:'copy' },
   ];
+  if (chillUrl) FMTS.push({ key:'chillio', label:'Chillio', getUrl: () => chillUrl, action:'copy', copyToast:'Copied! Paste into Chillio → Manage Account → Add Account → ChillLink Protocol' });
+  FMTS.push({ key:'manifest',label:'Manifest URL', getUrl: u => u, action:'copy' });
   const qrSrc = u => {
     try {
       const qr = qrcode(0, 'M'); qr.addData(u); qr.make();
@@ -6164,14 +6171,17 @@ function showManifestModal(manifestUrl, password, hostLabel, initialTab) {
   const actionBtn = document.getElementById('mActionBtn');
   let activeFi = 0;
 
-  const BTN_CLS = ['m-install','m-web','m-wu','m-nuvio','m-web'];
-  const BTN_LABELS = [
-    `<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>Install`,
-    `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>Web`,
-    `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>Open WuPlay`,
-    `${ICO.nuvio(13)}Open Nuvio`,
-    `${ICO.clipboard(13,'currentColor')}Copy Manifest`,
-  ];
+  // Keyed, not indexed: the Chillio tab is inserted conditionally, so tab
+  // positions can shift and any fi-based lookup would drift onto the wrong tab.
+  const BTN_CLASS = { app:'m-install', web:'m-web', wuplay:'m-wu', nuvio:'m-nuvio', chillio:'m-install', manifest:'m-web' };
+  const BTN_LABEL = {
+    app: `<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>Install`,
+    web: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>Web`,
+    wuplay: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>Open WuPlay`,
+    nuvio: `${ICO.nuvio(13)}Open Nuvio`,
+    chillio: `${ICO.chillio(13)}Copy ChillLink`,
+    manifest: `${ICO.clipboard(13,'currentColor')}Copy Manifest`,
+  };
 
   function switchFmt(fi) {
     activeFi = fi;
@@ -6184,12 +6194,13 @@ function showManifestModal(manifestUrl, password, hostLabel, initialTab) {
     navigator.clipboard.writeText(url).then(() => {
       if (copyBtn) { copyBtn.innerHTML = ICO.check(12,'currentColor'); copyBtn.classList.add('copied'); setTimeout(() => { copyBtn.textContent = 'Copy'; copyBtn.classList.remove('copied'); }, 2200); }
     }).catch(() => {});
-    // action button
-    actionBtn.className = `m-btn ${BTN_CLS[fi]}`;
-    actionBtn.innerHTML = BTN_LABELS[fi];
+    // action button — keyed lookups because the Chillio tab shifts indices
+    const key = f.key;
+    actionBtn.className = `m-btn ${BTN_CLASS[key]}`;
+    actionBtn.innerHTML = BTN_LABEL[key];
     if (f.action === 'link') {
       actionBtn.href = url;
-      actionBtn.target = fi === 1 ? '_blank' : '';
+      actionBtn.target = key === 'web' ? '_blank' : '';
       actionBtn.onclick = null;
     } else if (f.action === 'open') {
       actionBtn.href = f.configUrl;
@@ -6203,29 +6214,43 @@ function showManifestModal(manifestUrl, password, hostLabel, initialTab) {
       actionBtn.target = '';
       actionBtn.onclick = ev => {
         ev.preventDefault();
-        navigator.clipboard.writeText(url).then(() => showToast(`Copied! Paste into ${f.label} → Addons`));
+        navigator.clipboard.writeText(url).then(() => showToast(f.copyToast || `Copied! Paste into ${f.label} → Addons`));
       };
     }
     document.getElementById('mUrlLabel').innerHTML =
-      fi === 2 ? 'Manifest URL — auto-copied ' + ICO.check(12,'currentColor') :
-      fi === 3 ? 'Manifest URL — auto-copied ' + ICO.check(12,'currentColor') :
-      fi === 4 ? 'Raw manifest URL — auto-copied ' + ICO.check(12,'currentColor') : 'Manifest URL';
+      key === 'manifest' ? 'Raw manifest URL — auto-copied ' + ICO.check(12,'currentColor') :
+      (key === 'wuplay' || key === 'nuvio' || key === 'chillio') ? 'Manifest URL — auto-copied ' + ICO.check(12,'currentColor') : 'Manifest URL';
     if (copyBtn) { copyBtn.textContent = 'Copy'; copyBtn.classList.remove('copied'); }
     const helpEl = document.getElementById('mAppHelp');
     const qrWrap = document.getElementById('mQrWrap');
     const qrHint = document.getElementById('mQrHint');
-    if (fi === 2) {
+    if (key === 'wuplay') {
       helpEl.style.display = '';
       document.getElementById('mAppHelpTitle').textContent = 'WuPlay Setup';
       document.getElementById('mAppHelpBody').innerHTML = '<strong class="u-tx">1.</strong> Manifest URL is <strong class="u-green">already copied</strong> to your clipboard<br><strong class="u-tx">2.</strong> Tap <strong class="u-purple">Open WuPlay</strong> below (or go to WuPlay → Addons)<br><strong class="u-tx">3.</strong> Tap <strong class="u-purple">Add Addon</strong> and paste the URL';
       if (qrWrap) qrWrap.style.display = 'none';
       if (qrHint) qrHint.style.display = 'none';
-    } else if (fi === 3) {
+    } else if (key === 'nuvio') {
       helpEl.style.display = '';
       document.getElementById('mAppHelpTitle').textContent = 'Nuvio Setup';
       document.getElementById('mAppHelpBody').innerHTML = '<strong class="u-tx">1.</strong> Manifest URL is <strong class="u-green">already copied</strong> to your clipboard<br><strong class="u-tx">2.</strong> Tap <strong class="u-purple">Open Nuvio</strong> below (or go to Nuvio → Account → Addons)<br><strong class="u-tx">3.</strong> Paste the URL in the addon field';
       if (qrWrap) qrWrap.style.display = 'none';
       if (qrHint) qrHint.style.display = 'none';
+    } else if (key === 'chillio') {
+      helpEl.style.display = '';
+      document.getElementById('mAppHelpTitle').textContent = 'Chillio Setup (ChillLink)';
+      document.getElementById('mAppHelpBody').innerHTML =
+        '<strong class="u-tx">1.</strong> The ChillLink URL is <strong class="u-green">already copied</strong> to your clipboard<br>' +
+        '<strong class="u-tx">2.</strong> In Chillio open <strong class="u-purple">Settings → Manage Account → Add Account → ChillLink Protocol</strong><br>' +
+        '<strong class="u-tx">3.</strong> Paste the URL, optionally name the account, and Save<br>' +
+        '<span class="clp-note">AIOStreams supplies streams, not curated feeds. To add TMDB/Trakt home rows, merge this URL with a feed at the official ChillLink tools:</span>' +
+        '<span class="clp-links">' +
+        '<a href="https://link.chillio.app/manifest-merger" target="_blank" rel="noopener noreferrer" class="community-link">Manifest Merger</a> · ' +
+        '<a href="https://link.chillio.app/editor" target="_blank" rel="noopener noreferrer" class="community-link">Feed Editor</a> · ' +
+        '<a href="https://link.chillio.app/validator" target="_blank" rel="noopener noreferrer" class="community-link">Validator</a>' +
+        '</span>';
+      if (qrWrap) qrWrap.style.display = '';
+      if (qrHint) qrHint.style.display = '';
     } else {
       helpEl.style.display = 'none';
       if (qrWrap) qrWrap.style.display = '';
@@ -6620,6 +6645,7 @@ function simpleFinishHtml() {
       <div class="u-row8">
         <button class="btn-manifest" data-action="simple-install" data-target="wuplay" style="flex:1;font-size:.82rem;padding:11px 10px;background:rgba(167,139,250,.10);border-color:rgba(167,139,250,.3);color:#a78bfa">${ICO.wuplay(16,'#a78bfa')} WuPlay</button>
         <button class="btn-manifest" data-action="simple-install" data-target="nuvio" style="flex:1;font-size:.82rem;padding:11px 10px;background:rgba(168,85,247,.08);border-color:rgba(168,85,247,.25);color:#c084fc">${ICO.nuvio(16)} Nuvio</button>
+        <button class="btn-manifest btn-chillio" data-action="simple-install" data-target="chillio" title="ChillLink URL for the Chillio app">${ICO.chillio(16,'#fb923c')} Chillio</button>
       </div>
       `}
       <div id="aioResult"></div>`}
@@ -7503,7 +7529,7 @@ function showExpressLane() {
       </div>
     </div>
     <div class="fastlane-section"><div class="fastlane-label">3 · Install to</div>
-      <div class="fastlane-grid services">${[['app','Stremio','Recommended — direct install'],['nuvio','Nuvio','Manifest URL'],['wuplay','WuPlay','Manifest URL'],['manifest','Other app','Copy manifest']].map(([v,n,d])=>`<button type="button" class="fastlane-choice${state.target===v?' active':''}" data-express-target="${v}"><b>${n}</b><span>${d}</span></button>`).join('')}</div>
+      <div class="fastlane-grid services">${[['app','Stremio','Recommended — direct install'],['nuvio','Nuvio','Manifest URL'],['wuplay','WuPlay','Manifest URL'],['chillio','Chillio','ChillLink URL'],['manifest','Other app','Copy manifest']].map(([v,n,d])=>`<button type="button" class="fastlane-choice${state.target===v?' active':''}" data-express-target="${v}"><b>${n}</b><span>${d}</span></button>`).join('')}</div>
       <div id="expressStremio"${state.target==='app'?'':' style="display:none"'}>
         <div class="fastlane-pair" style="display:flex;gap:8px;margin-top:10px">
           <input class="fastlane-field" id="stremioEmailInline" type="email" autocomplete="username" placeholder="Stremio email" value="${escH(S.stremioEmail||'')}" style="flex:1">
@@ -7560,7 +7586,7 @@ function showExpressLane() {
     const svcName = (EXPRESS_SERVICES.find(([v]) => v === state.service) || [null, state.service || '—'])[1];
     const profName = { fast:'Fast', balanced:'Balanced', maximum:'Maximum' }[state.profile] || 'Balanced';
     const resName = { '4k':'4K', '1080p':'1080p', mixed:'Mixed' }[state.resolution] || '4K';
-    const tgtName = { app:'Stremio', nuvio:'Nuvio', wuplay:'WuPlay', manifest:'Manifest URL' }[state.target] || 'Stremio';
+    const tgtName = { app:'Stremio', nuvio:'Nuvio', wuplay:'WuPlay', chillio:'Chillio', manifest:'Manifest URL' }[state.target] || 'Stremio';
     const cacheName = S.cacheMode === 'cached' ? '⚡ Cached only' : S.cacheMode === 'uncached' ? 'Uncached only' : 'Mixed cache (uncached may download first)';
     const fsOn = document.getElementById('expressFullStack')?.checked;
     elSum.innerHTML = `${escHtml(svcName)} → ${escHtml(tgtName)} · ${profName} · ${escHtml(resName)} · <b style="color:${S.cacheMode==='cached'?'#34d399':'#fbbf24'}">${cacheName}</b> · host ${escHtml(HOST_LABEL_MAP[S.instanceHost] || S.instanceHost || 'auto')}${fsOn ? ' · <span class="u-purple">+ full stack (AIOMetadata + Cinemeta patch)</span>' : ''}`;
@@ -7769,7 +7795,9 @@ async function runExpressInstall(p) {
   saveState();
   try {
     // Renders progress + result into the modal's #aioResult.
-    await simpleInstall(p.target === 'app' ? 'app' : 'manifest');
+    // Chillio keeps its own tab in the manifest modal; every other non-Stremio
+    // target (WuPlay, Nuvio, Other app) collapses to the generic manifest tab.
+    await simpleInstall(p.target === 'app' ? 'app' : (p.target === 'chillio' ? 'chillio' : 'manifest'));
   } catch (err) {
     showToast('Install failed: ' + (err?.message || err), true);
   }
@@ -7862,6 +7890,22 @@ function showDiagnosticsModal() {
 
 async function simpleInstall(target) {
   if (!S.service) { showToast('Pick a service first — go back to step 1', true); return; }
+  // ChillLink carries direct URLs only — AIOStreams' ChillLink transformer drops
+  // P2P streams, so a P2P build installed into Chillio would return zero sources.
+  // The route itself needs AIOStreams 2.20+, so an old custom/self-hosted host
+  // is blocked too. Both checks run before anything is posted; the Stremio
+  // target remains available for either case.
+  if (target === 'chillio') {
+    const gate = chillLinkGate({ service: S.service });
+    const versionGate = chillLinkVersionDecision(currentHostCapabilities()?.version);
+    if (gate.status === 'blocked' || versionGate.status === 'blocked') {
+      const reasons = [...gate.reasons, ...versionGate.reasons];
+      const gateEl = document.getElementById('aioResult');
+      if (gateEl) gateEl.innerHTML = `<div class="u-mt12 import-success import-error"><strong class="u-red">Chillio can't use this setup</strong>${reasons.map(r => `<div class="clp-gate-reason">${escHtml(r)}</div>`).join('')}</div>`;
+      showToast('Fix the issue above, or use the Stremio target', true);
+      return;
+    }
+  }
   const isFree = S.service === 'p2p' || S.service === 'http';
   const btn = document.getElementById('btnAio') || document.getElementById('btnAutoCreate'), result = document.getElementById('aioResult');
   const origBtnHtml = btn ? btn.innerHTML : '';

@@ -66,9 +66,18 @@ Core Builds wires **17 safe** optional scrapers by default:
 - `isSensitiveKey` covers apiKey, token, password, secret; RPDB free-tier `t0-free-rpdb` is public exception
 - StreamNZB URL blanked on export (can embed credential)
 
+### Discovering more addons — the community directory
+The de facto community catalog is **[stremio-addons.net](https://stremio-addons.net/)** (unaffiliated with Stremio or Core Builds). Every addon carries a star count, version, last-updated date, manifest reachability check and, where relevant, an instance selector. Per-addon pages for the stack above:
+
+- [Torrentio](https://stremio-addons.net/addons/torrentio) · [Comet](https://stremio-addons.net/addons/comet) · [MediaFusion](https://stremio-addons.net/addons/mediafusion-elfhosted) · [AIOStreams](https://stremio-addons.net/addons/aiostreams)
+- The directory also ships [its own catalog addon](https://stremio-addons.net/addons/stremio-addons.net), so the same listings can be browsed inside Stremio.
+
+Caveats: it is **community-moderated, not curated** — quality varies and adult/NSFW addons are prominent, so treat unknown publishers with the same scrutiny as any other manifest URL. Submissions must be blank-slate addon URLs; preconfigured/personal manifests (the kind this configurator mints) are not allowed, which is why Core Builds has no listing of its own. A read-only, experimental JSON API exists at `/api/v0/` (open CORS, no stability guarantee) — the repo's `scripts/check-addon-directory-drift.mjs` uses it to watch for new public AIOStreams instances.
+
 ### References
 - Upstream pin c1d044c v2.34.1 Viren070/AIOStreams
 - r/StremioAddons 2025-2026 threads: best setup Torrentio+Comet+MediaFusion+StremThru Torz+Debridio
 - g0ldyy/comet: CometNet
 - ImJustDoingMyPart/stremio-stack: PG tuning, Jackett, FlareSolverr
 - stremioaddonmanager.org: credential handling
+- stremio-addons.net: community addon directory and `/api/v0/` experimental API

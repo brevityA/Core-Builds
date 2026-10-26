@@ -72,3 +72,11 @@
 .kv-row{display:flex;justify-content:space-between;padding:8px 10px;border-radius:8px;background:var(--th-input-bg);border:1px solid var(--th-border)}
 .ft-box{background:var(--th-card-alt);border:1.5px solid var(--th-border-strong);border-radius:10px;padding:14px 16px}
 .ft-input{width:100%;box-sizing:border-box;background:var(--th-card-alt);border:1px solid var(--th-border);border-radius:8px;padding:9px 12px;color:var(--th-tx);font-size:.82rem;outline:none}
+
+/* Chillio (ChillLink) target — deploy-row button and manifest-modal help.
+   Token-driven so light theme follows; keeps inline-style debt off app.js. */
+.btn-chillio{flex:1;font-size:.82rem;padding:11px 10px;background:rgba(251,146,60,.10);border:1px solid rgba(251,146,60,.3);color:#fb923c}
+[data-theme='light'] .btn-chillio{background:rgba(234,88,12,.08);border-color:rgba(234,88,12,.35);color:#c2410c}
+.clp-gate-reason{color:var(--th-tx3);font-size:.8rem;margin:6px 0;line-height:1.5}
+.clp-note{display:block;margin-top:6px;color:var(--th-tx3)}
+.clp-links{display:block;margin-top:4px}
