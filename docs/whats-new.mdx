@@ -1,14 +1,30 @@
 ---
-title: "What's New — Configurator v3.23"
+title: "What's New — Configurator v3.24"
 sidebarTitle: "What's New"
-description: "Latest Core Builds Configurator releases (v3.23 and earlier), auto-generated from the in-app changelog."
+description: "Latest Core Builds Configurator releases (v3.24 and earlier), auto-generated from the in-app changelog."
 ---
 
 # What's New in the Configurator
 
-This page is regenerated from `configurator/src/data/changelog.js` by `scripts/sync-docs.py`, so it always reflects the latest shipped configurator version (currently **v3.23**).
+This page is regenerated from `configurator/src/data/changelog.js` by `scripts/sync-docs.py`, so it always reflects the latest shipped configurator version (currently **v3.24**).
 
 For the template-suite release log, see the [Changelog](https://corebuilds-docs.docsalot.dev/changelog).
+
+## Configurator v3.24 (Oct 26 2026)
+
+<CardGroup cols={2}>
+  <Card title="Chillio is a first-class install target" icon="sparkles">
+    Review & Install and Quick install now offer Chillio alongside WuPlay and Nuvio. The manifest modal gains a Chillio tab that builds the ChillLink URL (your host’s /chilllink/uuid/password route, which every public AIOStreams host already serves), auto-copies it, shows the in-app Add Account steps, and links the official Manifest Merger, Feed Editor and Validator for adding curated TMDB/Trakt feeds. A P2P build with the Chillio target is blocked before anything is posted: the ChillLink protocol carries direct HTTP, Usenet, debrid and live URLs only, so a torrent build would install but play nothing — the Stremio target stays available for P2P.
+  </Card>
+  <Card title="Community addon directory linked" icon="bolt">
+    the Tools hub now points at stremio-addons.net (community-moderated, external), and the Best Add-ons guide cites per-addon directory pages with an honest note that the catalog includes adult addons and does not accept the preconfigured manifests this configurator produces. A weekly advisory workflow now diffs that directory’s approved AIOStreams instances against the audited host registry and opens an issue when a new public host appears.
+  </Card>
+  <Card title="Generated output unchanged" icon="shield-check">
+    every config the configurator and the CLI build is byte-for-byte what 3.23 produced apart from the version stamp; only the version stamp moves.
+  </Card>
+</CardGroup>
+
+---
 
 ## Configurator v3.23 (Oct 23 2026)
 
@@ -56,27 +72,5 @@ For the template-suite release log, see the [Changelog](https://corebuilds-docs.
   </Card>
   <Card title="Generated output unchanged" icon="shield-check">
     every config the configurator and the CLI build is byte-for-byte what 3.20 produced; only the version stamp moves.
-  </Card>
-</CardGroup>
-
----
-
-## Configurator v3.20 (Oct 23 2026)
-
-<CardGroup cols={2}>
-  <Card title="Two ways in, on the first screen" icon="sparkles">
-    Quick install and Custom build now sit side by side under the headline, where a phone shows them without scrolling. The Advanced Builder used to be a small grey link at the bottom edge of the screen; it is now Custom build, an equal card. Update an existing setup, Import a config, Setup Genie and the tour are text links right beneath them.
-  </Card>
-  <Card title="No pop-up on a first visit" icon="bolt">
-    the tour used to cover the landing before you had seen it. It now opens only when you pick Take the tour.
-  </Card>
-  <Card title="Resume from the top" icon="shield-check">
-    a saved build’s Continue where you left off banner moved above the headline, so on a phone it is on the first screen instead of below the fold.
-  </Card>
-  <Card title="Mode button no longer covers the help button" icon="sliders">
-    the light/dark switch sat on top of the chat button in the bottom-right corner. It now sits just above it, on desktop and phone.
-  </Card>
-  <Card title="Generated output unchanged" icon="gauge">
-    every config the configurator and the CLI build is byte-for-byte what 3.19 produced; only the version stamp moves.
   </Card>
 </CardGroup>

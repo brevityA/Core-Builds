@@ -57,7 +57,9 @@ function originOf(url) {
 }
 
 function esc(value) {
-  return String(value ?? '').replace(/\|/g, '\\|').replace(/\n/g, ' ').trim() || '—';
+  // Markdown table-cell escaping: backslashes first so a literal "\" in the
+  // third-party API data cannot neutralize the pipe escape we add after it.
+  return String(value ?? '').replace(/\\/g, '\\\\').replace(/\|/g, '\\|').replace(/\n/g, ' ').trim() || '—';
 }
 
 try {
