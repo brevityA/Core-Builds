@@ -21,9 +21,9 @@ test('manifest is a Stremio stream-only manifest behind the install token', asyn
   assert.equal(response.headers.get('Cache-Control'), 'no-store');
   assert.deepEqual(await response.json(), {
     id: 'uk.corebuilds.core-streams',
-    version: '0.6.0',
+    version: '0.7.0',
     name: 'Core Streams',
-    description: 'Stream-source fallback with curated public-domain torrents, Library of Congress films, open media, and configured add-ons.',
+    description: 'Quality-ranked stream fallback with curated torrents, open media, and configurable sources.',
     resources: ['stream'],
     types: ['movie', 'series'],
     idPrefixes: ['tt'],
@@ -72,6 +72,73 @@ test('stream request fans out to fixed torrent sources and returns normalized, d
   assert.equal(payload.streams[0].infoHash, 'a'.repeat(40));
   assert.equal(payload.streams[0].fileIdx, 2);
   assert.equal(payload.streams[1].url, 'https://cdn.example.com/movie.mp4');
+});
+
+test('smart ordering ranks quality and seed hints while interleaving provider results', () => {
+  const groups = [
+    [
+      { infoHash: 'a'.repeat(40), name: 'Torrentio · 360p' },
+      { infoHash: 'b'.repeat(40), name: 'Torrentio · 1080p 👤 40' },
+    ],
+    [
+      { url: 'https://cdn.example.org/film.mp4', name: 'HTTP source · 4K WEB-DL' },
+    ],
+  ];
+  const ordered = _coreStreamsTest.interleaveStreamGroups(groups);
+  assert.equal(ordered[0].name, 'HTTP source · 4K WEB-DL');
+  assert.equal(ordered[1].name, 'Torrentio · 1080p 👤 40');
+  assert.equal(ordered[2].name, 'Torrentio · 360p');
+  assert.ok(_coreStreamsTest.smartStreamScore(groups[0][1]) > _coreStreamsTest.smartStreamScore(groups[0][0]));
+  assert.equal(_coreStreamsTest.inferredSeeders(groups[0][1]), 40);
+});
+
+test('global result cap does not let high-volume providers starve later providers', async () => {
+  _coreStreamsTest.resetSourceHealth();
+  const hash = (number) => number.toString(16).padStart(40, '0');
+  const streamBatch = (count, makeStream) => Array.from({ length: count }, (_, index) => makeStream(index));
+  const fetchImpl = async (input) => {
+    const url = String(input);
+    if (url.startsWith('https://torrentio.strem.fun/')) {
+      return jsonResponse({ streams: streamBatch(40, (i) => ({
+        infoHash: hash(i + 1), name: i === 0 ? '360p' : '2160p',
+      })) });
+    }
+    if (url.startsWith('https://torrentsdb.com/')) {
+      return jsonResponse({ streams: streamBatch(40, (i) => ({
+        infoHash: hash(100 + i), name: `1080p seeders: ${i + 1}`,
+      })) });
+    }
+    if (url.startsWith('https://caching.stremio.net/publicdomainmovies.now.sh/')) {
+      return jsonResponse({ streams: streamBatch(5, (i) => ({
+        infoHash: hash(200 + i), name: `Public domain ${i}`,
+      })) });
+    }
+    if (url.startsWith('https://http-addon.example.org/')) {
+      return jsonResponse({ streams: streamBatch(40, (i) => ({
+        url: `https://media.example.org/${i}.mp4`, name: i === 0 ? '720p' : '2160p',
+      })) });
+    }
+    if (url.startsWith('https://v3-cinemeta.strem.io/')) {
+      return jsonResponse({ meta: { name: 'A Test Movie', year: '2000' } });
+    }
+    if (url.startsWith('https://archive.org/advancedsearch.php?')) {
+      return jsonResponse({ response: { docs: [] } });
+    }
+    return jsonResponse({ data: [] });
+  };
+  const response = await handleCoreStreams(
+    makeRequest(`/core-streams/${TOKEN}/stream/movie/tt0133093.json`),
+    makeEnv({ CORE_STREAMS_HTTP_SOURCE_MANIFEST: 'https://http-addon.example.org/manifest.json' }),
+    { fetchImpl },
+  );
+  const streams = (await response.json()).streams;
+  assert.equal(streams.length, 80);
+  assert.ok(streams.some((stream) => stream.name.startsWith('Torrentio · 2160p')));
+  assert.ok(streams.some((stream) => stream.name.startsWith('TorrentsDB · 1080p')));
+  assert.ok(streams.some((stream) => stream.name.startsWith('Public Domain Movies ·')));
+  assert.ok(streams.some((stream) => stream.name.startsWith('HTTP source · 2160p')));
+  assert.equal(streams.filter((stream) => stream.name.startsWith('Public Domain Movies ·')).length, 5);
+  _coreStreamsTest.resetSourceHealth();
 });
 
 test('official Public Domain Movies results are included for movies with a local-rights caveat', async () => {

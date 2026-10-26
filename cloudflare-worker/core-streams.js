@@ -258,6 +258,69 @@ function dedupeKey(stream) {
   return `url:${stream.url}`;
 }
 
+function inferredHeight(stream) {
+  const text = [stream?.name, stream?.title, stream?.description, stream?.behaviorHints?.filename]
+    .filter((part) => typeof part === 'string').join(' ').toLowerCase();
+  const explicit = text.match(/(?:^|\D)(4320|2160|1440|1080|900|720|576|540|480|360|240)p(?:\D|$)/);
+  if (explicit) return Number(explicit[1]);
+  if (/\b(?:4k|uhd)\b/.test(text) || /\b3840\s*x\s*2160\b/.test(text)) return 2160;
+  if (/\b2560\s*x\s*1440\b/.test(text)) return 1440;
+  if (/\b1920\s*x\s*1080\b/.test(text)) return 1080;
+  if (/\b1280\s*x\s*720\b/.test(text)) return 720;
+  return 0;
+}
+
+function inferredSeeders(stream) {
+  const text = [stream?.name, stream?.title, stream?.description]
+    .filter((part) => typeof part === 'string').join(' ');
+  const matches = [...text.matchAll(/(?:seeders?|seeds?|👤)\s*[:=]?\s*(\d{1,6})/gi)];
+  return matches.reduce((maximum, match) => Math.max(maximum, Number(match[1])), 0);
+}
+
+// Use only information already present in Stremio's stream card. This is a
+// ranking heuristic, not a claim that a mislabeled resolution or seeder count
+// has been independently verified. Preserve unknown-quality results as fallbacks.
+function smartStreamScore(stream) {
+  const text = [stream?.name, stream?.title, stream?.description, stream?.behaviorHints?.filename]
+    .filter((part) => typeof part === 'string').join(' ').toLowerCase();
+  let score = inferredHeight(stream) / 10;
+  score += Math.min(inferredSeeders(stream), 500) / 20;
+  if (typeof stream?.url === 'string') score += 12;
+  if (typeof stream?.ytId === 'string') score += 8;
+  if (/\b(?:bluray|blu-ray|web[ .-]?dl)\b/.test(text)) score += 5;
+  if (/\b(?:cam|hdcam|hdts|telesync|telecine|screener)\b/.test(text)) score -= 150;
+  return score;
+}
+
+function interleaveStreamGroups(groups) {
+  const ranked = groups.map((group) => (Array.isArray(group) ? group : [])
+    .map((stream, index) => ({ stream, index, score: smartStreamScore(stream) }))
+    .sort((a, b) => b.score - a.score || a.index - b.index)
+    .map(({ stream, score }) => ({ stream, score })));
+  const sourceOrder = ranked.map((_, index) => index);
+  const bestFirstOrder = [...sourceOrder].sort((a, b) =>
+    (ranked[b][0]?.score ?? -Infinity) - (ranked[a][0]?.score ?? -Infinity) || a - b);
+  const output = [];
+  const offsets = ranked.map(() => 0);
+  let remaining = ranked.reduce((sum, group) => sum + group.length, 0);
+  let firstRound = true;
+  while (remaining > 0) {
+    let appended = false;
+    const order = firstRound ? bestFirstOrder : sourceOrder;
+    for (const index of order) {
+      const offset = offsets[index];
+      if (offset >= ranked[index].length) continue;
+      output.push(ranked[index][offset].stream);
+      offsets[index]++;
+      remaining--;
+      appended = true;
+    }
+    firstRound = false;
+    if (!appended) break;
+  }
+  return output;
+}
+
 async function readBounded(response, maximumBytes) {
   if (!response.body || typeof response.body.getReader !== 'function') {
     const buffer = await response.arrayBuffer();
@@ -740,9 +803,9 @@ async function fetchSource(source, type, id, fetchImpl) {
 function manifest() {
   return {
     id: 'uk.corebuilds.core-streams',
-    version: '0.6.0',
+    version: '0.7.0',
     name: 'Core Streams',
-    description: 'Stream-source fallback with curated public-domain torrents, Library of Congress films, open media, and configured add-ons.',
+    description: 'Quality-ranked stream fallback with curated torrents, open media, and configurable sources.',
     resources: ['stream'],
     types: ['movie', 'series'],
     idPrefixes: ['tt'],
@@ -788,16 +851,16 @@ export async function handleCoreStreams(request, env, { headers = {}, rateLimit 
     ...sources.map((source) => fetchSource(source, route.type, normalizedId, fetchImpl)),
     fetchOpenMedia(route.type, normalizedId, fetchImpl),
   ]);
+  // Rank within each provider, then interleave providers before de-duplicating.
+  // This stops an early high-volume source from consuming the result cap and
+  // hiding every later provider or the curated open-media matches.
   const seen = new Set();
   const streams = [];
-  for (const group of responses) {
-    for (const stream of group) {
-      const key = dedupeKey(stream);
-      if (seen.has(key)) continue;
-      seen.add(key);
-      streams.push(stream);
-      if (streams.length >= MAX_STREAMS_TOTAL) break;
-    }
+  for (const stream of interleaveStreamGroups(responses)) {
+    const key = dedupeKey(stream);
+    if (seen.has(key)) continue;
+    seen.add(key);
+    streams.push(stream);
     if (streams.length >= MAX_STREAMS_TOTAL) break;
   }
   return jsonResponse(200, { streams }, headers);
@@ -810,6 +873,10 @@ export const _coreStreamsTest = {
   declaredOpenLicense,
   normalizeMatchTitle,
   normalizeStream,
+  inferredHeight,
+  inferredSeeders,
+  smartStreamScore,
+  interleaveStreamGroups,
   parseRequestPath,
   resetSourceHealth: () => sourceHealth.clear(),
   validMediaRequest,

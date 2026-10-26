@@ -45,7 +45,7 @@ const enc = (s) => encodeURIComponent(s);
 // EXPECTED_VERSION below (used by the deploy workflow's post-deploy gate).
 // Named rather than dated, so the two cannot drift apart on the next bump.
 const STRICT = args.includes('--strict');
-const EXPECTED_VERSION = '2026-10-25';
+const EXPECTED_VERSION = '2026-10-26';
 
 async function main() {
   console.log(`Core Builds worker smoke — ${BASE}\n`);

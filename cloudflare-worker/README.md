@@ -115,6 +115,8 @@ To revoke access, replace the `CORE_STREAMS_INSTALL_TOKEN` Worker secret and red
 
 Movie/episode lookups are rate-limited using the existing `RL_PROXY_CUSTOM` lane. Torrentio, TorrentsDB, the movie-only Public Domain Movies add-on, and any configured add-on have a 5.5-second timeout; open-media metadata lookups are separately bounded to 4 seconds and 768 KiB per JSON response. Each source has an isolate-local circuit breaker: after three consecutive failures it is skipped for 30 seconds while other sources keep running.
 
+Results use a best-effort ordering heuristic: within each source, recognizable resolution, seed-count hints, release tags, and direct-play URLs contribute to ranking; the best first result is shown first, then provider lists are interleaved before the 80-result cap. This prevents a high-volume source from hiding every other provider. Labels can be inaccurate, so the ordering is advisory—not a guarantee of quality, playback, seed availability, or safety.
+
 The Public Domain Movies endpoint currently returns torrent hashes from its curated collection. Its results carry a warning to verify local public-domain status: the add-on does not establish copyright status for Australia or every other territory.
 
 The Internet Archive adapter handles movies only, requires an exact normalized title/year match from Cinemeta and item metadata, and returns MP4 files only when the item has an explicit allowlisted CC0, Public Domain Mark, CC BY, or CC BY-SA license URL. It filters restricted files and excludes non-commercial/no-derivatives license variants. The license declaration is uploader-supplied, not independently verified; results include the item, creator, license and caveat.
