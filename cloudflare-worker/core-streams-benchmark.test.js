@@ -25,7 +25,7 @@ test('benchmark accepts only public HTTPS manifest URLs without displaying value
     'https://127.0.0.1/manifest.json',
     'https://localhost/manifest.json',
     'https://user:pass@addon.example/manifest.json',
-    'https://addon.example/manifest.json#secret',
+    'https://addon.example.net/manifest.json#secret',
     'https://addon.example/manifest',
   ]) {
     assert.throws(() => readManifestUrl(unsafe, 'TEST_URL'), /TEST_URL/);

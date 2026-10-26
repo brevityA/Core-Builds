@@ -23,19 +23,26 @@ if (!Number.isInteger(delayMs) || delayMs < 0 || delayMs > 60_000) {
 
 let providers;
 try {
-  providers = [
-    {
-      name: 'Core Streams',
-      manifestUrl: readManifestUrl(process.env.CORE_STREAMS_BENCHMARK_MANIFEST_URL, 'CORE_STREAMS_BENCHMARK_MANIFEST_URL'),
-    },
-    {
+  providers = [{
+    name: 'Core Streams',
+    manifestUrl: readManifestUrl(process.env.CORE_STREAMS_BENCHMARK_MANIFEST_URL, 'CORE_STREAMS_BENCHMARK_MANIFEST_URL'),
+  }];
+  if (process.env.PENGUPLAY_BENCHMARK_MANIFEST_URL?.trim()) {
+    providers.push({
       name: 'PenguPlay',
       manifestUrl: readManifestUrl(process.env.PENGUPLAY_BENCHMARK_MANIFEST_URL, 'PENGUPLAY_BENCHMARK_MANIFEST_URL'),
-    },
-  ];
+    });
+  }
+  if (process.env.HDHUB_BENCHMARK_MANIFEST_URL?.trim()) {
+    providers.push({
+      name: 'HDHub',
+      manifestUrl: readManifestUrl(process.env.HDHUB_BENCHMARK_MANIFEST_URL, 'HDHUB_BENCHMARK_MANIFEST_URL'),
+    });
+  }
+  if (providers.length < 2) throw new Error('Set at least one authorized comparator manifest URL (PenguPlay or HDHub)');
 } catch (error) {
   console.error(error.message);
-  console.error('Set both variables to your authorized Stremio manifest URLs. Values are never printed or saved.');
+  console.error('Enter authorized Stremio manifest URLs in environment variables; values are never printed or saved.');
   process.exit(2);
 }
 
@@ -43,7 +50,7 @@ const report = await runBenchmark(providers, BENCHMARK_CASES.slice(0, limit), { 
 if (jsonOutput) {
   console.log(JSON.stringify(report, null, 2));
 } else {
-  console.log('Core Streams vs PenguPlay — stream-list benchmark');
+  console.log('Core Streams add-on comparison — stream-list benchmark');
   console.log('Only result-list responses are measured; playback is not verified.');
   for (const summary of report.summaries) {
     console.log(`\n${summary.provider}`);

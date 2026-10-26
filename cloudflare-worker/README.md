@@ -117,23 +117,27 @@ Movie/episode lookups are rate-limited using the existing `RL_PROXY_CUSTOM` lane
 
 Results use a best-effort ordering heuristic: within each source, recognizable resolution, seed-count hints, release tags, and direct-play URLs contribute to ranking; the best first result is shown first, then provider lists are interleaved before the 80-result cap. This prevents a high-volume source from hiding every other provider. Labels can be inaccurate, so the ordering is advisory—not a guarantee of quality, playback, seed availability, or safety.
 
-### Compare Core Streams with PenguPlay
+### Compare Core Streams with PenguPlay and/or HDHub
 
-`benchmark-core-streams.mjs` runs the same small set of popular, episode, and open-media IMDb IDs against two Stremio stream manifests. It reports response time, non-empty coverage, stream counts/types, and advertised resolution/seeder hints. Requests run sequentially by title, with a one-second default pause; the script does not save responses, print manifest URLs/tokens, attempt playback, or establish rights. Labels and result counts are provider-reported signals—not verification. The sample cases are in `core-streams-benchmark.mjs`; use `--limit=3` for a small trial or `--json` for machine-readable aggregate output.
+`benchmark-core-streams.mjs` runs the same small set of popular, episode, and open-media IMDb IDs against Core Streams and one or both comparison add-ons. It reports response time, non-empty coverage, stream counts/types, and advertised resolution/seeder hints. Requests run sequentially by title, with a one-second default pause; the script does not save responses, print manifest URLs/tokens, attempt playback, or establish rights. Labels and result counts are provider-reported signals—not verification. The sample cases are in `core-streams-benchmark.mjs`; use `--limit=3` for a small trial or `--json` for machine-readable aggregate output.
 
-Only use manifest URLs you are authorized to access and whose terms allow direct requests. The variables below contain private install URLs; enter them interactively, do not paste them into shell history or commit them:
+The [HDHub directory page](https://stremio-addons.net/addons/hdhub) links to a configuration UI, not a ready-made comparison manifest. Generate a personal manifest there; only use it if you are authorized and its terms allow direct requests. The config page offers optional TorBox integration and warns about scraped-title mismatches and some download-only links with poor seeking support. Therefore, to test HDHub as a TorBox-outage fallback, use a configuration **without** TorBox credentials; a TorBox-connected manifest shares that dependency. Do not paste any private manifest or TorBox API key into the repository or chat.
+
+Enter the required Core Streams manifest and at least one authorized comparator manifest interactively. PenguPlay and HDHub are optional comparator variables; private values are not printed or saved:
 
 ```bash
 cd cloudflare-worker
 read -rsp 'Core Streams manifest URL: ' CORE_STREAMS_BENCHMARK_MANIFEST_URL; echo
 export CORE_STREAMS_BENCHMARK_MANIFEST_URL
-read -rsp 'PenguPlay manifest URL: ' PENGUPLAY_BENCHMARK_MANIFEST_URL; echo
-export PENGUPLAY_BENCHMARK_MANIFEST_URL
+read -rsp 'PenguPlay manifest URL (optional; Enter to skip): ' PENGUPLAY_BENCHMARK_MANIFEST_URL; echo
+[ -z "$PENGUPLAY_BENCHMARK_MANIFEST_URL" ] || export PENGUPLAY_BENCHMARK_MANIFEST_URL
+read -rsp 'HDHub manifest URL (optional; Enter to skip): ' HDHUB_BENCHMARK_MANIFEST_URL; echo
+[ -z "$HDHUB_BENCHMARK_MANIFEST_URL" ] || export HDHUB_BENCHMARK_MANIFEST_URL
 node benchmark-core-streams.mjs --limit=3
-unset CORE_STREAMS_BENCHMARK_MANIFEST_URL PENGUPLAY_BENCHMARK_MANIFEST_URL
+unset CORE_STREAMS_BENCHMARK_MANIFEST_URL PENGUPLAY_BENCHMARK_MANIFEST_URL HDHUB_BENCHMARK_MANIFEST_URL
 ```
 
-A live comparison requires deployed, authorized manifest URLs; no live PenguPlay integration or playback test is performed by this repository. A non-empty result is not proof that it will play.
+A live comparison requires deployed, authorized manifest URLs; this repository does not integrate or proxy PenguPlay/HDHub. The benchmark tests stream-list responses only, and a non-empty result is not proof that it plays.
 
 The Public Domain Movies endpoint currently returns torrent hashes from its curated collection. Its results carry a warning to verify local public-domain status: the add-on does not establish copyright status for Australia or every other territory.
 

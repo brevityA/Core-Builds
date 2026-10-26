@@ -15,19 +15,19 @@ export const BENCHMARK_CASES = Object.freeze([
 const MAX_JSON_BYTES = 2 * 1024 * 1024;
 const REQUEST_TIMEOUT_MS = 10_000;
 const DEFAULT_DELAY_MS = 1_000;
-const RESOLUTIONS = [4320, 2160, 1440, 1080, 900, 720, 576, 540, 480, 360, 240];
 
 export function readManifestUrl(raw, variableName) {
   if (typeof raw !== 'string' || !raw.trim()) {
     throw new Error(`${variableName} is not set`);
   }
+  if (raw.trim().length > 8192) throw new Error(`${variableName} is too long`);
   let url;
   try { url = new URL(raw.trim()); } catch {
     throw new Error(`${variableName} is not a valid URL`);
   }
   const hostname = url.hostname.replace(/^\[|\]$/g, '').toLowerCase();
   const reservedSuffixes = ['.localhost', '.local', '.internal', '.test', '.example', '.invalid', '.onion', '.arpa'];
-  if (url.protocol !== 'https:' || url.username || url.password || isIP(hostname)
+  if (url.protocol !== 'https:' || url.username || url.password || url.hash || isIP(hostname)
     || !hostname.includes('.') || reservedSuffixes.some((suffix) => hostname.endsWith(suffix))
     || ['localhost', 'example.com', 'example.net', 'example.org'].includes(hostname)) {
     throw new Error(`${variableName} must use a public HTTPS host without userinfo or an IP literal`);
