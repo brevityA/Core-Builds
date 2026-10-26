@@ -309,6 +309,19 @@ test('stream normalization rejects unsafe links and malformed torrent hashes', (
   });
 });
 
+test('stream title and description preserve normalized multiline display text', () => {
+  const titleStream = _coreStreamsTest.normalizeStream({
+    ytId: 'dQw4w9WgXcQ',
+    title: 'First line\r\nSecond\tline\u0001',
+  }, 'Source');
+  assert.equal(titleStream.title, 'First line\nSecond line');
+  const descriptionStream = _coreStreamsTest.normalizeStream({
+    ytId: 'dQw4w9WgXcQ',
+    description: 'Quality: 1080p\rDetails\nSeeders: 42',
+  }, 'Source');
+  assert.equal(descriptionStream.description, 'Quality: 1080p\nDetails\nSeeders: 42');
+});
+
 test('native YouTube stream normalization accepts only 11-character video IDs', () => {
   assert.deepEqual(_coreStreamsTest.normalizeStream({
     ytId: 'dQw4w9WgXcQ',
@@ -443,6 +456,84 @@ test('Library of Congress direct stream is included only for the exact Stremio f
   assert.equal(loc.url, 'https://tile.loc.gov/storage-services/service/mbrs/ntscrm/00015143/00015143.mp4');
   assert.ok(requested.includes('https://v3-cinemeta.strem.io/meta/movie/tt0205480.json'));
   assert.ok(!requested.some((url) => new URL(url).hostname === 'tile.loc.gov'), 'Worker returns the direct LOC URL; it does not fetch or relay movie bytes');
+});
+
+test('bounded metadata JSON distinguishes 404 from upstream and parse failures while honoring a shared deadline', async () => {
+  const json404 = await _coreStreamsTest.fetchBoundedJson('https://metadata.example/item', async () => new Response(null, { status: 404 }));
+  assert.equal(json404, null);
+  await assert.rejects(
+    _coreStreamsTest.fetchBoundedJson('https://metadata.example/item', async () => jsonResponse({}, 503)),
+    /HTTP 503/,
+  );
+  await assert.rejects(
+    _coreStreamsTest.fetchBoundedJson('https://metadata.example/item', async () => new Response('{')),
+    /valid JSON/,
+  );
+
+  const deadline = new AbortController();
+  deadline.abort();
+  let requestSignal;
+  await assert.rejects(
+    _coreStreamsTest.fetchBoundedJson('https://metadata.example/item', async (_url, init) => {
+      requestSignal = init.signal;
+      throw new Error('aborted request');
+    }, undefined, undefined, deadline.signal),
+    /aborted request/,
+  );
+  assert.equal(requestSignal.aborted, true, 'the shared deadline is composed with the per-request timeout');
+});
+
+test('Cinemeta 404 and valid metadata-free responses do not trip its source breaker', async () => {
+  for (const responseForCinemeta of [
+    () => new Response(null, { status: 404 }),
+    () => jsonResponse({}),
+  ]) {
+    _coreStreamsTest.resetSourceHealth();
+    let cinemetaCalls = 0;
+    const fetchImpl = async (input) => {
+      const url = String(input);
+      if (url.startsWith('https://v3-cinemeta.strem.io/')) {
+        cinemetaCalls++;
+        return responseForCinemeta();
+      }
+      return jsonResponse({ streams: [] });
+    };
+    for (let i = 0; i < 4; i++) {
+      const response = await handleCoreStreams(
+        makeRequest(`/core-streams/${TOKEN}/stream/movie/tt0133093.json`), makeEnv(), { fetchImpl },
+      );
+      assert.equal(response.status, 200);
+      assert.deepEqual((await response.json()).streams, []);
+    }
+    assert.equal(cinemetaCalls, 4, 'valid absence resets health rather than opening the breaker');
+  }
+  _coreStreamsTest.resetSourceHealth();
+});
+
+test('Cinemeta transport, server, and invalid-JSON errors count toward the source breaker', async () => {
+  for (const failCinemeta of [
+    async () => { throw new Error('network failure'); },
+    async () => jsonResponse({}, 503),
+    async () => new Response('{'),
+  ]) {
+    _coreStreamsTest.resetSourceHealth();
+    let cinemetaCalls = 0;
+    const fetchImpl = async (input) => {
+      const url = String(input);
+      if (url.startsWith('https://v3-cinemeta.strem.io/')) {
+        cinemetaCalls++;
+        return failCinemeta();
+      }
+      return jsonResponse({ streams: [] });
+    };
+    for (let i = 0; i < 4; i++) {
+      await handleCoreStreams(
+        makeRequest(`/core-streams/${TOKEN}/stream/movie/tt0133093.json`), makeEnv(), { fetchImpl },
+      );
+    }
+    assert.equal(cinemetaCalls, 3, 'three upstream failures open the circuit before the fourth request');
+  }
+  _coreStreamsTest.resetSourceHealth();
 });
 
 test('Internet Archive adapter returns only exact-title, year-matched, uploader-declared open MP4 files', async () => {

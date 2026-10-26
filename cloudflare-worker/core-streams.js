@@ -152,9 +152,12 @@ function normalizeHttpsUrl(value) {
   }
 }
 
-function cleanText(value, maxLength) {
+function cleanText(value, maxLength, multiline = false) {
   if (typeof value !== 'string') return '';
-  return value.replace(/[\u0000-\u001f\u007f]/g, '').trim().slice(0, maxLength);
+  const normalized = multiline
+    ? value.replace(/\r\n?|\u2028|\u2029/g, '\n').replace(/\t/g, ' ').replace(/[\u0000-\u0008\u000b-\u001f\u007f]/g, '')
+    : value.replace(/[\u0000-\u001f\u007f\u2028\u2029]+/g, ' ');
+  return normalized.trim().slice(0, maxLength);
 }
 
 function isSafeTorrentSource(value) {
@@ -216,8 +219,8 @@ function normalizeStream(stream, sourceName) {
   }
 
   const name = cleanText(stream.name, 80);
-  const title = cleanText(stream.title, 500);
-  const description = cleanText(stream.description, 500);
+  const title = cleanText(stream.title, 500, true);
+  const description = cleanText(stream.description, 500, true);
   normalized.name = name ? `${sourceName} · ${name}`.slice(0, 120) : `Core Streams · ${sourceName}`;
   if (description) normalized.description = description;
   else if (title) normalized.title = title;
@@ -419,25 +422,33 @@ function declaredOpenLicense(value) {
   return { url: url.href, label: match[1] === 'by-sa' ? `CC BY-SA ${match[2]}` : `CC BY ${match[2]}` };
 }
 
-async function fetchBoundedJson(url, fetchImpl, maxBytes = OPEN_MEDIA_MAX_BYTES, timeoutMs = OPEN_MEDIA_TIMEOUT_MS) {
+async function fetchBoundedJson(url, fetchImpl, maxBytes = OPEN_MEDIA_MAX_BYTES, timeoutMs = OPEN_MEDIA_TIMEOUT_MS, deadlineSignal = null) {
+  const requestSignal = AbortSignal.timeout(timeoutMs);
+  const signal = deadlineSignal ? AbortSignal.any([requestSignal, deadlineSignal]) : requestSignal;
   const response = await fetchImpl(url, {
     method: 'GET',
     headers: { Accept: 'application/json' },
     redirect: 'manual',
-    signal: AbortSignal.timeout(timeoutMs),
+    signal,
   });
-  if (!response || response.status < 200 || response.status >= 300) {
+  if (!response || response.status === 404) {
     cancelBody(response);
     return null;
+  }
+  if (response.status < 200 || response.status >= 300) {
+    cancelBody(response);
+    throw new Error(`Open-media request failed with HTTP ${response.status}`);
   }
   const contentLength = Number(response.headers && response.headers.get('content-length'));
   if (Number.isFinite(contentLength) && contentLength > maxBytes) {
     cancelBody(response);
-    return null;
+    throw new Error('Open-media response exceeds size limit');
   }
   const buffer = await readBounded(response, maxBytes);
-  if (!buffer) return null;
-  try { return JSON.parse(new TextDecoder().decode(buffer)); } catch { return null; }
+  if (!buffer) throw new Error('Open-media response could not be read within size limit');
+  try { return JSON.parse(new TextDecoder().decode(buffer)); } catch {
+    throw new Error('Open-media response was not valid JSON');
+  }
 }
 
 function archiveItemYear(metadata) {
@@ -526,7 +537,7 @@ function cinemetaTitleYear(payload) {
   return title && year ? { title, year } : null;
 }
 
-async function fetchInternetArchiveFromMeta(id, expected, fetchImpl) {
+async function fetchInternetArchiveFromMeta(id, expected, fetchImpl, deadlineSignal) {
   if (!sourceAllowed('internet-archive')) return [];
   try {
     const searchUrl = new URL('https://archive.org/advancedsearch.php');
@@ -537,7 +548,7 @@ async function fetchInternetArchiveFromMeta(id, expected, fetchImpl) {
     searchUrl.searchParams.set('rows', '6');
     searchUrl.searchParams.set('page', '1');
     searchUrl.searchParams.set('output', 'json');
-    const searchPayload = await fetchBoundedJson(searchUrl.href, fetchImpl);
+    const searchPayload = await fetchBoundedJson(searchUrl.href, fetchImpl, OPEN_MEDIA_MAX_BYTES, OPEN_MEDIA_TIMEOUT_MS, deadlineSignal);
     const docs = searchPayload?.response?.docs;
     if (!Array.isArray(docs)) {
       sourceFailed('internet-archive');
@@ -557,7 +568,7 @@ async function fetchInternetArchiveFromMeta(id, expected, fetchImpl) {
     // Keep metadata fetches sequential: the movie add-ons and Blender adapter
     // can already occupy six concurrent outbound connections on Workers Free.
     for (const doc of candidates) {
-      const payload = await fetchBoundedJson(`https://archive.org/metadata/${encodeURIComponent(doc.identifier)}`, fetchImpl);
+      const payload = await fetchBoundedJson(`https://archive.org/metadata/${encodeURIComponent(doc.identifier)}`, fetchImpl, OPEN_MEDIA_MAX_BYTES, OPEN_MEDIA_TIMEOUT_MS, deadlineSignal);
       if (!payload) {
         metadataFailed = true;
         continue;
@@ -658,14 +669,14 @@ function blenderVideoAllowed(video, film) {
       && known.allowedVideoTitles.includes(cleanText(video.name, 300)));
 }
 
-async function fetchBlenderOpenMovie(id, expected, fetchImpl) {
+async function fetchBlenderOpenMovie(id, expected, fetchImpl, deadlineSignal) {
   const film = BLENDER_OPEN_FILMS.find((candidate) => candidate.imdbId === id.toLowerCase());
   if (!film || expected.title !== film.title || expected.year !== film.year || !sourceAllowed('blender-open-movies')) return [];
   try {
     const searchUrl = new URL('https://video.blender.org/api/v1/videos');
     searchUrl.searchParams.set('search', film.title);
     searchUrl.searchParams.set('count', '10');
-    const searchPayload = await fetchBoundedJson(searchUrl.href, fetchImpl);
+    const searchPayload = await fetchBoundedJson(searchUrl.href, fetchImpl, OPEN_MEDIA_MAX_BYTES, OPEN_MEDIA_TIMEOUT_MS, deadlineSignal);
     if (!Array.isArray(searchPayload?.data)) {
       sourceFailed('blender-open-movies');
       return [];
@@ -678,7 +689,7 @@ async function fetchBlenderOpenMovie(id, expected, fetchImpl) {
     }
     let detailFailed = false;
     const details = await Promise.all(candidates.map(async (video) => {
-      const payload = await fetchBoundedJson(`https://video.blender.org/api/v1/videos/${video.id}`, fetchImpl);
+      const payload = await fetchBoundedJson(`https://video.blender.org/api/v1/videos/${video.id}`, fetchImpl, OPEN_MEDIA_MAX_BYTES, OPEN_MEDIA_TIMEOUT_MS, deadlineSignal);
       if (!payload) {
         detailFailed = true;
         return [];
@@ -719,26 +730,26 @@ async function fetchBlenderOpenMovie(id, expected, fetchImpl) {
 
 async function fetchOpenMedia(type, id, fetchImpl) {
   if (type !== 'movie' || !sourceAllowed('cinemeta')) return [];
+  const deadlineSignal = AbortSignal.timeout(SOURCE_TIMEOUT_MS);
   const imdb = id.split(':')[0].toLowerCase();
   let metaPayload;
   try {
     metaPayload = await fetchBoundedJson(
-      `https://v3-cinemeta.strem.io/meta/movie/${encodeURIComponent(imdb)}.json`, fetchImpl,
+      `https://v3-cinemeta.strem.io/meta/movie/${encodeURIComponent(imdb)}.json`,
+      fetchImpl, OPEN_MEDIA_MAX_BYTES, OPEN_MEDIA_TIMEOUT_MS, deadlineSignal,
     );
   } catch {
     sourceFailed('cinemeta');
     return [];
   }
-  if (!metaPayload?.meta || typeof metaPayload.meta.name !== 'string') {
-    sourceFailed('cinemeta');
-    return [];
-  }
+  // A missing item or a valid but metadata-free response is not an upstream
+  // outage. Transport, HTTP, body-size, and JSON errors throw above instead.
   sourceSucceeded('cinemeta');
   const expected = cinemetaTitleYear(metaPayload);
   if (!expected) return [];
   const [archiveStreams, blenderStreams] = await Promise.all([
-    fetchInternetArchiveFromMeta(imdb, expected, fetchImpl),
-    fetchBlenderOpenMovie(imdb, expected, fetchImpl),
+    fetchInternetArchiveFromMeta(imdb, expected, fetchImpl, deadlineSignal),
+    fetchBlenderOpenMovie(imdb, expected, fetchImpl, deadlineSignal),
   ]);
   return [...locFilmStreams(imdb, expected), ...archiveStreams, ...blenderStreams];
 }
@@ -877,6 +888,7 @@ export const _coreStreamsTest = {
   inferredSeeders,
   smartStreamScore,
   interleaveStreamGroups,
+  fetchBoundedJson,
   parseRequestPath,
   resetSourceHealth: () => sourceHealth.clear(),
   validMediaRequest,

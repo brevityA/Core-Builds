@@ -183,7 +183,7 @@ Set `CORS_PROXY = ''` to disable the proxy and fall back to direct-fetch-only.
 | `/paste` | POST | store template / badge pack | 10/min | ≤512 KB, two shapes only, 30-day TTL |
 | `/t/:id` | GET | read paste | 60/min | `ACAO: *`, `no-store` |
 | `/core-streams/:token/manifest.json` | GET | private Stremio add-on manifest | none | token is a bearer secret; `ACAO: *`, `no-store` |
-| `/core-streams/:token/stream/{movie|series}/{imdb-id}.json` | GET | Torrentio + TorrentsDB + movie-only Public Domain Movies + optional configured add-on (HTTPS, torrent, or native YouTube ID); open-media lookup via Cinemeta/Internet Archive, four LOC films, and six mapped Blender films | 20/min/IP | ≤10 total upstream requests worst case and ≤6 concurrent; add-on timeout 5.5 s / metadata timeout 4 s; per-source isolate-local breakers; no media relay; `ACAO: *`, `no-store` |
+| `/core-streams/:token/stream/{movie\|series}/{imdb-id}.json` | GET | Torrentio + TorrentsDB + movie-only Public Domain Movies + optional configured add-on (HTTPS, torrent, or native YouTube ID); open-media lookup via Cinemeta/Internet Archive, four LOC films, and six mapped Blender films | 20/min/IP | ≤10 total upstream requests worst case and ≤6 concurrent; add-on timeout 5.5 s / metadata timeout 4 s; per-source isolate-local breakers; no media relay; `ACAO: *`, `no-store` |
 | `/proxy<path>?host=` | GET/POST/PATCH | allowlisted lane | 60/min | every allowlisted host is scoped to its own surface — AIOStreams hosts: `GET /api/v1/status`, `POST/PATCH /api/v1/user[/id]`, `GET /stremio/<uuid>/<pwd>/{manifest.json,stream/*/*.json}` (origin form) or `GET /stream/*/*.json` (manifest-base form); `api.wuplay.app`: `GET /app/version`, `POST /devices/register`, `GET/POST/PATCH /sync/**` and is the **only** host that receives `Authorization`; `api.torbox.app`: `GET /v1/api/speedtest`. An allowlisted host matching no scope is refused |
 | `/proxy<path>?host=` | GET/POST/PATCH | custom lane | 20/min | `https://` origin → `GET /api/v1/status`, `POST/PATCH /api/v1/user[/id]` (same bounded id shape as the allowlisted lane, so a self-hosted config can be updated in place); manifest base → `GET /stream/*/*.json`; no IP literals, no userinfo/port/query, no dotless or reserved names (`.local .internal .lan .corp .home .test .example .invalid .onion .arpa`) |
 
@@ -202,7 +202,7 @@ HSTS.
   configurator's `writeHostFetch` treats 429 as "not forwarded" and retries the
   write directly; a post-forward 429 would duplicate a user's config. The
   circuit breaker therefore returns `503 + Retry-After`, not 429.
-- `ACAO: *` on `/t/` and `GET /proxy/api/v1/status` only; strict origin echo everywhere else.
+- `ACAO: *` on `/t/`, `/core-streams/`, and `GET /proxy/api/v1/status`; strict origin echo everywhere else.
 - `/api/stats` keeps `visits`/`generates` numeric at the top level (splash screen).
 
 ### Rate limiting — three layers
