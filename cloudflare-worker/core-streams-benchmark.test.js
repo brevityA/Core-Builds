@@ -20,15 +20,16 @@ function response(payload, status = 200) {
 test('benchmark accepts only public HTTPS manifest URLs without displaying values', () => {
   const url = readManifestUrl('https://addons.example.net/private/manifest.json?key=secret', 'TEST_URL');
   assert.equal(url.pathname, '/private/manifest.json');
-  for (const unsafe of [
-    'http://addon.example/manifest.json',
-    'https://127.0.0.1/manifest.json',
-    'https://localhost/manifest.json',
-    'https://user:pass@addon.example/manifest.json',
-    'https://addon.example.net/manifest.json#secret',
-    'https://addon.example/manifest',
+  for (const [unsafe, errorPattern] of [
+    ['http://addon.example.net/manifest.json', /public HTTPS host/],
+    ['https://127.0.0.1/manifest.json', /public HTTPS host/],
+    ['https://localhost/manifest.json', /public HTTPS host/],
+    ['https://user:pass@addon.example.net/manifest.json', /public HTTPS host/],
+    ['https://addon.example.net/manifest.json#secret', /public HTTPS host/],
+    ['https://addon.example.net/manifest', /manifest\.json/],
+    ['https://addon.example/manifest.json', /public HTTPS host/],
   ]) {
-    assert.throws(() => readManifestUrl(unsafe, 'TEST_URL'), /TEST_URL/);
+    assert.throws(() => readManifestUrl(unsafe, 'TEST_URL'), errorPattern);
   }
 });
 
@@ -76,7 +77,7 @@ test('benchmark report never includes private manifest URLs or bearer tokens', a
   assert.equal(report.summaries.length, 2);
   for (const summary of report.summaries) {
     assert.deepEqual(Object.keys(summary).sort(), [
-      'attempted', 'cases', 'coveragePct', 'http200', 'medianLatencyMs', 'medianResultCount',
+      'attempted', 'caseCount', 'cases', 'coveragePct', 'http200', 'medianLatencyMs', 'medianResultCount',
       'nonEmpty', 'provider', 'topFive1080pHintCases',
     ]);
     assert.deepEqual(Object.keys(summary.cases[0]).sort(), [
@@ -84,6 +85,7 @@ test('benchmark report never includes private manifest URLs or bearer tokens', a
     ]);
   }
   assert.equal(report.summaries[0].coveragePct, 100);
+  assert.equal(report.summaries[0].caseCount, 1);
   assert.equal(report.summaries[0].cases[0].metrics.topFive1080pHints, 1);
 });
 

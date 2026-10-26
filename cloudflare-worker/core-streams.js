@@ -389,6 +389,12 @@ function sourceFailed(sourceId) {
   }
 }
 
+function sourceDeadlineCancelled(sourceId) {
+  // The request-wide budget expired; this says nothing about source health.
+  // Release a half-open probe without changing its failure count or cooldown.
+  getSourceHealth(sourceId).probeInFlight = false;
+}
+
 function cancelBody(response) {
   try {
     const pending = response?.body?.cancel();
@@ -431,7 +437,8 @@ async function fetchBoundedJson(url, fetchImpl, maxBytes = OPEN_MEDIA_MAX_BYTES,
     redirect: 'manual',
     signal,
   });
-  if (!response || response.status === 404) {
+  if (!response) throw new Error('Open-media request returned no response');
+  if (response.status === 404) {
     cancelBody(response);
     return null;
   }
@@ -549,6 +556,10 @@ async function fetchInternetArchiveFromMeta(id, expected, fetchImpl, deadlineSig
     searchUrl.searchParams.set('page', '1');
     searchUrl.searchParams.set('output', 'json');
     const searchPayload = await fetchBoundedJson(searchUrl.href, fetchImpl, OPEN_MEDIA_MAX_BYTES, OPEN_MEDIA_TIMEOUT_MS, deadlineSignal);
+    if (searchPayload === null) {
+      sourceSucceeded('internet-archive');
+      return [];
+    }
     const docs = searchPayload?.response?.docs;
     if (!Array.isArray(docs)) {
       sourceFailed('internet-archive');
@@ -563,25 +574,21 @@ async function fetchInternetArchiveFromMeta(id, expected, fetchImpl, deadlineSig
       sourceSucceeded('internet-archive');
       return [];
     }
-    let metadataFailed = false;
     const records = [];
     // Keep metadata fetches sequential: the movie add-ons and Blender adapter
     // can already occupy six concurrent outbound connections on Workers Free.
     for (const doc of candidates) {
       const payload = await fetchBoundedJson(`https://archive.org/metadata/${encodeURIComponent(doc.identifier)}`, fetchImpl, OPEN_MEDIA_MAX_BYTES, OPEN_MEDIA_TIMEOUT_MS, deadlineSignal);
-      if (!payload) {
-        metadataFailed = true;
-        continue;
-      }
+      if (payload === null) continue; // A missing item is not a service failure.
       records.push(archiveMediaStreams(doc.identifier, payload, expected.title, expected.year));
     }
-    if (metadataFailed) sourceFailed('internet-archive');
-    else sourceSucceeded('internet-archive');
+    sourceSucceeded('internet-archive');
     return records.flat().slice(0, 6)
       .map((stream) => normalizeStream(stream, 'Internet Archive'))
       .filter(Boolean);
   } catch {
-    sourceFailed('internet-archive');
+    if (deadlineSignal?.aborted) sourceDeadlineCancelled('internet-archive');
+    else sourceFailed('internet-archive');
     return [];
   }
 }
@@ -677,6 +684,10 @@ async function fetchBlenderOpenMovie(id, expected, fetchImpl, deadlineSignal) {
     searchUrl.searchParams.set('search', film.title);
     searchUrl.searchParams.set('count', '10');
     const searchPayload = await fetchBoundedJson(searchUrl.href, fetchImpl, OPEN_MEDIA_MAX_BYTES, OPEN_MEDIA_TIMEOUT_MS, deadlineSignal);
+    if (searchPayload === null) {
+      sourceSucceeded('blender-open-movies');
+      return [];
+    }
     if (!Array.isArray(searchPayload?.data)) {
       sourceFailed('blender-open-movies');
       return [];
@@ -687,13 +698,9 @@ async function fetchBlenderOpenMovie(id, expected, fetchImpl, deadlineSignal) {
       sourceSucceeded('blender-open-movies');
       return [];
     }
-    let detailFailed = false;
     const details = await Promise.all(candidates.map(async (video) => {
       const payload = await fetchBoundedJson(`https://video.blender.org/api/v1/videos/${video.id}`, fetchImpl, OPEN_MEDIA_MAX_BYTES, OPEN_MEDIA_TIMEOUT_MS, deadlineSignal);
-      if (!payload) {
-        detailFailed = true;
-        return [];
-      }
+      if (payload === null) return []; // A removed video is not a service failure.
       if (!blenderVideoAllowed(payload, film) || !Array.isArray(payload.files)) return [];
       return payload.files
         .filter((file) => file && typeof file.fileUrl === 'string'
@@ -719,11 +726,11 @@ async function fetchBlenderOpenMovie(id, expected, fetchImpl, deadlineSignal) {
         }, 'Blender Open Movies'))
         .filter(Boolean);
     }));
-    if (detailFailed) sourceFailed('blender-open-movies');
-    else sourceSucceeded('blender-open-movies');
+    sourceSucceeded('blender-open-movies');
     return details.flat().slice(0, 4);
   } catch {
-    sourceFailed('blender-open-movies');
+    if (deadlineSignal?.aborted) sourceDeadlineCancelled('blender-open-movies');
+    else sourceFailed('blender-open-movies');
     return [];
   }
 }
@@ -889,6 +896,8 @@ export const _coreStreamsTest = {
   smartStreamScore,
   interleaveStreamGroups,
   fetchBoundedJson,
+  fetchInternetArchiveFromMeta,
+  fetchBlenderOpenMovie,
   parseRequestPath,
   resetSourceHealth: () => sourceHealth.clear(),
   validMediaRequest,

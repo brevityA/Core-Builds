@@ -536,6 +536,30 @@ test('Cinemeta transport, server, and invalid-JSON errors count toward the sourc
   _coreStreamsTest.resetSourceHealth();
 });
 
+test('shared open-media deadline cancellations do not trip downstream source breakers', async () => {
+  for (const [sourceName, invoke] of [
+    ['Internet Archive', (fetchImpl, signal) => _coreStreamsTest.fetchInternetArchiveFromMeta(
+      'tt0133093', { title: 'A Test Movie', year: 2000 }, fetchImpl, signal,
+    )],
+    ['Blender', (fetchImpl, signal) => _coreStreamsTest.fetchBlenderOpenMovie(
+      'tt1254207', { title: 'Big Buck Bunny', year: 2008 }, fetchImpl, signal,
+    )],
+  ]) {
+    _coreStreamsTest.resetSourceHealth();
+    const deadline = new AbortController();
+    deadline.abort();
+    let calls = 0;
+    const fetchImpl = async (_input, init) => {
+      calls++;
+      assert.equal(init.signal.aborted, true, `${sourceName} receives the shared deadline`);
+      throw new Error('request aborted by shared deadline');
+    };
+    for (let i = 0; i < 4; i++) await invoke(fetchImpl, deadline.signal);
+    assert.equal(calls, 4, `${sourceName} deadline cancellations do not open its breaker`);
+  }
+  _coreStreamsTest.resetSourceHealth();
+});
+
 test('Internet Archive adapter returns only exact-title, year-matched, uploader-declared open MP4 files', async () => {
   _coreStreamsTest.resetSourceHealth();
   const calls = [];

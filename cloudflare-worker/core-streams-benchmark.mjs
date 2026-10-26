@@ -101,7 +101,7 @@ export function summarizeProvider(providerName, rows) {
   const withResults = successful.filter((row) => row.metrics.resultCount > 0);
   return {
     provider: providerName,
-    cases: rows.length,
+    caseCount: rows.length,
     attempted: attempted.length,
     http200: successful.length,
     nonEmpty: withResults.length,
