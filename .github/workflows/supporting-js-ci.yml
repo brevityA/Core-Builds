@@ -7,6 +7,7 @@ on:
       - 'cli/**'
       - 'packages/core/**'
       - 'cloudflare-worker/**'
+      - 'tools/source-scout/**'
       - 'versions.json'
       - '.github/workflows/supporting-js-ci.yml'
   push:
@@ -16,6 +17,7 @@ on:
       - 'cli/**'
       - 'packages/core/**'
       - 'cloudflare-worker/**'
+      - 'tools/source-scout/**'
       - 'versions.json'
       - '.github/workflows/supporting-js-ci.yml'
 
@@ -52,4 +54,4 @@ jobs:
           npm test
 
       - name: Test Cloudflare worker and Core Streams addon
-        run: node --test cloudflare-worker/*.test.js
+        run: node --test cloudflare-worker/*.test.js cloudflare-worker/*.test.mjs tools/source-scout/*.test.mjs

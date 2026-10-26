@@ -10,24 +10,30 @@ import {
 } from './stremio-source-scout.mjs';
 
 function jsonResponse(payload, { status = 200 } = {}) {
-  const text = JSON.stringify(payload);
-  return {
-    ok: status >= 200 && status < 300,
+  return new Response(JSON.stringify(payload), {
     status,
-    headers: { get: (name) => name.toLowerCase() === 'content-length' ? String(Buffer.byteLength(text)) : null },
-    text: async () => text,
-  };
+    headers: { 'content-type': 'application/json' },
+  });
 }
 
 test('safePublicUrl keeps public HTTPS links and removes credentials from query/hash', () => {
   assert.deepEqual(safePublicUrl('https://example.org/page?q=ok&api_key=private#section'), {
     url: 'https://example.org/page?q=ok',
     credentialsRedacted: true,
+    pathRedacted: false,
   });
   assert.equal(safePublicUrl('http://example.org/page'), null);
   assert.equal(safePublicUrl('https://user:pass@example.org/page'), null);
   assert.equal(safePublicUrl('https://127.0.0.1/page'), null);
-  assert.equal(safePublicUrl('https://service.internal/page'), null);
+  for (const host of ['service.internal', 'router.lan', 'service.corp', 'nas.home', 'proxy.intranet']) {
+    assert.equal(safePublicUrl(`https://${host}/page`), null);
+  }
+  const privatePath = 'b'.repeat(48);
+  assert.deepEqual(safePublicUrl(`https://example.org/${privatePath}/manifest.json`), {
+    url: 'https://example.org/',
+    credentialsRedacted: false,
+    pathRedacted: true,
+  });
 });
 
 test('Brave adapter labels results as leads, drops unsafe URLs, and keeps API key out of output', async () => {
@@ -48,6 +54,23 @@ test('Brave adapter labels results as leads, drops unsafe URLs, and keeps API ke
   assert.equal(request.options.headers['X-Subscription-Token'], 'secret-api-key');
   assert.equal(request.options.redirect, 'error');
   assert.equal(JSON.stringify(results).includes('secret-api-key'), false);
+});
+
+test('scout redacts credentials in path tokens, snippets, titles, and query output', async () => {
+  const pathToken = 'c'.repeat(48);
+  const secret = 'this-must-not-appear';
+  const results = await searchBrave(`addon token=${secret}`, 'api-key', {
+    fetchImpl: async () => jsonResponse({ web: { results: [{
+      title: `Private token=${secret}`,
+      url: `https://addon.org/${pathToken}/manifest.json?session=${secret}`,
+      description: `Install at https://addon.org/${pathToken}/manifest.json?token=${secret}; API_KEY=${secret}`,
+    }] } }),
+  });
+  assert.equal(results[0].url, 'https://addon.org/');
+  assert.equal(results[0].pathRedacted, true);
+  assert.equal(results[0].credentialsRedacted, true);
+  assert.equal(JSON.stringify(results).includes(secret), false);
+  assert.match(results[0].snippet, /\[redacted\]/);
 });
 
 test('Brave adapter makes no request without a key', async () => {
@@ -75,29 +98,21 @@ test('GitHub adapter reports repository metadata with a narrow evidence label', 
   assert.match(repo.evidenceLabel, /not a stream or rights verification/);
 });
 
-test('GitHub adapter refuses oversized and non-JSON provider responses', async () => {
+test('GitHub adapter enforces its size cap while streaming and rejects non-JSON responses', async () => {
   await assert.rejects(searchGitHubRepositories('x', {
-    fetchImpl: async () => ({
-      ok: true,
-      status: 200,
-      headers: { get: () => String(3 * 1024 * 1024) },
-      text: async () => '{}',
-    }),
+    fetchImpl: async () => new Response(new ReadableStream({
+      pull(controller) { controller.enqueue(new Uint8Array(1024 * 1024)); },
+    }), { headers: { 'content-length': '1' } }),
   }), /2 MiB limit/);
   await assert.rejects(searchGitHubRepositories('x', {
-    fetchImpl: async () => ({
-      ok: true,
-      status: 200,
-      headers: { get: () => null },
-      text: async () => '<html>not json</html>',
-    }),
+    fetchImpl: async () => new Response('<html>not json</html>'),
   }), /invalid JSON/);
 });
 
 test('merge retains different evidence types and Markdown explains limitations', () => {
   const results = [
-    { kind: 'web_search_result', evidenceLabel: 'search snippet', query: 'q1', title: 'Candidate', url: 'https://github.com/owner/addon', snippet: 'May stream', indexAge: 'Yesterday', credentialsRedacted: false },
-    { kind: 'github_repository', evidenceLabel: 'GitHub metadata', query: 'q2', title: 'owner/addon', url: 'https://github.com/owner/addon', archived: true, credentialsRedacted: false },
+    { kind: 'web_search_result', evidenceLabel: 'search snippet', query: 'q1', title: 'Candidate', url: 'https://github.com/owner/addon_(evil)', snippet: '<img src=x onerror=alert(1)> **bold** `code`', indexAge: 'Yesterday', credentialsRedacted: false },
+    { kind: 'github_repository', evidenceLabel: 'GitHub metadata', query: 'q2', title: 'owner/addon', url: 'https://github.com/owner/addon_(evil)', archived: true, pushedAt: '2026-10-25', stars: 12, credentialsRedacted: false },
   ];
   const [finding] = mergeFindings(results);
   assert.equal(finding.evidence.length, 2);
@@ -105,6 +120,15 @@ test('merge retains different evidence types and Markdown explains limitations',
   assert.match(markdown, /not verified page contents/);
   assert.match(markdown, /Nothing here verifies a working Stremio manifest/);
   assert.match(markdown, /not a live-health check/);
+  assert.match(markdown, /GitHub archived flag: true/);
+  assert.match(markdown, /GitHub last push: 2026-10-25/);
+  assert.match(markdown, /GitHub stars: 12/);
+  assert.ok(markdown.includes('](<https://github.com/owner/addon_(evil)>)'));
+  assert.ok(!markdown.includes('](https://github.com/owner/addon_(evil))'));
+  assert.ok(markdown.includes('&lt;img src=x onerror=alert\\(1\\)&gt;'));
+  assert.ok(markdown.includes('\\*\\*bold\\*\\*'));
+  assert.ok(markdown.includes('\\`code\\`'));
+  assert.ok(!markdown.includes('<img src=x'));
 });
 
 test('run refuses missing credentials before network access', async () => {

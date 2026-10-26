@@ -4,6 +4,7 @@ import {
   queryCase,
   readManifestUrl,
   runBenchmark,
+  selectBenchmarkCases,
   streamRequestUrl,
   summarizeStreams,
 } from './core-streams-benchmark.mjs';
@@ -26,11 +27,25 @@ test('benchmark accepts only public HTTPS manifest URLs without displaying value
     ['https://localhost/manifest.json', /public HTTPS host/],
     ['https://user:pass@addon.example.net/manifest.json', /public HTTPS host/],
     ['https://addon.example.net/manifest.json#secret', /public HTTPS host/],
+    ['https://router.lan/manifest.json', /public HTTPS host/],
+    ['https://service.corp/manifest.json', /public HTTPS host/],
+    ['https://nas.home/manifest.json', /public HTTPS host/],
+    ['https://proxy.intranet/manifest.json', /public HTTPS host/],
     ['https://addon.example.net/manifest', /manifest\.json/],
     ['https://addon.example/manifest.json', /public HTTPS host/],
   ]) {
     assert.throws(() => readManifestUrl(unsafe, 'TEST_URL'), errorPattern);
   }
+});
+
+test('small benchmark limits retain a representative movie, episode, and open-media sample', () => {
+  const sampleCases = selectBenchmarkCases(3);
+  assert.deepEqual(sampleCases.map((media) => media.group), ['popular', 'episode', 'open-media']);
+  assert.deepEqual(sampleCases.map((media) => media.type), ['movie', 'series', 'movie']);
+  assert.equal(sampleCases[2].id, 'tt1254207');
+  const expanded = selectBenchmarkCases(4);
+  assert.equal(expanded.length, 4);
+  assert.deepEqual(expanded.slice(0, 3).map((media) => media.group), ['popular', 'episode', 'open-media']);
 });
 
 test('benchmark builds encoded stream paths while preserving path and query install tokens', () => {
@@ -102,6 +117,35 @@ test('manifest network errors are reduced to safe codes without leaking install 
   assert.equal(report.manifestErrors[0].error, 'network_error');
   assert.equal(JSON.stringify(report).includes(secret), false);
   assert.deepEqual(report.manifestErrors, [{ provider: 'Core Streams', error: 'network_error' }]);
+});
+
+test('benchmark latency includes reading and parsing the full stream-list body', async () => {
+  const manifestUrl = readManifestUrl('https://addon.example.net/manifest.json', 'TEST');
+  const encoder = new TextEncoder();
+  const body = new ReadableStream({
+    start(controller) {
+      controller.enqueue(encoder.encode('{"streams":['));
+      setTimeout(() => {
+        controller.enqueue(encoder.encode('{"name":"slow body"}]}'));
+        controller.close();
+      }, 60);
+    },
+  });
+  const row = await queryCase(manifestUrl, { types: ['series'] }, sample[0], async () => new Response(body));
+  assert.equal(row.status, 200);
+  assert.equal(row.metrics.resultCount, 1);
+  assert.ok(row.latencyMs >= 45, `expected body-read latency, got ${row.latencyMs}ms`);
+});
+
+test('benchmark distinguishes bodyless and malformed stream-list responses from empty results', async () => {
+  const manifestUrl = readManifestUrl('https://addon.example.net/manifest.json', 'TEST');
+  const bodyless = await queryCase(manifestUrl, { types: ['series'] }, sample[0], async () => new Response(null));
+  const malformed = await queryCase(manifestUrl, { types: ['series'] }, sample[0], async () => response({}));
+  const validEmpty = await queryCase(manifestUrl, { types: ['series'] }, sample[0], async () => response({ streams: [] }));
+  assert.equal(bodyless.status, 'invalid_json');
+  assert.equal(malformed.status, 'invalid_stream_response');
+  assert.equal(validEmpty.status, 200);
+  assert.equal(validEmpty.metrics.resultCount, 0);
 });
 
 test('unsupported media types are excluded from the benchmark denominator', async () => {

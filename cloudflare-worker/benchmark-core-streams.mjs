@@ -3,6 +3,7 @@ import {
   BENCHMARK_CASES,
   readManifestUrl,
   runBenchmark,
+  selectBenchmarkCases,
 } from './core-streams-benchmark.mjs';
 
 const args = process.argv.slice(2);
@@ -46,7 +47,7 @@ try {
   process.exit(2);
 }
 
-const report = await runBenchmark(providers, BENCHMARK_CASES.slice(0, limit), { delayMs });
+const report = await runBenchmark(providers, selectBenchmarkCases(limit), { delayMs });
 if (jsonOutput) {
   console.log(JSON.stringify(report, null, 2));
 } else {

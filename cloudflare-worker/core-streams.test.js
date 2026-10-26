@@ -21,7 +21,7 @@ test('manifest is a Stremio stream-only manifest behind the install token', asyn
   assert.equal(response.headers.get('Cache-Control'), 'no-store');
   assert.deepEqual(await response.json(), {
     id: 'uk.corebuilds.core-streams',
-    version: '0.7.0',
+    version: '0.8.0',
     name: 'Core Streams',
     description: 'Quality-ranked stream fallback with curated torrents, open media, and configurable sources.',
     resources: ['stream'],
@@ -708,6 +708,15 @@ test('mapped Blender Open Movies use exact official uploads and per-film verifie
       license: 'CC BY 4.0', licenseUrl: 'creativecommons.org/licenses/by/4.0',
       officialRightsUrl: 'studio.blender.org/projects/coffee-run/pages/licensing',
     },
+    {
+      id: 'tt7993892', title: 'Caminandes: Llamigos', year: '2016',
+      videoId: 48, videoTitle: 'Caminandes 3: Llamigos - Funny 3D Animated Short',
+      path: '23f3ef79-15dc-44c5-aa45-cf92e78a4509-720.mp4', resolution: 720,
+      license: 'CC BY (version unspecified)', peerTubeLicenseId: 1,
+      officialRightsUrl: 'cloud.blender.org/p/caminandes-3',
+      officialVideoUrl: 'video.blender.org/w/5ruRYckTcQMTMQvyqMnVsr',
+      licenseEvidence: 'reports Attribution without a version',
+    },
   ];
   for (const film of films) {
     _coreStreamsTest.resetSourceHealth();
@@ -745,8 +754,11 @@ test('mapped Blender Open Movies use exact official uploads and per-film verifie
     const stream = payload.streams.find((item) => item.url?.endsWith(film.path));
     assert.ok(stream, film.title);
     assert.equal(stream.name, `Blender Open Movies · ${film.license}`);
-    assert.ok(stream.description.includes(film.licenseUrl));
+    if (film.licenseUrl) assert.ok(stream.description.includes(film.licenseUrl));
+    else assert.match(stream.description, /version unspecified/);
     assert.ok(stream.description.includes(film.officialRightsUrl));
+    if (film.officialVideoUrl) assert.ok(stream.description.includes(film.officialVideoUrl));
+    if (film.licenseEvidence) assert.ok(stream.description.includes(film.licenseEvidence));
     assert.equal(stream.url, `https://video.blender.org/object-storage/web_videos/${film.path}`);
     assert.equal(calls.length, 7, 'three add-ons, Cinemeta, Archive search, and Blender search/detail');
   }

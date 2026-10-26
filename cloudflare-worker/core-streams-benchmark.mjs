@@ -7,6 +7,7 @@ export const BENCHMARK_CASES = Object.freeze([
   { type: 'movie', id: 'tt0468569', title: 'The Dark Knight', group: 'popular' },
   { type: 'movie', id: 'tt1254207', title: 'Big Buck Bunny', group: 'open-media' },
   { type: 'movie', id: 'tt1727587', title: 'Sintel', group: 'open-media' },
+  { type: 'movie', id: 'tt7993892', title: 'Caminandes: Llamigos', group: 'open-media' },
   { type: 'movie', id: 'tt0205480', title: 'A Trip Down Market Street Before the Fire', group: 'open-media' },
   { type: 'series', id: 'tt0903747:1:1', title: 'Breaking Bad S01E01', group: 'episode' },
   { type: 'series', id: 'tt0944947:1:1', title: 'Game of Thrones S01E01', group: 'episode' },
@@ -15,6 +16,23 @@ export const BENCHMARK_CASES = Object.freeze([
 const MAX_JSON_BYTES = 2 * 1024 * 1024;
 const REQUEST_TIMEOUT_MS = 10_000;
 const DEFAULT_DELAY_MS = 1_000;
+const REPRESENTATIVE_GROUP_ORDER = ['popular', 'episode', 'open-media'];
+
+export function selectBenchmarkCases(limit, cases = BENCHMARK_CASES) {
+  if (!Number.isInteger(limit) || limit < 1 || limit > cases.length) {
+    throw new RangeError(`limit must be an integer from 1 to ${cases.length}`);
+  }
+  const selected = [];
+  for (const group of REPRESENTATIVE_GROUP_ORDER) {
+    const representative = cases.find((item) => item.group === group);
+    if (representative && selected.length < limit) selected.push(representative);
+  }
+  for (const item of cases) {
+    if (selected.length >= limit) break;
+    if (!selected.includes(item)) selected.push(item);
+  }
+  return selected;
+}
 
 export function readManifestUrl(raw, variableName) {
   if (typeof raw !== 'string' || !raw.trim()) {
@@ -25,8 +43,8 @@ export function readManifestUrl(raw, variableName) {
   try { url = new URL(raw.trim()); } catch {
     throw new Error(`${variableName} is not a valid URL`);
   }
-  const hostname = url.hostname.replace(/^\[|\]$/g, '').toLowerCase();
-  const reservedSuffixes = ['.localhost', '.local', '.internal', '.test', '.example', '.invalid', '.onion', '.arpa'];
+  const hostname = url.hostname.replace(/^\[|\]$/g, '').toLowerCase().replace(/\.$/, '');
+  const reservedSuffixes = ['.localhost', '.local', '.internal', '.intranet', '.lan', '.corp', '.home', '.private', '.test', '.example', '.invalid', '.onion', '.arpa'];
   if (url.protocol !== 'https:' || url.username || url.password || url.hash || isIP(hostname)
     || !hostname.includes('.') || reservedSuffixes.some((suffix) => hostname.endsWith(suffix))
     || ['localhost', 'example.com', 'example.net', 'example.org'].includes(hostname)) {
@@ -114,7 +132,7 @@ export function summarizeProvider(providerName, rows) {
 }
 
 async function readJsonBounded(response) {
-  if (!response.body) return null;
+  if (!response.body) throw new Error('invalid_json');
   const declared = Number(response.headers.get('content-length'));
   if (Number.isFinite(declared) && declared > MAX_JSON_BYTES) throw new Error('response_too_large');
   const reader = response.body.getReader();
@@ -170,19 +188,22 @@ export async function queryCase(manifestUrl, manifest, media, fetchImpl = fetch)
       method: 'GET', redirect: 'manual', headers: { Accept: 'application/json' },
       signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
     });
-    const latencyMs = Math.round(performance.now() - started);
     if (response.status !== 200) {
       try { await response.body?.cancel(); } catch {}
-      return { status: response.status, latencyMs, metrics: null };
+      return { status: response.status, latencyMs: Math.round(performance.now() - started), metrics: null };
     }
     const payload = await readJsonBounded(response);
-    const streams = Array.isArray(payload?.streams) ? payload.streams.filter((stream) => stream && typeof stream === 'object') : [];
-    return { status: 200, latencyMs, metrics: summarizeStreams(streams) };
+    if (!payload || typeof payload !== 'object' || Array.isArray(payload) || !Array.isArray(payload.streams)) {
+      throw new Error('invalid_stream_response');
+    }
+    const streams = payload.streams.filter((stream) => stream && typeof stream === 'object' && !Array.isArray(stream));
+    return { status: 200, latencyMs: Math.round(performance.now() - started), metrics: summarizeStreams(streams) };
   } catch (error) {
     // Deliberately omit error.message: fetch exceptions can include the full
     // manifest URL, which may contain a private install token.
     return { status: error?.message === 'invalid_json' ? 'invalid_json'
-      : error?.message === 'response_too_large' ? 'response_too_large'
+      : error?.message === 'invalid_stream_response' ? 'invalid_stream_response'
+        : error?.message === 'response_too_large' ? 'response_too_large'
         : error?.name === 'TimeoutError' || error?.name === 'AbortError' ? 'timeout' : 'network_error',
     latencyMs: Math.round(performance.now() - started), metrics: null };
   }

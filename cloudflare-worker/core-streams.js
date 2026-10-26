@@ -620,6 +620,18 @@ const BLENDER_OPEN_FILMS = [
     allowedVideoTitles: ['Elephants Dream'],
   },
   {
+    imdbId: 'tt7993892',
+    title: 'Caminandes: Llamigos',
+    year: 2016,
+    license: 'CC BY (version unspecified)',
+    licenseUrl: null,
+    peerTubeLicenseId: 1,
+    officialRightsUrl: 'https://cloud.blender.org/p/caminandes-3',
+    officialVideoUrl: 'https://video.blender.org/w/5ruRYckTcQMTMQvyqMnVsr',
+    licenseEvidenceNote: 'The official PeerTube API reports Attribution without a version; the official video description says the film and source files are Creative Commons. An Internet Archive uploader lists CC BY 3.0, but that unverified version is not relied upon.',
+    allowedVideoTitles: ['Caminandes 3: Llamigos - Funny 3D Animated Short'],
+  },
+  {
     imdbId: 'tt1727587',
     title: 'Sintel',
     year: 2010,
@@ -721,7 +733,7 @@ async function fetchBlenderOpenMovie(id, expected, fetchImpl, deadlineSignal) {
           name: film.license,
           title: `${film.title} (${film.year})`,
           filename: file.fileUrl.split('/').pop(),
-          description: `Official Blender Open Movie. ${film.license} (${film.licenseUrl}); see ${film.officialRightsUrl}. Attribution must be preserved.`,
+          description: `Official Blender Open Movie. ${film.licenseUrl ? `${film.license} (${film.licenseUrl})` : film.license}. ${film.licenseEvidenceNote ? `${film.licenseEvidenceNote} ` : ''}See ${[film.officialRightsUrl, film.officialVideoUrl].filter(Boolean).join(' and ')}. Attribution must be preserved.`,
           behaviorHints: { videoSize: file.size, filename: file.fileUrl.split('/').pop() },
         }, 'Blender Open Movies'))
         .filter(Boolean);
@@ -821,7 +833,7 @@ async function fetchSource(source, type, id, fetchImpl) {
 function manifest() {
   return {
     id: 'uk.corebuilds.core-streams',
-    version: '0.7.0',
+    version: '0.8.0',
     name: 'Core Streams',
     description: 'Quality-ranked stream fallback with curated torrents, open media, and configurable sources.',
     resources: ['stream'],

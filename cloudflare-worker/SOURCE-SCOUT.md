@@ -64,4 +64,10 @@ Before adding any candidate as a Core Streams provider, collect and record (with
 5. Item-level media rights/permission and applicable Australian/territory restrictions. If uncertain, leave it out.
 6. Low-volume comparison with TorBox/debrid functions explicitly disabled where the purpose is TorBox-outage independence.
 
-No deployment or Core Streams source integration was made from these discovery leads.
+No directory- or snippet-only lead was integrated. A separate, rights-gated follow-up added one exact Blender Open Movie item to the existing adapter; its evidence and version uncertainty are recorded below.
+
+## Rights-gated media follow-up — 2026-10-26
+
+**Caminandes: Llamigos** (`tt7993892`, 2016) passed the narrow movie gate through Blender's first-party publishing channel, so it was added as a static item mapping in the existing Blender Open Movies adapter—not as a new backend or a general PeerTube rule. Cinemeta returns the matching title/year. The official PeerTube API record is public/non-adult, belongs to `blender` / `blender_open_movies`, reports the Attribution category without a version, and lists MP4 renditions with audio/video flags. Its official video description states Creative Commons and links the Blender Cloud project. The returned stream is labelled `CC BY (version unspecified)`; the exact version is deliberately not inferred from an Internet Archive uploader's CC BY 3.0 metadata. Metadata presence is not a range, codec, or Stremio playback test. The code requires the exact IMDb/title/year, official account/channel, public status, license category, exact upload title, and Blender MP4 object-storage path. Other title candidates with unknown or conflicting terms remain out.
+
+Primary evidence: [Cinemeta](https://v3-cinemeta.strem.io/meta/movie/tt7993892.json), [Blender PeerTube video API](https://video.blender.org/api/v1/videos/48), [official PeerTube watch page](https://video.blender.org/w/5ruRYckTcQMTMQvyqMnVsr), and [Blender Cloud project](https://cloud.blender.org/p/caminandes-3). The Archive record is retained only as lower-confidence uploader metadata, not as the rights basis.

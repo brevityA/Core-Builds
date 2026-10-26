@@ -21,7 +21,7 @@ The command prints a Markdown evidence report. Add `--json` for a machine-readab
 node tools/source-scout/stremio-source-scout.mjs --help
 ```
 
-`--github` uses GitHub's public repository search API without a credential; it is subject to GitHub's unauthenticated rate limits. Each run accepts at most five queries and requests at most 20 results per provider/query. The tool caps provider responses at 2 MiB, applies 12-second request deadlines, refuses redirects, accepts only public-looking HTTPS result URLs, and strips sensitive query parameters from displayed links. It never fetches the discovered add-on pages or manifests.
+`--github` uses GitHub's public repository search API without a credential; it is subject to GitHub's unauthenticated rate limits. Each run accepts at most five queries and requests at most 20 results per provider/query. The tool enforces a 2 MiB provider-response cap while streaming, applies 12-second request deadlines, refuses redirects, accepts only public-looking HTTPS result URLs, and redacts sensitive query parameters, credential-like manifest path segments, and secret text from displayed output. Markdown link destinations are rendered safely, and untrusted titles/snippets are escaped as text rather than raw HTML. It never fetches the discovered add-on pages or manifests.
 
 ## How to read its evidence
 

@@ -4,7 +4,7 @@ import { handleCoreStreams } from './core-streams.js';
 //
 // /proxy/*       — re-issues narrowly scoped AIOStreams API requests server-to-server.
 // /core-streams/:token/* — private Stremio stream aggregator (Torrentio + TorrentsDB,
-//                          bounded Archive + LOC open-media discovery, six exact-
+//                          bounded Archive + LOC open-media discovery, seven exact-
 //                          mapped Blender Open Movies, and an optional
 //                          operator-configured direct-HTTP addon).
 // /paste         — stores a validated template or Nuvio badge-pack JSON and returns a URL.

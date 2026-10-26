@@ -74,8 +74,9 @@ async function main() {
       const r = await get(`${BASE}/core-streams/${encodeURIComponent(coreStreamsToken)}/manifest.json`);
       let m = null; try { m = JSON.parse(r.text); } catch {}
       check('Core Streams manifest is installed', r.status === 200 && m?.name === 'Core Streams' && Array.isArray(m?.resources) && m.resources.includes('stream'), `http ${r.status}`);
-    } catch (e) {
-      check('Core Streams manifest is installed', false, String(e.message || e));
+    } catch {
+      // The request URL contains the private install token; never echo a fetch error.
+      check('Core Streams manifest is installed', false, 'network error (private URL omitted)');
     }
   } else {
     console.log('WARN  CORE_STREAMS_INSTALL_TOKEN not set — private Core Streams manifest check skipped.');
