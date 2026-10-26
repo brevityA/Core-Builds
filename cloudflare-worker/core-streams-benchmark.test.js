@@ -51,7 +51,10 @@ test('benchmark summarizes advertised stream signals without retaining media URL
   assert.equal(metrics.seedHintCount, 1);
   assert.equal(metrics.maxAdvertisedResolution, 1080);
   assert.deepEqual(metrics.types, { direct: 1, torrent: 1, youtube: 1, other: 0 });
-  assert.equal(JSON.stringify(metrics).includes('media.example.net'), false);
+  assert.deepEqual(Object.keys(metrics).sort(), [
+    'first1080pPosition', 'maxAdvertisedResolution', 'resolutionHintCount', 'resultCount',
+    'seedHintCount', 'topFive1080pHints', 'topFiveCount', 'types',
+  ]);
 });
 
 test('benchmark report never includes private manifest URLs or bearer tokens', async () => {
@@ -70,9 +73,16 @@ test('benchmark report never includes private manifest URLs or bearer tokens', a
   const report = await runBenchmark(providers, sample, { fetchImpl, delayMs: 0 });
   const serialized = JSON.stringify(report);
   assert.equal(serialized.includes(secret), false);
-  assert.equal(serialized.includes('core.example.net'), false);
-  assert.equal(serialized.includes('pengu.example.net'), false);
   assert.equal(report.summaries.length, 2);
+  for (const summary of report.summaries) {
+    assert.deepEqual(Object.keys(summary).sort(), [
+      'attempted', 'cases', 'coveragePct', 'http200', 'medianLatencyMs', 'medianResultCount',
+      'nonEmpty', 'provider', 'topFive1080pHintCases',
+    ]);
+    assert.deepEqual(Object.keys(summary.cases[0]).sort(), [
+      'id', 'latencyMs', 'metrics', 'status', 'title', 'type',
+    ]);
+  }
   assert.equal(report.summaries[0].coveragePct, 100);
   assert.equal(report.summaries[0].cases[0].metrics.topFive1080pHints, 1);
 });
@@ -89,7 +99,7 @@ test('manifest network errors are reduced to safe codes without leaking install 
   });
   assert.equal(report.manifestErrors[0].error, 'network_error');
   assert.equal(JSON.stringify(report).includes(secret), false);
-  assert.equal(JSON.stringify(report).includes('core.example.net'), false);
+  assert.deepEqual(report.manifestErrors, [{ provider: 'Core Streams', error: 'network_error' }]);
 });
 
 test('unsupported media types are excluded from the benchmark denominator', async () => {
