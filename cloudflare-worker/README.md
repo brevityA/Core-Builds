@@ -117,6 +117,24 @@ Movie/episode lookups are rate-limited using the existing `RL_PROXY_CUSTOM` lane
 
 Results use a best-effort ordering heuristic: within each source, recognizable resolution, seed-count hints, release tags, and direct-play URLs contribute to ranking; the best first result is shown first, then provider lists are interleaved before the 80-result cap. This prevents a high-volume source from hiding every other provider. Labels can be inaccurate, so the ordering is advisory—not a guarantee of quality, playback, seed availability, or safety.
 
+### Compare Core Streams with PenguPlay
+
+`benchmark-core-streams.mjs` runs the same small set of popular, episode, and open-media IMDb IDs against two Stremio stream manifests. It reports response time, non-empty coverage, stream counts/types, and advertised resolution/seeder hints. Requests run sequentially by title, with a one-second default pause; the script does not save responses, print manifest URLs/tokens, attempt playback, or establish rights. Labels and result counts are provider-reported signals—not verification. The sample cases are in `core-streams-benchmark.mjs`; use `--limit=3` for a small trial or `--json` for machine-readable aggregate output.
+
+Only use manifest URLs you are authorized to access and whose terms allow direct requests. The variables below contain private install URLs; enter them interactively, do not paste them into shell history or commit them:
+
+```bash
+cd cloudflare-worker
+read -rsp 'Core Streams manifest URL: ' CORE_STREAMS_BENCHMARK_MANIFEST_URL; echo
+export CORE_STREAMS_BENCHMARK_MANIFEST_URL
+read -rsp 'PenguPlay manifest URL: ' PENGUPLAY_BENCHMARK_MANIFEST_URL; echo
+export PENGUPLAY_BENCHMARK_MANIFEST_URL
+node benchmark-core-streams.mjs --limit=3
+unset CORE_STREAMS_BENCHMARK_MANIFEST_URL PENGUPLAY_BENCHMARK_MANIFEST_URL
+```
+
+A live comparison requires deployed, authorized manifest URLs; no live PenguPlay integration or playback test is performed by this repository. A non-empty result is not proof that it will play.
+
 The Public Domain Movies endpoint currently returns torrent hashes from its curated collection. Its results carry a warning to verify local public-domain status: the add-on does not establish copyright status for Australia or every other territory.
 
 The Internet Archive adapter handles movies only, requires an exact normalized title/year match from Cinemeta and item metadata, and returns MP4 files only when the item has an explicit allowlisted CC0, Public Domain Mark, CC BY, or CC BY-SA license URL. It filters restricted files and excludes non-commercial/no-derivatives license variants. The license declaration is uploader-supplied, not independently verified; results include the item, creator, license and caveat.
