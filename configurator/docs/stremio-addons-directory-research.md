@@ -13,8 +13,9 @@ on outage). Option C (live in-app API data) remains intentionally not built.
 successor to the old `Stremio-Community/stremio-addons-list` GitHub repo, which is no
 longer maintained). Run by sleeyax; not affiliated with Stremio. It provides:
 
-- Addon listings with categories, community star counts, versions, last-updated dates,
-  a **Manifest Status (Reachable)** probe, and per-addon problem/uptime reports.
+- Addon listings with categories and, where populated, community star counts,
+  versions and last-updated dates (any of these can be blank), a **Manifest Status**
+  probe (Reachable / Checking), and per-addon problem/uptime reports.
 - Addon detail pages with Install deep links and, for multi-host addons like
   AIOStreams, an **instance selector**.
 - Its own catalog addon (`/addons/stremio-addons.net`, v1.0.1) so the directory can be

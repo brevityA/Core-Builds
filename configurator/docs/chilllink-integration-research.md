@@ -190,8 +190,10 @@ fetches, and all AIOStreams hosts the configurator fetches are already allowlist
   `packages/core/package.json`, `versions.json`, and `src/data/changelog.js`.
 - **Changelog rule.** This feature changes no generated template JSON, so the changelog
   entry needs the mandated `Generated output unchanged — ` item (enforced by
-  `scripts/check_output_note.py` in the changelog-format CI job). Golden configs stay
-  byte-identical.
+  `scripts/check_output_note.py` in the changelog-format CI job). The generated template
+  payloads stay byte-identical; only the golden files' `metadata.coreBuildsVersion`
+  stamp moves (3.23 → 3.24 for this release), which is the version-stamp-only diff
+  `check_output_note.py` expects.
 - **Build order.** Content edits first, `npm run build --prefix configurator` last;
   the Playwright global setup refuses stale `dist/`. Run `npm test` in configurator,
   cli and packages/core before pushing.

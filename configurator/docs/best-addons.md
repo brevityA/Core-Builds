@@ -67,7 +67,7 @@ Core Builds wires **17 safe** optional scrapers by default:
 - StreamNZB URL blanked on export (can embed credential)
 
 ### Discovering more addons — the community directory
-The de facto community catalog is **[stremio-addons.net](https://stremio-addons.net/)** (unaffiliated with Stremio or Core Builds). Every addon carries a star count, version, last-updated date, manifest reachability check and, where relevant, an instance selector. Per-addon pages for the stack above:
+The de facto community catalog is **[stremio-addons.net](https://stremio-addons.net/)** (unaffiliated with Stremio or Core Builds). Listings can include a star count, version, last-updated date (sometimes blank), a manifest reachability probe (which may still read "Checking" when you open the page) and, where relevant, an instance selector — treat these as advisory metadata, not guarantees. Per-addon pages for the stack above:
 
 - [Torrentio](https://stremio-addons.net/addons/torrentio) · [Comet](https://stremio-addons.net/addons/comet) · [MediaFusion](https://stremio-addons.net/addons/mediafusion-elfhosted) · [AIOStreams](https://stremio-addons.net/addons/aiostreams)
 - The directory also ships [its own catalog addon](https://stremio-addons.net/addons/stremio-addons.net), so the same listings can be browsed inside Stremio.

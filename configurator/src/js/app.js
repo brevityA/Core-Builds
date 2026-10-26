@@ -6159,9 +6159,10 @@ function showManifestModal(manifestUrl, password, hostLabel, initialTab) {
   const initFi = initialTab ? FMTS.findIndex(f => f.key === initialTab) : 0;
   const startFi = initFi > 0 ? initFi : 0;
 
-  // Auto-copy the initial manifest URL to clipboard on modal open
+  // Auto-copy the initial URL to clipboard on modal open (Chillio opens on a
+  // ChillLink URL, so name what was copied rather than always saying manifest).
   navigator.clipboard.writeText(FMTS[startFi].getUrl(manifestUrl)).then(() => {
-    showToast('Manifest URL copied to clipboard');
+    showToast(FMTS[startFi].key === 'chillio' ? 'ChillLink URL copied to clipboard' : 'Manifest URL copied to clipboard');
     const cb = document.getElementById('mCopyUrl');
     if (cb) { cb.innerHTML = ICO.check(12,'currentColor'); cb.classList.add('copied'); setTimeout(() => { cb.textContent = 'Copy'; cb.classList.remove('copied'); }, 2200); }
   }).catch(() => {});
@@ -6219,7 +6220,8 @@ function showManifestModal(manifestUrl, password, hostLabel, initialTab) {
     }
     document.getElementById('mUrlLabel').innerHTML =
       key === 'manifest' ? 'Raw manifest URL — auto-copied ' + ICO.check(12,'currentColor') :
-      (key === 'wuplay' || key === 'nuvio' || key === 'chillio') ? 'Manifest URL — auto-copied ' + ICO.check(12,'currentColor') : 'Manifest URL';
+      key === 'chillio' ? 'ChillLink URL — auto-copied ' + ICO.check(12,'currentColor') :
+      (key === 'wuplay' || key === 'nuvio') ? 'Manifest URL — auto-copied ' + ICO.check(12,'currentColor') : 'Manifest URL';
     if (copyBtn) { copyBtn.textContent = 'Copy'; copyBtn.classList.remove('copied'); }
     const helpEl = document.getElementById('mAppHelp');
     const qrWrap = document.getElementById('mQrWrap');

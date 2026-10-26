@@ -39,6 +39,12 @@ jobs:
           code=${PIPESTATUS[0]}
           set -e
           echo "exit_code=$code" >> "$GITHUB_OUTPUT"
+          # 0 = clean or soft-skipped outage/contract change, 1 = drift (the
+          # issue step below handles it). A 2 is an unexpected checker failure:
+          # fail the job rather than go green with no tracking issue.
+          if [ "$code" -eq 2 ]; then
+            exit 2
+          fi
 
       - name: Open or refresh drift issue
         if: steps.drift.outputs.exit_code == '1'

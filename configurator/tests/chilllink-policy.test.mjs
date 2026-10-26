@@ -164,3 +164,11 @@ test('app.js links the official ChillLink helper tools in the Chillio tab', () =
     assert.ok(app.includes(path), `missing ${path}`);
   }
 });
+
+test('app.js names the Chillio tab value as a ChillLink URL, not a manifest URL', () => {
+  assert.ok(app.includes("key === 'chillio' ? 'ChillLink URL — auto-copied '"), 'dedicated ChillLink label branch');
+  assert.ok(
+    app.includes("FMTS[startFi].key === 'chillio' ? 'ChillLink URL copied to clipboard' : 'Manifest URL copied to clipboard'"),
+    'modal-open auto-copy toast is tab-aware',
+  );
+});
