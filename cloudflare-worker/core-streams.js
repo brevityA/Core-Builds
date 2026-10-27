@@ -748,29 +748,48 @@ async function fetchBlenderOpenMovie(id, expected, fetchImpl, deadlineSignal) {
 }
 
 async function fetchOpenMedia(type, id, fetchImpl) {
-  if (type !== 'movie' || !sourceAllowed('cinemeta')) return [];
+  if (type !== 'movie') return [];
   const deadlineSignal = AbortSignal.timeout(SOURCE_TIMEOUT_MS);
   const imdb = id.split(':')[0].toLowerCase();
-  let metaPayload;
-  try {
-    metaPayload = await fetchBoundedJson(
-      `https://v3-cinemeta.strem.io/meta/movie/${encodeURIComponent(imdb)}.json`,
-      fetchImpl, OPEN_MEDIA_MAX_BYTES, OPEN_MEDIA_TIMEOUT_MS, deadlineSignal,
-    );
-  } catch {
-    sourceFailed('cinemeta');
-    return [];
+
+  // These direct-HTTP records are pinned to exact IMDb IDs, titles, years, and
+  // item-level rights evidence. They do not need Cinemeta to be available to
+  // return a known official/open-media match. In particular, clients such as
+  // WuPlay cannot use the torrent-only results from the general add-on sources.
+  const locFilm = LOC_OPEN_FILMS.find((film) => film.imdbId === imdb);
+  const blenderFilm = BLENDER_OPEN_FILMS.find((film) => film.imdbId === imdb);
+  const knownExpected = locFilm
+    ? { title: locFilm.title, year: locFilm.year }
+    : blenderFilm ? { title: blenderFilm.title, year: blenderFilm.year } : null;
+  const locStreams = knownExpected ? locFilmStreams(imdb, knownExpected) : [];
+
+  // Start the exact-title official Blender lookup alongside the metadata query.
+  // Previously Blender and LOC were both gated on a successful Cinemeta response,
+  // so a metadata outage could erase otherwise independent direct HTTP streams.
+  const blenderPromise = blenderFilm
+    ? fetchBlenderOpenMovie(imdb, knownExpected, fetchImpl, deadlineSignal)
+    : Promise.resolve([]);
+
+  let expected = null;
+  if (sourceAllowed('cinemeta')) {
+    try {
+      const metaPayload = await fetchBoundedJson(
+        `https://v3-cinemeta.strem.io/meta/movie/${encodeURIComponent(imdb)}.json`,
+        fetchImpl, OPEN_MEDIA_MAX_BYTES, OPEN_MEDIA_TIMEOUT_MS, deadlineSignal,
+      );
+      // A missing item or a valid but metadata-free response is not an upstream
+      // outage. Transport, HTTP, body-size, and JSON errors throw above instead.
+      sourceSucceeded('cinemeta');
+      expected = cinemetaTitleYear(metaPayload);
+    } catch {
+      sourceFailed('cinemeta');
+    }
   }
-  // A missing item or a valid but metadata-free response is not an upstream
-  // outage. Transport, HTTP, body-size, and JSON errors throw above instead.
-  sourceSucceeded('cinemeta');
-  const expected = cinemetaTitleYear(metaPayload);
-  if (!expected) return [];
-  const [archiveStreams, blenderStreams] = await Promise.all([
-    fetchInternetArchiveFromMeta(imdb, expected, fetchImpl, deadlineSignal),
-    fetchBlenderOpenMovie(imdb, expected, fetchImpl, deadlineSignal),
-  ]);
-  return [...locFilmStreams(imdb, expected), ...archiveStreams, ...blenderStreams];
+
+  const blenderStreams = await blenderPromise;
+  if (!expected) return [...locStreams, ...blenderStreams];
+  const archiveStreams = await fetchInternetArchiveFromMeta(imdb, expected, fetchImpl, deadlineSignal);
+  return [...locStreams, ...archiveStreams, ...blenderStreams];
 }
 
 async function fetchSource(source, type, id, fetchImpl) {

@@ -643,6 +643,40 @@ test('Internet Archive adapter returns only exact-title, year-matched, uploader-
   _coreStreamsTest.resetSourceHealth();
 });
 
+test('mapped direct HTTP streams survive a Cinemeta outage for WuPlay-compatible clients', async () => {
+  _coreStreamsTest.resetSourceHealth();
+  const baseVideo = {
+    id: 56,
+    name: 'Big Buck Bunny 60fps 4K - Official Blender Foundation Short Film',
+    privacy: { id: 1 }, nsfw: false, licence: { id: 1 },
+    channel: { name: 'blender_open_movies' }, account: { name: 'blender' },
+  };
+  const requested = [];
+  const fetchImpl = async (input) => {
+    const url = String(input);
+    requested.push(url);
+    if (url.startsWith('https://v3-cinemeta.strem.io/')) throw new Error('Cinemeta unavailable');
+    if (url.startsWith('https://video.blender.org/api/v1/videos?')) return jsonResponse({ data: [baseVideo] });
+    if (url === 'https://video.blender.org/api/v1/videos/56') {
+      return jsonResponse({ ...baseVideo, files: [{
+        fileUrl: 'https://video.blender.org/object-storage/web_videos/bbb-1080.mp4',
+        hasAudio: true, hasVideo: true, size: 250_000_000, resolution: { id: 1080 },
+      }] });
+    }
+    return jsonResponse({ streams: [] });
+  };
+
+  const response = await handleCoreStreams(
+    makeRequest(`/core-streams/${TOKEN}/stream/movie/tt1254207.json`), makeEnv(), { fetchImpl },
+  );
+  const payload = await response.json();
+  const direct = payload.streams.find((stream) => stream.url === 'https://video.blender.org/object-storage/web_videos/bbb-1080.mp4');
+  assert.ok(direct, 'the official direct HTTPS stream does not depend on Cinemeta');
+  assert.ok(!direct.infoHash, 'WuPlay receives a direct HTTP(S) stream rather than P2P metadata');
+  assert.ok(requested.some((url) => url.startsWith('https://video.blender.org/api/v1/videos?')));
+  _coreStreamsTest.resetSourceHealth();
+});
+
 test('Blender Open Movies resolves the exact Elephants Dream upload under its official CC BY 2.5 terms', async () => {
   _coreStreamsTest.resetSourceHealth();
   const calls = [];
