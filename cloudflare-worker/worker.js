@@ -1,6 +1,12 @@
+import { handleCoreStreams } from './core-streams.js';
+
 // Core Builds — CORS proxy + template paste + usage analytics for the configurator.
 //
-// /proxy/*       — re-issues AIOStreams API requests server-to-server to bypass CORS.
+// /proxy/*       — re-issues narrowly scoped AIOStreams API requests server-to-server.
+// /core-streams/:token/* — private Stremio stream aggregator (Torrentio + TorrentsDB,
+//                          bounded Archive + LOC open-media discovery, seven exact-
+//                          mapped Blender Open Movies, and an optional
+//                          operator-configured direct-HTTP addon).
 // /paste         — stores a validated template or Nuvio badge-pack JSON and returns a URL.
 //                  Imports expire after 30 days. Nothing is logged or inspected.
 // /t/:id         — returns a stored paste (Durable Object first, legacy KV fallback).
@@ -22,7 +28,7 @@
 // wait-loop. A second deploy on the same date takes a letter suffix (…-11 →
 // …-11b): reusing a live tag makes that wait-loop pass instantly and lets smoke
 // run before the new build has propagated. Never parsed as a date.
-const WORKER_VERSION = '2026-09-17';
+const WORKER_VERSION = '2026-10-26';
 
 // ── Hardening constants ─────────────────────────────────────────────────────
 const PROXY_MAX_SIZE = 2 * 1024 * 1024;     // 2 MB proxy request body cap (configs are a few KB)
@@ -714,12 +720,22 @@ export default {
     // password) stay on the strict origin echo — only the configurator's own
     // origins may read those. Computed per request.
     const url = new URL(request.url);
-    const isPublicRead = request.method === 'GET' &&
-      (url.pathname.startsWith('/t/') || url.pathname === '/proxy/api/v1/status');
+    const isPublicRead = (request.method === 'GET' || request.method === 'OPTIONS') &&
+      (url.pathname.startsWith('/t/') || url.pathname === '/proxy/api/v1/status' || url.pathname.startsWith('/core-streams/'));
     const publicCors = isPublicRead ? corsHeaders(request, true) : null;
     if (request.method === 'OPTIONS') {
       // Preflight must mirror what the actual request would get.
       return new Response(null, { headers: isPublicRead ? publicCors : cors });
+    }
+
+    // --- Core Streams: private Stremio stream aggregator ---
+    // This is deliberately a separate, fixed-source route rather than an
+    // expansion of /proxy's narrow AIOStreams-only policy.
+    if (url.pathname.startsWith('/core-streams/')) {
+      return handleCoreStreams(request, env, {
+        headers: { ...SECURE_DOC_HEADERS, ...publicCors },
+        rateLimit: () => rateAllow(env, 'proxy_custom', getClientIp(request), CUSTOM_HOST_PER_MIN, 60),
+      });
     }
 
     // --- Health: liveness/readiness (no I/O, never rate limited) ---
