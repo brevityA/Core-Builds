@@ -159,6 +159,50 @@ test('Express Install manifest target skips Stremio and shows the manifest modal
   expect(JSON.stringify(posted[0].config)).not.toContain('torbox-search');
 });
 
+test('Express lane offers a Chillio (ChillLink) install target', async ({ page }) => {
+  await fresh(page);
+  await page.locator('[data-action="open-express-lane"]').click();
+  const tile = page.locator('[data-express-target="chillio"]');
+  await expect(tile).toBeVisible();
+  await expect(tile).toContainText('Chillio');
+});
+
+test('Chillio target blocks a P2P build before anything is posted (ChillLink drops torrents)', async ({ page }) => {
+  const posted = [];
+  await mockBackend(page, posted);
+  await fresh(page);
+  await page.locator('[data-action="open-express-lane"]').click();
+  await page.locator('[data-express-service="p2p"]').click();
+  await page.locator('[data-express-target="chillio"]').click();
+  await page.locator('#expressGo').click();
+  // The gate fires before the password prompt and the /api/v1/user POST.
+  await expect(page.locator('#aioResult')).toContainText("Chillio can't use this setup", { timeout: 15000 });
+  await expect(page.locator('#aioResult')).toContainText('P2P');
+  await expect(page.locator('#pwdPrompt')).toHaveCount(0);
+  expect(posted).toEqual([]);
+});
+
+test('Chillio target posts the config and opens the modal on a /chilllink/ URL', async ({ page }) => {
+  const posted = [];
+  await mockBackend(page, posted);
+  await fresh(page);
+  page.on('dialog', dialog => dialog.accept());
+  await page.locator('[data-action="open-express-lane"]').click();
+  await page.locator('[data-express-cred="torbox"]').fill('test-torbox-key');
+  await page.locator('[data-express-target="chillio"]').click();
+  await page.locator('#expressGo').click();
+  await page.locator('#pwdPrompt .pwd-go').click();
+  await expect(page.locator('#manifestModal')).toBeVisible({ timeout: 45000 });
+  // The modal opens directly on the Chillio tab, whose URL uses the
+  // authenticated /chilllink/<uuid>/<encryptedPassword> route.
+  await expect(page.locator('#mUrlVal')).toContainText('/chilllink/11111111-2222-4333-8444-555555555555/encrypted-password');
+  const chillioTab = page.locator('#mFmtTabs .fmt-tab', { hasText: 'Chillio' });
+  await expect(chillioTab).toHaveClass(/active/);
+  // Companion links to the official ChillLink tools ship in the help box.
+  await expect(page.locator('#mAppHelpBody a[href*="link.chillio.app/manifest-merger"]')).toBeVisible();
+  expect(posted).toHaveLength(1);
+});
+
 test('Express "Additional services & scrapers" popout adds Debridio + folds its key into the config', async ({ page }) => {
   test.setTimeout(90_000);
   const posted = [];
