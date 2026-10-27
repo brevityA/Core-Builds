@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import { parseArgs as parseNodeArgs } from 'node:util';
 import {
   BENCHMARK_CASES,
   readManifestUrl,
@@ -6,19 +7,40 @@ import {
   selectBenchmarkCases,
 } from './core-streams-benchmark.mjs';
 
-const args = process.argv.slice(2);
-const jsonOutput = args.includes('--json');
-const limitArg = args.find((arg) => arg.startsWith('--limit='));
-const delayArg = args.find((arg) => arg.startsWith('--delay-ms='));
-const limit = limitArg ? Number(limitArg.slice('--limit='.length)) : BENCHMARK_CASES.length;
-const delayMs = delayArg ? Number(delayArg.slice('--delay-ms='.length)) : 1000;
-
-if (!Number.isInteger(limit) || limit < 1 || limit > BENCHMARK_CASES.length) {
-  console.error(`--limit must be an integer from 1 to ${BENCHMARK_CASES.length}`);
+let values;
+try {
+  ({ values } = parseNodeArgs({
+    args: process.argv.slice(2),
+    options: {
+      json: { type: 'boolean' },
+      limit: { type: 'string' },
+      'delay-ms': { type: 'string' },
+    },
+    allowPositionals: false,
+  }));
+} catch (error) {
+  console.error(`Invalid benchmark arguments: ${error.message}`);
   process.exit(2);
 }
-if (!Number.isInteger(delayMs) || delayMs < 0 || delayMs > 60_000) {
-  console.error('--delay-ms must be an integer from 0 to 60000');
+
+function integerOption(raw, name, fallback, minimum, maximum) {
+  if (raw === undefined) return fallback;
+  if (!/^\\d+$/.test(raw)) throw new Error(`${name} must be an integer from ${minimum} to ${maximum}`);
+  const value = Number(raw);
+  if (!Number.isSafeInteger(value) || value < minimum || value > maximum) {
+    throw new Error(`${name} must be an integer from ${minimum} to ${maximum}`);
+  }
+  return value;
+}
+
+const jsonOutput = values.json || false;
+let limit;
+let delayMs;
+try {
+  limit = integerOption(values.limit, '--limit', BENCHMARK_CASES.length, 1, BENCHMARK_CASES.length);
+  delayMs = integerOption(values['delay-ms'], '--delay-ms', 1000, 0, 60_000);
+} catch (error) {
+  console.error(error.message);
   process.exit(2);
 }
 

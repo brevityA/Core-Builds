@@ -26,6 +26,7 @@ test('manifest is a Stremio stream-only manifest behind the install token', asyn
     description: 'Quality-ranked stream fallback with curated torrents, open media, and configurable sources.',
     resources: ['stream'],
     types: ['movie', 'series'],
+    catalogs: [],
     idPrefixes: ['tt'],
   });
 });
@@ -35,6 +36,14 @@ test('unconfigured or invalid install tokens fail closed without fetching provid
   const fetchImpl = async () => { calls++; return jsonResponse({ streams: [] }); };
   const unconfigured = await handleCoreStreams(makeRequest(`/core-streams/${TOKEN}/manifest.json`), {}, { fetchImpl });
   assert.equal(unconfigured.status, 503);
+  for (const invalidConfiguredToken of ['a'.repeat(32) + '+', 'a'.repeat(129)]) {
+    const invalidConfig = await handleCoreStreams(
+      makeRequest(`/core-streams/${TOKEN}/manifest.json`),
+      makeEnv({ CORE_STREAMS_INSTALL_TOKEN: invalidConfiguredToken }),
+      { fetchImpl },
+    );
+    assert.equal(invalidConfig.status, 503);
+  }
   const badToken = await handleCoreStreams(makeRequest(`/core-streams/${'f'.repeat(32)}/stream/movie/tt0133093.json`), makeEnv(), { fetchImpl });
   assert.equal(badToken.status, 404);
   assert.equal(calls, 0);

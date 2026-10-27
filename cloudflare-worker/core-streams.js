@@ -66,7 +66,7 @@ const OPEN_MEDIA_MAX_BYTES = 768 * 1024;
 const SOURCE_FAILURE_THRESHOLD = 3;
 const SOURCE_BREAKER_COOLDOWN_MS = 30_000;
 const sourceHealth = new Map(); // fixed provider IDs only; isolate-local best-effort breaker
-const INSTALL_TOKEN_MIN_LENGTH = 32;
+const INSTALL_TOKEN_RE = /^[A-Za-z0-9_-]{32,128}$/;
 const ID_RE = /^tt\d{6,12}(?::\d{1,3}:\d{1,3})?$/i;
 const INFO_HASH_RE = /^[a-f0-9]{40}$/i;
 const YOUTUBE_ID_RE = /^[A-Za-z0-9_-]{11}$/;
@@ -838,6 +838,7 @@ function manifest() {
     description: 'Quality-ranked stream fallback with curated torrents, open media, and configurable sources.',
     resources: ['stream'],
     types: ['movie', 'series'],
+    catalogs: [],
     idPrefixes: ['tt'],
   };
 }
@@ -853,10 +854,10 @@ export async function handleCoreStreams(request, env, { headers = {}, rateLimit 
   if (!route) return jsonResponse(404, { error: 'not found' }, headers);
 
   const expectedToken = env && env.CORE_STREAMS_INSTALL_TOKEN;
-  if (typeof expectedToken !== 'string' || expectedToken.length < INSTALL_TOKEN_MIN_LENGTH) {
+  if (typeof expectedToken !== 'string' || !INSTALL_TOKEN_RE.test(expectedToken)) {
     return jsonResponse(503, { error: 'Core Streams is not configured' }, headers);
   }
-  if (!/^[A-Za-z0-9_-]{32,128}$/.test(route.token) || !constantTimeEqual(route.token, expectedToken)) {
+  if (!INSTALL_TOKEN_RE.test(route.token) || !constantTimeEqual(route.token, expectedToken)) {
     return jsonResponse(404, { error: 'not found' }, headers);
   }
 

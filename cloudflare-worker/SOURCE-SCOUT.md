@@ -51,7 +51,7 @@ For Australia, prioritize publisher-owned/free-to-air integrations that the broa
 
 ## Source-search tool
 
-A reusable provenance-focused search tool is in [`../../tools/source-scout/README.md`](../../tools/source-scout/README.md). It uses Brave web search for broad web discovery and the public GitHub repository search API optionally. It labels index snippets as unverified leads, preserves source URLs and query provenance, exposes only returned GitHub repository metadata, and does not crawl pages or scrape media. It never claims rights, playback, manifest health, or independent corroboration. It requires the user to keep any Brave key local; no key or personal source URL is stored here.
+A reusable provenance-focused search tool is in [`../tools/source-scout/README.md`](../tools/source-scout/README.md). It uses Brave web search for broad web discovery and the public GitHub repository search API optionally. It labels index snippets as unverified leads, preserves source URLs and query provenance, exposes only returned GitHub repository metadata, and does not crawl pages or scrape media. It never claims rights, playback, manifest health, or independent corroboration. It requires the user to keep any Brave key local; no key or personal source URL is stored here.
 
 ## Next verification gates
 

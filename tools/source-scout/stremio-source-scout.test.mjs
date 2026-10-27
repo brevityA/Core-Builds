@@ -24,6 +24,11 @@ test('safePublicUrl keeps public HTTPS links and removes credentials from query/
   });
   assert.equal(safePublicUrl('http://example.org/page'), null);
   assert.equal(safePublicUrl('https://user:pass@example.org/page'), null);
+  for (const key of ['pwd', 'pass', 'pw']) {
+    const safe = safePublicUrl(`https://example.org/page?${key}=private`);
+    assert.equal(safe.credentialsRedacted, true);
+    assert.equal(new URL(safe.url).search, '');
+  }
   assert.equal(safePublicUrl('https://127.0.0.1/page'), null);
   for (const host of ['service.internal', 'router.lan', 'service.corp', 'nas.home', 'proxy.intranet']) {
     assert.equal(safePublicUrl(`https://${host}/page`), null);
@@ -34,6 +39,11 @@ test('safePublicUrl keeps public HTTPS links and removes credentials from query/
     credentialsRedacted: false,
     pathRedacted: true,
   });
+  for (const token of ['c'.repeat(129), `${'d'.repeat(129)}==`]) {
+    const safe = safePublicUrl(`https://example.org/${token}/manifest.json`);
+    assert.equal(safe.url, 'https://example.org/');
+    assert.equal(safe.pathRedacted, true);
+  }
 });
 
 test('Brave adapter labels results as leads, drops unsafe URLs, and keeps API key out of output', async () => {
@@ -71,6 +81,22 @@ test('scout redacts credentials in path tokens, snippets, titles, and query outp
   assert.equal(results[0].credentialsRedacted, true);
   assert.equal(JSON.stringify(results).includes(secret), false);
   assert.match(results[0].snippet, /\[redacted\]/);
+});
+
+test('JSON and Markdown reports redact long and padded manifest path tokens', async () => {
+  for (const token of ['x'.repeat(129), `${'y'.repeat(129)}==`]) {
+    const results = await searchBrave('authorized stream source', 'local-test-key', {
+      fetchImpl: async () => jsonResponse({ web: { results: [{
+        title: 'Candidate',
+        url: `https://addon.example.org/${token}/manifest.json`,
+        description: 'Candidate lead',
+      }] } }),
+    });
+    const findings = mergeFindings(results);
+    const report = { generatedAt: '2026-10-27T00:00:00.000Z', queries: ['authorized stream source'], providers: ['Brave'], findings };
+    assert.equal(JSON.stringify(report).includes(token), false);
+    assert.equal(renderMarkdown(report).includes(token), false);
+  }
 });
 
 test('Brave adapter makes no request without a key', async () => {

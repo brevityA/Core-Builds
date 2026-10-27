@@ -9,10 +9,10 @@ import { pathToFileURL } from 'node:url';
 const BRAVE_ENDPOINT = 'https://api.search.brave.com/res/v1/web/search';
 const GITHUB_ENDPOINT = 'https://api.github.com/search/repositories';
 const MAX_RESPONSE_BYTES = 2 * 1024 * 1024;
-const SENSITIVE_QUERY_KEY = /(?:token|key|auth|password|secret|cookie|credential|signature|config|profile|session)/i;
+const SENSITIVE_QUERY_KEY = /(?:token|key|auth|pass(?:word|wd)?|pwd|pw|secret|cookie|credential|signature|config|profile|session)/i;
 const RESERVED_HOST = /(?:^|\.)(?:localhost|local|internal|intranet|lan|corp|home|private|test|example|invalid|onion|arpa)$/i;
 const CONTROL_CHARS = /[\u0000-\u001f\u007f-\u009f]/g;
-const PRIVATE_PATH_TOKEN = /^[A-Za-z0-9_-]{32,128}$/;
+const PRIVATE_PATH_TOKEN = /^[A-Za-z0-9_-]{32,}={0,2}$/;
 const SECRET_ASSIGNMENT = /\b(token|access[_-]?token|api[_-]?key|auth(?:orization)?|password|passwd|cookie|secret|session|config(?:uration)?[_-]?token)(\s*[:=]\s*)(?:"[^"]*"|'[^']*'|[^\s&;,]+)/gi;
 const BEARER_CREDENTIAL = /\bBearer\s+[A-Za-z0-9._~+\/-]{16,}={0,2}/gi;
 

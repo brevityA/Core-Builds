@@ -1,5 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { spawnSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
 import {
   queryCase,
   readManifestUrl,
@@ -46,6 +48,15 @@ test('small benchmark limits retain a representative movie, episode, and open-me
   const expanded = selectBenchmarkCases(4);
   assert.equal(expanded.length, 4);
   assert.deepEqual(expanded.slice(0, 3).map((media) => media.group), ['popular', 'episode', 'open-media']);
+});
+
+test('benchmark CLI rejects unknown flags and malformed or missing option values', () => {
+  const script = fileURLToPath(new URL('./benchmark-core-streams.mjs', import.meta.url));
+  for (const args of [['--unknown'], ['--limit'], ['--limit=3x'], ['--delay-ms=']]) {
+    const result = spawnSync(process.execPath, [script, ...args], { encoding: 'utf8' });
+    assert.equal(result.status, 2, args.join(' '));
+    assert.match(result.stderr, /benchmark arguments|--limit|--delay-ms/);
+  }
 });
 
 test('benchmark builds encoded stream paths while preserving path and query install tokens', () => {
