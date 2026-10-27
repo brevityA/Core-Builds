@@ -29,9 +29,14 @@ const AIO_HOSTS = [
 
 const TIMEOUT_MS = 15000;
 const results = [];
+const warnings = [];
 function check(name, ok, detail = '') {
   results.push({ name, ok, detail });
   console.log(`${ok ? 'PASS' : 'FAIL'}  ${name}${detail ? `  — ${detail}` : ''}`);
+}
+function warn(name, detail = '') {
+  warnings.push({ name, detail });
+  console.log(`WARN  ${name}${detail ? `  — ${detail}` : ''}`);
 }
 
 async function get(url) {
@@ -145,19 +150,25 @@ async function main() {
     check('GET /api/stats → 200', false, String(e.message || e));
   }
 
-  // 2. status probes through the allowlisted lane + the 30s cache header
+  // 2. Advisory status probes through the allowlisted lane + the 30s cache header.
+  // These are independently operated third-party instances, so their availability
+  // must not block a Worker deployment. The functional proxy contract is exercised
+  // separately below; report instance outages as warnings rather than gate failures.
   for (const host of AIO_HOSTS) {
     const label = host.replace('https://', '');
     try {
       const r = await get(`${BASE}/proxy/api/v1/status?host=${enc(host)}`);
       const cc = r.headers.get('cache-control') || '';
-      const cached = /max-age=30/.test(cc);
-      check(`status ${label}`, r.status === 200, `http ${r.status}${cached ? ' · cached' : ' · NO cache header'}`);
+      const cacheable = /max-age=30/.test(cc);
+      const detail = `http ${r.status}${cacheable ? ' · cache header present' : ' · NO cache header'}`;
       if (r.status === 200) {
-        try { const d = JSON.parse(r.text); if (!d?.data?.version) console.log(`WARN  ${label} status missing data.version`); } catch { /* non-JSON */ }
+        check(`status ${label}`, true, detail);
+        try { const d = JSON.parse(r.text); if (!d?.data?.version) warn(`${label} status missing data.version`); } catch { /* non-JSON */ }
+      } else {
+        warn(`status ${label}`, detail);
       }
     } catch (e) {
-      check(`status ${label}`, false, String(e.message || e));
+      warn(`status ${label}`, String(e.message || e));
     }
   }
 
@@ -226,7 +237,7 @@ async function main() {
   }
 
   const failed = results.filter((r) => !r.ok).length;
-  console.log(`\n${results.length - failed}/${results.length} checks passed`);
+  console.log(`\n${results.length - failed}/${results.length} checks passed${warnings.length ? ` · ${warnings.length} warning(s)` : ''}`);
   process.exit(failed ? 1 : 0);
 }
 
