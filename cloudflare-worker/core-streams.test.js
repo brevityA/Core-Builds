@@ -952,7 +952,7 @@ test('the Internet Archive search asks for the title, year and an open license, 
   };
   const streams = await _coreStreamsTest.fetchInternetArchiveFromMeta('tt0063350', { title: 'Night of the Living Dead', year: 1968 }, fetchImpl, null);
   const q = new URL(searchUrl).searchParams;
-  assert.match(q.get('q'), /year:1968/);
+  assert.match(q.get('q'), /\(year:1968 OR date:\[1968-01-01 TO 1968-12-31\]\)/, 'items with only a date still qualify');
   assert.match(q.get('q'), /licenseurl:\*creativecommons\.org\*/);
   assert.equal(q.get('sort[]'), 'downloads desc');
   assert.deepEqual(metadataFor, ['nightofthelivingdead_201910'], 'the exact-title item is reached past the unrelated first hits');

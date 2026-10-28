@@ -569,7 +569,7 @@ async function fetchInternetArchiveFromMeta(id, expected, fetchImpl, deadlineSig
   try {
     const searchUrl = new URL('https://archive.org/advancedsearch.php');
     const escapedTitle = expected.title.replace(/([\\"])/g, '\\$1');
-    searchUrl.searchParams.set('q', `mediatype:movies AND title:"${escapedTitle}" AND year:${expected.year} AND licenseurl:*creativecommons.org*`);
+    searchUrl.searchParams.set('q', `mediatype:movies AND title:"${escapedTitle}" AND (year:${expected.year} OR date:[${expected.year}-01-01 TO ${expected.year}-12-31]) AND licenseurl:*creativecommons.org*`);
     searchUrl.searchParams.append('fl[]', 'identifier');
     searchUrl.searchParams.append('fl[]', 'title');
     searchUrl.searchParams.append('sort[]', 'downloads desc');
