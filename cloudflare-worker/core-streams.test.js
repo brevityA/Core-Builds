@@ -1140,8 +1140,12 @@ test('episode, season-pack and file patterns accept common release names and rej
 });
 
 test('fileMustInclude survives normalization only as a short list of plain strings', () => {
-  const ok = _coreStreamsTest.normalizeStream({ infoHash: HASH('a'), fileMustInclude: ['S01E01', 42, '', 'x'.repeat(121), 'a\nb'] }, 'Test');
-  assert.deepEqual(ok.fileMustInclude, ['S01E01']);
+  const filtered = _coreStreamsTest.normalizeStream({ infoHash: HASH('a'), fileMustInclude: ['S01E01', 'a\nb', 42, ''] }, 'Test');
+  assert.deepEqual(filtered.fileMustInclude, ['S01E01'], 'control characters, non-strings and empty strings are dropped');
+  const long = _coreStreamsTest.normalizeStream({ infoHash: HASH('a'), fileMustInclude: ['x'.repeat(121)] }, 'Test');
+  assert.equal(long.fileMustInclude, undefined, 'patterns over 120 characters are dropped');
+  const capped = _coreStreamsTest.normalizeStream({ infoHash: HASH('a'), fileMustInclude: ['a', 'b', 'c', 'd', 'e'] }, 'Test');
+  assert.deepEqual(capped.fileMustInclude, ['a', 'b', 'c', 'd'], 'at most four patterns are kept');
   const none = _coreStreamsTest.normalizeStream({ infoHash: HASH('a'), fileMustInclude: [7] }, 'Test');
   assert.equal(none.fileMustInclude, undefined);
 });
