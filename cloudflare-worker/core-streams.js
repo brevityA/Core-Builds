@@ -215,6 +215,14 @@ function normalizeStream(stream, sourceName) {
       const sources = stream.sources.slice(0, 20).filter(isSafeTorrentSource);
       if (sources.length) normalized.sources = sources;
     }
+    // Stremio's streaming server picks the file inside a multi-file torrent
+    // that matches one of these patterns (stremio-core StreamSource::Torrent).
+    if (Array.isArray(stream.fileMustInclude)) {
+      const patterns = stream.fileMustInclude.slice(0, 4)
+        .filter((pattern) => typeof pattern === 'string' && pattern.length > 0 && pattern.length <= 120
+          && !/[\u0000-\u001f\u007f]/.test(pattern));
+      if (patterns.length) normalized.fileMustInclude = patterns;
+    }
   } else if (typeof stream.ytId === 'string' && YOUTUBE_ID_RE.test(stream.ytId)) {
     // Stremio clients resolve YouTube IDs in their native player; don't fetch,
     // download, proxy, or turn YouTube's signed media URLs into stream URLs.
@@ -769,9 +777,31 @@ async function fetchBlenderOpenMovie(id, expected, fetchImpl, deadlineSignal) {
   }
 }
 
-async function fetchOpenMedia(type, id, fetchImpl) {
+// One Cinemeta lookup per request, shared by the open-media matchers (movies)
+// and the EZTV title check (series). Resolves to { title, year } or null.
+async function fetchCinemetaTitleYear(type, imdb, fetchImpl, deadlineSignal) {
+  if (!sourceAllowed('cinemeta')) return null;
+  try {
+    const metaPayload = await fetchBoundedJson(
+      `https://v3-cinemeta.strem.io/meta/${type}/${encodeURIComponent(imdb)}.json`,
+      fetchImpl, OPEN_MEDIA_MAX_BYTES, OPEN_MEDIA_TIMEOUT_MS, deadlineSignal,
+      // Titles missing from the cached host (most open-media films) are
+      // answered with a 307 to cinemeta-live; it was being counted as an outage.
+      ['cinemeta-live.strem.io'],
+    );
+    // A missing item or a valid but metadata-free response is not an upstream
+    // outage. Transport, HTTP, body-size, and JSON errors throw above instead.
+    sourceSucceeded('cinemeta');
+    return cinemetaTitleYear(metaPayload);
+  } catch {
+    if (deadlineSignal.aborted) sourceDeadlineCancelled('cinemeta');
+    else sourceFailed('cinemeta');
+    return null;
+  }
+}
+
+async function fetchOpenMedia(type, id, fetchImpl, deadlineSignal, metaPromise) {
   if (type !== 'movie') return [];
-  const deadlineSignal = AbortSignal.timeout(SOURCE_TIMEOUT_MS);
   const imdb = id.split(':')[0].toLowerCase();
 
   // These direct-HTTP records are pinned to exact IMDb IDs, titles, years, and
@@ -792,35 +822,17 @@ async function fetchOpenMedia(type, id, fetchImpl) {
     ? fetchBlenderOpenMovie(imdb, knownExpected, fetchImpl, deadlineSignal)
     : Promise.resolve([]);
 
-  let expected = null;
-  if (sourceAllowed('cinemeta')) {
-    try {
-      const metaPayload = await fetchBoundedJson(
-        `https://v3-cinemeta.strem.io/meta/movie/${encodeURIComponent(imdb)}.json`,
-        fetchImpl, OPEN_MEDIA_MAX_BYTES, OPEN_MEDIA_TIMEOUT_MS, deadlineSignal,
-        // Titles missing from the cached host (most open-media films) are
-        // answered with a 307 to cinemeta-live; it was being counted as an outage.
-        ['cinemeta-live.strem.io'],
-      );
-      // A missing item or a valid but metadata-free response is not an upstream
-      // outage. Transport, HTTP, body-size, and JSON errors throw above instead.
-      sourceSucceeded('cinemeta');
-      expected = cinemetaTitleYear(metaPayload);
-    } catch {
-      if (deadlineSignal.aborted) sourceDeadlineCancelled('cinemeta');
-      else sourceFailed('cinemeta');
-    }
-  }
-
+  const expected = await metaPromise;
   const blenderStreams = await blenderPromise;
   if (!expected) return [...locStreams, ...blenderStreams];
   const archiveStreams = await fetchInternetArchiveFromMeta(imdb, expected, fetchImpl, deadlineSignal);
   return [...locStreams, ...archiveStreams, ...blenderStreams];
 }
 
-async function fetchSource(source, type, id, fetchImpl) {
-  if (!sourceAllowed(source.id)) return [];
+async function fetchSource(source, type, id, fetchImpl, report = {}) {
+  if (!sourceAllowed(source.id)) { report[source.id] = 'paused'; return []; }
   const url = sourceRequestUrl(source.base, type, id);
+  const fail = (reason) => { report[source.id] = reason; sourceFailed(source.id); return []; };
   try {
     const response = await fetchImpl(url, {
       method: 'GET',
@@ -834,35 +846,27 @@ async function fetchSource(source, type, id, fetchImpl) {
       // hide the source from every request for 30 seconds.
       cancelBody(response);
       sourceSucceeded(source.id);
+      report[source.id] = 'ok 0';
       return [];
     }
     if (!response || response.status < 200 || response.status >= 300) {
       cancelBody(response);
-      sourceFailed(source.id);
-      return [];
+      return fail(response ? `http ${response.status}` : 'no response');
     }
     const contentLength = Number(response.headers && response.headers.get('content-length'));
     if (Number.isFinite(contentLength) && contentLength > MAX_SOURCE_RESPONSE_BYTES) {
       cancelBody(response);
-      sourceFailed(source.id);
-      return [];
+      return fail('too large');
     }
     const buffer = await readBounded(response, MAX_SOURCE_RESPONSE_BYTES);
-    if (!buffer) {
-      sourceFailed(source.id);
-      return [];
-    }
+    if (!buffer) return fail('too large');
     let payload;
     try { payload = JSON.parse(new TextDecoder().decode(buffer)); } catch {
-      sourceFailed(source.id);
-      return [];
+      return fail('not json');
     }
-    if (!payload || !Array.isArray(payload.streams)) {
-      sourceFailed(source.id);
-      return [];
-    }
+    if (!payload || !Array.isArray(payload.streams)) return fail('no streams array');
     sourceSucceeded(source.id);
-    return payload.streams.slice(0, MAX_STREAMS_PER_SOURCE)
+    const streams = payload.streams.slice(0, MAX_STREAMS_PER_SOURCE)
       .map((stream) => {
         const normalized = normalizeStream(stream, source.name);
         if (normalized && source.id === 'public-domain-movies') {
@@ -874,21 +878,244 @@ async function fetchSource(source, type, id, fetchImpl) {
         return normalized;
       })
       .filter(Boolean);
-  } catch {
+    report[source.id] = `ok ${streams.length}`;
+    return streams;
+  } catch (error) {
     // Providers are independent: one outage or timeout must not erase results
     // returned by the other configured providers. An isolate-local breaker also
     // stops repeatedly waiting on a provider that has failed three times.
-    sourceFailed(source.id);
+    return fail(error?.name === 'TimeoutError' ? 'timeout' : 'network error');
+  }
+}
+
+// --- Public torrent indexes -------------------------------------------------
+// Torrentio refuses requests from shared Cloudflare egress and TorrentsDB has
+// been returning 502, so on the deployed Worker both could fail together and
+// leave mainstream titles with no results at all. These are fixed JSON APIs,
+// queried by IMDb id (EZTV's results are additionally title-checked), and they
+// return info hashes only: nothing is downloaded or relayed by the Worker.
+const TORRENT_TRACKERS = [
+  'udp://tracker.opentrackr.org:1337/announce',
+  'udp://open.stealth.si:80/announce',
+  'udp://tracker.torrent.eu.org:451/announce',
+  'udp://open.demonii.com:1337/announce',
+  'udp://exodus.desync.com:6969/announce',
+  'udp://tracker.dler.org:6969/announce',
+];
+const INDEXER_MAX_BYTES = 512 * 1024;
+
+function formatBytes(bytes) {
+  const value = Number(bytes);
+  if (!Number.isFinite(value) || value <= 0) return '';
+  if (value >= 1e9) return `${(value / 1e9).toFixed(2)} GB`;
+  return `${Math.round(value / 1e6)} MB`;
+}
+
+// Build a raw Stremio torrent stream, then run it through normalizeStream so
+// indexer results get exactly the validation add-on results get.
+function indexerStream(sourceName, { hash, label, release, seeders, sizeBytes, filename, fileMustInclude }) {
+  if (typeof hash !== 'string' || !INFO_HASH_RE.test(hash)) return null;
+  const infoHash = hash.toLowerCase();
+  const seeds = Number(seeders);
+  const size = Number(sizeBytes);
+  const stats = [
+    Number.isFinite(seeds) && seeds >= 0 ? `👤 ${Math.floor(seeds)}` : '',
+    formatBytes(size) ? `💾 ${formatBytes(size)}` : '',
+  ].filter(Boolean).join(' ');
+  return normalizeStream({
+    infoHash,
+    name: label || 'Torrent',
+    title: [release, stats].filter(Boolean).join('\n'),
+    sources: [...TORRENT_TRACKERS.map((tracker) => `tracker:${tracker}`), `dht:${infoHash}`],
+    ...(fileMustInclude ? { fileMustInclude } : {}),
+    behaviorHints: {
+      bingeGroup: `core-streams|${sourceName}|${label || 'torrent'}`,
+      ...(filename ? { filename } : {}),
+      ...(Number.isSafeInteger(size) && size > 0 ? { videoSize: size } : {}),
+    },
+  }, sourceName);
+}
+
+// Matches a single-episode release name ("S01E01", "s1e1", "1x01") but not a
+// range ("S01E01-E03"), whose file layout is unknown.
+function episodeMatcher(season, episode) {
+  const s = Number(season);
+  const e = Number(episode);
+  return new RegExp(`(?:\\bS0*${s}[ ._-]?E0*${e}|\\b${s}x0*${e})(?![0-9]|-E?[0-9])`, 'i');
+}
+
+// A whole-season pack for this season ("Season 2", "S02 Complete", "S02 1080p"),
+// or a complete-series pack. Neither names the episode.
+function seasonPackMatcher(season) {
+  const s = Number(season);
+  return new RegExp(`(?:\\bseason[ ._-]?0*${s}\\b(?![ ._-]*(?:-|to)[ ._-]*\\d)|\\bS0*${s}\\b(?![ ._-]*(?:E\\d|-))|\\bcomplete[ ._-]+series\\b)`, 'i');
+}
+
+// Hands the streaming server the episode to open inside a pack. Written
+// without lookarounds or flags so any regex engine reads it the same way.
+function episodeFilePattern(season, episode) {
+  return `[Ss]0*${Number(season)}[ ._-]?[Ee]0*${Number(episode)}[^0-9]`;
+}
+
+function releaseLabel(text) {
+  const height = inferredHeight({ title: text });
+  return height ? `${height}p` : 'Torrent';
+}
+
+async function fetchIndexer(sourceId, url, fetchImpl, deadlineSignal, report, toStreams) {
+  if (!sourceAllowed(sourceId)) { report[sourceId] = 'paused'; return []; }
+  try {
+    const payload = await fetchBoundedJson(url, fetchImpl, INDEXER_MAX_BYTES, SOURCE_TIMEOUT_MS, deadlineSignal);
+    sourceSucceeded(sourceId);
+    const streams = payload ? toStreams(payload).filter(Boolean).slice(0, MAX_STREAMS_PER_SOURCE) : [];
+    report[sourceId] = `ok ${streams.length}`;
+    return streams;
+  } catch (error) {
+    if (deadlineSignal.aborted) {
+      sourceDeadlineCancelled(sourceId);
+      report[sourceId] = 'timeout';
+    } else {
+      sourceFailed(sourceId);
+      report[sourceId] = /HTTP (\d{3})/.test(error?.message || '') ? `http ${error.message.match(/HTTP (\d{3})/)[1]}` : 'network error';
+    }
     return [];
   }
+}
+
+function fetchYts(type, id, fetchImpl, deadlineSignal, report) {
+  if (type !== 'movie') return Promise.resolve([]);
+  const imdb = id.split(':')[0];
+  const url = `https://movies-api.accel.li/api/v2/list_movies.json?query_term=${encodeURIComponent(imdb)}&limit=5`;
+  return fetchIndexer('yts', url, fetchImpl, deadlineSignal, report, (payload) => {
+    const movies = Array.isArray(payload?.data?.movies) ? payload.data.movies : [];
+    return movies.filter((movie) => String(movie?.imdb_code).toLowerCase() === imdb)
+      .flatMap((movie) => (Array.isArray(movie.torrents) ? movie.torrents : []).map((torrent) => {
+        const quality = cleanText(torrent?.quality, 12);
+        const kind = cleanText(torrent?.type, 12);
+        const codec = cleanText(torrent?.video_codec, 12);
+        const release = [cleanText(movie.title, 200), movie.year ? `(${Number(movie.year)})` : '', quality, kind, codec, 'YTS']
+          .filter(Boolean).join(' ');
+        return indexerStream('YTS', {
+          hash: torrent?.hash,
+          label: [quality, kind && kind.toUpperCase() === 'BLURAY' ? 'BluRay' : kind].filter(Boolean).join(' '),
+          release,
+          seeders: torrent?.seeds,
+          sizeBytes: torrent?.size_bytes,
+        });
+      }));
+  });
+}
+
+function pirateBayStream(item, extra = {}) {
+  const release = cleanText(item.name, 200);
+  return indexerStream('TPB', {
+    hash: item.info_hash,
+    label: releaseLabel(release),
+    release,
+    seeders: item.seeders,
+    sizeBytes: item.size,
+    ...extra,
+  });
+}
+
+const playablePirateBayItem = (item) => /^2\d\d$/.test(String(item?.category)) && Number(item?.seeders) > 0;
+const bySeeders = (a, b) => Number(b.seeders) - Number(a.seeders);
+
+async function fetchPirateBay(type, id, fetchImpl, deadlineSignal, report, metaPromise) {
+  const [imdb, season, episode] = id.split(':');
+  const byImdb = (item) => String(item?.imdb).toLowerCase() === imdb;
+  if (type === 'movie') {
+    // `imdb` is the uploader's tag; it is the whole match, so require it exactly.
+    return fetchIndexer('tpb', `https://apibay.org/q.php?q=${encodeURIComponent(imdb)}&cat=0`, fetchImpl, deadlineSignal, report,
+      (payload) => (Array.isArray(payload) ? payload : []).filter(byImdb).filter(playablePirateBayItem)
+        .sort(bySeeders).map((item) => pirateBayStream(item)));
+  }
+
+  // Series: the IMDb tag mostly lands on season packs, and single episodes are
+  // usually untagged, so search "<title> S01E01" as well. Packs are offered
+  // with the episode pattern so the player opens the right file inside them.
+  const isEpisode = episodeMatcher(season, episode);
+  const isSeasonPack = seasonPackMatcher(season);
+  const filePattern = episodeFilePattern(season, episode);
+  const tagged = fetchIndexer('tpb', `https://apibay.org/q.php?q=${encodeURIComponent(imdb)}&cat=0`, fetchImpl, deadlineSignal, report,
+    (payload) => (Array.isArray(payload) ? payload : []).filter(byImdb).filter(playablePirateBayItem));
+  const titled = metaPromise.then((expected) => {
+    if (!expected) return [];
+    const tag = `S${String(Number(season)).padStart(2, '0')}E${String(Number(episode)).padStart(2, '0')}`;
+    const show = normalizeMatchTitle(expected.title);
+    return fetchIndexer('tpb-search', `https://apibay.org/q.php?q=${encodeURIComponent(`${expected.title} ${tag}`)}&cat=0`, fetchImpl, deadlineSignal, report,
+      (payload) => (Array.isArray(payload) ? payload : []).filter(playablePirateBayItem)
+        // An untagged hit must start with the show's name, so "The Office"
+        // does not collect "The Office Party" or another country's version.
+        .filter((item) => byImdb(item) || showTitleMatches(cleanText(item?.name, 200).replace(/[._]/g, ' '), show)));
+  });
+  const items = [...await tagged, ...await titled];
+  const seenHashes = new Set();
+  const episodes = [];
+  const packs = [];
+  for (const item of items.sort(bySeeders)) {
+    const hash = String(item?.info_hash).toLowerCase();
+    if (seenHashes.has(hash)) continue;
+    seenHashes.add(hash);
+    const name = String(item?.name);
+    if (isEpisode.test(name)) episodes.push(pirateBayStream(item));
+    else if (isSeasonPack.test(name)) packs.push(pirateBayStream(item, { fileMustInclude: [filePattern] }));
+  }
+  const streams = [...episodes, ...packs].filter(Boolean).slice(0, MAX_STREAMS_PER_SOURCE);
+  report.tpb = report.tpb?.startsWith('ok') || report['tpb-search']?.startsWith('ok') ? `ok ${streams.length}` : (report.tpb || 'failed');
+  delete report['tpb-search'];
+  return streams;
+}
+
+// EZTV keys shows by IMDb number, but its mapping is unreliable (the Breaking
+// Bad id returns a different show), so a result must also carry the Cinemeta
+// title, optionally followed by a year or country tag ("The Office US").
+function showTitleMatches(releaseTitle, expectedTitle) {
+  const show = normalizeMatchTitle(String(releaseTitle).split(/\sS\d{1,3}E\d{1,4}\b/i)[0]);
+  const expected = normalizeMatchTitle(expectedTitle);
+  if (!show || !expected) return false;
+  if (show === expected) return true;
+  const rest = show.startsWith(`${expected} `) ? show.slice(expected.length + 1) : null;
+  return rest !== null && /^(?:(?:19|20)\d\d|us|uk|au|nz|ca)$/.test(rest);
+}
+
+async function fetchEztv(type, id, fetchImpl, deadlineSignal, report, metaPromise) {
+  if (type !== 'series') return [];
+  const [imdb, season, episode] = id.split(':');
+  const url = `https://eztvx.to/api/get-torrents?imdb_id=${encodeURIComponent(imdb.slice(2))}&limit=100`;
+  // Fetch alongside Cinemeta rather than after it; the title check runs once both are in.
+  const [expected, candidates] = await Promise.all([
+    metaPromise,
+    fetchIndexer('eztv', url, fetchImpl, deadlineSignal, report, (payload) => (Array.isArray(payload?.torrents) ? payload.torrents : [])
+      .filter((torrent) => Number(torrent?.season) === Number(season) && Number(torrent?.episode) === Number(episode))),
+  ]);
+  if (!candidates.length) return [];
+  if (!expected) { report.eztv = 'skipped (no title to check)'; return []; }
+  const streams = candidates
+    .filter((torrent) => showTitleMatches(torrent?.title, expected.title))
+    .map((torrent) => {
+      const release = cleanText(torrent.title, 200);
+      const filename = cleanText(torrent.filename, 255);
+      return indexerStream('EZTV', {
+        hash: torrent.hash,
+        label: releaseLabel(`${release} ${filename}`),
+        release,
+        seeders: torrent.seeds,
+        sizeBytes: torrent.size_bytes,
+        filename,
+      });
+    })
+    .filter(Boolean);
+  report.eztv = `ok ${streams.length}`;
+  return streams;
 }
 
 function manifest() {
   return {
     id: 'uk.corebuilds.core-streams',
-    version: '0.8.1',
+    version: '0.9.0',
     name: 'Core Streams',
-    description: 'Quality-ranked stream fallback with curated torrents, open media, and configurable sources.',
+    description: 'Quality-ranked free streams: torrent add-ons and public indexes (YTS, The Pirate Bay, EZTV), open media, and configurable sources.',
     resources: ['stream'],
     types: ['movie', 'series'],
     catalogs: [],
@@ -931,26 +1158,52 @@ export async function handleCoreStreams(request, env, { headers = {}, rateLimit 
   }
 
   const normalizedId = route.id.toLowerCase();
+  const imdb = normalizedId.split(':')[0];
+  const deadlineSignal = AbortSignal.timeout(SOURCE_TIMEOUT_MS);
+  const metaPromise = fetchCinemetaTitleYear(route.type, imdb, fetchImpl, deadlineSignal);
+  const report = {};
   const responses = await Promise.all([
-    ...sources.map((source) => fetchSource(source, route.type, normalizedId, fetchImpl)),
-    fetchOpenMedia(route.type, normalizedId, fetchImpl),
+    ...sources.map((source) => fetchSource(source, route.type, normalizedId, fetchImpl, report)),
+    fetchYts(route.type, normalizedId, fetchImpl, deadlineSignal, report),
+    fetchPirateBay(route.type, normalizedId, fetchImpl, deadlineSignal, report, metaPromise),
+    fetchEztv(route.type, normalizedId, fetchImpl, deadlineSignal, report, metaPromise),
+    fetchOpenMedia(route.type, normalizedId, fetchImpl, deadlineSignal, metaPromise).then((streams) => {
+      if (route.type === 'movie') report['open-media'] = `ok ${streams.length}`;
+      return streams;
+    }),
   ]);
   // Rank within each provider, then interleave providers before de-duplicating.
   // This stops an early high-volume source from consuming the result cap and
   // hiding every later provider or the curated open-media matches.
   const seen = new Set();
+  const bareHashes = new Set();
+  const anyHashes = new Set();
   const streams = [];
   for (const stream of interleaveStreamGroups(responses)) {
     const key = dedupeKey(stream);
     if (seen.has(key)) continue;
+    // Indexers return a hash with no fileIdx; add-ons return the same torrent
+    // with one. Treat those as one result whichever arrives first.
+    if (stream.infoHash) {
+      if (stream.fileIdx === undefined ? anyHashes.has(stream.infoHash) : bareHashes.has(stream.infoHash)) continue;
+      anyHashes.add(stream.infoHash);
+      if (stream.fileIdx === undefined) bareHashes.add(stream.infoHash);
+    }
     seen.add(key);
     streams.push(stream);
     if (streams.length >= MAX_STREAMS_TOTAL) break;
   }
-  return jsonResponse(200, { streams }, headers);
+  // Per-source outcome, so an empty list can be explained from the outside
+  // (curl -I the stream URL). Source names and status only: no ids or URLs.
+  const sourceStatus = Object.entries(report).map(([id, status]) => `${id}=${status}`).join('; ');
+  return jsonResponse(200, { streams }, { ...headers, 'X-Core-Streams-Sources': sourceStatus });
 }
 
 export const _coreStreamsTest = {
+  episodeMatcher,
+  seasonPackMatcher,
+  episodeFilePattern,
+  showTitleMatches,
   archiveMediaStreams,
   configuredAddonBase,
   locFilmStreams,

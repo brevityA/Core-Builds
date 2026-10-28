@@ -21,9 +21,9 @@ test('manifest is a Stremio stream-only manifest behind the install token', asyn
   assert.equal(response.headers.get('Cache-Control'), 'no-store');
   assert.deepEqual(await response.json(), {
     id: 'uk.corebuilds.core-streams',
-    version: '0.8.1',
+    version: '0.9.0',
     name: 'Core Streams',
-    description: 'Quality-ranked stream fallback with curated torrents, open media, and configurable sources.',
+    description: 'Quality-ranked free streams: torrent add-ons and public indexes (YTS, The Pirate Bay, EZTV), open media, and configurable sources.',
     resources: ['stream'],
     types: ['movie', 'series'],
     catalogs: [],
@@ -72,7 +72,7 @@ test('stream request fans out to fixed torrent sources and returns normalized, d
   );
   assert.equal(response.status, 200);
   const payload = await response.json();
-  assert.equal(calls.length, 4, 'three torrent add-ons and Cinemeta are queried once');
+  assert.equal(calls.length, 6, 'three torrent add-ons, YTS, The Pirate Bay and Cinemeta are queried once');
   assert.ok(calls.every(({ init }) => init.method === 'GET' && init.redirect === 'manual'));
   assert.equal(payload.streams.length, 3);
   assert.deepEqual(payload.streams.map((item) => item.name), [
@@ -178,7 +178,7 @@ test('official Public Domain Movies results are included for movies with a local
   assert.ok(requested.includes(
     'https://caching.stremio.net/publicdomainmovies.now.sh/stream/movie/tt0051744.json',
   ));
-  assert.equal(requested.length, 4, 'movie add-on, two general add-ons, and Cinemeta are queried');
+  assert.equal(requested.length, 6, 'movie add-on, two general add-ons, YTS, The Pirate Bay and Cinemeta are queried');
   _coreStreamsTest.resetSourceHealth();
 });
 
@@ -193,7 +193,7 @@ test('valid IMDb episode ids are passed through encoded; bad type and identifier
   );
   assert.equal(episode.status, 200);
   assert.ok(requestedUrls.includes('https://torrentio.strem.fun/stream/series/tt0944947%3A1%3A2.json'));
-  assert.equal(requestedUrls.length, 2, 'the movie-only Public Domain Movies and Cinemeta sources are skipped for episodes');
+  assert.equal(requestedUrls.length, 5, 'two general add-ons, Cinemeta, EZTV and The Pirate Bay; the movie-only sources are skipped for episodes');
   assert.ok(!requestedUrls.some((url) => url.includes('publicdomainmovies.now.sh')));
   assert.equal((await episode.json()).streams.length, 0);
 
@@ -223,7 +223,7 @@ test('source failures and redirects are isolated; the working source still retur
   const response = await handleCoreStreams(makeRequest(`/core-streams/${TOKEN}/stream/movie/tt0133093.json`), makeEnv(), { fetchImpl });
   assert.equal(response.status, 200);
   assert.deepEqual(await response.json(), { streams: [] });
-  assert.equal(index, 4, 'Cinemeta and the three stream providers fail independently');
+  assert.equal(index, 6, 'Cinemeta, the three stream add-ons and both indexes fail independently');
 });
 
 test('failed providers open an isolate-local circuit after three failures and resume probes after cooldown', async () => {
@@ -240,11 +240,11 @@ test('failed providers open an isolate-local circuit after three failures and re
       assert.equal(response.status, 200);
       assert.deepEqual(await response.json(), { streams: [] });
     }
-    assert.equal(calls, 12, 'three add-ons and the optional Cinemeta lookup were tried on each of the first three requests');
+    assert.equal(calls, 18, 'three add-ons, two indexes and the Cinemeta lookup were tried on each of the first three requests');
 
     const open = await handleCoreStreams(makeRequest(path), makeEnv(), { fetchImpl });
     assert.equal(open.status, 200);
-    assert.equal(calls, 12, 'open circuits avoid another upstream wait during the cooldown');
+    assert.equal(calls, 18, 'open circuits avoid another upstream wait during the cooldown');
 
     now += 30_001;
     const recoveryFetch = async (input) => {
@@ -253,7 +253,7 @@ test('failed providers open an isolate-local circuit after three failures and re
       return jsonResponse({ streams: [{ url: `https://${source}.example.com/movie.mp4` }] });
     };
     const recovered = await handleCoreStreams(makeRequest(path), makeEnv(), { fetchImpl: recoveryFetch });
-    assert.equal(calls, 16, 'one half-open probe runs per add-on and metadata lookup after cooldown');
+    assert.equal(calls, 24, 'one half-open probe runs per add-on, index and metadata lookup after cooldown');
     assert.equal((await recovered.json()).streams.length, 2);
   } finally {
     Date.now = realNow;
@@ -284,7 +284,7 @@ test('operator-configured addon may return deduplicated native YouTube IDs', asy
     makeEnv({ CORE_STREAMS_HTTP_SOURCE_MANIFEST: validManifest }), { fetchImpl },
   );
   const payload = await response.json();
-  assert.equal(urls.length, 5, 'three fixed add-ons, the configured add-on, and one Cinemeta request');
+  assert.equal(urls.length, 7, 'three fixed add-ons, the configured add-on, two indexes and one Cinemeta request');
   assert.ok(urls.includes('https://pengu.example.com/config/abc123/stream/movie/tt0133093.json'));
   assert.deepEqual(payload.streams, [
     { ytId: 'dQw4w9WgXcQ', name: 'Torrentio · Duplicate YouTube result' },
@@ -634,7 +634,7 @@ test('Internet Archive adapter returns only exact-title, year-matched, uploader-
   assert.ok(blenderStream);
   assert.equal(blenderStream.name, 'Blender Open Movies · CC BY 3.0');
   assert.match(blenderStream.description, /peach\.blender\.org\/about/);
-  assert.equal(calls.length, 8, 'three add-ons, Cinemeta, IA search/item metadata, and Blender search/video metadata');
+  assert.equal(calls.length, 10, 'three add-ons, two indexes, Cinemeta, IA search/item metadata, and Blender search/video metadata');
   assert.ok(calls.every(({ init }) => init.redirect === 'manual'));
 
   assert.equal(_coreStreamsTest.declaredOpenLicense('https://creativecommons.org/licenses/by-nc/4.0/'), null);
@@ -716,7 +716,7 @@ test('Blender Open Movies resolves the exact Elephants Dream upload under its of
   assert.equal(stream.name, 'Blender Open Movies · CC BY 2.5');
   assert.match(stream.description, /creativecommons\.org\/licenses\/by\/2\.5/);
   assert.match(stream.description, /orange\.blender\.org/);
-  assert.equal(calls.length, 7);
+  assert.equal(calls.length, 9);
   _coreStreamsTest.resetSourceHealth();
 });
 
@@ -803,7 +803,7 @@ test('mapped Blender Open Movies use exact official uploads and per-film verifie
     if (film.officialVideoUrl) assert.ok(stream.description.includes(film.officialVideoUrl));
     if (film.licenseEvidence) assert.ok(stream.description.includes(film.licenseEvidence));
     assert.equal(stream.url, `https://video.blender.org/object-storage/web_videos/${film.path}`);
-    assert.equal(calls.length, 7, 'three add-ons, Cinemeta, Archive search, and Blender search/detail');
+    assert.equal(calls.length, 9, 'three add-ons, two indexes, Cinemeta, Archive search, and Blender search/detail');
   }
   _coreStreamsTest.resetSourceHealth();
 });
@@ -990,4 +990,158 @@ test('a 404 from a stream add-on is "nothing here", not an outage that opens its
 test('a torrent whose trackers are all unsafe carries no empty sources list', () => {
   const stream = _coreStreamsTest.normalizeStream({ infoHash: 'a'.repeat(40), sources: ['tracker:udp://10.0.0.1:80/announce'] }, 'Torrentio');
   assert.equal('sources' in stream, false);
+});
+
+// --- Public torrent indexes ---------------------------------------------------
+
+const HASH = (c) => c.repeat(40);
+
+function indexFetch(routes, calls = []) {
+  return async (input) => {
+    const url = String(input);
+    calls.push(url);
+    for (const [prefix, respond] of routes) if (url.startsWith(prefix)) return respond(url);
+    return jsonResponse({ streams: [] });
+  };
+}
+
+test('YTS and The Pirate Bay add exact-IMDb movie torrents with trackers, seeders and size', async () => {
+  _coreStreamsTest.resetSourceHealth();
+  const calls = [];
+  const fetchImpl = indexFetch([
+    ['https://movies-api.accel.li/', () => jsonResponse({ data: { movies: [
+      { imdb_code: 'tt0133093', title: 'The Matrix', year: 1999, torrents: [
+        { hash: HASH('C'), quality: '2160p', type: 'bluray', video_codec: 'x265', seeds: 90, size_bytes: 9_000_000_000 },
+      ] },
+      { imdb_code: 'tt9999999', title: 'Not It', year: 2001, torrents: [{ hash: HASH('d'), quality: '1080p', seeds: 999 }] },
+    ] } })],
+    ['https://apibay.org/', () => jsonResponse([
+      { name: 'The.Matrix.1999.1080p.BluRay.x264', info_hash: HASH('e'), seeders: '50', size: '2000000000', category: '207', imdb: 'tt0133093' },
+      { name: 'The Matrix soundtrack FLAC', info_hash: HASH('f'), seeders: '80', size: '400000000', category: '104', imdb: 'tt0133093' },
+      { name: 'The.Matrix.1999.dead.torrent', info_hash: HASH('1'), seeders: '0', size: '1', category: '201', imdb: 'tt0133093' },
+      { name: 'The Matrix Reloaded', info_hash: HASH('2'), seeders: '70', size: '1', category: '207', imdb: 'tt0234215' },
+    ])],
+  ], calls);
+  const response = await handleCoreStreams(makeRequest(`/core-streams/${TOKEN}/stream/movie/tt0133093.json`), makeEnv(), { fetchImpl });
+  const { streams } = await response.json();
+  assert.ok(calls.includes('https://movies-api.accel.li/api/v2/list_movies.json?query_term=tt0133093&limit=5'));
+  assert.ok(calls.includes('https://apibay.org/q.php?q=tt0133093&cat=0'));
+  const yts = streams.find((stream) => stream.name.startsWith('YTS'));
+  assert.equal(yts.name, 'YTS · 2160p BluRay');
+  assert.equal(yts.infoHash, HASH('c'));
+  assert.match(yts.title, /The Matrix \(1999\) 2160p bluray x265 YTS\n👤 90 💾 9\.00 GB/);
+  assert.ok(yts.sources.includes('tracker:udp://tracker.opentrackr.org:1337/announce'));
+  assert.ok(yts.sources.includes(`dht:${HASH('c')}`));
+  assert.equal(yts.behaviorHints.videoSize, 9_000_000_000);
+  const tpb = streams.filter((stream) => stream.name.startsWith('TPB'));
+  assert.deepEqual(tpb.map((stream) => stream.infoHash), [HASH('e')], 'video category, live seeders and the exact IMDb tag only');
+  assert.equal(tpb[0].name, 'TPB · 1080p');
+  assert.ok(!streams.some((stream) => stream.infoHash === HASH('d')), 'a YTS hit for another IMDb id is dropped');
+  assert.match(response.headers.get('X-Core-Streams-Sources'), /yts=ok 1/);
+  assert.match(response.headers.get('X-Core-Streams-Sources'), /tpb=ok 1/);
+  _coreStreamsTest.resetSourceHealth();
+});
+
+test('series: The Pirate Bay returns single episodes first, then season packs that open the episode', async () => {
+  _coreStreamsTest.resetSourceHealth();
+  const calls = [];
+  const fetchImpl = indexFetch([
+    ['https://v3-cinemeta.strem.io/meta/series/', () => jsonResponse({ meta: { name: 'The Office', releaseInfo: '2005–2013' } })],
+    ['https://apibay.org/q.php?q=tt0386676', () => jsonResponse([
+      { name: 'The Office US Season 2 Complete 720p', info_hash: HASH('a'), seeders: '40', size: '1', category: '208', imdb: 'tt0386676' },
+      { name: 'The Office US Season 3 Complete 720p', info_hash: HASH('b'), seeders: '90', size: '1', category: '208', imdb: 'tt0386676' },
+      { name: 'The Office US S02E01-E03 720p', info_hash: HASH('c'), seeders: '90', size: '1', category: '208', imdb: 'tt0386676' },
+    ])],
+    ['https://apibay.org/q.php?q=The%20Office%20S02E01', () => jsonResponse([
+      { name: 'The.Office.US.S02E01.The.Dundies.1080p.WEB-DL', info_hash: HASH('d'), seeders: '20', size: '1', category: '208', imdb: '' },
+      { name: 'The Office Party S02E01 1080p', info_hash: HASH('e'), seeders: '99', size: '1', category: '208', imdb: '' },
+      { name: 'The Office US S02E10 1080p', info_hash: HASH('f'), seeders: '99', size: '1', category: '208', imdb: '' },
+    ])],
+  ], calls);
+  const response = await handleCoreStreams(makeRequest(`/core-streams/${TOKEN}/stream/series/tt0386676:2:1.json`), makeEnv(), { fetchImpl });
+  const tpb = (await response.json()).streams.filter((stream) => stream.name.startsWith('TPB'));
+  assert.deepEqual(tpb.map((stream) => stream.infoHash), [HASH('d'), HASH('a')],
+    'the episode, then the season 2 pack; not season 3, an episode range, another show or another episode');
+  assert.equal(tpb[0].fileMustInclude, undefined);
+  assert.deepEqual(tpb[1].fileMustInclude, ['[Ss]0*2[ ._-]?[Ee]0*1[^0-9]']);
+  assert.match(response.headers.get('X-Core-Streams-Sources'), /tpb=ok 2/);
+  assert.ok(!response.headers.get('X-Core-Streams-Sources').includes('tpb-search'));
+  _coreStreamsTest.resetSourceHealth();
+});
+
+test('series: EZTV results must carry the Cinemeta show title, since its IMDb mapping is unreliable', async () => {
+  _coreStreamsTest.resetSourceHealth();
+  const torrent = (title, hash) => ({ title, hash, filename: `${title.replace(/ /g, '.')}.mkv`, season: '1', episode: '1', seeds: 12, size_bytes: '900000000' });
+  const fetchImpl = indexFetch([
+    ['https://v3-cinemeta.strem.io/meta/series/', () => jsonResponse({ meta: { name: 'Breaking Bad', releaseInfo: '2008–2013' } })],
+    ['https://eztvx.to/api/get-torrents?imdb_id=0903747', () => jsonResponse({ torrents: [
+      torrent('Breaking Brad S01E01 Pilot 480p x264-mSD EZTV', HASH('a')),
+      torrent('Breaking Bad S01E01 720p HDTV x264 EZTV', HASH('b')),
+      { ...torrent('Breaking Bad S01E02 720p HDTV x264 EZTV', HASH('c')), episode: '2' },
+    ] })],
+  ]);
+  const response = await handleCoreStreams(makeRequest(`/core-streams/${TOKEN}/stream/series/tt0903747:1:1.json`), makeEnv(), { fetchImpl });
+  const eztv = (await response.json()).streams.filter((stream) => stream.name.startsWith('EZTV'));
+  assert.deepEqual(eztv.map((stream) => stream.infoHash), [HASH('b')]);
+  assert.equal(eztv[0].name, 'EZTV · 720p');
+  assert.equal(eztv[0].behaviorHints.filename, 'Breaking.Bad.S01E01.720p.HDTV.x264.EZTV.mkv');
+  assert.match(response.headers.get('X-Core-Streams-Sources'), /eztv=ok 1/);
+  _coreStreamsTest.resetSourceHealth();
+});
+
+test('the same torrent from an index (no fileIdx) and an add-on (with fileIdx) is listed once', async () => {
+  _coreStreamsTest.resetSourceHealth();
+  const fetchImpl = indexFetch([
+    ['https://torrentio.strem.fun/', () => jsonResponse({ streams: [{ infoHash: HASH('a'), fileIdx: 0, name: '1080p 👤 900' }] })],
+    ['https://apibay.org/', () => jsonResponse([
+      { name: 'Film.2001.1080p', info_hash: HASH('A'), seeders: '5', size: '1', category: '207', imdb: 'tt0133093' },
+    ])],
+  ]);
+  const response = await handleCoreStreams(makeRequest(`/core-streams/${TOKEN}/stream/movie/tt0133093.json`), makeEnv(), { fetchImpl });
+  const { streams } = await response.json();
+  assert.equal(streams.filter((stream) => stream.infoHash === HASH('a')).length, 1);
+  _coreStreamsTest.resetSourceHealth();
+});
+
+test('the stream response names each source\'s outcome, so an empty list can be explained', async () => {
+  _coreStreamsTest.resetSourceHealth();
+  const fetchImpl = indexFetch([
+    ['https://torrentio.strem.fun/', () => new Response('blocked', { status: 403 })],
+    ['https://torrentsdb.com/', () => new Response('error code: 502', { status: 502 })],
+    ['https://apibay.org/', () => { throw new TypeError('fetch failed'); }],
+  ]);
+  const response = await handleCoreStreams(makeRequest(`/core-streams/${TOKEN}/stream/movie/tt0133093.json`), makeEnv(), { fetchImpl });
+  const status = response.headers.get('X-Core-Streams-Sources');
+  assert.match(status, /torrentio=http 403/);
+  assert.match(status, /torrentsdb=http 502/);
+  assert.match(status, /tpb=network error/);
+  assert.match(status, /yts=ok 0/);
+  assert.match(status, /open-media=ok 0/);
+  assert.ok(!status.includes('tt0133093') && !status.includes(TOKEN), 'no ids or tokens in the header');
+  _coreStreamsTest.resetSourceHealth();
+});
+
+test('episode, season-pack and file patterns accept common release names and reject neighbours', () => {
+  const ep = _coreStreamsTest.episodeMatcher('2', '1');
+  for (const name of ['Show.S02E01.1080p', 'Show S2E1 720p', 'show.s02.e01.web', 'Show 2x01 HDTV']) assert.ok(ep.test(name), name);
+  for (const name of ['Show.S02E10.1080p', 'Show.S12E01', 'Show.S02E01-E03', 'Show.S02E011']) assert.ok(!ep.test(name), name);
+
+  const pack = _coreStreamsTest.seasonPackMatcher('2');
+  for (const name of ['Show Season 2 Complete 720p', 'Show S02 1080p WEB-DL', 'Show.S02.Complete', 'Show Complete Series 1080p']) assert.ok(pack.test(name), name);
+  for (const name of ['Show Season 3 Complete', 'Show S02E05 1080p', 'Show Season 2-5 Complete', 'Show S20 1080p', 'Show Season 20']) assert.ok(!pack.test(name), name);
+
+  const file = new RegExp(_coreStreamsTest.episodeFilePattern('2', '1'));
+  for (const name of ['Show.S02E01.mkv', 'Show - s2e1 - Title.mp4', 'Season 2/Show.S02.E01.mkv']) assert.ok(file.test(name), name);
+  for (const name of ['Show.S02E10.mkv', 'Show.S02E11.mkv', 'Show.S12E01.mkv']) assert.ok(!file.test(name), name);
+
+  assert.ok(_coreStreamsTest.showTitleMatches('The Office US S02E01 x', 'The Office'));
+  assert.ok(_coreStreamsTest.showTitleMatches('The Boys 2019 S01E01 x', 'The Boys'));
+  assert.ok(!_coreStreamsTest.showTitleMatches('The Office Party S02E01 x', 'The Office'));
+});
+
+test('fileMustInclude survives normalization only as a short list of plain strings', () => {
+  const ok = _coreStreamsTest.normalizeStream({ infoHash: HASH('a'), fileMustInclude: ['S01E01', 42, '', 'x'.repeat(121), 'a\nb'] }, 'Test');
+  assert.deepEqual(ok.fileMustInclude, ['S01E01']);
+  const none = _coreStreamsTest.normalizeStream({ infoHash: HASH('a'), fileMustInclude: [7] }, 'Test');
+  assert.equal(none.fileMustInclude, undefined);
 });

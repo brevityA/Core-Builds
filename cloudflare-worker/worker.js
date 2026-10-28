@@ -4,6 +4,7 @@ import { handleCoreStreams } from './core-streams.js';
 //
 // /proxy/*       — re-issues narrowly scoped AIOStreams API requests server-to-server.
 // /core-streams/:token/* — private Stremio stream aggregator (Torrentio + TorrentsDB,
+//                          YTS / The Pirate Bay / EZTV index lookups,
 //                          bounded Archive + LOC open-media discovery, seven exact-
 //                          mapped Blender Open Movies, and an optional
 //                          operator-configured direct-HTTP addon).
