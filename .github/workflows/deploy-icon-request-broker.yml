@@ -89,10 +89,15 @@ jobs:
           ref: ${{ github.event.inputs.ref }}
           path: apps
           # The broker's tests read the issue form they must stay in step
-          # with (worker.test.mjs -> .github/ISSUE_TEMPLATE/).
+          # with (worker.test.mjs -> .github/ISSUE_TEMPLATE/), and the Play
+          # ids the app ships: PlusStore.kt's product id here, and
+          # app/build.gradle.kts's applicationId, which cone mode checks out
+          # as a file in that directory's parent path. Without them the
+          # suite fails before any deploy (49/50 since the Plus check).
           sparse-checkout: |
             tools/icon_request_broker
             .github/ISSUE_TEMPLATE
+            app/src/play/java/tv/corebuilds/iconpack
           fetch-depth: 0
 
       - name: Refuse a ref that is not on CoreBuildsApps main
