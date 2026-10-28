@@ -21,7 +21,7 @@ test('manifest is a Stremio stream-only manifest behind the install token', asyn
   assert.equal(response.headers.get('Cache-Control'), 'no-store');
   assert.deepEqual(await response.json(), {
     id: 'uk.corebuilds.core-streams',
-    version: '0.8.0',
+    version: '0.8.1',
     name: 'Core Streams',
     description: 'Quality-ranked stream fallback with curated torrents, open media, and configurable sources.',
     resources: ['stream'],
@@ -876,4 +876,118 @@ test('rate limiting and HTTP method restrictions are enforced', async () => {
     makeRequest(`/core-streams/${TOKEN}/manifest.json`, 'POST'), makeEnv(), { fetchImpl },
   );
   assert.equal(post.status, 405);
+});
+
+// ── Review fixes (2026-10-28) ────────────────────────────────────────────────
+
+test('configured add-on manifests may carry their configuration in RFC 3986 path characters', () => {
+  for (const [value, base] of [
+    ['https://torrentio.strem.fun/providers=yts,eztv|sort=quality/manifest.json', 'https://torrentio.strem.fun/providers=yts,eztv|sort=quality'],
+    ['https://comet.example.org/eyJtYXgiOjB9=/manifest.json', 'https://comet.example.org/eyJtYXgiOjB9='],
+    ['https://aio.example.org/stremio/0b1c2d3e/eyJpdiI6Ik1a%2BcyJ9%3D/manifest.json', 'https://aio.example.org/stremio/0b1c2d3e/eyJpdiI6Ik1a%2BcyJ9%3D'],
+    ['https://webstreamr.example.org/%7B%22en%22%3A%22on%22%7D/manifest.json', 'https://webstreamr.example.org/%7B%22en%22%3A%22on%22%7D'],
+  ]) {
+    assert.equal(_coreStreamsTest.configuredAddonBase(value), base, value);
+  }
+  // The origin rules are unchanged, and a malformed escape is still refused.
+  for (const value of [
+    'https://addon.example.org/a%2/manifest.json',
+    'https://addon.example.org/cfg/manifest.json?x=1',
+  ]) {
+    assert.equal(_coreStreamsTest.configuredAddonBase(value), null, value);
+  }
+});
+
+test('Cinemeta cache misses follow one redirect to cinemeta-live and read its releaseInfo year', async () => {
+  _coreStreamsTest.resetSourceHealth();
+  const seen = [];
+  const fetchImpl = async (url) => {
+    seen.push(url);
+    if (url.startsWith('https://v3-cinemeta.strem.io/')) {
+      return new Response(null, { status: 307, headers: { location: url.replace('v3-cinemeta.strem.io', 'cinemeta-live.strem.io') } });
+    }
+    if (url.startsWith('https://cinemeta-live.strem.io/')) return jsonResponse({ meta: { name: 'A Test Movie', releaseInfo: '1950' } });
+    if (url.startsWith('https://archive.org/advancedsearch.php?')) return jsonResponse({ response: { docs: [] } });
+    return jsonResponse({ streams: [] });
+  };
+  await handleCoreStreams(makeRequest(`/core-streams/${TOKEN}/stream/movie/tt0000001.json`), makeEnv(), { fetchImpl });
+  assert.ok(seen.some((url) => url.startsWith('https://cinemeta-live.strem.io/meta/movie/tt0000001.json')));
+  const search = seen.find((url) => url.startsWith('https://archive.org/advancedsearch.php?'));
+  assert.ok(search, 'the Archive lookup runs once the live host supplies a year');
+  assert.match(decodeURIComponent(search), /year:1950/);
+  _coreStreamsTest.resetSourceHealth();
+});
+
+test('a redirect to a host that is not allowed is refused, and plain redirects are not followed', async () => {
+  const offHost = async () => new Response(null, { status: 307, headers: { location: 'https://evil.example.org/meta.json' } });
+  await assert.rejects(_coreStreamsTest.fetchBoundedJson('https://v3-cinemeta.strem.io/x.json', offHost, 1024, 1000, null, ['cinemeta-live.strem.io']));
+  let calls = 0;
+  const noList = async () => { calls++; return new Response(null, { status: 302, headers: { location: 'https://cinemeta-live.strem.io/x.json' } }); };
+  await assert.rejects(_coreStreamsTest.fetchBoundedJson('https://metadata.example/item', noList));
+  assert.equal(calls, 1, 'without an allow-list the redirect is not followed');
+});
+
+test('the Internet Archive search asks for the title, year and an open license, and skips unrelated hits', async () => {
+  _coreStreamsTest.resetSourceHealth();
+  let searchUrl = null;
+  const metadataFor = [];
+  const fetchImpl = async (url) => {
+    if (url.startsWith('https://archive.org/advancedsearch.php?')) {
+      searchUrl = url;
+      // Unrelated items first, as the live search returns them.
+      return jsonResponse({ response: { docs: [
+        { identifier: 'tv-segment-1990', title: 'Night Of The Living Dead 1990 House Of Svengoolie' },
+        { identifier: 'creature-feature-s1e14', title: 'Creature Feature S1-E14 - Night Of The Living Dead' },
+        { identifier: 'nightofthelivingdead_201910', title: 'Night Of The Living Dead' },
+      ] } });
+    }
+    if (url.startsWith('https://archive.org/metadata/')) {
+      metadataFor.push(url.split('/').pop());
+      return jsonResponse({
+        metadata: { title: 'Night of the Living Dead', year: '1968', licenseurl: 'http://creativecommons.org/licenses/publicdomain/' },
+        files: [{ name: 'NOTLD.mp4', format: 'MPEG4', size: '700000000' }],
+      });
+    }
+    return jsonResponse({});
+  };
+  const streams = await _coreStreamsTest.fetchInternetArchiveFromMeta('tt0063350', { title: 'Night of the Living Dead', year: 1968 }, fetchImpl, null);
+  const q = new URL(searchUrl).searchParams;
+  assert.match(q.get('q'), /year:1968/);
+  assert.match(q.get('q'), /licenseurl:\*creativecommons\.org\*/);
+  assert.equal(q.get('sort[]'), 'downloads desc');
+  assert.deepEqual(metadataFor, ['nightofthelivingdead_201910'], 'the exact-title item is reached past the unrelated first hits');
+  assert.equal(streams.length, 1);
+  assert.equal(streams[0].name, 'Internet Archive · Public Domain');
+  _coreStreamsTest.resetSourceHealth();
+});
+
+test('the retired Creative Commons public-domain URL counts as a public-domain declaration', () => {
+  assert.deepEqual(_coreStreamsTest.declaredOpenLicense('http://creativecommons.org/licenses/publicdomain/'),
+    { url: 'http://creativecommons.org/licenses/publicdomain/', label: 'Public Domain' });
+  assert.equal(_coreStreamsTest.declaredOpenLicense('https://creativecommons.org/licenses/by-nc/4.0/'), null, 'non-commercial stays out');
+});
+
+test('a 404 from a stream add-on is "nothing here", not an outage that opens its breaker', async () => {
+  _coreStreamsTest.resetSourceHealth();
+  let httpCalls = 0;
+  const fetchImpl = async (url) => {
+    if (url.startsWith('https://http-addon.example.org/')) {
+      httpCalls++;
+      return url.includes('/series/') ? new Response('Not found', { status: 404 }) : jsonResponse({ streams: [{ url: 'https://media.example.org/a.mp4', name: '1080p' }] });
+    }
+    return jsonResponse({ streams: [] });
+  };
+  const env = makeEnv({ CORE_STREAMS_HTTP_SOURCE_MANIFEST: 'https://http-addon.example.org/manifest.json' });
+  for (let i = 1; i <= 4; i++) {
+    await handleCoreStreams(makeRequest(`/core-streams/${TOKEN}/stream/series/tt0944947:1:${i}.json`), env, { fetchImpl });
+  }
+  const movie = await handleCoreStreams(makeRequest(`/core-streams/${TOKEN}/stream/movie/tt0133093.json`), env, { fetchImpl });
+  assert.equal(httpCalls, 5, 'the movie request still reaches the source');
+  assert.ok((await movie.json()).streams.some((stream) => stream.name.startsWith('HTTP source')));
+  _coreStreamsTest.resetSourceHealth();
+});
+
+test('a torrent whose trackers are all unsafe carries no empty sources list', () => {
+  const stream = _coreStreamsTest.normalizeStream({ infoHash: 'a'.repeat(40), sources: ['tracker:udp://10.0.0.1:80/announce'] }, 'Torrentio');
+  assert.equal('sources' in stream, false);
 });

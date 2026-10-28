@@ -110,7 +110,12 @@ function configuredAddonBase(manifestUrl) {
   if (!isPublicHostname(parsed.hostname)) return null;
   const path = parsed.pathname.replace(/\/+$/, '');
   if (!path.endsWith('/manifest.json') || path.includes('..')) return null;
-  if (!/^\/(?:[A-Za-z0-9._~-]+\/)*manifest\.json$/.test(path)) return null;
+  // Path segments may carry an add-on's configuration in any RFC 3986 path
+  // character: Torrentio uses `providers=yts,eztv|sort=quality`, Comet and
+  // AIOStreams base64 with `=` or percent-encoded `%2B`/`%3D`, WebStreamr
+  // percent-encoded JSON. Only the path is affected; the origin checks above
+  // still decide where requests can go. `|` is kept literally by URL parsing.
+  if (!/^\/(?:(?:[A-Za-z0-9._~!$&'()*+,;=:@|-]|%[0-9A-Fa-f]{2})+\/)*manifest\.json$/.test(path)) return null;
   return parsed.origin + path.slice(0, -'/manifest.json'.length);
 }
 
@@ -207,8 +212,8 @@ function normalizeStream(stream, sourceName) {
       normalized.fileIdx = stream.fileIdx;
     }
     if (Array.isArray(stream.sources)) {
-      normalized.sources = stream.sources.slice(0, 20)
-        .filter(isSafeTorrentSource);
+      const sources = stream.sources.slice(0, 20).filter(isSafeTorrentSource);
+      if (sources.length) normalized.sources = sources;
     }
   } else if (typeof stream.ytId === 'string' && YOUTUBE_ID_RE.test(stream.ytId)) {
     // Stremio clients resolve YouTube IDs in their native player; don't fetch,
@@ -423,21 +428,34 @@ function declaredOpenLicense(value) {
   if (/^\/publicdomain\/(?:mark|zero)\/(?:\d+(?:\.\d+)?|1\.0)$/.test(path)) {
     return { url: url.href, label: path.includes('/zero/') ? 'CC0' : 'Public Domain Mark' };
   }
+  // Creative Commons' retired Public Domain Certification. Still declared on
+  // many Archive uploads of public-domain films (e.g. Night of the Living Dead).
+  if (path === '/licenses/publicdomain') return { url: url.href, label: 'Public Domain' };
   const match = path.match(/^\/licenses\/(by|by-sa)\/(\d+(?:\.\d+)?)$/);
   if (!match) return null;
   return { url: url.href, label: match[1] === 'by-sa' ? `CC BY-SA ${match[2]}` : `CC BY ${match[2]}` };
 }
 
-async function fetchBoundedJson(url, fetchImpl, maxBytes = OPEN_MEDIA_MAX_BYTES, timeoutMs = OPEN_MEDIA_TIMEOUT_MS, deadlineSignal = null) {
+async function fetchBoundedJson(url, fetchImpl, maxBytes = OPEN_MEDIA_MAX_BYTES, timeoutMs = OPEN_MEDIA_TIMEOUT_MS, deadlineSignal = null, redirectHosts = []) {
   const requestSignal = AbortSignal.timeout(timeoutMs);
   const signal = deadlineSignal ? AbortSignal.any([requestSignal, deadlineSignal]) : requestSignal;
-  const response = await fetchImpl(url, {
-    method: 'GET',
-    headers: { Accept: 'application/json' },
-    redirect: 'manual',
-    signal,
-  });
+  const init = { method: 'GET', headers: { Accept: 'application/json' }, redirect: 'manual', signal };
+  let response = await fetchImpl(url, init);
   if (!response) throw new Error('Open-media request returned no response');
+  // Redirects stay manual, but a caller may name hosts it trusts as the
+  // destination of one hop (Cinemeta sends cache misses to cinemeta-live).
+  if ([301, 302, 303, 307, 308].includes(response.status) && redirectHosts.length) {
+    const location = response.headers && response.headers.get('location');
+    cancelBody(response);
+    let next = null;
+    try { next = new URL(location, url); } catch { /* invalid Location */ }
+    if (!next || next.protocol !== 'https:' || !redirectHosts.includes(next.hostname)
+      || next.username || next.password || next.port) {
+      throw new Error('Open-media redirect is not allowed');
+    }
+    response = await fetchImpl(next.href, init);
+    if (!response) throw new Error('Open-media request returned no response');
+  }
   if (response.status === 404) {
     cancelBody(response);
     return null;
@@ -539,7 +557,9 @@ function cinemetaTitleYear(payload) {
   const meta = payload?.meta;
   if (!meta || typeof meta.name !== 'string') return null;
   const title = cleanText(meta.name, 300);
-  const yearValue = Number(meta.year || String(meta.released || '').slice(0, 4));
+  // The cached host sends `year`/`released`; cinemeta-live sends only `releaseInfo`.
+  const yearText = String(meta.year || meta.released || meta.releaseInfo || '');
+  const yearValue = Number((yearText.match(/\d{4}/) || [])[0]);
   const year = Number.isInteger(yearValue) && yearValue >= 1880 && yearValue <= 2200 ? yearValue : null;
   return title && year ? { title, year } : null;
 }
@@ -549,10 +569,11 @@ async function fetchInternetArchiveFromMeta(id, expected, fetchImpl, deadlineSig
   try {
     const searchUrl = new URL('https://archive.org/advancedsearch.php');
     const escapedTitle = expected.title.replace(/([\\"])/g, '\\$1');
-    searchUrl.searchParams.set('q', `mediatype:movies AND title:"${escapedTitle}"`);
+    searchUrl.searchParams.set('q', `mediatype:movies AND title:"${escapedTitle}" AND year:${expected.year} AND licenseurl:*creativecommons.org*`);
     searchUrl.searchParams.append('fl[]', 'identifier');
     searchUrl.searchParams.append('fl[]', 'title');
-    searchUrl.searchParams.set('rows', '6');
+    searchUrl.searchParams.append('sort[]', 'downloads desc');
+    searchUrl.searchParams.set('rows', '12');
     searchUrl.searchParams.set('page', '1');
     searchUrl.searchParams.set('output', 'json');
     const searchPayload = await fetchBoundedJson(searchUrl.href, fetchImpl, OPEN_MEDIA_MAX_BYTES, OPEN_MEDIA_TIMEOUT_MS, deadlineSignal);
@@ -565,11 +586,12 @@ async function fetchInternetArchiveFromMeta(id, expected, fetchImpl, deadlineSig
       sourceFailed('internet-archive');
       return [];
     }
-    const candidates = docs.slice(0, 2)
+    const candidates = docs
       .filter((doc) => doc && typeof doc.identifier === 'string'
         && /^[A-Za-z0-9][A-Za-z0-9_.-]{1,99}$/.test(doc.identifier)
         && typeof doc.title === 'string'
-        && normalizeMatchTitle(doc.title) === normalizeMatchTitle(expected.title));
+        && normalizeMatchTitle(doc.title) === normalizeMatchTitle(expected.title))
+      .slice(0, 2);
     if (!candidates.length) {
       sourceSucceeded('internet-archive');
       return [];
@@ -776,13 +798,17 @@ async function fetchOpenMedia(type, id, fetchImpl) {
       const metaPayload = await fetchBoundedJson(
         `https://v3-cinemeta.strem.io/meta/movie/${encodeURIComponent(imdb)}.json`,
         fetchImpl, OPEN_MEDIA_MAX_BYTES, OPEN_MEDIA_TIMEOUT_MS, deadlineSignal,
+        // Titles missing from the cached host (most open-media films) are
+        // answered with a 307 to cinemeta-live; it was being counted as an outage.
+        ['cinemeta-live.strem.io'],
       );
       // A missing item or a valid but metadata-free response is not an upstream
       // outage. Transport, HTTP, body-size, and JSON errors throw above instead.
       sourceSucceeded('cinemeta');
       expected = cinemetaTitleYear(metaPayload);
     } catch {
-      sourceFailed('cinemeta');
+      if (deadlineSignal.aborted) sourceDeadlineCancelled('cinemeta');
+      else sourceFailed('cinemeta');
     }
   }
 
@@ -802,6 +828,14 @@ async function fetchSource(source, type, id, fetchImpl) {
       redirect: 'manual',
       signal: AbortSignal.timeout(SOURCE_TIMEOUT_MS),
     });
+    if (response && response.status === 404) {
+      // Add-ons answer 404 for a type or id they do not serve (the configured
+      // source may be movie-only). Three of those used to open the breaker and
+      // hide the source from every request for 30 seconds.
+      cancelBody(response);
+      sourceSucceeded(source.id);
+      return [];
+    }
     if (!response || response.status < 200 || response.status >= 300) {
       cancelBody(response);
       sourceFailed(source.id);
@@ -852,7 +886,7 @@ async function fetchSource(source, type, id, fetchImpl) {
 function manifest() {
   return {
     id: 'uk.corebuilds.core-streams',
-    version: '0.8.0',
+    version: '0.8.1',
     name: 'Core Streams',
     description: 'Quality-ranked stream fallback with curated torrents, open media, and configurable sources.',
     resources: ['stream'],
