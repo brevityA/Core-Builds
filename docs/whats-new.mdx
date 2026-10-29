@@ -1,14 +1,30 @@
 ---
-title: "What's New — Configurator v3.24"
+title: "What's New — Configurator v3.25"
 sidebarTitle: "What's New"
-description: "Latest Core Builds Configurator releases (v3.24 and earlier), auto-generated from the in-app changelog."
+description: "Latest Core Builds Configurator releases (v3.25 and earlier), auto-generated from the in-app changelog."
 ---
 
 # What's New in the Configurator
 
-This page is regenerated from `configurator/src/data/changelog.js` by `scripts/sync-docs.py`, so it always reflects the latest shipped configurator version (currently **v3.24**).
+This page is regenerated from `configurator/src/data/changelog.js` by `scripts/sync-docs.py`, so it always reflects the latest shipped configurator version (currently **v3.25**).
 
 For the template-suite release log, see the [Changelog](https://corebuilds-docs.docsalot.dev/changelog).
+
+## Configurator v3.25 (Oct 29 2026)
+
+<CardGroup cols={2}>
+  <Card title="EasyNews add-ons now reach your config" icon="sparkles">
+    choosing EasyNews or EasyNews+ under Additional services & scrapers on a TorBox (or any non-EasyNews) build left them out of the JSON, because both need the EasyNews service and that dialog had no way to add it. Picking either now adds the EasyNews service too, and Quick install asks for its username and password. Unticking them takes the service back out of Quick install.
+  </Card>
+  <Card title="Typing no longer jumps to the previous box" icon="bolt">
+    a helper that selects a field’s text 50 ms after you click into it also moved the cursor back there, so autofill, a password manager or fast tabbing could put the next field’s text in the wrong box. In Quick install the Stremio password could end up in the email field and the install would sit waiting.
+  </Card>
+  <Card title="Generated output unchanged" icon="shield-check">
+    for the same settings, every config the configurator and the CLI build is byte-for-byte what 3.24 produced apart from the version stamp; the fix changes which settings the EasyNews picks produce.
+  </Card>
+</CardGroup>
+
+---
 
 ## Configurator v3.24 (Oct 26 2026)
 
@@ -56,21 +72,5 @@ For the template-suite release log, see the [Changelog](https://corebuilds-docs.
   </Card>
   <Card title="Generated output unchanged" icon="shield-check">
     every config the configurator and the CLI build is byte-for-byte what 3.21 produced; only the version stamp moves.
-  </Card>
-</CardGroup>
-
----
-
-## Configurator v3.21 (Oct 23 2026)
-
-<CardGroup cols={2}>
-  <Card title="Quick install is a full-screen page on phones" icon="sparkles">
-    it used to open as a pop-up over the landing, with two-column grids of small cards. On a phone it now fills the screen: one column of full-width rows you can tap easily, larger text, and the Install button pinned to the bottom so it is always in reach. Desktop keeps the centred panel.
-  </Card>
-  <Card title="Back closes Quick install" icon="bolt">
-    the new Back button at the top, or your phone’s own Back button, returns to the landing. The system Back button used to leave the site.
-  </Card>
-  <Card title="Generated output unchanged" icon="shield-check">
-    every config the configurator and the CLI build is byte-for-byte what 3.20 produced; only the version stamp moves.
   </Card>
 </CardGroup>
