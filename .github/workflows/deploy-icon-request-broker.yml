@@ -79,8 +79,13 @@ jobs:
       ENV_NAME: ${{ github.event.inputs.environment }}
       BROKER: apps/tools/icon_request_broker
     steps:
+      # Neither checkout keeps the job token in .git/config: the CoreBuildsApps
+      # tests and wrangler run from these trees, and the only later git call
+      # fetches the public CoreBuildsApps main, which needs no credentials.
       - name: Checkout Core-Builds (for the cors-proxy config)
         uses: actions/checkout@v7
+        with:
+          persist-credentials: false
 
       - name: Checkout CoreBuildsApps @ ${{ github.event.inputs.ref }}
         uses: actions/checkout@v7
@@ -88,11 +93,17 @@ jobs:
           repository: brevityA/CoreBuildsApps
           ref: ${{ github.event.inputs.ref }}
           path: apps
+          persist-credentials: false
           # The broker's tests read the issue form they must stay in step
-          # with (worker.test.mjs -> .github/ISSUE_TEMPLATE/).
+          # with (worker.test.mjs -> .github/ISSUE_TEMPLATE/), and the Play
+          # ids the app ships: PlusStore.kt's product id here, and
+          # app/build.gradle.kts's applicationId, which cone mode checks out
+          # as a file in that directory's parent path. Without them the
+          # suite fails before any deploy (49/50 since the Plus check).
           sparse-checkout: |
             tools/icon_request_broker
             .github/ISSUE_TEMPLATE
+            app/src/play/java/tv/corebuilds/iconpack
           fetch-depth: 0
 
       - name: Refuse a ref that is not on CoreBuildsApps main
