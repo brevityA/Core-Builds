@@ -1394,7 +1394,7 @@ test('Core Streams: stream route uses bounded source rate limiting and returns s
     const res = await worker.fetch(req, env, ctxSync);
     assert.equal(res.status, 200);
     assert.equal(res.headers.get('Access-Control-Allow-Origin'), '*');
-    assert.equal(urls.length, 4, 'three fixed torrent add-ons and the bounded Cinemeta title lookup are requested');
+    assert.equal(urls.length, 6, 'three fixed torrent add-ons, YTS, The Pirate Bay and the bounded Cinemeta title lookup are requested');
     assert.deepEqual((await res.json()).streams.map((stream) => stream.infoHash), ['d'.repeat(40)]);
   } finally {
     global.fetch = priorFetch;
