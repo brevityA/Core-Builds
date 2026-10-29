@@ -21,9 +21,9 @@ test('manifest is a Stremio stream-only manifest behind the install token', asyn
   assert.equal(response.headers.get('Cache-Control'), 'no-store');
   assert.deepEqual(await response.json(), {
     id: 'uk.corebuilds.core-streams',
-    version: '0.9.0',
+    version: '0.10.0',
     name: 'Core Streams',
-    description: 'Quality-ranked free streams: torrent add-ons and public indexes (YTS, The Pirate Bay, EZTV), open media, and configurable sources.',
+    description: 'Quality-ranked streams: torrent add-ons and public indexes (YTS, The Pirate Bay, EZTV, Knaben), instant TorBox playback when configured, open media, and configurable sources.',
     resources: ['stream'],
     types: ['movie', 'series'],
     catalogs: [],
@@ -634,7 +634,7 @@ test('Internet Archive adapter returns only exact-title, year-matched, uploader-
   assert.ok(blenderStream);
   assert.equal(blenderStream.name, 'Blender Open Movies · CC BY 3.0');
   assert.match(blenderStream.description, /peach\.blender\.org\/about/);
-  assert.equal(calls.length, 10, 'three add-ons, two indexes, Cinemeta, IA search/item metadata, and Blender search/video metadata');
+  assert.equal(calls.length, 11, 'three add-ons, three indexes, Cinemeta, IA search/item metadata, and Blender search/video metadata');
   assert.ok(calls.every(({ init }) => init.redirect === 'manual'));
 
   assert.equal(_coreStreamsTest.declaredOpenLicense('https://creativecommons.org/licenses/by-nc/4.0/'), null);
@@ -716,7 +716,7 @@ test('Blender Open Movies resolves the exact Elephants Dream upload under its of
   assert.equal(stream.name, 'Blender Open Movies · CC BY 2.5');
   assert.match(stream.description, /creativecommons\.org\/licenses\/by\/2\.5/);
   assert.match(stream.description, /orange\.blender\.org/);
-  assert.equal(calls.length, 9);
+  assert.equal(calls.length, 10, 'Knaben searches once Cinemeta has a title');
   _coreStreamsTest.resetSourceHealth();
 });
 
@@ -803,7 +803,7 @@ test('mapped Blender Open Movies use exact official uploads and per-film verifie
     if (film.officialVideoUrl) assert.ok(stream.description.includes(film.officialVideoUrl));
     if (film.licenseEvidence) assert.ok(stream.description.includes(film.licenseEvidence));
     assert.equal(stream.url, `https://video.blender.org/object-storage/web_videos/${film.path}`);
-    assert.equal(calls.length, 9, 'three add-ons, two indexes, Cinemeta, Archive search, and Blender search/detail');
+    assert.equal(calls.length, 10, 'three add-ons, three indexes, Cinemeta, Archive search, and Blender search/detail');
   }
   _coreStreamsTest.resetSourceHealth();
 });
@@ -1148,4 +1148,216 @@ test('fileMustInclude survives normalization only as a short list of plain strin
   assert.deepEqual(capped.fileMustInclude, ['a', 'b', 'c', 'd'], 'at most four patterns are kept');
   const none = _coreStreamsTest.normalizeStream({ infoHash: HASH('a'), fileMustInclude: [7] }, 'Test');
   assert.equal(none.fileMustInclude, undefined);
+});
+
+// --- Knaben -------------------------------------------------------------------
+
+test('Knaben searches "<title> <year>" for films and keeps only title-and-year matches in video categories', async () => {
+  _coreStreamsTest.resetSourceHealth();
+  let knabenBody = null;
+  const fetchImpl = async (input, init) => {
+    const url = String(input);
+    if (url.startsWith('https://v3-cinemeta.strem.io/')) return jsonResponse({ meta: { name: 'Oppenheimer', year: '2023' } });
+    if (url === 'https://api.knaben.org/v1') {
+      assert.equal(init.method, 'POST');
+      knabenBody = JSON.parse(init.body);
+      return jsonResponse({ hits: [
+        { title: 'Oppenheimer.2023.2160p.UHD.BluRay.REMUX', hash: HASH('A'), seeders: 250, bytes: 70e9, categoryId: [3003000, 3000000], tracker: '1337x' },
+        { title: 'To End All War Oppenheimer The Atomic Bomb (2023) 1080p', hash: HASH('b'), seeders: 111, bytes: 1, categoryId: [3001000] },
+        { title: 'Oppenheimer 2023 Soundtrack FLAC', hash: HASH('c'), seeders: 50, bytes: 1, categoryId: [1000000] },
+        { title: 'Oppenheimer.1980.TV.Series.S01E01', hash: HASH('d'), seeders: 5, bytes: 1, categoryId: [2000000] },
+        { title: 'Oppenheimer 2023 1080p dead', hash: HASH('e'), seeders: 0, bytes: 1, categoryId: [3001000] },
+      ] });
+    }
+    return jsonResponse({ streams: [] });
+  };
+  const response = await handleCoreStreams(makeRequest(`/core-streams/${TOKEN}/stream/movie/tt15398776.json`), makeEnv(), { fetchImpl });
+  const knaben = (await response.json()).streams.filter((stream) => stream.name.startsWith('Knaben'));
+  assert.equal(knabenBody.query, 'Oppenheimer 2023');
+  assert.equal(knabenBody.hide_unsafe, true);
+  assert.equal(knabenBody.hide_xxx, true);
+  assert.deepEqual(knaben.map((stream) => stream.infoHash), [HASH('a')]);
+  assert.equal(knaben[0].name, 'Knaben · 2160p');
+  assert.match(knaben[0].title, /· 1337x\n👤 250/);
+  assert.match(response.headers.get('X-Core-Streams-Sources'), /knaben=ok 1/);
+  _coreStreamsTest.resetSourceHealth();
+});
+
+test('Knaben episodes need the exact episode and the show name', async () => {
+  _coreStreamsTest.resetSourceHealth();
+  let query = null;
+  const fetchImpl = async (input, init) => {
+    const url = String(input);
+    if (url.startsWith('https://v3-cinemeta.strem.io/')) return jsonResponse({ meta: { name: 'Breaking Bad', releaseInfo: '2008–2013' } });
+    if (url === 'https://api.knaben.org/v1') {
+      query = JSON.parse(init.body).query;
+      return jsonResponse({ hits: [
+        { title: 'Breaking.Bad.S01E01.Pilot.1080p.HEVC.x265-MeGusta', hash: HASH('a'), seeders: 50, bytes: 1, categoryId: [2000000] },
+        { title: 'The Bad Guys Breaking In S01E01 1080p', hash: HASH('b'), seeders: 6, bytes: 1, categoryId: [2000000] },
+        { title: 'Breaking Bad S01E02 1080p', hash: HASH('c'), seeders: 9, bytes: 1, categoryId: [2000000] },
+      ] });
+    }
+    return jsonResponse({ streams: [] });
+  };
+  const response = await handleCoreStreams(makeRequest(`/core-streams/${TOKEN}/stream/series/tt0903747:1:1.json`), makeEnv(), { fetchImpl });
+  const knaben = (await response.json()).streams.filter((stream) => stream.name.startsWith('Knaben'));
+  assert.equal(query, 'Breaking Bad S01E01');
+  assert.deepEqual(knaben.map((stream) => stream.infoHash), [HASH('a')]);
+  _coreStreamsTest.resetSourceHealth();
+});
+
+// --- TorBox -------------------------------------------------------------------
+
+const TORBOX_KEY = 'tb0123456789abcdef0123456789abcd';
+
+function torboxFixture({ cached = {}, files = [], linkFor = (id) => `https://store-021.tb-cdn.io/dl/${id}.mkv`, createError = null } = {}) {
+  const calls = [];
+  const fetchImpl = async (input, init = {}) => {
+    const url = String(input);
+    calls.push({ url, init });
+    if (url.startsWith('https://api.torbox.app/')) {
+      assert.equal(init.headers.Authorization, `Bearer ${TORBOX_KEY}`);
+      const { pathname, searchParams } = new URL(url);
+      if (pathname.endsWith('/torrents/checkcached')) {
+        const hits = searchParams.get('hash').split(',').filter((hash) => cached[hash]).map((hash) => ({ hash, name: 'x', size: 1, files: cached[hash] }));
+        return jsonResponse({ success: true, data: hits });
+      }
+      if (pathname.endsWith('/torrents/createtorrent')) {
+        if (createError) return jsonResponse({ success: false, error: createError, data: null }, 400);
+        return jsonResponse({ success: true, data: { torrent_id: 4242, hash: init.body.get('magnet').slice(-40) } });
+      }
+      if (pathname.endsWith('/torrents/mylist')) return jsonResponse({ success: true, data: { id: 4242, download_present: true, files } });
+      if (pathname.endsWith('/torrents/requestdl')) return jsonResponse({ success: true, data: linkFor(searchParams.get('file_id')) });
+    }
+    if (url.startsWith('https://torrentio.strem.fun/')) {
+      return jsonResponse({ streams: [
+        { infoHash: HASH('a'), fileIdx: 0, name: '1080p', title: 'Cached.Film.2001.1080p 👤 50' },
+        { infoHash: HASH('b'), fileIdx: 0, name: '2160p', title: 'Uncached.Film.2001.2160p 👤 900' },
+      ] });
+    }
+    return jsonResponse({ streams: [] });
+  };
+  return { calls, fetchImpl };
+}
+
+test('without TORBOX_API_KEY nothing is sent to TorBox and the play route is closed', async () => {
+  _coreStreamsTest.resetSourceHealth();
+  const { calls, fetchImpl } = torboxFixture({ cached: { [HASH('a')]: [{ name: 'Film.mkv', size: 9 }] } });
+  const response = await handleCoreStreams(makeRequest(`/core-streams/${TOKEN}/stream/movie/tt0133093.json`), makeEnv(), { fetchImpl });
+  assert.ok(!calls.some(({ url }) => url.includes('torbox')));
+  assert.ok(!(await response.json()).streams.some((stream) => stream.name.startsWith('TorBox')));
+  const play = await handleCoreStreams(makeRequest(`/core-streams/${TOKEN}/play/${HASH('a')}/movie`), makeEnv(), { fetchImpl });
+  assert.equal(play.status, 404);
+  _coreStreamsTest.resetSourceHealth();
+});
+
+test('cached torrents become TorBox HTTPS streams at the top; the key never appears in the response', async () => {
+  _coreStreamsTest.resetSourceHealth();
+  const { calls, fetchImpl } = torboxFixture({ cached: { [HASH('a')]: [{ name: 'Cached Film/Cached.Film.2001.1080p.mkv', size: 8_000_000_000 }, { name: 'Cached Film/sample.mkv', size: 9 }] } });
+  const response = await handleCoreStreams(makeRequest(`/core-streams/${TOKEN}/stream/movie/tt0133093.json`), makeEnv({ TORBOX_API_KEY: TORBOX_KEY }), { fetchImpl });
+  const text = await response.text();
+  assert.ok(!text.includes(TORBOX_KEY), 'the TorBox key is not in any stream');
+  const { streams } = JSON.parse(text);
+  assert.equal(streams[0].url, `https://worker.example/core-streams/${TOKEN}/play/${HASH('a')}/movie`);
+  assert.equal(streams[0].name, 'TorBox ⚡ · 1080p');
+  assert.match(streams[0].title, /Cached on TorBox · via Torrentio/);
+  assert.equal(streams[0].behaviorHints.filename, 'Cached.Film.2001.1080p.mkv');
+  assert.equal(streams[0].behaviorHints.videoSize, 8_000_000_000);
+  assert.equal(streams[0].behaviorHints.notWebReady, true);
+  assert.ok(!streams.some((stream) => stream.infoHash === HASH('a')), 'the P2P copy of a cached torrent is dropped');
+  assert.ok(streams.some((stream) => stream.infoHash === HASH('b')), 'uncached torrents stay as P2P');
+  const check = calls.find(({ url }) => url.includes('/torrents/checkcached'));
+  assert.match(check.url, /format=list/);
+  assert.match(check.url, /list_files=true/);
+  assert.match(response.headers.get('X-Core-Streams-Sources'), /torbox=cached 1/);
+  _coreStreamsTest.resetSourceHealth();
+});
+
+test('a cached season pack without the requested episode stays a P2P result', async () => {
+  _coreStreamsTest.resetSourceHealth();
+  const { fetchImpl } = torboxFixture({ cached: { [HASH('a')]: [{ name: 'Show.S01E02.mkv', size: 9 }, { name: 'Show.S01E03.mkv', size: 9 }] } });
+  const response = await handleCoreStreams(makeRequest(`/core-streams/${TOKEN}/stream/series/tt0903747:1:1.json`), makeEnv({ TORBOX_API_KEY: TORBOX_KEY }), { fetchImpl });
+  const { streams } = await response.json();
+  assert.ok(!streams.some((stream) => stream.name.startsWith('TorBox')));
+  assert.ok(streams.some((stream) => stream.infoHash === HASH('a')));
+  _coreStreamsTest.resetSourceHealth();
+});
+
+test('a TorBox cache-check failure leaves the normal results untouched and says why', async () => {
+  _coreStreamsTest.resetSourceHealth();
+  const fetchImpl = async (input) => {
+    const url = String(input);
+    if (url.startsWith('https://api.torbox.app/')) return jsonResponse({ success: false, error: 'BAD_TOKEN' }, 403);
+    if (url.startsWith('https://torrentio.strem.fun/')) return jsonResponse({ streams: [{ infoHash: HASH('a'), name: '1080p' }] });
+    return jsonResponse({ streams: [] });
+  };
+  const response = await handleCoreStreams(makeRequest(`/core-streams/${TOKEN}/stream/movie/tt0133093.json`), makeEnv({ TORBOX_API_KEY: TORBOX_KEY }), { fetchImpl });
+  assert.deepEqual((await response.json()).streams.map((stream) => stream.infoHash), [HASH('a')]);
+  assert.match(response.headers.get('X-Core-Streams-Sources'), /torbox=error BAD_TOKEN/);
+  _coreStreamsTest.resetSourceHealth();
+});
+
+test('play adds the torrent, picks the episode inside a pack and redirects to the TorBox CDN', async () => {
+  _coreStreamsTest.resetTorboxIds();
+  const { calls, fetchImpl } = torboxFixture({ files: [
+    { id: 0, name: 'Show S01/Show.S01E01.1080p.mkv', size: 2e9 },
+    { id: 1, name: 'Show S01/Show.S01E02.1080p.mkv', size: 3e9 },
+    { id: 2, name: 'Show S01/Sample/Show.S01E02.sample.mkv', size: 4e9 },
+  ] });
+  const env = makeEnv({ TORBOX_API_KEY: TORBOX_KEY });
+  const request = new Request(`https://worker.example/core-streams/${TOKEN}/play/${HASH('A')}/1x2`, { headers: { 'CF-Connecting-IP': '203.0.113.9' } });
+  const response = await handleCoreStreams(request, env, { fetchImpl, headers: secureHeaders });
+  assert.equal(response.status, 302);
+  assert.equal(response.headers.get('Location'), 'https://store-021.tb-cdn.io/dl/1.mkv');
+  assert.equal(response.headers.get('Access-Control-Allow-Origin'), '*');
+  const create = calls.find(({ url }) => url.endsWith('/torrents/createtorrent'));
+  assert.equal(create.init.method, 'POST');
+  assert.equal(create.init.body.get('magnet'), `magnet:?xt=urn:btih:${HASH('a')}`);
+  assert.equal(create.init.body.get('allow_zip'), 'false');
+  const dl = new URL(calls.find(({ url }) => url.includes('/torrents/requestdl')).url);
+  assert.equal(dl.searchParams.get('torrent_id'), '4242');
+  assert.equal(dl.searchParams.get('file_id'), '1');
+  assert.equal(dl.searchParams.get('redirect'), 'false');
+  assert.equal(dl.searchParams.get('user_ip'), '203.0.113.9');
+
+  // The torrent id is remembered, so a second play (or a HEAD probe) skips the add.
+  const again = await handleCoreStreams(new Request(`https://worker.example/core-streams/${TOKEN}/play/${HASH('a')}/1x2`, { method: 'HEAD' }), env, { fetchImpl });
+  assert.equal(again.status, 302);
+  assert.equal(calls.filter(({ url }) => url.endsWith('/torrents/createtorrent')).length, 1);
+  _coreStreamsTest.resetTorboxIds();
+});
+
+test('play refuses bad input and reports TorBox errors without leaking the key', async () => {
+  _coreStreamsTest.resetTorboxIds();
+  const env = makeEnv({ TORBOX_API_KEY: TORBOX_KEY });
+  const { fetchImpl } = torboxFixture({ createError: 'ACTIVE_LIMIT' });
+  assert.equal((await handleCoreStreams(makeRequest(`/core-streams/${TOKEN}/play/not-a-hash/movie`), env, { fetchImpl })).status, 404);
+  assert.equal((await handleCoreStreams(makeRequest(`/core-streams/${TOKEN}/play/${HASH('a')}/season-one`), env, { fetchImpl })).status, 404);
+  assert.equal((await handleCoreStreams(makeRequest(`/core-streams/${'f'.repeat(32)}/play/${HASH('a')}/movie`), env, { fetchImpl })).status, 404);
+  assert.equal((await handleCoreStreams(makeRequest(`/core-streams/${TOKEN}/play/${HASH('a')}/movie`, 'POST'), env, { fetchImpl })).status, 405);
+  const failed = await handleCoreStreams(makeRequest(`/core-streams/${TOKEN}/play/${HASH('a')}/movie`), env, { fetchImpl });
+  assert.equal(failed.status, 502);
+  const body = await failed.text();
+  assert.match(body, /ACTIVE_LIMIT/);
+  assert.ok(!body.includes(TORBOX_KEY));
+  const limited = await handleCoreStreams(makeRequest(`/core-streams/${TOKEN}/play/${HASH('a')}/movie`), env, { fetchImpl, rateLimit: async () => false });
+  assert.equal(limited.status, 429);
+  _coreStreamsTest.resetTorboxIds();
+});
+
+test('the video picker takes the largest film file and the requested episode, never samples or extras', () => {
+  const pick = (files, selector) => _coreStreamsTest.chooseVideoFile(files, _coreStreamsTest.parsePlaySelector(selector))?.name;
+  assert.equal(pick([
+    { id: 0, name: 'Film/Film.2001.mkv', size: 8 },
+    { id: 1, name: 'Film/Sample/film-sample.mkv', size: 9 },
+    { id: 2, name: 'Film/Extras/Making Of.mkv', size: 10 },
+    { id: 3, name: 'Film/Film.nfo', size: 99 },
+  ], 'movie'), 'Film/Film.2001.mkv');
+  assert.equal(pick([{ name: 'Show.S02E01.mkv', size: 1 }, { name: 'Show.S02E10.mkv', size: 9 }], '2x1'), 'Show.S02E01.mkv');
+  assert.equal(pick([{ name: 'Show.Pilot.mkv', size: 1 }], '1x1'), 'Show.Pilot.mkv', 'a single-video torrent is the episode');
+  assert.equal(pick([{ name: 'Show.S01E02.mkv', size: 1 }, { name: 'Show.S01E03.mkv', size: 1 }], '1x1'), undefined);
+  assert.equal(_coreStreamsTest.parsePlaySelector('0x1').kind, 'episode');
+  assert.equal(_coreStreamsTest.parsePlaySelector('../x'), null);
+  assert.ok(_coreStreamsTest.movieTitleMatches('Oppenheimer (2023) [1080p]', 'Oppenheimer', 2023));
+  assert.ok(!_coreStreamsTest.movieTitleMatches('Oppenheimer 1980', 'Oppenheimer', 2023));
 });
