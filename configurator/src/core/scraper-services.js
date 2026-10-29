@@ -28,3 +28,17 @@ export function withScraperServices(services, scrapers) {
   }
   return out;
 }
+
+/**
+ * Custom build: apply the extras dialog to the service list.
+ *
+ * `autoServices` are the services a previous Apply added only because an
+ * add-on needed them. They are dropped once no picked add-on needs them, so
+ * unticking EasyNews+ also turns the EasyNews service back off. A service the
+ * user chose themselves (in the service step) is never removed here.
+ */
+export function applyAddonServices({ services = [], autoServices = [], carouselPicks = [], scrapers = [], carousel = [] }) {
+  const independent = services.filter(v => !carousel.includes(v) && !autoServices.includes(v));
+  const auto = withScraperServices([], scrapers).filter(v => !independent.includes(v) && !carouselPicks.includes(v));
+  return { services: [...new Set([...independent, ...carouselPicks, ...auto])], autoServices: auto };
+}

@@ -30,3 +30,29 @@ test('the extras dialog applies required services and Quick install asks for the
   assert.match(appSrc, /sv=withScraperServices\(\[\.\.\.selectedServices\],sc\)/);
   assert.match(appSrc, /easynews:\['easynews','easynewsPass'\]/);
 });
+
+test('Custom build: an add-on-only service leaves with its add-on; a chosen service stays', async () => {
+  const { applyAddonServices } = await import('../src/core/scraper-services.js');
+  const carousel = CAROUSEL_SVCS;
+  // TorBox build, tick EasyNews+: the service comes along and is remembered as automatic.
+  let r = applyAddonServices({ services: ['torbox-pro'], scrapers: ['easynewsPlus'], carousel });
+  assert.deepEqual(r, { services: ['torbox-pro', 'easynews'], autoServices: ['easynews'] });
+  // Untick it: the automatic EasyNews goes too.
+  r = applyAddonServices({ services: r.services, autoServices: r.autoServices, scrapers: [], carousel });
+  assert.deepEqual(r, { services: ['torbox-pro'], autoServices: [] });
+  // EasyNews picked as a service by the user is never removed by the dialog.
+  r = applyAddonServices({ services: ['torbox-pro', 'easynews'], scrapers: ['easynews'], carousel });
+  assert.deepEqual(r, { services: ['torbox-pro', 'easynews'], autoServices: [] });
+  r = applyAddonServices({ services: r.services, autoServices: r.autoServices, scrapers: [], carousel });
+  assert.deepEqual(r.services, ['torbox-pro', 'easynews']);
+  // Carousel picks are replaced by the dialog's current picks.
+  r = applyAddonServices({ services: ['torbox-pro', 'debridio'], carouselPicks: ['p2p'], scrapers: [], carousel });
+  assert.deepEqual(r.services, ['torbox-pro', 'p2p']);
+});
+
+test('Quick install derives add-on services where it uses them, not only when the picker closes', () => {
+  // Reopening Quick install starts extras from carousel services only, so the
+  // EasyNews service must come back from the saved add-on picks.
+  assert.match(appSrc, /withScraperServices\(state\.extras, state\.scrapers\)/);
+  assert.match(appSrc, /const extrasSvc = withScraperServices\(p\.extras\?\.services \|\| \[\], extrasScr\)/);
+});
