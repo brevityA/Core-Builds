@@ -131,6 +131,9 @@ function parseRequestPath(pathname) {
     try { id = decodeURIComponent(rawId); } catch { return null; }
     return { token: parts[1], kind: 'stream', type, id };
   }
+  if (parts.length === 5 && parts[0] === 'core-streams' && parts[2] === 'play') {
+    return { token: parts[1], kind: 'play', hash: parts[3], selector: parts[4] };
+  }
   return null;
 }
 
@@ -444,10 +447,12 @@ function declaredOpenLicense(value) {
   return { url: url.href, label: match[1] === 'by-sa' ? `CC BY-SA ${match[2]}` : `CC BY ${match[2]}` };
 }
 
-async function fetchBoundedJson(url, fetchImpl, maxBytes = OPEN_MEDIA_MAX_BYTES, timeoutMs = OPEN_MEDIA_TIMEOUT_MS, deadlineSignal = null, redirectHosts = []) {
+async function fetchBoundedJson(url, fetchImpl, maxBytes = OPEN_MEDIA_MAX_BYTES, timeoutMs = OPEN_MEDIA_TIMEOUT_MS, deadlineSignal = null, redirectHosts = [], jsonBody = null) {
   const requestSignal = AbortSignal.timeout(timeoutMs);
   const signal = deadlineSignal ? AbortSignal.any([requestSignal, deadlineSignal]) : requestSignal;
-  const init = { method: 'GET', headers: { Accept: 'application/json' }, redirect: 'manual', signal };
+  const init = jsonBody === null
+    ? { method: 'GET', headers: { Accept: 'application/json' }, redirect: 'manual', signal }
+    : { method: 'POST', headers: { Accept: 'application/json', 'Content-Type': 'application/json' }, body: JSON.stringify(jsonBody), redirect: 'manual', signal };
   let response = await fetchImpl(url, init);
   if (!response) throw new Error('Open-media request returned no response');
   // Redirects stay manual, but a caller may name hosts it trusts as the
@@ -962,10 +967,10 @@ function releaseLabel(text) {
   return height ? `${height}p` : 'Torrent';
 }
 
-async function fetchIndexer(sourceId, url, fetchImpl, deadlineSignal, report, toStreams) {
+async function fetchIndexer(sourceId, url, fetchImpl, deadlineSignal, report, toStreams, jsonBody = null) {
   if (!sourceAllowed(sourceId)) { report[sourceId] = 'paused'; return []; }
   try {
-    const payload = await fetchBoundedJson(url, fetchImpl, INDEXER_MAX_BYTES, SOURCE_TIMEOUT_MS, deadlineSignal);
+    const payload = await fetchBoundedJson(url, fetchImpl, INDEXER_MAX_BYTES, SOURCE_TIMEOUT_MS, deadlineSignal, [], jsonBody);
     sourceSucceeded(sourceId);
     const streams = payload ? toStreams(payload).filter(Boolean).slice(0, MAX_STREAMS_PER_SOURCE) : [];
     report[sourceId] = `ok ${streams.length}`;
@@ -1110,12 +1115,249 @@ async function fetchEztv(type, id, fetchImpl, deadlineSignal, report, metaPromis
   return streams;
 }
 
+// --- Knaben -----------------------------------------------------------------
+// A meta-search over ~30 trackers (TPB, 1337x, RARBG mirrors, Nyaa, YTS...).
+// It searches by title, so every hit is checked against the Cinemeta title
+// (and year, for films) before it is offered.
+function movieTitleMatches(releaseTitle, title, year) {
+  const release = normalizeMatchTitle(String(releaseTitle).replace(/[._]/g, ' '));
+  const expected = normalizeMatchTitle(title);
+  if (!release || !expected || !year || !release.startsWith(`${expected} `)) return false;
+  return new RegExp(`(?:^| )${Number(year)}(?: |$)`).test(release.slice(expected.length));
+}
+
+const KNABEN_VIDEO_CATEGORY = (ids) => Array.isArray(ids) && ids.some((id) => id >= 2000000 && id < 4000000);
+
+async function fetchKnaben(type, id, fetchImpl, deadlineSignal, report, metaPromise) {
+  const [, season, episode] = id.split(':');
+  const expected = await metaPromise;
+  if (!expected) { report.knaben = 'skipped (no title)'; return []; }
+  const tag = type === 'series'
+    ? `S${String(Number(season)).padStart(2, '0')}E${String(Number(episode)).padStart(2, '0')}`
+    : String(expected.year);
+  const isEpisode = type === 'series' ? episodeMatcher(season, episode) : null;
+  const body = {
+    search_type: '100%',
+    search_field: 'title',
+    query: `${expected.title} ${tag}`,
+    order_by: 'seeders',
+    order_direction: 'desc',
+    size: 50,
+    hide_unsafe: true,
+    hide_xxx: true,
+  };
+  return fetchIndexer('knaben', 'https://api.knaben.org/v1', fetchImpl, deadlineSignal, report, (payload) =>
+    (Array.isArray(payload?.hits) ? payload.hits : [])
+      .filter((hit) => typeof hit?.hash === 'string' && Number(hit.seeders) > 0 && KNABEN_VIDEO_CATEGORY(hit.categoryId))
+      .filter((hit) => (type === 'series'
+        ? isEpisode.test(String(hit.title)) && showTitleMatches(cleanText(hit.title, 200).replace(/[._]/g, ' '), expected.title)
+        : movieTitleMatches(hit.title, expected.title, expected.year)))
+      .map((hit) => {
+        const release = cleanText(hit.title, 200);
+        const tracker = cleanText(hit.tracker, 40);
+        return indexerStream('Knaben', {
+          hash: hit.hash,
+          label: releaseLabel(release),
+          release: tracker ? `${release} · ${tracker}` : release,
+          seeders: hit.seeders,
+          sizeBytes: hit.bytes,
+        });
+      }), body);
+}
+
+// --- TorBox (optional, owner's own account) --------------------------------
+// With TORBOX_API_KEY set as a Worker secret, every torrent result is checked
+// against TorBox's cache. Cached ones are offered first as HTTPS links to this
+// Worker's /play route, which adds the torrent to the account, picks the file
+// and answers with a 302 to TorBox's CDN. The key never appears in a stream
+// URL or response, and no media passes through the Worker.
+const TORBOX_API = 'https://api.torbox.app/v1/api';
+const TORBOX_KEY_RE = /^[A-Za-z0-9-]{20,100}$/;
+const TORBOX_CHECK_TIMEOUT_MS = 3000;
+const TORBOX_PLAY_TIMEOUT_MS = 8000;
+const TORBOX_MAX_BYTES = 1024 * 1024;
+const VIDEO_FILE_RE = /\.(?:mkv|mp4|m4v|avi|webm|mov|ts|m2ts|wmv)$/i;
+const torboxTorrentIds = new Map(); // info hash -> TorBox torrent id; isolate-local, bounded
+
+function torboxKey(env) {
+  const key = env && env.TORBOX_API_KEY;
+  return typeof key === 'string' && TORBOX_KEY_RE.test(key.trim()) ? key.trim() : null;
+}
+
+async function torboxRequest(path, key, fetchImpl, signal, { method = 'GET', query = {}, form = null } = {}) {
+  const url = new URL(`${TORBOX_API}${path}`);
+  for (const [name, value] of Object.entries(query)) {
+    if (value !== undefined && value !== null && value !== '') url.searchParams.set(name, String(value));
+  }
+  let body;
+  if (form) {
+    body = new FormData();
+    for (const [name, value] of Object.entries(form)) body.append(name, String(value));
+  }
+  const response = await fetchImpl(url.href, {
+    method,
+    headers: { Accept: 'application/json', Authorization: `Bearer ${key}` },
+    body,
+    redirect: 'manual',
+    signal,
+  });
+  if (!response) throw new Error('TorBox returned no response');
+  const buffer = await readBounded(response, TORBOX_MAX_BYTES);
+  let payload = null;
+  if (buffer) { try { payload = JSON.parse(new TextDecoder().decode(buffer)); } catch { payload = null; } }
+  if (response.status < 200 || response.status >= 300 || !payload || payload.success === false) {
+    const code = cleanText(payload?.error, 40) || `HTTP ${response.status}`;
+    const error = new Error(code);
+    error.torbox = code;
+    throw error;
+  }
+  return payload.data;
+}
+
+// Which video inside a torrent to play: the requested episode for a series
+// (a single-video torrent counts), the largest video for a film. Samples and
+// extras are never picked.
+function chooseVideoFile(files, selector) {
+  const videos = (Array.isArray(files) ? files : [])
+    .filter((file) => file && typeof file === 'object')
+    .map((file) => ({ ...file, path: String(file.name || file.short_name || '') }))
+    .filter((file) => VIDEO_FILE_RE.test(file.path) && !/(?:^|[\/ ._-])(?:sample|trailer|extras?|featurettes?)(?:[\/ ._-]|$)/i.test(file.path));
+  if (!videos.length) return null;
+  const bySize = (a, b) => Number(b.size || 0) - Number(a.size || 0);
+  if (selector.kind === 'episode') {
+    const match = episodeMatcher(selector.season, selector.episode);
+    const hits = videos.filter((file) => match.test(file.path)).sort(bySize);
+    if (hits.length) return hits[0];
+    return videos.length === 1 ? videos[0] : null;
+  }
+  return videos.sort(bySize)[0];
+}
+
+function playSelector(type, id) {
+  const [, season, episode] = id.split(':');
+  return type === 'series' ? `${Number(season)}x${Number(episode)}` : 'movie';
+}
+
+function parsePlaySelector(value) {
+  if (value === 'movie') return { kind: 'movie' };
+  const match = /^(\d{1,3})x(\d{1,4})$/.exec(value || '');
+  return match ? { kind: 'episode', season: Number(match[1]), episode: Number(match[2]) } : null;
+}
+
+async function torboxCachedHashes(hashes, key, fetchImpl, report) {
+  if (!hashes.length) return new Map();
+  if (!sourceAllowed('torbox')) { report.torbox = 'paused'; return new Map(); }
+  try {
+    const data = await torboxRequest('/torrents/checkcached', key, fetchImpl, AbortSignal.timeout(TORBOX_CHECK_TIMEOUT_MS), {
+      query: { hash: hashes.join(','), format: 'list', list_files: 'true' },
+    });
+    sourceSucceeded('torbox');
+    const entries = Array.isArray(data) ? data : (data && typeof data === 'object' ? Object.values(data) : []);
+    const cached = new Map();
+    for (const entry of entries) {
+      const hash = typeof entry?.hash === 'string' ? entry.hash.toLowerCase() : '';
+      if (INFO_HASH_RE.test(hash)) cached.set(hash, entry);
+    }
+    report.torbox = `cached ${cached.size}`;
+    return cached;
+  } catch (error) {
+    sourceFailed('torbox');
+    report.torbox = error?.name === 'TimeoutError' ? 'timeout' : (error?.torbox ? `error ${error.torbox}` : 'network error');
+    return new Map();
+  }
+}
+
+// Swap cached torrents for TorBox HTTPS streams and put them first. The P2P
+// copy of a cached torrent is dropped: the TorBox one plays the same file faster.
+async function applyTorbox(streams, { key, origin, token, type, id, fetchImpl, report }) {
+  const hashes = [...new Set(streams.filter((stream) => stream.infoHash).map((stream) => stream.infoHash))].slice(0, 100);
+  const cached = await torboxCachedHashes(hashes, key, fetchImpl, report);
+  if (!cached.size) return streams;
+  const selector = playSelector(type, id);
+  const parsedSelector = parsePlaySelector(selector);
+  const instant = [];
+  const rest = [];
+  const offered = new Set();
+  for (const stream of streams) {
+    if (!stream.infoHash || !cached.has(stream.infoHash)) { rest.push(stream); continue; }
+    if (offered.has(stream.infoHash)) continue;
+    const file = chooseVideoFile(cached.get(stream.infoHash).files, parsedSelector);
+    // A cached pack without the requested episode can't play it; keep the P2P entry.
+    if (Array.isArray(cached.get(stream.infoHash).files) && cached.get(stream.infoHash).files.length && !file) { rest.push(stream); continue; }
+    offered.add(stream.infoHash);
+    const [source, label] = String(stream.name).split(' · ');
+    const filename = file ? cleanText(String(file.path).split('/').pop(), 255) : '';
+    const size = Number(file?.size);
+    instant.push({
+      url: `${origin}/core-streams/${token}/play/${stream.infoHash}/${selector}`,
+      name: `TorBox ⚡ · ${label || source}`,
+      ...(stream.title ? { title: `${stream.title}\nCached on TorBox · via ${source}` } : {}),
+      ...(stream.description ? { description: `${stream.description}\nCached on TorBox · via ${source}` } : {}),
+      behaviorHints: {
+        bingeGroup: `core-streams|torbox|${label || 'video'}`,
+        ...(filename ? { filename } : {}),
+        ...(Number.isSafeInteger(size) && size > 0 ? { videoSize: size } : {}),
+        // Stremio's web player only handles MP4/WebM natively.
+        ...(!/\.(?:mp4|webm)$/i.test(filename) ? { notWebReady: true } : {}),
+      },
+    });
+  }
+  instant.sort((a, b) => smartStreamScore(b) - smartStreamScore(a));
+  return [...instant, ...rest];
+}
+
+function clientIp(request) {
+  const ip = request.headers.get('CF-Connecting-IP') || '';
+  return /^[0-9a-f.:]{3,45}$/i.test(ip) ? ip : '';
+}
+
+async function handleTorboxPlay(request, env, route, headers, fetchImpl) {
+  const key = torboxKey(env);
+  if (!key) return jsonResponse(404, { error: 'TorBox is not configured' }, headers);
+  const selector = parsePlaySelector(route.selector);
+  if (!INFO_HASH_RE.test(route.hash) || !selector) return jsonResponse(404, { error: 'not found' }, headers);
+  const hash = route.hash.toLowerCase();
+  const signal = AbortSignal.timeout(TORBOX_PLAY_TIMEOUT_MS);
+  try {
+    let torrentId = torboxTorrentIds.get(hash);
+    if (!torrentId) {
+      // Adding a torrent TorBox already has cached is instant and returns its id;
+      // adding one already in the account returns the existing id.
+      const created = await torboxRequest('/torrents/createtorrent', key, fetchImpl, signal, {
+        method: 'POST',
+        form: { magnet: `magnet:?xt=urn:btih:${hash}`, seed: '3', allow_zip: 'false' },
+      });
+      torrentId = Number(created?.torrent_id ?? created?.id);
+      if (!Number.isSafeInteger(torrentId) || torrentId <= 0) throw Object.assign(new Error('no torrent id'), { torbox: 'NO_TORRENT_ID' });
+      if (torboxTorrentIds.size >= 200) torboxTorrentIds.delete(torboxTorrentIds.keys().next().value);
+      torboxTorrentIds.set(hash, torrentId);
+    }
+    const torrent = await torboxRequest('/torrents/mylist', key, fetchImpl, signal, {
+      query: { id: torrentId, bypass_cache: 'true' },
+    });
+    const file = chooseVideoFile(torrent?.files, selector);
+    if (!file || !Number.isSafeInteger(Number(file.id))) {
+      return jsonResponse(404, { error: torrent?.download_present === false ? 'TorBox is still preparing this torrent; try again shortly' : 'no matching video file in this torrent' }, headers);
+    }
+    const link = await torboxRequest('/torrents/requestdl', key, fetchImpl, signal, {
+      query: { token: key, torrent_id: torrentId, file_id: Number(file.id), redirect: 'false', user_ip: clientIp(request) },
+    });
+    const location = normalizeHttpsUrl(typeof link === 'string' ? link : '');
+    if (!location) throw Object.assign(new Error('bad link'), { torbox: 'BAD_LINK' });
+    return new Response(null, { status: 302, headers: { ...headers, Location: location, 'Cache-Control': 'no-store' } });
+  } catch (error) {
+    if (error?.torbox === 'ITEM_NOT_FOUND') torboxTorrentIds.delete(hash);
+    const status = error?.name === 'TimeoutError' ? 504 : 502;
+    return jsonResponse(status, { error: `TorBox: ${error?.torbox || (status === 504 ? 'timed out' : 'unavailable')}` }, headers);
+  }
+}
+
 function manifest() {
   return {
     id: 'uk.corebuilds.core-streams',
-    version: '0.9.0',
+    version: '0.10.0',
     name: 'Core Streams',
-    description: 'Quality-ranked free streams: torrent add-ons and public indexes (YTS, The Pirate Bay, EZTV), open media, and configurable sources.',
+    description: 'Quality-ranked streams: torrent add-ons and public indexes (YTS, The Pirate Bay, EZTV, Knaben), instant TorBox playback when configured, open media, and configurable sources.',
     resources: ['stream'],
     types: ['movie', 'series'],
     catalogs: [],
@@ -1129,8 +1371,11 @@ function manifest() {
  * RL_PROXY_CUSTOM bucket. `headers` contains the Worker security/CORS headers.
  */
 export async function handleCoreStreams(request, env, { headers = {}, rateLimit = async () => true, fetchImpl = fetch } = {}) {
-  if (request.method !== 'GET') return jsonResponse(405, { error: 'method not allowed' }, headers);
-  const route = parseRequestPath(new URL(request.url).pathname);
+  const requestUrl = new URL(request.url);
+  const route = parseRequestPath(requestUrl.pathname);
+  // Players may probe a stream URL with HEAD before playing it.
+  const allowedMethod = request.method === 'GET' || (request.method === 'HEAD' && route?.kind === 'play');
+  if (!allowedMethod) return jsonResponse(405, { error: 'method not allowed' }, headers);
   if (!route) return jsonResponse(404, { error: 'not found' }, headers);
 
   const expectedToken = env && env.CORE_STREAMS_INSTALL_TOKEN;
@@ -1143,6 +1388,11 @@ export async function handleCoreStreams(request, env, { headers = {}, rateLimit 
 
   if (route.kind === 'manifest') {
     return jsonResponse(200, manifest(), headers);
+  }
+
+  if (route.kind === 'play') {
+    if (!(await rateLimit())) return jsonResponse(429, { error: 'rate limit exceeded' }, headers);
+    return handleTorboxPlay(request, env, route, headers, fetchImpl);
   }
 
   if (!validMediaRequest(route.type, route.id)) {
@@ -1167,6 +1417,7 @@ export async function handleCoreStreams(request, env, { headers = {}, rateLimit 
     fetchYts(route.type, normalizedId, fetchImpl, deadlineSignal, report),
     fetchPirateBay(route.type, normalizedId, fetchImpl, deadlineSignal, report, metaPromise),
     fetchEztv(route.type, normalizedId, fetchImpl, deadlineSignal, report, metaPromise),
+    fetchKnaben(route.type, normalizedId, fetchImpl, deadlineSignal, report, metaPromise),
     fetchOpenMedia(route.type, normalizedId, fetchImpl, deadlineSignal, metaPromise).then((streams) => {
       if (route.type === 'movie') report['open-media'] = `ok ${streams.length}`;
       return streams;
@@ -1193,13 +1444,23 @@ export async function handleCoreStreams(request, env, { headers = {}, rateLimit 
     streams.push(stream);
     if (streams.length >= MAX_STREAMS_TOTAL) break;
   }
+  const key = torboxKey(env);
+  const finalStreams = key
+    ? (await applyTorbox(streams, {
+      key, origin: requestUrl.origin, token: route.token, type: route.type, id: normalizedId, fetchImpl, report,
+    })).slice(0, MAX_STREAMS_TOTAL)
+    : streams;
   // Per-source outcome, so an empty list can be explained from the outside
   // (curl -I the stream URL). Source names and status only: no ids or URLs.
   const sourceStatus = Object.entries(report).map(([id, status]) => `${id}=${status}`).join('; ');
-  return jsonResponse(200, { streams }, { ...headers, 'X-Core-Streams-Sources': sourceStatus });
+  return jsonResponse(200, { streams: finalStreams }, { ...headers, 'X-Core-Streams-Sources': sourceStatus });
 }
 
 export const _coreStreamsTest = {
+  chooseVideoFile,
+  movieTitleMatches,
+  parsePlaySelector,
+  resetTorboxIds: () => torboxTorrentIds.clear(),
   episodeMatcher,
   seasonPackMatcher,
   episodeFilePattern,
