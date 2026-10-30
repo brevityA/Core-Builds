@@ -186,6 +186,50 @@ test('Express profile is a main step, and Fast builds 1080p instant-play-only', 
   // Fast promised 1080p: before 3.26 Quick install's own 4K default overrode it.
   expect(config.excludedResolutions || []).toContain('2160p');
   expect(config.excludeUncached, 'Fast shows only streams ready to play').toBe(true);
+  // An English browser keeps the English-only language list every golden carries.
+  expect(config.preferredLanguages[0]).toBe('English');
+  expect(config.preferredLanguages).not.toContain('Spanish');
+});
+
+test.describe('Express language from a Spanish browser', () => {
+  test.use({ locale: 'es-ES' });
+
+  test('pre-fills Spanish, ranks it first and keeps English behind it', async ({ page }) => {
+    const posted = [];
+    await mockBackend(page, posted);
+    await fresh(page);
+    page.on('dialog', dialog => dialog.accept());
+    await page.locator('[data-action="open-express-lane"]').click();
+    await expect(page.locator('#expressLang')).toHaveValue('Spanish');
+    await expect(page.locator('#expressSummary')).toContainText('Spanish');
+    await page.locator('[data-express-cred="torbox"]').fill('test-torbox-key');
+    await page.locator('[data-express-target="manifest"]').click();
+    await page.locator('#expressGo').click();
+    await page.locator('#pwdPrompt .pwd-go').click();
+    await expect(page.locator('#manifestModal')).toBeVisible({ timeout: 45000 });
+    expect(posted).toHaveLength(1);
+    const langs = posted[0].config.preferredLanguages;
+    expect(langs.slice(0, 2)).toEqual(['Spanish', 'English']);
+    expect(langs).toContain('Original');
+  });
+
+  test('a Chinese pick posts the one name AIOStreams accepts', async ({ page }) => {
+    const posted = [];
+    await mockBackend(page, posted);
+    await fresh(page);
+    page.on('dialog', dialog => dialog.accept());
+    await page.locator('[data-action="open-express-lane"]').click();
+    await page.locator('details.fastlane-optional summary').click();
+    await page.locator('#expressLang').selectOption('Chinese');
+    await page.locator('[data-express-cred="torbox"]').fill('test-torbox-key');
+    await page.locator('[data-express-target="manifest"]').click();
+    await page.locator('#expressGo').click();
+    await page.locator('#pwdPrompt .pwd-go').click();
+    await expect(page.locator('#manifestModal')).toBeVisible({ timeout: 45000 });
+    const langs = posted[0].config.preferredLanguages;
+    expect(langs[0]).toBe('Chinese');
+    expect(JSON.stringify(posted[0].config)).not.toContain('Chinese (');
+  });
 });
 
 test('Express lane offers a Chillio (ChillLink) install target', async ({ page }) => {

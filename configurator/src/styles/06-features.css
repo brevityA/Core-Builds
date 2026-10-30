@@ -17,6 +17,7 @@
 
 /* Quick Install contextual credential links */
 .fastlane-credential{display:flex;flex-direction:column;gap:6px}.fastlane-trust{margin:8px 2px 0;font-size:.66rem;line-height:1.45;color:var(--th-tx2,#8b949e)}.fastlane-trust b{color:var(--th-tx1,#e6edf3);font-weight:700}
+.fastlane-sublabel{display:block;font-size:.64rem;font-weight:800;color:#8b949e;letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px}
 .fastlane-credential-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
 .fastlane-credential-head label{font-size:.7rem;font-weight:800;color:#b9c7d2;letter-spacing:.02em}
 .fastlane-get-key{flex-shrink:0;color:#67e8f9;text-decoration:none;font-size:.66rem;font-weight:800;padding:3px 7px;border-radius:6px;border:1px solid rgba(0,212,255,.2);background:rgba(0,212,255,.06)}

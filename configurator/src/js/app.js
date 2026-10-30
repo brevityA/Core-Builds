@@ -48,7 +48,7 @@ const STEPS = 6;
 // workflow) the raw x.y here expands to x.y.0 in package.json / versions.json and
 // the release tag; the built badge drops the trailing .0. At the 2026-09-06
 // audit the release tag was v3.7.0 while this said 3.1 — they must move together.
-const CONFIGURATOR_VERSION = '3.28';
+const CONFIGURATOR_VERSION = '3.29';
 // Set to a collector endpoint to enable the opt-in anonymous usage ping (service+device+resolution only).
 // Leave empty to keep the feature fully disabled and hidden.
 const USAGE_BEACON_URL = '';
@@ -534,10 +534,21 @@ function sanitizeSnapshotForStorage(raw) {
 // Conservative playback defaults. These describe the device/app itself, not an AVR attached elsewhere.
 const LANG_OPTS = [
   {v:'English'},{v:'Spanish'},{v:'French'},{v:'German'},{v:'Italian'},
-  {v:'Portuguese'},{v:'Japanese'},{v:'Korean'},{v:'Chinese (Simplified)'},
-  {v:'Chinese (Traditional)'},{v:'Arabic'},{v:'Hindi'},{v:'Russian'},
+  {v:'Portuguese'},{v:'Japanese'},{v:'Korean'},{v:'Chinese'},
+  {v:'Arabic'},{v:'Hindi'},{v:'Russian'},
   {v:'Dutch'},{v:'Polish'},{v:'Turkish'}
 ];
+// AIOStreams has a single "Chinese". The two script variants this list used to
+// offer are not in its LANGUAGES enum, so a config carrying either was refused on save.
+const LEGACY_LANG_NAMES = { 'Chinese (Simplified)': 'Chinese', 'Chinese (Traditional)': 'Chinese' };
+const normLangs = (list) => [...new Set(list.map(v => LEGACY_LANG_NAMES[v] || v))].filter(v => LANG_OPTS.some(o => o.v === v));
+// Quick install's language guess: the browser's first language Core Builds can rank.
+const BROWSER_LANG = { en:'English', es:'Spanish', fr:'French', de:'German', it:'Italian', pt:'Portuguese', ja:'Japanese', ko:'Korean', zh:'Chinese', ar:'Arabic', hi:'Hindi', ru:'Russian', nl:'Dutch', pl:'Polish', tr:'Turkish' };
+function browserLang() {
+  const tags = (navigator.languages && navigator.languages.length) ? navigator.languages : [navigator.language || 'en'];
+  for (const tag of tags) { const v = BROWSER_LANG[String(tag).toLowerCase().split('-')[0]]; if (v) return v; }
+  return 'English';
+}
 
 const DEFS = [
   { id:'service', title:'Sources', desc:'Choose one or more providers for streams. Add optional sources separately.', key:'service', cols:'c4d', layout:'svc-list',
@@ -718,7 +729,7 @@ function sanitizeSharedConfig(d) {
   pick('autoPlayMethod', v => ['matchingFile','matchingIndex','firstFile'].includes(v));
   pick('addonTimeout', v => [4000,6000,8000,10000].includes(Number(v)));
   if (Array.isArray(d.multiServices)) out.multiServices = d.multiServices.filter(v => SVC_IDS.includes(v));
-  if (Array.isArray(d.langs)) { const l = d.langs.filter(v => LANG_OPTS.some(o => o.v === v)); if (l.length) out.langs = l; }
+  if (Array.isArray(d.langs)) { const l = normLangs(d.langs); if (l.length) out.langs = l; }
   if (typeof d.name === 'string') out.name = sanitizeDisplayName(d.name);
   if (Array.isArray(d.optionalScrapers)) out.optionalScrapers = d.optionalScrapers.filter(v => OPTIONAL_SCRAPER_DEFS.some(x => x.id === v));
   if (Array.isArray(d.subtitleAddons)) out.subtitleAddons = d.subtitleAddons.filter(v => ['opensubtitles-v3-plus', 'subdl'].includes(v));
@@ -7476,7 +7487,9 @@ function showExpressLane() {
   document.getElementById('expressLaneModal')?.remove();
   const gh = window.__genieHandoff; window.__genieHandoff = null; // one-shot seed: read both fields, then clear (review P4)
   const svc = gh?.service || ((S.service && EXPRESS_SERVICES.some(([v]) => v === S.service)) ? S.service : 'torbox-pro');
-  const state = { service: svc, target: gh?.app || 'app', profile:S.quickProfile || 'balanced', device:S.device || 'generic', resolution:S.resolution || '4k', extras:(S.multiServices||[]).filter(v=>CAROUSEL_SVCS.includes(v) && v!==svc), scrapers:[...(S.optionalScrapers||[])] };
+  const state = { service: svc, target: gh?.app || 'app', profile:S.quickProfile || 'balanced', device:S.device || 'generic', resolution:S.resolution || '4k', extras:(S.multiServices||[]).filter(v=>CAROUSEL_SVCS.includes(v) && v!==svc), scrapers:[...(S.optionalScrapers||[])],
+    // A language picked in Custom build wins; otherwise guess from the browser.
+    lang: (S.langs?.[0] && S.langs[0] !== 'English') ? S.langs[0] : browserLang() };
   const credInput = (key) => {
     const d = PROVIDER_CREDENTIALS[key] || { label: key, placeholder:'Paste your key', url:'#', linkLabel:'Get key' };
     const link = (d.url && d.url !== '#') ? `<a class="fastlane-get-key" href="${d.url}" target="_blank" rel="noopener noreferrer">${d.linkLabel||'Get key'} &nearr;</a>` : '';
@@ -7579,6 +7592,10 @@ function showExpressLane() {
       <div class="u-mt8"><div style="font-size:.64rem;font-weight:800;color:#8b949e;letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px">Resolution</div>
         <div class="fastlane-grid services cols-3">${[['4k','4K','2160p primary · 1080p fallback'],['1080p','1080p','Excludes 4K'],['mixed','Mixed','Adaptive · no hard caps']].map(([v,n,d])=>`<button type="button" class="fastlane-choice${state.resolution===v?' active':''}" data-express-res="${v}"><b>${n}</b><span>${d}</span></button>`).join('')}</div>
       </div>
+      <div class="u-mt8"><label for="expressLang" class="fastlane-sublabel">Language you watch in</label>
+        <select class="fastlane-field" id="expressLang">${LANG_OPTS.map(l => `<option value="${l.v}"${state.lang === l.v ? ' selected' : ''}>${l.v}</option>`).join('')}</select>
+        <p class="fastlane-trust">Releases in this language come first when everything else is equal. English and original-audio releases still show.</p>
+      </div>
       <label style="display:flex;align-items:flex-start;gap:8px;cursor:pointer;margin-top:8px"><input type="checkbox" id="expressFullStack" ${S.installAIOMeta !== false?'checked':''} style="margin-top:2px"><span style="color:#c9d5df"><b class="u-tx">Full stack</b><br><span class="u-tx2">Install AIOMetadata + patch Cinemeta for better posters and catalogs.</span></span></label>
       <label style="display:flex;align-items:flex-start;gap:8px;cursor:pointer;margin-top:8px"><input type="checkbox" id="expressClean" ${S.cleanInstall?'checked':''} style="margin-top:2px"><span style="color:#c9d5df"><b class="u-tx">Clean reinstall</b><br><span class="u-tx2">Remove previous Core Builds addons from your Stremio account.</span></span></label>
       <div class="u-mt8"><input class="fastlane-field" id="expressTmdb" type="password" autocomplete="off" spellcheck="false" placeholder="TMDB Read Access Token (optional — improves matching)" value="${escH(S.tmdbToken||'')}" style="width:100%"></div>
@@ -7605,6 +7622,7 @@ function showExpressLane() {
     extras: { services: state.extras, scrapers: state.scrapers },
     profile: state.profile, device: state.device, resolution: state.resolution,
     cacheMode: S.cacheMode,
+    lang: state.lang,
   });
   // Truthful-at-a-glance chorus above the Install button — every pick lands in it.
   const refreshExpressSummary = () => {
@@ -7616,10 +7634,11 @@ function showExpressLane() {
     const tgtName = { app:'Stremio', nuvio:'Nuvio', wuplay:'WuPlay', chillio:'Chillio', manifest:'Manifest URL' }[state.target] || 'Stremio';
     const cacheName = S.cacheMode === 'cached' ? '⚡ Cached only' : S.cacheMode === 'uncached' ? 'Uncached only' : 'Mixed cache (uncached may download first)';
     const fsOn = document.getElementById('expressFullStack')?.checked;
-    elSum.innerHTML = `${escHtml(svcName)} → ${escHtml(tgtName)} · ${profName} · ${escHtml(resName)} · <b style="color:${S.cacheMode==='cached'?'#34d399':'#fbbf24'}">${cacheName}</b> · host ${escHtml(HOST_LABEL_MAP[S.instanceHost] || S.instanceHost || 'auto')}${fsOn ? ' · <span class="u-purple">+ full stack (AIOMetadata + Cinemeta patch)</span>' : ''}`;
+    elSum.innerHTML = `${escHtml(svcName)} → ${escHtml(tgtName)} · ${profName} · ${escHtml(resName)} · ${escHtml(state.lang)} · <b style="color:${S.cacheMode==='cached'?'#34d399':'#fbbf24'}">${cacheName}</b> · host ${escHtml(HOST_LABEL_MAP[S.instanceHost] || S.instanceHost || 'auto')}${fsOn ? ' · <span class="u-purple">+ full stack (AIOMetadata + Cinemeta patch)</span>' : ''}`;
   };
   refreshExpressSummary();
   document.getElementById('expressFullStack')?.addEventListener('change', refreshExpressSummary);
+  document.getElementById('expressLang')?.addEventListener('change', e => { state.lang = e.target.value; refreshExpressSummary(); });
   overlay.addEventListener('click', e => {
     if (e.target === overlay || e.target.closest('#expressClose') || e.target.closest('[data-express-back]')) { closeLane(); return; }
     const svcBtn = e.target.closest('[data-express-service]');
@@ -7735,6 +7754,11 @@ function applyExpressChoices(p) {
   if (p.cacheMode) S.cacheMode = p.cacheMode;   // explicit "Streams shown" pick outranks the profile's bundled default
   if (p.device) S.device = p.device;
   if (p.resolution) S.resolution = p.resolution;
+  // One language, English kept behind it. A Custom build list that already
+  // leads with the same language is left as it is.
+  if (p.lang && LANG_OPTS.some(o => o.v === p.lang) && S.langs?.[0] !== p.lang) {
+    S.langs = p.lang === 'English' ? ['English'] : [p.lang, 'English'];
+  }
   S.service = p.service;
   const extrasScr = p.extras?.scrapers || [];
   // A picked add-on brings the service it reads (EasyNews), however the picks got here.
