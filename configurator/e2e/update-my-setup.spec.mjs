@@ -33,7 +33,8 @@ async function mockHost(page, calls, { patchStatus = 200 } = {}) {
     if (url.includes('core-builds-cors-proxy') && /\/api\/(visit|generate|stats)/.test(url)) {
       return route.fulfill({ status: 200, contentType: 'application/json', body: '{}' });
     }
-    return route.continue();
+    // Hand anything else back to the splash mocks registered before this one.
+    return route.fallback();
   });
 }
 
@@ -76,7 +77,7 @@ test('the first screen offers Update my setup and saves over the same config', a
   // Same choices, same release: nothing differs from what was saved.
   await expect(modal).toContainText('No changes');
   await modal.locator('#updSetupGo').click();
-  await expect(modal.locator('#updSetupResult')).toContainText('Nothing to reinstall');
+  await expect(modal.locator('#updSetupResult')).toContainText('Streams use it straight away');
   const patches = calls.filter(c => c.method === 'PATCH');
   expect(patches).toHaveLength(1);
   expect(patches[0].url).toContain(`/api/v1/user/${UUID}`);

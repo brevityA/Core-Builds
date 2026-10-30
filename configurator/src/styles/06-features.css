@@ -154,5 +154,5 @@ a.core-tool-door:focus-visible{outline:2px solid #67e8f9;outline-offset:3px}
 .upd-go:disabled{opacity:.6;cursor:wait}
 .upd-cancel{flex:1;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,.12);background:transparent;color:var(--th-tx2,#8b949e);font-weight:600;cursor:pointer}
 .upd-ok,.upd-err{margin-top:10px;font-size:.76rem;line-height:1.5}.upd-ok{color:#34d399}.upd-err{color:#f87171}
-[data-theme='light'] .upd-go{color:#047857;border-color:rgba(4,120,87,.45)}[data-theme='light'] .upd-sec{border-color:#d7dee5}
+[data-theme='light'] .upd-go{color:#047857;border-color:rgba(4,120,87,.45)}[data-theme='light'] .upd-sec{border-color:#d7dee5}[data-theme='light'] .upd-ok{color:#047857}[data-theme='light'] .upd-err{color:#b91c1c}
 .upd-box{max-width:520px}.upd-title{font-size:1.05rem}.upd-title svg{color:var(--th-accent)}.upd-actions{display:flex;gap:8px;margin-top:12px}.upd-paste{margin-top:8px}

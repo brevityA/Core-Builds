@@ -39,3 +39,10 @@ test('values read back from storage are escaped on the first screen', () => {
   assert.match(body, /escHtml\(String\(rec\.ver\)\)/);
   assert.match(body, /escHtml\(when\)/);
 });
+
+test('a timeout is not reported as unchanged, and a custom host is stored without a trailing slash', () => {
+  const body = fn('updateMySetup');
+  assert.match(body, /timedOut\s*\n?\s*\? `<div class="upd-err"><b>No answer\.<\/b> The host did not reply in time, so the update may or may not have been saved\./);
+  assert.match(body, /bindModalEsc\(overlay, close\)/);
+  assert.match(fn('recordSavedConfig'), /String\(host \|\| ''\)\.trim\(\)\.replace\(\/\\\/\+\$\/, ''\)/);
+});

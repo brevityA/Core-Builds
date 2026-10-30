@@ -754,9 +754,11 @@ function saveLastGen() {
 const LAST_SAVED_KEY = 'coreBuildLastSaved';
 function recordSavedConfig(host, uuid, config) {
   try {
-    if (!host || !validateUuid(uuid)) return;
+    // A custom URL can arrive with a trailing slash; lastSavedConfig compares without one.
+    const base = String(host || '').trim().replace(/\/+$/, '');
+    if (!base || !validateUuid(uuid)) return;
     const scrubbed = sanitizeTemplateForRemoteImport({ metadata: {}, config }).config;
-    localStorage.setItem(LAST_SAVED_KEY, JSON.stringify({ host, uuid, ver: CONFIGURATOR_VERSION, ts: Date.now(), config: scrubbed }));
+    localStorage.setItem(LAST_SAVED_KEY, JSON.stringify({ host: base, uuid, ver: CONFIGURATOR_VERSION, ts: Date.now(), config: scrubbed }));
   } catch(e) {}
 }
 // Only offered while the saved password and UUID still match the record, and only
@@ -821,6 +823,8 @@ function updateMySetup() {
     </div>`;
   document.body.appendChild(overlay);
   const close = () => overlay.remove();
+  bindModalEsc(overlay, close);
+  overlay.querySelector('#updSetupGo')?.focus();
   overlay.addEventListener('click', async e => {
     if (e.target === overlay || e.target.closest('[data-upd-close]')) { close(); return; }
     if (e.target.closest('[data-upd-paste]')) { close(); showUpdateTemplateModal(); return; }
@@ -839,14 +843,18 @@ function updateMySetup() {
       recordSavedConfig(rec.host, rec.uuid, cfg);
       saveLastGen();
       go.textContent = 'Saved';
-      out.innerHTML = `<div class="upd-ok">Updated on ${hostLbl}. Nothing to reinstall.</div>`;
+      out.innerHTML = `<div class="upd-ok">Updated on ${hostLbl}. Streams use it straight away.</div>`;
       showToast('Your setup is updated');
       render();
     } catch(err) {
       logError('deploy', 'Update in place failed', { host: S.instanceHost, error: err?.message });
       go.disabled = false; go.textContent = 'Try again';
-      const why = err?.name === 'AbortError' ? 'The host did not answer in time.' : escHtml(String(err?.message || err));
-      out.innerHTML = `<div class="upd-err"><b>Not saved.</b> ${why} Your existing config is unchanged.</div>${pasteBtn}`;
+      // A timeout can land after the host applied the PATCH; only a refusal is known to change nothing.
+      // Retrying is safe: it saves the same config to the same UUID.
+      const timedOut = err?.name === 'AbortError';
+      out.innerHTML = timedOut
+        ? `<div class="upd-err"><b>No answer.</b> The host did not reply in time, so the update may or may not have been saved. Try again to be sure.</div>${pasteBtn}`
+        : `<div class="upd-err"><b>Not saved.</b> ${escHtml(String(err?.message || err))} Your existing config is unchanged.</div>${pasteBtn}`;
     }
   });
 }
