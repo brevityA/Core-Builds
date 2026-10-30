@@ -1,4 +1,9 @@
 export const CHANGELOG = [
+  { v:'3.27', date:'Oct 30 2026', items:[
+    'Quick install says where your keys go — under the key fields: your keys go only to your AIOStreams host and are remembered in this browser; Core Builds never keeps a copy. The line is hidden on P2P, which needs no key.',
+    'Quick install says your other addons stay — under the Stremio login: Core Builds is added to your account and your other addons stay; only Clean reinstall replaces earlier Core Builds addons. Both lines describe what the installer already does, and tests now fail if either stops being true.',
+    'Generated output unchanged — every config the configurator and the CLI build is byte-for-byte what 3.26 produced apart from the version stamp; only Quick install’s wording changed.',
+  ]},
   { v:'3.26', date:'Oct 30 2026', items:[
     'Quick install asks what matters most — Fast, Balanced and Maximum moved out of “Optional” into the main steps, each saying what you get: Fast starts instantly at 1080p with only streams ready to play, Balanced gives 4K when available and starts quickly, Maximum searches widest for the best picture. Balanced is marked Recommended.',
     'Fast builds 1080p again — Quick install passed its own resolution (4K unless changed under Optional) and it overrode the profile, so choosing Fast still built a 4K config. Picking a profile now sets its resolution too; you can still change it afterwards.',

@@ -1,14 +1,30 @@
 ---
-title: "What's New — Configurator v3.26"
+title: "What's New — Configurator v3.27"
 sidebarTitle: "What's New"
-description: "Latest Core Builds Configurator releases (v3.26 and earlier), auto-generated from the in-app changelog."
+description: "Latest Core Builds Configurator releases (v3.27 and earlier), auto-generated from the in-app changelog."
 ---
 
 # What's New in the Configurator
 
-This page is regenerated from `configurator/src/data/changelog.js` by `scripts/sync-docs.py`, so it always reflects the latest shipped configurator version (currently **v3.26**).
+This page is regenerated from `configurator/src/data/changelog.js` by `scripts/sync-docs.py`, so it always reflects the latest shipped configurator version (currently **v3.27**).
 
 For the template-suite release log, see the [Changelog](https://corebuilds-docs.docsalot.dev/changelog).
+
+## Configurator v3.27 (Oct 30 2026)
+
+<CardGroup cols={2}>
+  <Card title="Quick install says where your keys go" icon="sparkles">
+    under the key fields: your keys go only to your AIOStreams host and are remembered in this browser; Core Builds never keeps a copy. The line is hidden on P2P, which needs no key.
+  </Card>
+  <Card title="Quick install says your other addons stay" icon="bolt">
+    under the Stremio login: Core Builds is added to your account and your other addons stay; only Clean reinstall replaces earlier Core Builds addons. Both lines describe what the installer already does, and tests now fail if either stops being true.
+  </Card>
+  <Card title="Generated output unchanged" icon="shield-check">
+    every config the configurator and the CLI build is byte-for-byte what 3.26 produced apart from the version stamp; only Quick install’s wording changed.
+  </Card>
+</CardGroup>
+
+---
 
 ## Configurator v3.26 (Oct 30 2026)
 
@@ -56,24 +72,5 @@ For the template-suite release log, see the [Changelog](https://corebuilds-docs.
   </Card>
   <Card title="Generated output unchanged" icon="shield-check">
     every config the configurator and the CLI build is byte-for-byte what 3.23 produced apart from the version stamp; only the version stamp moves.
-  </Card>
-</CardGroup>
-
----
-
-## Configurator v3.23 (Oct 23 2026)
-
-<CardGroup cols={2}>
-  <Card title="Light mode reads properly" icon="sparkles">
-    text, panels and key hints that were coloured for the dark theme now follow whichever theme you use. In light mode, Fine-Tune’s audio, video, subtitle and catalog panels used to stay dark inside a white page, and the keyboard-shortcut keys were dark boxes with unreadable text; both are fixed. Dark mode looks the same as before.
-  </Card>
-  <Card title="One set of colours under the hood" icon="bolt">
-    282 hard-coded styles became shared classes built on the theme colours, so new screens pick up both themes automatically. A test now stops hard-coded inline styles from growing back.
-  </Card>
-  <Card title="Subtitles help no longer mentions AIOSubtitle" icon="shield-check">
-    the addon was removed in 3.18, but the Fine-Tune tooltip still described it.
-  </Card>
-  <Card title="Generated output unchanged" icon="sliders">
-    every config the configurator and the CLI build is byte-for-byte what 3.22 produced; only the version stamp moves.
   </Card>
 </CardGroup>
