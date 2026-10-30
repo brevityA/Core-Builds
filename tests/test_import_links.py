@@ -68,3 +68,41 @@ def test_each_import_block_links_every_listed_host_once():
             assert len(templates) == 1, f"{page}: an import block mixes templates: {templates}"
             bases = [link.split("/stremio/configure", 1)[0] for link in re.findall(r'https://[^\s"()]+/stremio/configure', block)]
             assert len(bases) == len(set(bases)), f"{page}: a host is linked twice in one block"
+
+
+def test_links_open_the_same_template_as_the_raw_url_below_them():
+    for page in PAGES:
+        text = (ROOT / page).read_text(encoding="utf8")
+        blocks = re.findall(r"<CardGroup cols=\{2\}>\n((?:.*\n)*?)\s*</CardGroup>((?:\n[ \t]*Also on: [^\n]*)?)\n(?:[ \t]*\n)*[ \t]*```\n[ \t]*(\S+)\n", text)
+        assert blocks
+        for cards, also, raw in blocks:
+            if "Import on" not in cards:
+                continue
+            targets = set(re.findall(r"template=([^\s\")]+)", cards + also))
+            assert targets == {raw}, f"{page}: links {targets} do not match the raw URL {raw}"
+
+
+def test_generator_rebuilds_from_the_raw_url_and_never_leaves_an_empty_block():
+    script = r"""
+const m = await import('./scripts/sync_import_links.mjs');
+const raw = 'https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/x.json';
+const old = 'https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/OLD.json';
+const page = '<CardGroup cols={2}>\n  <Card title="Import on A" icon="arrow-up-right" href="https://a/stremio/configure?menu=about&template=' + old + '" />\n</CardGroup>\n\n```\n' + raw + '\n```';
+// Neither named host qualifies: the next ones become the buttons.
+const hosts = [{id:'midnight',base:'https://m',label:'M'},{id:'kuu',base:'https://k',label:'K'},{id:'atbp',base:'https://t',label:'T'}];
+const once = m.rewrite(page, hosts).text;
+const twice = m.rewrite(once, hosts).text;
+const empty = m.rewrite('<CardGroup cols={2}>\n</CardGroup>\n```\n' + raw + '\n```', hosts);
+let refused = false; try { m.rewrite(page, []); } catch { refused = true; }
+console.log(JSON.stringify({
+  cards: (once.match(/<Card /g) || []).length,
+  oldGone: !once.includes('OLD.json'),
+  idempotent: once === twice,
+  emptyRecovered: empty.count === 1 && (empty.text.match(/<Card /g) || []).length === 2,
+  refused,
+}));
+"""
+    out = subprocess.run(["node", "--input-type=module", "-e", script], cwd=ROOT,
+                         capture_output=True, text=True, check=True)
+    assert json.loads(out.stdout) == {"cards": 2, "oldGone": True, "idempotent": True,
+                                      "emptyRecovered": True, "refused": True}

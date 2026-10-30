@@ -3,8 +3,8 @@
 // from configurator/src/data/hosts.js so the host list has one source of truth.
 //
 // For each import block (a CardGroup of "Import on …" cards followed by the raw
-// template URL) this rewrites the two primary cards and an "Also on" line that
-// links every other host. A host is listed only if it runs the pinned AIOStreams
+// template URL) this rewrites two buttons and an "Also on" line that links every
+// other host, all built from the raw URL. A host is listed only if it runs the pinned AIOStreams
 // release or newer (configurator/UPSTREAM.pin): older hosts cannot load the
 // templates (Anime ones need anime-tosho-new, added in 2.36.0).
 //
@@ -46,9 +46,12 @@ export function importUrl(base, templateUrl) {
 }
 
 function block(templateUrl, hosts, indent) {
+  // The two named hosts are the buttons; if either is ever below the floor, the
+  // next eligible hosts take its place so a block always keeps two buttons.
   const primary = hosts.filter(h => PRIMARY.includes(h.id));
-  const others = hosts.filter(h => !PRIMARY.includes(h.id));
-  const cards = primary.map(h =>
+  const buttons = [...primary, ...hosts.filter(h => !PRIMARY.includes(h.id))].slice(0, 2);
+  const others = hosts.filter(h => !buttons.includes(h));
+  const cards = buttons.map(h =>
     `${indent}  <Card title="Import on ${h.label}" icon="arrow-up-right" href="${importUrl(h.base, templateUrl)}" />`);
   const lines = [`${indent}<CardGroup cols={2}>`, ...cards, `${indent}</CardGroup>`];
   if (others.length) {
@@ -57,20 +60,20 @@ function block(templateUrl, hosts, indent) {
   return lines.join('\n');
 }
 
-// An import block: a CardGroup whose cards are all "Import on …", optionally
-// followed by a generated "Also on:" line (so a second run replaces it).
-const BLOCK_RE = /^([ \t]*)<CardGroup cols=\{2\}>\n((?:[ \t]*<Card title="Import on [^"]*" icon="arrow-up-right" href="[^"]*" \/>\n)+)[ \t]*<\/CardGroup>(?:\n[ \t]*Also on: [^\n]*)?/gm;
+// An import block: a CardGroup of "Import on …" cards (possibly none), an
+// optional generated "Also on:" line, then the fenced raw template URL. The raw
+// URL is what people copy, so it is the source the links are rebuilt from.
+const BLOCK_RE = /^([ \t]*)<CardGroup cols=\{2\}>\n(?:[ \t]*<Card title="Import on [^"]*" icon="arrow-up-right" href="[^"]*" \/>\n)*[ \t]*<\/CardGroup>(?:\n[ \t]*Also on: [^\n]*)?(\n(?:[ \t]*\n)*[ \t]*```\n[ \t]*(\S+)\n[ \t]*```)/gm;
 
 export function rewrite(text, hosts) {
+  if (!hosts.length) throw new Error('No host runs the pinned AIOStreams release; refusing to remove every import link');
   let count = 0;
-  const out = text.replace(BLOCK_RE, (whole, indent, cards) => {
-    const href = (cards.match(/href="([^"]*)"/) || [])[1] || '';
-    const templateUrl = (href.match(/[?&]template=(.+)$/) || [])[1] || '';
+  const out = text.replace(BLOCK_RE, (whole, indent, fence, templateUrl) => {
     if (!TEMPLATE_URL_RE.test(templateUrl)) {
-      throw new Error(`Import block points at an unexpected template URL: ${href}`);
+      throw new Error(`Import block's raw URL is not a Core Builds template: ${templateUrl}`);
     }
     count++;
-    return block(templateUrl, hosts, indent);
+    return block(templateUrl, hosts, indent) + fence;
   });
   return { text: out, count };
 }
