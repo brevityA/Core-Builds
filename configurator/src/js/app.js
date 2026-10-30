@@ -5,6 +5,7 @@ import { OPTIONAL_SCRAPER_DEFS, presetRole, withPenguplay } from '../data/scrape
 import { HOST_BASE_URLS, HOST_LABEL_MAP, HOST_META, MIN_AIOSTREAMS_VERSION } from '../data/hosts.js';
 import { DEVICE_AUDIO_DEFAULTS, DEVICE_FORCE_LIMITED_AUDIO, DEVICE_AV1_SAFE, DEVICE_DV_SAFE, POPULAR_DEVICE_IDS, DEVICE_PROFILES } from '../data/devices.js';
 import { CAROUSEL_SVCS } from '../data/services.js';
+import { applyAddonServices, requiredServiceFor, withScraperServices } from '../core/scraper-services.js';
 import { PROVIDER_CREDENTIALS } from '../data/credentials.js';
 import { serviceCredentialKeys, serviceCredentials } from '../data/credentials.js';
 import { initErrorLogger, logError, errorLogHtml, formatErrorLog, clearErrorLog, exportErrorLog } from './error-logger.js';
@@ -47,7 +48,7 @@ const STEPS = 6;
 // workflow) the raw x.y here expands to x.y.0 in package.json / versions.json and
 // the release tag; the built badge drops the trailing .0. At the 2026-09-06
 // audit the release tag was v3.7.0 while this said 3.1 — they must move together.
-const CONFIGURATOR_VERSION = '3.24';
+const CONFIGURATOR_VERSION = '3.25';
 // Set to a collector endpoint to enable the opt-in anonymous usage ping (service+device+resolution only).
 // Leave empty to keep the feature fully disabled and hidden.
 const USAGE_BEACON_URL = '';
@@ -452,7 +453,7 @@ async function selectHealthyHost(timeout=4000) {
 // Cloudflare Worker CORS proxy — see cloudflare-worker/README.md for deployment.
 // Set to '' to disable and fall back to direct-only fetches.
 const CORS_PROXY = 'https://core-builds-cors-proxy.tlorenzato26.workers.dev';
-const S = { service:null, device:null, resolution:null, audio:'limited', bandwidthMbps:0, content:null, name:'', multiServices:[], sizeLimit:'unlimited', formatter:'family-v4', p2pEnabled:false, qualityFirst:false, resolutionFirst:false, foreignLangKill:true, matchMode:'balanced', exclude4K:false, excludeDV:false, tmdbToken:'', tmdbApiKey:'', creds:{torbox:'',realdebrid:'',alldebrid:'',premiumize:'',debridlink:'',offcloud:'',easynews:'',easynewsPass:'',nzbgeek:'',debridio:'',debrider:'',nzbnoob:'',althub:'',usenetcrawler:'',drunkenslug:'',nzbfinder:'',jackett:'',prowlarr:'',subdl:'',penguplay:''}, instanceHost:'elfhosted', instanceUrl:'', instanceUuid:'', instancePassword:'', baseUuid:'', basePassword:'', quickStart:false, langs: ['English'], langExclusive: false, cacheMode: 'mixed', streamPool: 'normal', pseArch: 'standard', telemetryOk: false, simpleMode: false, outputProfile:'auto', aiostreamsVersion:DEFAULT_AIOSTREAMS_VERSION, installMode: 'direct', stremioEmail: '', stremioPassword: '', subtitleLangs: ['en'], subtitleAddons: ['opensubtitles-v3-plus'], streamProxy: { ...DEFAULT_STREAM_PROXY, proxiedServices: [], proxiedAddons: [] }, streamProxyPassword: '', catalogs: ['tmdb-addon'], dedupMerge: false, optionalScrapers: [], cleanInstall: false, quickProfile: 'balanced', preloadEnabled:true, autoPlayMethod:'matchingFile', addonTimeout:6000, patchCinemeta:false, installAIOMeta:false, libraryBoost:'default', nzbFailover:false, nzbFailoverPosition:'after-torrents', maxFailoverNzbs:3 };
+const S = { service:null, device:null, resolution:null, audio:'limited', bandwidthMbps:0, content:null, name:'', multiServices:[], sizeLimit:'unlimited', formatter:'family-v4', p2pEnabled:false, qualityFirst:false, resolutionFirst:false, foreignLangKill:true, matchMode:'balanced', exclude4K:false, excludeDV:false, tmdbToken:'', tmdbApiKey:'', creds:{torbox:'',realdebrid:'',alldebrid:'',premiumize:'',debridlink:'',offcloud:'',easynews:'',easynewsPass:'',nzbgeek:'',debridio:'',debrider:'',nzbnoob:'',althub:'',usenetcrawler:'',drunkenslug:'',nzbfinder:'',jackett:'',prowlarr:'',subdl:'',penguplay:''}, instanceHost:'elfhosted', instanceUrl:'', instanceUuid:'', instancePassword:'', baseUuid:'', basePassword:'', quickStart:false, langs: ['English'], langExclusive: false, cacheMode: 'mixed', streamPool: 'normal', pseArch: 'standard', telemetryOk: false, simpleMode: false, outputProfile:'auto', aiostreamsVersion:DEFAULT_AIOSTREAMS_VERSION, installMode: 'direct', stremioEmail: '', stremioPassword: '', subtitleLangs: ['en'], subtitleAddons: ['opensubtitles-v3-plus'], streamProxy: { ...DEFAULT_STREAM_PROXY, proxiedServices: [], proxiedAddons: [] }, streamProxyPassword: '', catalogs: ['tmdb-addon'], dedupMerge: false, optionalScrapers: [], cleanInstall: false, quickProfile: 'balanced', preloadEnabled:true, autoPlayMethod:'matchingFile', addonTimeout:6000, patchCinemeta:false, installAIOMeta:false, libraryBoost:'default', nzbFailover:false, nzbFailoverPosition:'after-torrents', maxFailoverNzbs:3, addonServices:[] };
 // A clean template update must not inherit unrelated wizard/experimental flags.
 const INITIAL_STATE = cloneUpdateValue(S);
 function replaceState(nextState) {
@@ -2766,7 +2767,10 @@ document.addEventListener('DOMContentLoaded', () => {
   document.addEventListener('focusin', e => {
     if (e.target && e.target.tagName === 'INPUT' && ['text', 'password', 'url'].includes(e.target.type)) {
       setTimeout(() => {
-        if (e.target.value) {
+        // select() also focuses the input. If focus has already moved on (a password
+        // manager or autofill filling the next field, or fast tabbing), selecting here
+        // pulls it back and the next field's text lands in this one.
+        if (document.activeElement === e.target && e.target.value) {
           try {
             e.target.select();
             e.target.setSelectionRange(0, 99999);
@@ -3712,6 +3716,8 @@ document.addEventListener('DOMContentLoaded', () => {
       const i = S.multiServices.indexOf(val);
       if (i >= 0) S.multiServices.splice(i, 1);
       else S.multiServices.push(val);
+      // Toggled by hand, the service is the user's choice now, not an add-on's.
+      S.addonServices = (S.addonServices || []).filter(v => v !== val);
       S.service = deriveService();
       if (val === 'p2p' && S.multiServices.includes('p2p') && !S.p2pEnabled) {
         S.p2pEnabled = true;
@@ -7411,13 +7417,15 @@ function applyQuickProfile(profile) {
 function showAdditionalServicesPicker(options={}) {
   document.getElementById('additionalServicesModal')?.remove();
   const serviceDef=DEFS.find(d=>d.key==='service');
-  const selectedServices=new Set(options.services || S.multiServices.filter(v=>CAROUSEL_SVCS.includes(v)));
+  // Only the services this dialog shows. A service an add-on brought along (EasyNews) is
+  // re-derived on Apply, so unticking the add-on drops it again.
+  const selectedServices=new Set((options.services || S.multiServices).filter(v=>CAROUSEL_SVCS.includes(v)));
   const selectedScrapers=new Set(options.scrapers || S.optionalScrapers||[]);
   // Host-capability gate: an extra source the selected AIOStreams host will not
   // serve is offered disabled, with the reason in place of the usual hint.
   const extraBlocked = (() => { const m={}; for (const e of hostGateEntries()) if (e.scope==='service') m[e.option.slice('service:'.length)] = e.reason; return m; })();
   const serviceCards=CAROUSEL_SVCS.map(id=>{const o=serviceDef?.opts.find(x=>x.v===id);if(!o)return'';const why=selectedServices.has(id)?'':extraBlocked[id]||'';return `<button type="button" class="fastlane-choice${selectedServices.has(id)?' active':''}${why?' opt-host-blocked':''}"${why?` disabled aria-disabled="true" title="${escHtml(why)}"`:''} data-extra-service="${id}"><b>${o.name}</b><span${why?' class="opt-host-note"':''}>${why?`Unavailable — ${escHtml(why)}`:(id==='p2p'||id==='http'?'No account required':'Credentials may be required')}</span></button>`;}).join('');
-  const scraperCards=OPTIONAL_SCRAPER_DEFS.map(d=>{const why=selectedScrapers.has(d.id)?'':optionalScraperHostBlock(d.id);return `<button type="button" class="fastlane-choice${selectedScrapers.has(d.id)?' active':''}" data-extra-scraper="${d.id}"${why?` disabled aria-disabled="true" title="${escHtml(why)}"`:''}><b>${d.label}</b><span>${d.desc}${why?` · Unavailable — ${escHtml(why)}`:''}</span></button>`;}).join('');
+  const scraperCards=OPTIONAL_SCRAPER_DEFS.map(d=>{const why=selectedScrapers.has(d.id)?'':optionalScraperHostBlock(d.id);const needs=requiredServiceFor(d.id);const needsNote=needs?` · adds the ${escHtml(serviceDef?.opts.find(x=>x.v===needs)?.name||needs)} service and its login`:'';return `<button type="button" class="fastlane-choice${selectedScrapers.has(d.id)?' active':''}" data-extra-scraper="${d.id}"${why?` disabled aria-disabled="true" title="${escHtml(why)}"`:''}><b>${d.label}</b><span>${d.desc}${why?` · Unavailable — ${escHtml(why)}`:needsNote}</span></button>`;}).join('');
   const overlay=document.createElement('div');overlay.id='additionalServicesModal';overlay.className='fastlane-overlay';
   overlay.innerHTML=`<div class="fastlane-panel" role="dialog" aria-modal="true" aria-labelledby="extraTitle" style="max-width:700px"><div class="fastlane-head"><div class="fastlane-head-copy"><div class="fastlane-kicker">Optional sources</div><div class="fastlane-title" id="extraTitle">Additional services &amp; scrapers</div><div class="fastlane-sub">Choose any extras you use. ${typeof options.onApply==='function'?'Required credential fields will appear when you return to Quick Install.':'Credentials for selected paid sources appear later under Accounts &amp; Keys.'}</div></div><button class="fastlane-close" id="extraClose" aria-label="Close">✕</button></div><div class="fastlane-section"><div class="fastlane-label">Additional services</div><div class="fastlane-grid services">${serviceCards}</div></div><div class="fastlane-section"><div class="fastlane-label">Optional Usenet indexers</div><div class="fastlane-grid services">${scraperCards}</div></div><button class="fastlane-go" id="extraApply">Apply selections</button></div>`;
   document.body.appendChild(overlay);
@@ -7427,7 +7435,7 @@ function showAdditionalServicesPicker(options={}) {
     const svc=e.target.closest('[data-extra-service]');if(svc){const id=svc.dataset.extraService;selectedServices.has(id)?selectedServices.delete(id):selectedServices.add(id);svc.classList.toggle('active',selectedServices.has(id));return;}
     const scr=e.target.closest('[data-extra-scraper]');if(scr){const id=scr.dataset.extraScraper;selectedScrapers.has(id)?selectedScrapers.delete(id):selectedScrapers.add(id);scr.classList.toggle('active',selectedScrapers.has(id));return;}
     if(e.target===overlay||e.target.closest('#extraClose')){overlay.remove();return;}
-    if(e.target.closest('#extraApply')){const sv=[...selectedServices],sc=[...selectedScrapers];if(typeof options.onApply==='function'){options.onApply(sv,sc);overlay.remove();return;}releaseMigrationFields(['services', 'presets', 'groups']);S.multiServices=S.multiServices.filter(v=>!CAROUSEL_SVCS.includes(v));sv.forEach(v=>S.multiServices.push(v));S.optionalScrapers=sc;S.p2pEnabled=S.multiServices.includes('p2p');S.service=deriveService();saveState();overlay.remove();render();}
+    if(e.target.closest('#extraApply')){const sc=[...selectedScrapers],sv=withScraperServices([...selectedServices],sc);if(typeof options.onApply==='function'){options.onApply(sv,sc);overlay.remove();return;}releaseMigrationFields(['services', 'presets', 'groups']);const applied=applyAddonServices({services:S.multiServices,autoServices:S.addonServices||[],carouselPicks:sv.filter(v=>CAROUSEL_SVCS.includes(v)),scrapers:sc,carousel:CAROUSEL_SVCS});S.multiServices=applied.services;S.addonServices=applied.autoServices;S.optionalScrapers=sc;S.p2pEnabled=S.multiServices.includes('p2p');S.service=deriveService();saveState();overlay.remove();render();}
   });
   document.getElementById('extraClose').focus();
 }
@@ -7474,13 +7482,16 @@ function showExpressLane() {
     return serviceCredentialKeys(service === 'torbox-pro' ? 'torbox' : service).map(credInput).join('');
   };
   // Extra services that need a credential when added via the popout.
-  const EXTRA_CRED = { debridio:'debridio', debrider:'debrider', nzbgeek:'nzbgeek', streamnzb:'streamnzb' };
+  const EXTRA_CRED = { debridio:['debridio'], debrider:['debrider'], nzbgeek:['nzbgeek'], streamnzb:['streamnzb'], easynews:['easynews','easynewsPass'] };
   const renderCreds = () => {
     const prim = credArea(state.service);
-    const extraCreds = [
-      ...state.extras.filter(v => v !== state.service).map(v => EXTRA_CRED[v]).filter(Boolean).map(credInput),
-      ...state.scrapers.map(sid => (OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid) || {}).credKey).filter(Boolean).map(credInput),
-    ].join('');
+    // One field per credential: the primary may already ask for it (Usenet asks for EasyNews).
+    const shown = new Set([...prim.matchAll(/data-express-cred="([^"]+)"/g)].map(m => m[1]));
+    const extraKeys = [
+      ...withScraperServices(state.extras, state.scrapers).filter(v => v !== state.service).flatMap(v => EXTRA_CRED[v] || []),
+      ...state.scrapers.map(sid => (OPTIONAL_SCRAPER_DEFS.find(x => x.id === sid) || {}).credKey).filter(Boolean),
+    ].filter(key => !shown.has(key) && shown.add(key));
+    const extraCreds = extraKeys.map(credInput).join('');
     const extraBlock = extraCreds ? `<div style="margin-top:8px;border-top:1px dashed rgba(255,255,255,.12);padding-top:8px">${extraCreds}</div>` : '';
     return prim + extraBlock;
   };
@@ -7656,7 +7667,8 @@ function showExpressLane() {
         services: state.extras,
         scrapers: state.scrapers,
         onApply: (sv, sc) => {
-          state.extras = sv.filter(v => v !== state.service);
+          // Keep only the services picked here; add-on services are re-derived from state.scrapers.
+          state.extras = sv.filter(v => v !== state.service && CAROUSEL_SVCS.includes(v));
           state.scrapers = sc;
           renderCredsInto();
           const c = document.getElementById('expressExtrasCount');
@@ -7706,8 +7718,11 @@ function applyExpressChoices(p) {
   if (p.device) S.device = p.device;
   if (p.resolution) S.resolution = p.resolution;
   S.service = p.service;
-  const extrasSvc = p.extras?.services || [];
   const extrasScr = p.extras?.scrapers || [];
+  // A picked add-on brings the service it reads (EasyNews), however the picks got here.
+  const extrasSvc = withScraperServices(p.extras?.services || [], extrasScr);
+  // Remembered so Custom build can drop them again if the add-ons are unticked there.
+  S.addonServices = extrasSvc.filter(v => v !== p.service && !(p.extras?.services || []).includes(v));
   S.multiServices = [...new Set([...(isFree ? ['p2p'] : [p.service]), ...extrasSvc])];
   S.optionalScrapers = extrasScr;
   S.p2pEnabled = isFree || extrasSvc.includes('p2p');

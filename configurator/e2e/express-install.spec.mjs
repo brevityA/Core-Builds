@@ -235,6 +235,42 @@ test('Express "Additional services & scrapers" popout adds Debridio + folds its 
   expect(errors).toEqual([]);
 });
 
+test('Express TorBox + EasyNews add-ons brings the EasyNews service, asks for its login and ships the presets', async ({ page }) => {
+  test.setTimeout(90_000);
+  const posted = [];
+  await mockBackend(page, posted);
+  const errors = await fresh(page);
+  page.on('dialog', dialog => dialog.accept());
+  await page.locator('[data-action="open-express-lane"]').click();
+  await page.locator('[data-express-cred="torbox"]').fill('test-torbox-key');
+  await page.locator('#expressExtrasBtn').click();
+  await expect(page.locator('[data-extra-scraper="easynews"]')).toContainText('adds the EasyNews service');
+  await page.locator('[data-extra-scraper="easynews"]').click();
+  await page.locator('[data-extra-scraper="easynewsPlus"]').click();
+  await page.locator('#extraApply').click();
+  // The add-ons read the EasyNews login, so Quick install now asks for it — once.
+  await expect(page.locator('[data-express-cred="easynews"]')).toHaveCount(1);
+  await expect(page.locator('[data-express-cred="easynewsPass"]')).toHaveCount(1);
+  await page.locator('[data-express-cred="easynews"]').fill('en-user');
+  await page.locator('[data-express-cred="easynewsPass"]').fill('en-pass');
+  await page.locator('#stremioEmailInline').fill('test@stremio.com');
+  await page.locator('#stremioPasswordInline').fill('test-password');
+  await page.locator('#expressGo').click();
+  await page.locator('#pwdPrompt .pwd-go').click();
+  await expect(page.locator('#aioResult')).toContainText('Full Stack Installed and verified!', { timeout: 45000 });
+  expect(posted).toHaveLength(1);
+  const config = posted[0].config;
+  const easynews = config.services.find(s => s.id === 'easynews');
+  expect(easynews?.enabled, 'EasyNews service is enabled').toBe(true);
+  expect(easynews.credentials).toEqual({ username: 'en-user', password: 'en-pass' });
+  expect(config.services.find(s => s.id === 'torbox')?.enabled, 'TorBox stays the main service').toBe(true);
+  const types = config.presets.map(p => p.type);
+  for (const type of ['stremthruTorz', 'easynewsPlusPlus', 'easynews-search', 'easynews', 'easynewsPlus']) {
+    expect(types, `${type} preset is in the config`).toContain(type);
+  }
+  expect(errors).toEqual([]);
+});
+
 test('Express without a Debridio key omits the preset (no config reject)', async ({ page }) => {
   const posted = [];
   await mockBackend(page, posted);
