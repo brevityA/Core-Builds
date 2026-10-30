@@ -1,4 +1,10 @@
 export const CHANGELOG = [
+  { v:'3.26', date:'Oct 30 2026', items:[
+    'Quick install asks what matters most — Fast, Balanced and Maximum moved out of “Optional” into the main steps, each saying what you get: Fast starts instantly at 1080p with only streams ready to play, Balanced gives 4K when available and starts quickly, Maximum searches widest for the best picture. Balanced is marked Recommended.',
+    'Fast builds 1080p again — Quick install passed its own resolution (4K unless changed under Optional) and it overrode the profile, so choosing Fast still built a 4K config. Picking a profile now sets its resolution too; you can still change it afterwards.',
+    'No extra stop for Fast — the note that 1080p removes 4K results no longer interrupts a Quick install that picked Fast, whose card already says 1080p.',
+    'Generated output unchanged — for the same settings, every config the configurator and the CLI build is byte-for-byte what 3.25 produced apart from the version stamp; the fix changes which settings choosing Fast produces.',
+  ]},
   { v:'3.25', date:'Oct 29 2026', items:[
     'EasyNews add-ons now reach your config — choosing EasyNews or EasyNews+ under Additional services & scrapers on a TorBox (or any non-EasyNews) build left them out of the JSON, because both need the EasyNews service and that dialog had no way to add it. Picking either now adds the EasyNews service too, and Quick install asks for its username and password. Unticking them takes the service back out of Quick install.',
     'Typing no longer jumps to the previous box — a helper that selects a field’s text 50 ms after you click into it also moved the cursor back there, so autofill, a password manager or fast tabbing could put the next field’s text in the wrong box. In Quick install the Stremio password could end up in the email field and the install would sit waiting.',

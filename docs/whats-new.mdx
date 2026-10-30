@@ -1,14 +1,33 @@
 ---
-title: "What's New — Configurator v3.25"
+title: "What's New — Configurator v3.26"
 sidebarTitle: "What's New"
-description: "Latest Core Builds Configurator releases (v3.25 and earlier), auto-generated from the in-app changelog."
+description: "Latest Core Builds Configurator releases (v3.26 and earlier), auto-generated from the in-app changelog."
 ---
 
 # What's New in the Configurator
 
-This page is regenerated from `configurator/src/data/changelog.js` by `scripts/sync-docs.py`, so it always reflects the latest shipped configurator version (currently **v3.25**).
+This page is regenerated from `configurator/src/data/changelog.js` by `scripts/sync-docs.py`, so it always reflects the latest shipped configurator version (currently **v3.26**).
 
 For the template-suite release log, see the [Changelog](https://corebuilds-docs.docsalot.dev/changelog).
+
+## Configurator v3.26 (Oct 30 2026)
+
+<CardGroup cols={2}>
+  <Card title="Quick install asks what matters most" icon="sparkles">
+    Fast, Balanced and Maximum moved out of “Optional” into the main steps, each saying what you get: Fast starts instantly at 1080p with only streams ready to play, Balanced gives 4K when available and starts quickly, Maximum searches widest for the best picture. Balanced is marked Recommended.
+  </Card>
+  <Card title="Fast builds 1080p again" icon="bolt">
+    Quick install passed its own resolution (4K unless changed under Optional) and it overrode the profile, so choosing Fast still built a 4K config. Picking a profile now sets its resolution too; you can still change it afterwards.
+  </Card>
+  <Card title="No extra stop for Fast" icon="shield-check">
+    the note that 1080p removes 4K results no longer interrupts a Quick install that picked Fast, whose card already says 1080p.
+  </Card>
+  <Card title="Generated output unchanged" icon="sliders">
+    for the same settings, every config the configurator and the CLI build is byte-for-byte what 3.25 produced apart from the version stamp; the fix changes which settings choosing Fast produces.
+  </Card>
+</CardGroup>
+
+---
 
 ## Configurator v3.25 (Oct 29 2026)
 
@@ -56,21 +75,5 @@ For the template-suite release log, see the [Changelog](https://corebuilds-docs.
   </Card>
   <Card title="Generated output unchanged" icon="sliders">
     every config the configurator and the CLI build is byte-for-byte what 3.22 produced; only the version stamp moves.
-  </Card>
-</CardGroup>
-
----
-
-## Configurator v3.22 (Oct 23 2026)
-
-<CardGroup cols={2}>
-  <Card title="Quick install reaches every setting" icon="sparkles">
-    a new Defaults we’ll use list shows what Quick install leaves at its default: audio, size and quality, stream cards, subtitles and catalogs. Tap one and the full builder opens at that setting, with your service, key, device, quality and install target already filled in, so nothing is lost when you move from Quick to Custom. Install from Review when you are done.
-  </Card>
-  <Card title="Customize every setting" icon="bolt">
-    the link under the list opens all of Fine-Tune the same way.
-  </Card>
-  <Card title="Generated output unchanged" icon="shield-check">
-    every config the configurator and the CLI build is byte-for-byte what 3.21 produced; only the version stamp moves.
   </Card>
 </CardGroup>

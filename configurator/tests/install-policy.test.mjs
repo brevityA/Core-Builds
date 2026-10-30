@@ -113,7 +113,7 @@ test('presets() gates every library emission on hasLibraryCapableService(service
 });
 
 test('simpleInstall blocks the POST on missing credentials, before anything is sent', () => {
-  const body = app.match(/async function simpleInstall\(target\) \{[\s\S]*?\n\}/)?.[0];
+  const body = app.match(/async function simpleInstall\(target[^)]*\) \{[\s\S]*?\n\}/)?.[0];
   assert.ok(body, 'simpleInstall not found');
   const gate = body.indexOf('missingDirectInstallCredentials(services(), S.creds)');
   assert.ok(gate > -1, 'the key gate must consult the emitted services array');

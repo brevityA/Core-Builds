@@ -159,6 +159,32 @@ test('Express Install manifest target skips Stremio and shows the manifest modal
   expect(JSON.stringify(posted[0].config)).not.toContain('torbox-search');
 });
 
+test('Express profile is a main step, and Fast builds 1080p instant-play-only', async ({ page }) => {
+  const posted = [];
+  await mockBackend(page, posted);
+  await fresh(page);
+  page.on('dialog', dialog => dialog.accept());
+  await page.locator('[data-action="open-express-lane"]').click();
+  // On the page itself, not tucked under "Optional".
+  const fast = page.locator('#expressLaneModal [data-express-profile="fast"]');
+  await expect(fast).toBeVisible();
+  await expect(page.locator('#expressLaneModal details.fastlane-optional [data-express-profile]')).toHaveCount(0);
+  await expect(page.locator('#expressLaneModal [data-express-profile="balanced"]')).toContainText('Recommended');
+  await page.locator('[data-express-cred="torbox"]').fill('test-torbox-key');
+  await fast.click();
+  await expect(page.locator('[data-express-cache="cached"]')).toHaveClass(/active/);
+  await expect(page.locator('[data-express-res="1080p"]')).toHaveClass(/active/);
+  await page.locator('[data-express-target="manifest"]').click();
+  await page.locator('#expressGo').click();
+  await page.locator('#pwdPrompt .pwd-go').click();
+  await expect(page.locator('#manifestModal')).toBeVisible({ timeout: 45000 });
+  expect(posted).toHaveLength(1);
+  const config = posted[0].config;
+  // Fast promised 1080p: before 3.26 Quick install's own 4K default overrode it.
+  expect(config.excludedResolutions || []).toContain('2160p');
+  expect(config.excludeUncached, 'Fast shows only streams ready to play').toBe(true);
+});
+
 test('Express lane offers a Chillio (ChillLink) install target', async ({ page }) => {
   await fresh(page);
   await page.locator('[data-action="open-express-lane"]').click();

@@ -21,6 +21,7 @@
 .fastlane-credential-head label{font-size:.7rem;font-weight:800;color:#b9c7d2;letter-spacing:.02em}
 .fastlane-get-key{flex-shrink:0;color:#67e8f9;text-decoration:none;font-size:.66rem;font-weight:800;padding:3px 7px;border-radius:6px;border:1px solid rgba(0,212,255,.2);background:rgba(0,212,255,.06)}
 .fastlane-get-key:hover,.fastlane-get-key:focus-visible{color:#fff;border-color:rgba(0,212,255,.45);background:rgba(0,212,255,.12);outline:none}
+.fastlane-choice b .fastlane-reco{display:inline-block;margin:0 0 0 6px;padding:1px 6px;border:1px solid currentColor;border-radius:99px;color:var(--th-accent);font-size:.52rem;font-weight:800;letter-spacing:.04em;text-transform:uppercase;vertical-align:1px}
 [data-theme='light'] .fastlane-credential-head label{color:#1f2933}
 [data-theme='light'] .fastlane-get-key{color:#075ebd;border-color:#9fc4ea;background:#edf6ff}
 [data-theme='light'] .fastlane-get-key:hover,[data-theme='light'] .fastlane-get-key:focus-visible{color:#064f9d;border-color:#6aa7e8;background:#dfeeff}
