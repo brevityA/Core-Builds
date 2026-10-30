@@ -7499,7 +7499,13 @@ function showExpressLane() {
     ].filter(key => !shown.has(key) && shown.add(key));
     const extraCreds = extraKeys.map(credInput).join('');
     const extraBlock = extraCreds ? `<div style="margin-top:8px;border-top:1px dashed rgba(255,255,255,.12);padding-top:8px">${extraCreds}</div>` : '';
-    return prim + extraBlock;
+    // True as written: keys are posted only to the chosen AIOStreams host (directly, or
+    // through the Core Builds relay, which forwards and doesn't log them) and are kept
+    // in this browser's storage. Nothing else receives them.
+    const keyNote = /data-express-cred=/.test(prim + extraCreds)
+      ? '<p class="fastlane-trust">Your keys go only to your AIOStreams host and are remembered in this browser. Core Builds never keeps a copy.</p>'
+      : '';
+    return prim + extraBlock + keyNote;
   };
   // Re-render #expressCreds while preserving typed values across re-renders.
   const renderCredsInto = () => {
@@ -7558,6 +7564,7 @@ function showExpressLane() {
           <input class="fastlane-field" id="stremioPasswordInline" type="password" autocomplete="current-password" placeholder="Stremio password" value="${escH(S.stremioPassword||'')}" style="flex:1">
         </div>
         <button type="button" data-action="create-stremio-account" style="margin-top:6px;font-size:.74rem;color:var(--th-accent);background:none;border:none;cursor:pointer;padding:0;font-weight:600">Create random account →</button>
+        <p class="fastlane-trust">Adds Core Builds to your Stremio account. Your other addons stay; only <b>Clean reinstall</b> replaces earlier Core Builds addons.</p>
       </div>
     </div>
     <div class="fastlane-section"><div class="fastlane-label">Defaults we’ll use</div>

@@ -103,9 +103,12 @@ test('Express free/P2P hides credentials; manifest target hides Stremio fields',
   await page.locator('[data-express-service="p2p"]').click();
   await expect(page.locator('#expressCreds')).toContainText('No key needed');
   await expect(page.locator('[data-express-cred]')).toHaveCount(0);
-  // Switch back to TorBox → credential appears
+  await expect(page.locator('#expressCreds .fastlane-trust'), 'no key, no key promise').toHaveCount(0);
+  // Switch back to TorBox → credential appears, with where the key goes
   await page.locator('[data-express-service="torbox-pro"]').click();
   await expect(page.locator('[data-express-cred="torbox"]')).toBeVisible();
+  await expect(page.locator('#expressCreds .fastlane-trust')).toContainText('Your keys go only to your AIOStreams host');
+  await expect(page.locator('#expressStremio .fastlane-trust')).toContainText('Your other addons stay');
   // Manifest target hides the Stremio block
   await page.locator('[data-express-target="manifest"]').click();
   await expect(page.locator('#expressStremio')).toBeHidden();
