@@ -2015,6 +2015,7 @@ function splashHtml() {
           <a href="../tools/genies/" class="splash-tertiary-btn">Setup Genie</a>
           <button data-action="open-tutorial" class="splash-tertiary-btn">Take the tour</button>
         </div>
+        <p class="splash-from-note">Coming from QuackStart? <button type="button" data-action="open-quick-install" class="splash-from-link">Quick install</button> does the same one-click setup: AIOStreams with AIOMetadata and the Cinemeta patch, or just a manifest URL for any app.</p>
         <div class="hybrid-trust"><span><i></i> Runs locally</span><span><i></i> Open source · MIT</span><span><i></i> Build without a login — or push it in one click</span></div>
         <div class="splash-stats" id="splashStats"></div>
         <div class="hybrid-subnote">Core Stable by default · 6s addon timeout · keys go only to the host you choose</div>
@@ -3179,7 +3180,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (action === 'close-advanced') closeAdvancedDrawer();
     if (action === 'close-and-next') { closeAdvancedDrawer(); if (step < STEPS && S.multiServices.length > 0) { step++; pushStep(); saveState(); render(); window.scrollTo(0,0); } }
     if (action === 'start-setup') { S.quickStart = false; document.getElementById('main').classList.remove('nav-back'); step = 1; pushStep(); saveState(); render(); window.scrollTo(0,0); }
-    if (action === 'open-express-lane') showExpressLane();
+    if (action === 'open-express-lane' || action === 'open-quick-install') showExpressLane();
     if (action === 'update-now') applyRemoteUpdate();
     if (action === 'revert-update') revertToPrevious();
     if (action === 'strip-regex') stripNonWhitelistedRegex();

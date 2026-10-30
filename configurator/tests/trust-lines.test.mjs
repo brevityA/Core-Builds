@@ -30,3 +30,11 @@ test('"Core Builds never keeps a copy": the relay logs a fixed, body-free field 
 test('the key note shows only when Quick install asks for a key', () => {
   assert.match(app, /const keyNote = \/data-express-cred=\/\.test\(prim \+ extraCreds\)/);
 });
+
+test('the QuackStart note opens Quick install and claims only what Quick install does', () => {
+  assert.match(app, /Coming from QuackStart\? <button type="button" data-action="open-quick-install" class="splash-from-link">Quick install<\/button>/);
+  // "AIOMetadata and the Cinemeta patch": Quick install's Full stack option, on by default.
+  assert.match(app, /id="expressFullStack" \$\{S\.installAIOMeta !== false\?'checked':''\}/);
+  // "just a manifest URL for any app": the Other app target.
+  assert.match(app, /\['manifest','Other app','Copy manifest'\]/);
+});
