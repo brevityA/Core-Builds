@@ -1,4 +1,9 @@
 export const CHANGELOG = [
+  { v:'3.29', date:'Oct 30 2026', items:[
+    'Quick install asks your language — under Optional, filled in from your browser’s language (a language you already chose in Custom build wins). It goes first in the preferred-language list with English kept behind it, so releases in your language come first when everything else is equal. Nothing is made strict: English and original-audio releases still show.',
+    'Chinese saves again — the language list offered “Chinese (Simplified)” and “Chinese (Traditional)”, but AIOStreams only knows “Chinese”, so any config carrying either was refused when saved. Both are now “Chinese”, including in settings saved in your browser and in share links, and a test checks every offered language against AIOStreams’ own list.',
+    'Generated output unchanged — for every setting that saved before, configs are byte-for-byte what 3.28 produced apart from the version stamp; only a build that picked a Chinese option changes, from refused to saved.',
+  ]},
   { v:'3.28', date:'Oct 30 2026', items:[
     'A note for QuackStart users — Duck Tools’ QuackStart has been offline for weeks, so the first screen now says that Quick install does the same one-click setup: AIOStreams with AIOMetadata and the Cinemeta patch, or just a manifest URL for any app. The link opens Quick install.',
     'Generated output unchanged — every config the configurator and the CLI build is byte-for-byte what 3.27 produced apart from the version stamp; only the first screen gained a line.',

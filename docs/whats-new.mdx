@@ -1,14 +1,30 @@
 ---
-title: "What's New — Configurator v3.28"
+title: "What's New — Configurator v3.29"
 sidebarTitle: "What's New"
-description: "Latest Core Builds Configurator releases (v3.28 and earlier), auto-generated from the in-app changelog."
+description: "Latest Core Builds Configurator releases (v3.29 and earlier), auto-generated from the in-app changelog."
 ---
 
 # What's New in the Configurator
 
-This page is regenerated from `configurator/src/data/changelog.js` by `scripts/sync-docs.py`, so it always reflects the latest shipped configurator version (currently **v3.28**).
+This page is regenerated from `configurator/src/data/changelog.js` by `scripts/sync-docs.py`, so it always reflects the latest shipped configurator version (currently **v3.29**).
 
 For the template-suite release log, see the [Changelog](https://corebuilds-docs.docsalot.dev/changelog).
+
+## Configurator v3.29 (Oct 30 2026)
+
+<CardGroup cols={2}>
+  <Card title="Quick install asks your language" icon="sparkles">
+    under Optional, filled in from your browser’s language (a language you already chose in Custom build wins). It goes first in the preferred-language list with English kept behind it, so releases in your language come first when everything else is equal. Nothing is made strict: English and original-audio releases still show.
+  </Card>
+  <Card title="Chinese saves again" icon="bolt">
+    the language list offered “Chinese (Simplified)” and “Chinese (Traditional)”, but AIOStreams only knows “Chinese”, so any config carrying either was refused when saved. Both are now “Chinese”, including in settings saved in your browser and in share links, and a test checks every offered language against AIOStreams’ own list.
+  </Card>
+  <Card title="Generated output unchanged" icon="shield-check">
+    for every setting that saved before, configs are byte-for-byte what 3.28 produced apart from the version stamp; only a build that picked a Chinese option changes, from refused to saved.
+  </Card>
+</CardGroup>
+
+---
 
 ## Configurator v3.28 (Oct 30 2026)
 
@@ -53,21 +69,5 @@ For the template-suite release log, see the [Changelog](https://corebuilds-docs.
   </Card>
   <Card title="Generated output unchanged" icon="sliders">
     for the same settings, every config the configurator and the CLI build is byte-for-byte what 3.25 produced apart from the version stamp; the fix changes which settings choosing Fast produces.
-  </Card>
-</CardGroup>
-
----
-
-## Configurator v3.25 (Oct 29 2026)
-
-<CardGroup cols={2}>
-  <Card title="EasyNews add-ons now reach your config" icon="sparkles">
-    choosing EasyNews or EasyNews+ under Additional services & scrapers on a TorBox (or any non-EasyNews) build left them out of the JSON, because both need the EasyNews service and that dialog had no way to add it. Picking either now adds the EasyNews service too, and Quick install asks for its username and password. Unticking them takes the service back out of Quick install.
-  </Card>
-  <Card title="Typing no longer jumps to the previous box" icon="bolt">
-    a helper that selects a field’s text 50 ms after you click into it also moved the cursor back there, so autofill, a password manager or fast tabbing could put the next field’s text in the wrong box. In Quick install the Stremio password could end up in the email field and the install would sit waiting.
-  </Card>
-  <Card title="Generated output unchanged" icon="shield-check">
-    for the same settings, every config the configurator and the CLI build is byte-for-byte what 3.24 produced apart from the version stamp; the fix changes which settings the EasyNews picks produce.
   </Card>
 </CardGroup>
