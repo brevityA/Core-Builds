@@ -1,14 +1,27 @@
 ---
-title: "What's New — Configurator v3.27"
+title: "What's New — Configurator v3.28"
 sidebarTitle: "What's New"
-description: "Latest Core Builds Configurator releases (v3.27 and earlier), auto-generated from the in-app changelog."
+description: "Latest Core Builds Configurator releases (v3.28 and earlier), auto-generated from the in-app changelog."
 ---
 
 # What's New in the Configurator
 
-This page is regenerated from `configurator/src/data/changelog.js` by `scripts/sync-docs.py`, so it always reflects the latest shipped configurator version (currently **v3.27**).
+This page is regenerated from `configurator/src/data/changelog.js` by `scripts/sync-docs.py`, so it always reflects the latest shipped configurator version (currently **v3.28**).
 
 For the template-suite release log, see the [Changelog](https://corebuilds-docs.docsalot.dev/changelog).
+
+## Configurator v3.28 (Oct 30 2026)
+
+<CardGroup cols={2}>
+  <Card title="A note for QuackStart users" icon="sparkles">
+    Duck Tools’ QuackStart has been offline for weeks, so the first screen now says that Quick install does the same one-click setup: AIOStreams with AIOMetadata and the Cinemeta patch, or just a manifest URL for any app. The link opens Quick install.
+  </Card>
+  <Card title="Generated output unchanged" icon="bolt">
+    every config the configurator and the CLI build is byte-for-byte what 3.27 produced apart from the version stamp; only the first screen gained a line.
+  </Card>
+</CardGroup>
+
+---
 
 ## Configurator v3.27 (Oct 30 2026)
 
@@ -56,21 +69,5 @@ For the template-suite release log, see the [Changelog](https://corebuilds-docs.
   </Card>
   <Card title="Generated output unchanged" icon="shield-check">
     for the same settings, every config the configurator and the CLI build is byte-for-byte what 3.24 produced apart from the version stamp; the fix changes which settings the EasyNews picks produce.
-  </Card>
-</CardGroup>
-
----
-
-## Configurator v3.24 (Oct 26 2026)
-
-<CardGroup cols={2}>
-  <Card title="Chillio is a first-class install target" icon="sparkles">
-    Review & Install and Quick install now offer Chillio alongside WuPlay and Nuvio. The manifest modal gains a Chillio tab that builds the ChillLink URL (your host’s /chilllink/uuid/password route, which every public AIOStreams host already serves), auto-copies it, shows the in-app Add Account steps, and links the official Manifest Merger, Feed Editor and Validator for adding curated TMDB/Trakt feeds. A P2P build with the Chillio target is blocked before anything is posted: the ChillLink protocol carries direct HTTP, Usenet, debrid and live URLs only, so a torrent build would install but play nothing — the Stremio target stays available for P2P.
-  </Card>
-  <Card title="Community addon directory linked" icon="bolt">
-    the Tools hub now points at stremio-addons.net (community-moderated, external), and the Best Add-ons guide cites per-addon directory pages with an honest note that the catalog includes adult addons and does not accept the preconfigured manifests this configurator produces. A weekly advisory workflow now diffs that directory’s approved AIOStreams instances against the audited host registry and opens an issue when a new public host appears.
-  </Card>
-  <Card title="Generated output unchanged" icon="shield-check">
-    every config the configurator and the CLI build is byte-for-byte what 3.23 produced apart from the version stamp; only the version stamp moves.
   </Card>
 </CardGroup>

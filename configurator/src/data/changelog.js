@@ -1,4 +1,8 @@
 export const CHANGELOG = [
+  { v:'3.28', date:'Oct 30 2026', items:[
+    'A note for QuackStart users — Duck Tools’ QuackStart has been offline for weeks, so the first screen now says that Quick install does the same one-click setup: AIOStreams with AIOMetadata and the Cinemeta patch, or just a manifest URL for any app. The link opens Quick install.',
+    'Generated output unchanged — every config the configurator and the CLI build is byte-for-byte what 3.27 produced apart from the version stamp; only the first screen gained a line.',
+  ]},
   { v:'3.27', date:'Oct 30 2026', items:[
     'Quick install says where your keys go — under the key fields: your keys go only to your AIOStreams host and are remembered in this browser; Core Builds never keeps a copy. The line is hidden on P2P, which needs no key.',
     'Quick install says your other addons stay — under the Stremio login: Core Builds is added to your account and your other addons stay; only Clean reinstall replaces earlier Core Builds addons. Both lines describe what the installer already does, and tests now fail if either stops being true.',
