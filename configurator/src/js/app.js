@@ -48,7 +48,7 @@ const STEPS = 6;
 // workflow) the raw x.y here expands to x.y.0 in package.json / versions.json and
 // the release tag; the built badge drops the trailing .0. At the 2026-09-06
 // audit the release tag was v3.7.0 while this said 3.1 — they must move together.
-const CONFIGURATOR_VERSION = '3.25';
+const CONFIGURATOR_VERSION = '3.26';
 // Set to a collector endpoint to enable the opt-in anonymous usage ping (service+device+resolution only).
 // Leave empty to keep the feature fully disabled and hidden.
 const USAGE_BEACON_URL = '';
@@ -7455,6 +7455,12 @@ function bindModalEsc(overlay, doClose){
 // It reuses the full install pipeline (simpleInstall → host auto-select →
 // POST → pushToStremio → Full-Stack AIOMetadata+Cinemeta) with Balanced
 // defaults so novices get a working setup in ~30 seconds.
+// Quick install profiles, named by what you get. Values mirror applyQuickProfile().
+const EXPRESS_PROFILES = [
+  ['fast', 'Fast', 'Starts instantly · 1080p · only streams ready to play'],
+  ['balanced', 'Balanced', '4K when available · starts quickly'],
+  ['maximum', 'Maximum', 'Best picture · widest search · any file size'],
+];
 const EXPRESS_SERVICES = [
   ['torbox-pro','TorBox','Debrid · fast cache'],
   ['realdebrid','Real-Debrid','Debrid · large library'],
@@ -7534,14 +7540,17 @@ function showExpressLane() {
       </div>
       <button type="button" id="expressExtrasBtn" class="additional-services-btn" style="width:100%;margin-top:8px;display:flex;align-items:center;gap:10px;padding:11px 13px;border-radius:11px;border:1px solid rgba(255,255,255,.09);background:#0e1621;color:#c9d5df;cursor:pointer;text-align:left"><span style="font-size:1rem;color:#a78bfa">＋</span><span class="u-flex1"><b style="display:block;font-size:.72rem">Additional services &amp; scrapers</b><span style="display:block;font-size:.6rem;color:#718093;margin-top:1px">Debridio, Debrider, Usenet, indexers and more</span></span><span id="expressExtrasCount" style="font-size:.6rem;font-weight:900;color:#67e8f9"></span><span>→</span></button>
     </div>
-    <div class="fastlane-section"><div class="fastlane-label">2 · Streams shown ${ftTip('<strong>Cached only</strong> = instant play; nothing that still needs downloading appears at all. <strong>Mixed</strong> also shows torrents your debrid must fetch first — those stall on a “downloading to debrid” screen the first time. Fast profile implies Cached-only until you change it here.')}</div>
+    <div class="fastlane-section"><div class="fastlane-label">2 · What matters most</div>
+      <div class="fastlane-grid services cols-3">${EXPRESS_PROFILES.map(([v,n,d])=>`<button type="button" class="fastlane-choice${state.profile===v?' active':''}" data-express-profile="${v}"><b>${n}${v==='balanced'?' <span class="fastlane-reco">Recommended</span>':''}</b><span>${d}</span></button>`).join('')}</div>
+    </div>
+    <div class="fastlane-section"><div class="fastlane-label">3 · Streams shown ${ftTip('<strong>Cached only</strong> = instant play; nothing that still needs downloading appears at all. <strong>Mixed</strong> also shows torrents your debrid must fetch first — those stall on a “downloading to debrid” screen the first time. Fast profile implies Cached-only until you change it here.')}</div>
       <div class="fastlane-grid services cols-2">
         <button type="button" class="fastlane-choice${S.cacheMode!=='cached' && S.cacheMode!=='uncached'?' active':''}" data-express-cache="mixed"><b>Mixed</b><span>Cached first · uncached can download first</span></button>
         <button type="button" class="fastlane-choice${S.cacheMode==='cached'?' active':''}" data-express-cache="cached"><b>⚡ Cached only</b><span>Instant play guaranteed — uncached hidden</span></button>
         ${S.cacheMode==='uncached' ? '<div style="font-size:.6rem;color:#fbbf24;margin-top:6px">Advanced is set to “Uncached only” — Express will honor it unless you pick here.</div>' : ''}
       </div>
     </div>
-    <div class="fastlane-section"><div class="fastlane-label">3 · Install to</div>
+    <div class="fastlane-section"><div class="fastlane-label">4 · Install to</div>
       <div class="fastlane-grid services">${[['app','Stremio','Recommended — direct install'],['nuvio','Nuvio','Manifest URL'],['wuplay','WuPlay','Manifest URL'],['chillio','Chillio','ChillLink URL'],['manifest','Other app','Copy manifest']].map(([v,n,d])=>`<button type="button" class="fastlane-choice${state.target===v?' active':''}" data-express-target="${v}"><b>${n}</b><span>${d}</span></button>`).join('')}</div>
       <div id="expressStremio"${state.target==='app'?'':' style="display:none"'}>
         <div class="fastlane-pair" style="display:flex;gap:8px;margin-top:10px">
@@ -7556,9 +7565,6 @@ function showExpressLane() {
       <button type="button" class="fastlane-customize" data-express-customize="">Customize every setting →</button>
     </div>
     <details class="fastlane-optional"><summary style="cursor:pointer;color:#8b949e;font-weight:700;letter-spacing:.04em;text-transform:uppercase">Optional</summary>
-      <div class="u-mt8"><div style="font-size:.64rem;font-weight:800;color:#8b949e;letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px">Performance profile</div>
-        <div class="fastlane-grid services cols-3">${[['fast','Fast','1080p · cached first'],['balanced','Balanced','4K · sensible pool'],['maximum','Maximum','4K · largest pool']].map(([v,n,d])=>`<button type="button" class="fastlane-choice${state.profile===v?' active':''}" data-express-profile="${v}"><b>${n}</b><span>${d}</span></button>`).join('')}</div>
-      </div>
       <div class="u-mt8"><div style="font-size:.64rem;font-weight:800;color:#8b949e;letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px">Device</div>
         <div class="fastlane-grid services devices cols-4">${[['generic','Standard'],['shield','NVIDIA Shield'],['firestick-4kmax','Fire Stick 4K Max'],['googletv','Google TV'],['samsung','Samsung TV'],['onn','onn 4K'],['appletv-new','Apple TV 4K'],['windows','Windows PC']].map(([v,n])=>`<button type="button" class="fastlane-choice${state.device===v?' active':''}" data-express-device="${v}"><b>${n}</b></button>`).join('')}</div>
       </div>
@@ -7643,8 +7649,12 @@ function showExpressLane() {
       // Keep the visible "Streams shown" toggle truthful about the profile's own cache semantics
       // (mirrors applyQuickProfile: fast→cached-only, balanced/maximum→mixed). User can override after.
       S.cacheMode = state.profile === 'fast' ? 'cached' : 'mixed';
+      // The profile's resolution too: Quick install passes its own resolution to
+      // applyExpressChoices, which overrides the profile's, so Fast used to build 4K.
+      state.resolution = state.profile === 'fast' ? '1080p' : '4k';
       saveState();
       overlay.querySelectorAll('[data-express-cache]').forEach(b => b.classList.toggle('active', b.dataset.expressCache === S.cacheMode));
+      overlay.querySelectorAll('[data-express-res]').forEach(b => b.classList.toggle('active', b.dataset.expressRes === state.resolution));
       refreshExpressSummary();
       return;
     }
@@ -7814,7 +7824,7 @@ async function runExpressInstall(p) {
     // Renders progress + result into the modal's #aioResult.
     // Chillio keeps its own tab in the manifest modal; every other non-Stremio
     // target (WuPlay, Nuvio, Other app) collapses to the generic manifest tab.
-    await simpleInstall(p.target === 'app' ? 'app' : (p.target === 'chillio' ? 'chillio' : 'manifest'));
+    await simpleInstall(p.target === 'app' ? 'app' : (p.target === 'chillio' ? 'chillio' : 'manifest'), { profile: p.profile });
   } catch (err) {
     showToast('Install failed: ' + (err?.message || err), true);
   }
@@ -7905,7 +7915,7 @@ function showDiagnosticsModal() {
   document.getElementById('diagClose').focus();
 }
 
-async function simpleInstall(target) {
+async function simpleInstall(target, { profile = '' } = {}) {
   if (!S.service) { showToast('Pick a service first — go back to step 1', true); return; }
   // ChillLink carries direct URLs only — AIOStreams' ChillLink transformer drops
   // P2P streams, so a P2P build installed into Chillio would return zero sources.
@@ -7927,7 +7937,10 @@ async function simpleInstall(target) {
   const btn = document.getElementById('btnAio') || document.getElementById('btnAutoCreate'), result = document.getElementById('aioResult');
   const origBtnHtml = btn ? btn.innerHTML : '';
   if (btn) { btn.disabled = true; btn.innerHTML = `<span class="dot-spin"><span></span><span></span><span></span></span> Checking…`; }
-  const findings = collectPreflightFindings();
+  // Quick install's Fast card already says "1080p", so the note that 1080p removes
+  // 4K tells the user nothing new and would only stand between them and the install.
+  const findings = collectPreflightFindings()
+    .filter(f => !(profile === 'fast' && S.resolution === '1080p' && f.id === 'resolution-4k-excluded'));
   if (btn) { btn.disabled = false; btn.innerHTML = origBtnHtml; }
   if (!await showPreflightModal(findings, { actionLabel: 'Install anyway' })) return;
   if (S.installMode === 'direct' && target === 'app' && !isFree) {
