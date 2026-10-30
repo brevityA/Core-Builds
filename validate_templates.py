@@ -770,6 +770,10 @@ def main():
             files.extend(sorted(p.rglob('*.json')))
         # A path can be reached through overlapping --dir arguments; validate once.
         files = list(dict.fromkeys(files))
+        # The smart template is compiled AIOStreams directives (__switch/__if), not a
+        # plain config; packages/core/tests/smart-template.test.mjs resolves it through
+        # AIOStreams' own evaluator and checks every result against the generator.
+        files = [f for f in files if Path(f).parts[-2:] != ('Smart', 'core-builds.json')]
 
     print(f"\n{'='*60}")
     print(f"  CORE BUILDS TEMPLATE VALIDATOR")

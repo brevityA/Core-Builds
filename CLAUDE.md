@@ -17,6 +17,7 @@ This is **brevityA/Core-Builds**, the canonical repo for Core Builds by Brevity 
   - Run `npm test` in `configurator/`, `cli/` **and** `packages/core/` before pushing. The configurator suite alone will not catch a version-coupling break.
 - **Changelog items are `Short title — body`.** `docs/whats-new.mdx` builds each Mintlify `<Card>` by splitting an item on its **first** `" — "`: the part before it becomes the card title. An item that leads straight into prose ships a card with a 300-character title, or — with no separator at all — one whose title and body are the same paragraph printed twice. `python3 scripts/sync-docs.py --check-changelog` lints the newest entry and blocks the PR; the renderer derives a short title for older entries so they degrade rather than break.
 - **Say when a release changes no generated output.** If a configurator release leaves every golden in `configurator/e2e/golden/` unchanged apart from its `coreBuildsVersion`/`generatedAt` stamps, its changelog entry must include an item starting `Generated output unchanged — `. Claiming unchanged output when a golden did move also fails. `scripts/check_output_note.py` enforces both in the blocking `changelog-format` job. Why: 3.12→3.13 shipped byte-identical configs as an apparent config release, users re-imported, AIOStreams correctly showed "no changes", and the configurator looked broken.
+- **A change to generator output means recompiling the smart template.** Run `node scripts/smart-template/compile.mjs` and `python3 scripts/sync_template_collection.py`, and bump `TEMPLATE_VERSION`. `packages/core/tests/smart-template.test.mjs` fails until you do (it resolves the template through AIOStreams' own evaluator for every answer and service).
 - **Touching `configurator/src/data/hosts.js` means running e2e, not just `npm test`.** Host metadata is asserted in browser specs (`direct-install-gate.spec.mjs` pins each host's advertised version), so the unit suite goes green on a change that fails CI. #755 did exactly this.
 
 ---
@@ -712,19 +713,21 @@ AIOStreams uses `registerTrustedAccess()` (`packages/core/src/utils/templates.ts
 
 ### Core Builds template collection
 
-`core-builds-template-collection.json` at repo root. Contains 3 representative templates (4K Apex, Stream, Anime 4K) with all Core Builds synced URLs declared.
+`core-builds-template-collection.json` at repo root holds **one entry: the Core Builds smart template** (v3.31; it held 50 static templates, Personal ones included, before). `scripts/sync_template_collection.py` builds it from `Templates/Smart/core-builds.json` and adds the trust strings (regex patterns and synced URLs) of every active static template, plus our own `Filtering/ranked-regex-patterns.json`, in a `__switch` on `services` whose only case is `core-builds-trust`. AIOStreams' `extractTemplateStrings` reads every case, so operators keep trusting all of it; the wizard switches on the picked services joined with commas and never lands on that case. A test asserts the entry resolves exactly like the standalone template.
 
 **Operator setup:** Add to `TEMPLATE_URLS`:
 ```
 https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/core-builds-template-collection.json
 ```
 
-**URLs auto-whitelisted when added:**
-- `Filtering/ranked-regex-patterns.json` — 107 scored regex patterns (via `syncedRankedRegexUrls`)
-- `Filtering/core-builds-eses.json` — 81 ESEs, full fleet superset (via `syncedExcludedStreamExpressionUrls`)
-- `Filtering/core-builds-ises.json` — 8 ISEs (via `syncedIncludedStreamExpressionUrls`)
-- `Filtering/core-builds-pses.json` — 163 PSEs, all architectures (via `syncedPreferredStreamExpressionUrls`)
-- Vidhin05's `regexes.json` (via `syncedRankedRegexUrls`, already whitelisted on most instances)
+### Smart template (`Templates/Smart/core-builds.json`)
+
+One AIOStreams template that asks device (26), picture, what matters most, cached only, language and anime, then reads the services picked in the AIOStreams wizard (none = free P2P). `scripts/smart-template/compile.mjs` runs `packages/core` `generateTemplate()` for every combination (168,480 builds, ~90 s) and emits each config key as a `__switch` tree over only the answers it depends on; presets are aligned by `instanceId` with an `__if` naming the services and answers they appear for.
+
+- **Regenerate it whenever generator output changes**: `node scripts/smart-template/compile.mjs`, then `python3 scripts/sync_template_collection.py`. `packages/core/tests/smart-template.test.mjs` resolves it through AIOStreams' own evaluator (fetched at `UPSTREAM.pin`, never vendored: AGPL) for every answer × service and fails on any difference, so a stale file cannot ship. Bump `TEMPLATE_VERSION` in `compile.mjs` when the output changes; AIOStreams offers that update to people who imported it.
+- `dimensions.mjs` is the single source for the questions and their mapping to generator input.
+- Two services at once resolve to the union of both builds' presets (one StremThru Store preset serves every store service); the save test saves such picks in a real AIOStreams.
+- `validate_templates.py` skips this file: it is directives, not a plain config.
 
 ### AIOStreams trust mechanisms (3 levels)
 

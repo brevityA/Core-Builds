@@ -19,13 +19,17 @@ AIOStreams itself. CI: `.github/workflows/aio-save-test.yml`.
    profile, plus each optional toggle on TorBox, P2P and EasyNews.
    `save-test.mjs` fills dummy credentials from `required.json` (upstream
    `SERVICE_DETAILS`) and POSTs `/api/v1/user`.
+4. The smart template (`Templates/Smart/core-builds.json`) is resolved with
+   AIOStreams' own evaluator, fetched at the pin, for single and combined service
+   picks across three answer sets, and saved the same way. Combined picks are the
+   only smart output not already proven equal to generator output.
 
 ## Variants
 
 | Variant | Host rules | Cases |
 |---|---|---|
-| `open` | `REGEX_FILTER_ACCESS=all`, `SEL_SYNC_ACCESS=all` | 462 |
-| `restricted` | ElfHosted's allowlist from `allowlist.elfhosted.json` (level, synced URLs, literal patterns) | 388 (free lanes skipped: ElfHosted refuses them) |
+| `open` | `REGEX_FILTER_ACCESS=all`, `SEL_SYNC_ACCESS=all` | 489 (27 smart template) |
+| `restricted` | ElfHosted's allowlist from `allowlist.elfhosted.json` (level, synced URLs, literal patterns) | 412 (24 smart template; free lanes skipped: ElfHosted refuses them) |
 
 The restricted run also saves one config carrying a regex no allowlist has and
 fails unless AIOStreams refuses it, so a green run cannot mean the gate was off.
