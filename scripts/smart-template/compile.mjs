@@ -13,8 +13,7 @@
 import { writeFileSync, mkdirSync } from 'node:fs';
 import { dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { generateTemplate } from '../../packages/core/src/index.js';
-import { DIMS, INPUTS, SERVICES, combinations, generatorInput } from './dimensions.mjs';
+import { DIMS, INPUTS, SERVICES, combinations, generateFor } from './dimensions.mjs';
 
 const ROOT = fileURLToPath(new URL('../../', import.meta.url));
 export const OUT_PATH = 'Templates/Smart/core-builds.json';
@@ -47,7 +46,7 @@ function buildAll() {
   const keyFns = new Map();
   let c = 0;
   for (const [answers, serviceId] of combinations()) {
-    const cfg = generateTemplate(generatorInput(answers, serviceId)).config;
+    const cfg = generateFor(answers, serviceId);
     // The AIOStreams wizard adds the picked services itself, enabled with empty credentials.
     const want = serviceId ? [{ id: serviceId, enabled: true, credentials: {} }] : [];
     if (JSON.stringify(cfg.services) !== JSON.stringify(want)) throw new Error(`unexpected services for ${serviceId}: ${JSON.stringify(cfg.services)}`);

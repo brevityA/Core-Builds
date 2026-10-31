@@ -2,6 +2,9 @@
 // each answer maps onto packages/core generateTemplate(). Shared by the compiler
 // (compile.mjs) and the equivalence test, so both read the same matrix.
 import { ALLOWED_AIO_NAMES } from '../../configurator/src/data/language-packs.js';
+import { DEVICE_AV1_SAFE, DEVICE_DV_SAFE, DEVICE_FORCE_LIMITED_AUDIO } from '../../configurator/src/data/devices.js';
+import { FORMATTERS } from '../../configurator/src/data/formatters.js';
+import { generateTemplate } from '../../packages/core/src/index.js';
 
 // AIOStreams service id → configurator service id → label. Selecting none in the
 // AIOStreams wizard builds the free P2P lane.
@@ -74,6 +77,21 @@ export function generatorInput(answers, serviceId) {
     cacheMode: answers.cachedOnly ? 'cached' : 'mixed',
     ...PROFILES[answers.profile],
   };
+}
+
+// The device capability sets the configurator and the CLI pass. generateTemplate()
+// defaults them to empty, which treats every device as AV1-unsafe and able to
+// play lossless audio: 10,800 of 11,232 smart-template builds came out wrong that way.
+export const GENERATOR_OPTIONS = Object.freeze({
+  deviceAv1Safe: DEVICE_AV1_SAFE,
+  deviceDvSafe: DEVICE_DV_SAFE,
+  deviceForceLimitedAudio: DEVICE_FORCE_LIMITED_AUDIO,
+  formatters: FORMATTERS,
+});
+
+/** The config the configurator's generator builds for these answers and service. */
+export function generateFor(answers, serviceId) {
+  return generateTemplate(generatorInput(answers, serviceId), GENERATOR_OPTIONS).config;
 }
 
 /** Every combination, as [answers, serviceId], in DIMS order (service outermost). */

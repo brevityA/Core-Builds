@@ -64,7 +64,10 @@ for (const c of cases) {
   const { writeFileSync, mkdtempSync } = await import('node:fs');
   const { tmpdir } = await import('node:os');
   const evalFile = mkdtempSync(tmpdir() + '/aio-eval-') + '/conditionals.ts';
-  writeFileSync(evalFile, await (await fetch(`${pin.rawBase}/${pin.sha}/packages/frontend/src/lib/templates/processors/conditionals.ts`)).text());
+  const evalUrl = `${pin.rawBase}/${pin.sha}/packages/frontend/src/lib/templates/processors/conditionals.ts`;
+  const evalRes = await fetch(evalUrl);
+  if (!evalRes.ok) throw new Error(`AIOStreams evaluator: HTTP ${evalRes.status} for ${evalUrl}`);
+  writeFileSync(evalFile, await evalRes.text());
   const { applyTemplateConditionals } = await import(evalFile);
   const smart = JSON.parse(readFileSync(new URL('../../Templates/Smart/core-builds.json', import.meta.url), 'utf8'));
   const picks = [['torbox'], ['realdebrid'], ['easynews'], ['seedr'], ['torbox', 'realdebrid'], ['realdebrid', 'alldebrid', 'premiumize'], ['torbox', 'easynews'], ['debrider', 'offcloud'], ...(ONLY_HOST ? [] : [[]])];

@@ -1852,18 +1852,78 @@
         "Unknown"
       ]
     },
-    "preferredAudioTags": [
-      "TrueHD",
-      "Atmos",
-      "DTS-HD MA",
-      "DTS:X",
-      "FLAC",
-      "DTS-HD",
-      "DD+",
-      "AAC",
-      "DTS",
-      "DD"
-    ],
+    "preferredAudioTags": {
+      "__switch": "inputs.device",
+      "cases": {
+        "firestick-4kmax": [
+          "TrueHD",
+          "Atmos",
+          "DTS-HD MA",
+          "DTS:X",
+          "FLAC",
+          "DTS-HD",
+          "DD+",
+          "AAC",
+          "DTS",
+          "DD"
+        ],
+        "shield": [
+          "TrueHD",
+          "Atmos",
+          "DTS-HD MA",
+          "DTS:X",
+          "FLAC",
+          "DTS-HD",
+          "DD+",
+          "AAC",
+          "DTS",
+          "DD"
+        ],
+        "xiaomi": [
+          "TrueHD",
+          "Atmos",
+          "DTS-HD MA",
+          "DTS:X",
+          "FLAC",
+          "DTS-HD",
+          "DD+",
+          "AAC",
+          "DTS",
+          "DD"
+        ],
+        "xiaomi-3rd": [
+          "TrueHD",
+          "Atmos",
+          "DTS-HD MA",
+          "DTS:X",
+          "FLAC",
+          "DTS-HD",
+          "DD+",
+          "AAC",
+          "DTS",
+          "DD"
+        ],
+        "windows": [
+          "TrueHD",
+          "Atmos",
+          "DTS-HD MA",
+          "DTS:X",
+          "FLAC",
+          "DTS-HD",
+          "DD+",
+          "AAC",
+          "DTS",
+          "DD"
+        ]
+      },
+      "default": [
+        "Atmos",
+        "DD+",
+        "AAC",
+        "DD",
+        "DTS"
+      ]
+    },
     "syncedRankedRegexUrls": [],
     "rankedRegexPatterns": [],
     "excludedRegexPatterns": [],
@@ -2607,24 +2667,93 @@
     "excludedEncodes": {
       "__switch": "inputs.device",
       "cases": {
+        "firestick-4kmax": [
+          "VC-1"
+        ],
         "shield": [
           "AV1"
         ],
-        "windows": [
-          "AV1"
-        ]
+        "googletv": [
+          "VC-1"
+        ],
+        "onn": [
+          "VC-1"
+        ],
+        "xiaomi": [
+          "VC-1"
+        ],
+        "xiaomi-3rd": [
+          "VC-1"
+        ],
+        "windows": []
       },
       "default": [
         "AV1",
         "VC-1"
       ]
     },
-    "preferredEncodes": [
-      "HEVC",
-      "AVC",
-      "Unknown"
-    ],
-    "excludedAudioTags": [],
+    "preferredEncodes": {
+      "__switch": "inputs.device",
+      "cases": {
+        "firestick-4kmax": [
+          "HEVC",
+          "AV1",
+          "AVC",
+          "Unknown"
+        ],
+        "googletv": [
+          "HEVC",
+          "AV1",
+          "AVC",
+          "Unknown"
+        ],
+        "onn": [
+          "HEVC",
+          "AV1",
+          "AVC",
+          "Unknown"
+        ],
+        "xiaomi": [
+          "HEVC",
+          "AV1",
+          "AVC",
+          "Unknown"
+        ],
+        "xiaomi-3rd": [
+          "HEVC",
+          "AV1",
+          "AVC",
+          "Unknown"
+        ],
+        "windows": [
+          "HEVC",
+          "AV1",
+          "AVC",
+          "Unknown"
+        ]
+      },
+      "default": [
+        "HEVC",
+        "AVC",
+        "Unknown"
+      ]
+    },
+    "excludedAudioTags": {
+      "__switch": "inputs.device",
+      "cases": {
+        "firestick-4kmax": [],
+        "shield": [],
+        "xiaomi": [],
+        "xiaomi-3rd": [],
+        "windows": []
+      },
+      "default": [
+        "TrueHD",
+        "DTS-HD MA",
+        "DTS:X",
+        "FLAC"
+      ]
+    },
     "preferredAudioChannels": {
       "__switch": "inputs.device",
       "cases": {

@@ -11,8 +11,7 @@ import { readFileSync, writeFileSync, mkdtempSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { generateTemplate } from '../src/index.js';
-import { DIMS, LANGUAGES, SERVICES, combinations, generatorInput } from '../../../scripts/smart-template/dimensions.mjs';
+import { DIMS, LANGUAGES, SERVICES, combinations, generateFor } from '../../../scripts/smart-template/dimensions.mjs';
 
 const ROOT = new URL('../../../', import.meta.url);
 const template = JSON.parse(readFileSync(new URL('Templates/Smart/core-builds.json', ROOT), 'utf8'));
@@ -22,7 +21,7 @@ const EVALUATOR = `${pin.rawBase}/${pin.sha}/packages/frontend/src/lib/templates
 async function loadEvaluator() {
   try {
     const res = await fetch(EVALUATOR, { signal: AbortSignal.timeout(15000) });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    if (!res.ok) throw new Error(`HTTP ${res.status} for ${EVALUATOR}`);
     const file = join(mkdtempSync(join(tmpdir(), 'aio-eval-')), 'conditionals.ts');
     writeFileSync(file, await res.text());
     return await import(pathToFileURL(file).href);
@@ -51,7 +50,7 @@ test('every answer and service resolves to the generator output', { skip }, () =
   let i = 0;
   for (const [answers, service] of combinations(noLang)) {
     answers.language = LANGUAGES[i++ % LANGUAGES.length];
-    const want = generateTemplate(generatorInput(answers, service)).config;
+    const want = generateFor(answers, service);
     const got = resolve(answers, service ? [service] : []);
     assert.deepStrictEqual(got, want, `${service || 'p2p'} ${JSON.stringify(answers)}`);
   }
@@ -67,7 +66,7 @@ test('two services at once give one valid config with both services', { skip }, 
     const instanceIds = cfg.presets.map(p => p.instanceId);
     assert.equal(new Set(instanceIds).size, instanceIds.length, `duplicate preset for ${pick}`);
     for (const one of pick) {
-      for (const p of generateTemplate(generatorInput(answers, one)).config.presets) {
+      for (const p of generateFor(answers, one).presets) {
         assert.ok(instanceIds.includes(p.instanceId), `${pick}: ${p.instanceId} from ${one} missing`);
       }
     }
