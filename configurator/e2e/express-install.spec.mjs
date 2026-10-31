@@ -107,7 +107,7 @@ test('Express free/P2P hides credentials; manifest target hides Stremio fields',
   // Switch back to TorBox → credential appears, with where the key goes
   await page.locator('[data-express-service="torbox-pro"]').click();
   await expect(page.locator('[data-express-cred="torbox"]')).toBeVisible();
-  await expect(page.locator('#expressCreds .fastlane-trust')).toContainText('Your keys go only to your AIOStreams host');
+  await expect(page.locator('#expressCreds .fastlane-trust')).toContainText('Your keys go to your AIOStreams host through the Core Builds relay');
   await expect(page.locator('#expressStremio .fastlane-trust')).toContainText('Your other addons stay');
   // Manifest target hides the Stremio block
   await page.locator('[data-express-target="manifest"]').click();
@@ -211,6 +211,15 @@ test.describe('Express language from a Spanish browser', () => {
     const langs = posted[0].config.preferredLanguages;
     expect(langs.slice(0, 2)).toEqual(['Spanish', 'English']);
     expect(langs).toContain('Original');
+  });
+
+  test('an English choice made earlier beats the Spanish browser guess', async ({ page }) => {
+    await fresh(page);
+    // Only the language fields: the rest of the state falls back to its defaults.
+    await page.evaluate(() => localStorage.setItem('coreBuild', JSON.stringify({ langs: ['English'], langsSet: true })));
+    await page.reload();
+    await page.locator('[data-action="open-express-lane"]').click();
+    await expect(page.locator('#expressLang')).toHaveValue('English');
   });
 
   test('a Chinese pick posts the one name AIOStreams accepts', async ({ page }) => {
