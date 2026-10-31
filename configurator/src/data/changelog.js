@@ -1,4 +1,10 @@
 export const CHANGELOG = [
+  { v:'3.32', date:'Oct 31 2026', items:[
+    'Truer line about your keys — Quick install said your keys go only to your AIOStreams host. They pass through the Core Builds relay on the way, which forwards them and keeps nothing, and the line now says so. The first screen says Core Builds keeps no copy of your keys.',
+    'Full stack names Cinebye — the Full stack option now says that Cinebye, a separate service, makes the Cinemeta patch using your Stremio sign-in.',
+    'Your language choice sticks — Quick install filled the language from your browser even after you had chosen one, so picking English in a Spanish browser reverted to Spanish next time. A language you chose in Quick install or Custom build now wins over the browser.',
+    'Generated output unchanged — every config the configurator and the CLI build is byte-for-byte what 3.31 produced apart from the version stamp; only wording and the language prefill changed.',
+  ]},
   { v:'3.31', date:'Oct 31 2026', items:[
     'One Core Builds template inside AIOStreams — a single template asks what you watch on (26 devices), the picture you want, what matters most, whether to show only streams that play straight away, your language and whether you mostly watch anime, then uses the service you pick in AIOStreams (none gives the free P2P setup). It builds the same config Quick install would for those answers. It is first in the template directory, with Import buttons for every host.',
     'Proven against AIOStreams itself — a test runs the template through AIOStreams’ own template code, fetched at the pinned release, for every answer and service, and fails on any difference from the configurator’s output; a browser test checks that output against what Quick install builds for every service and device. Picking two services at once gives one config with both, and those combinations are saved in a real AIOStreams on every pull request.',

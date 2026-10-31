@@ -1,14 +1,33 @@
 ---
-title: "What's New — Configurator v3.31"
+title: "What's New — Configurator v3.32"
 sidebarTitle: "What's New"
-description: "Latest Core Builds Configurator releases (v3.31 and earlier), auto-generated from the in-app changelog."
+description: "Latest Core Builds Configurator releases (v3.32 and earlier), auto-generated from the in-app changelog."
 ---
 
 # What's New in the Configurator
 
-This page is regenerated from `configurator/src/data/changelog.js` by `scripts/sync-docs.py`, so it always reflects the latest shipped configurator version (currently **v3.31**).
+This page is regenerated from `configurator/src/data/changelog.js` by `scripts/sync-docs.py`, so it always reflects the latest shipped configurator version (currently **v3.32**).
 
 For the template-suite release log, see the [Changelog](https://corebuilds-docs.docsalot.dev/changelog).
+
+## Configurator v3.32 (Oct 31 2026)
+
+<CardGroup cols={2}>
+  <Card title="Truer line about your keys" icon="sparkles">
+    Quick install said your keys go only to your AIOStreams host. They pass through the Core Builds relay on the way, which forwards them and keeps nothing, and the line now says so. The first screen says Core Builds keeps no copy of your keys.
+  </Card>
+  <Card title="Full stack names Cinebye" icon="bolt">
+    the Full stack option now says that Cinebye, a separate service, makes the Cinemeta patch using your Stremio sign-in.
+  </Card>
+  <Card title="Your language choice sticks" icon="shield-check">
+    Quick install filled the language from your browser even after you had chosen one, so picking English in a Spanish browser reverted to Spanish next time. A language you chose in Quick install or Custom build now wins over the browser.
+  </Card>
+  <Card title="Generated output unchanged" icon="sliders">
+    every config the configurator and the CLI build is byte-for-byte what 3.31 produced apart from the version stamp; only wording and the language prefill changed.
+  </Card>
+</CardGroup>
+
+---
 
 ## Configurator v3.31 (Oct 31 2026)
 
@@ -56,18 +75,5 @@ For the template-suite release log, see the [Changelog](https://corebuilds-docs.
   </Card>
   <Card title="Generated output unchanged" icon="shield-check">
     for every setting that saved before, configs are byte-for-byte what 3.28 produced apart from the version stamp; only a build that picked a Chinese option changes, from refused to saved.
-  </Card>
-</CardGroup>
-
----
-
-## Configurator v3.28 (Oct 30 2026)
-
-<CardGroup cols={2}>
-  <Card title="A note for QuackStart users" icon="sparkles">
-    Duck Tools’ QuackStart has been offline for weeks, so the first screen now says that Quick install does the same one-click setup: AIOStreams with AIOMetadata and the Cinemeta patch, or just a manifest URL for any app. The link opens Quick install.
-  </Card>
-  <Card title="Generated output unchanged" icon="bolt">
-    every config the configurator and the CLI build is byte-for-byte what 3.27 produced apart from the version stamp; only the first screen gained a line.
   </Card>
 </CardGroup>
