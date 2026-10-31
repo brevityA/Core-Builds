@@ -28,3 +28,10 @@ test('Quick install keeps English behind a picked language and states what it do
   assert.match(app, /S\.langs = p\.lang === 'English' \? \['English'\] : \[p\.lang, 'English'\];/);
   assert.match(app, /Releases in this language come first when everything else is equal\. English and original-audio releases still show\./);
 });
+
+test('a language choice survives share links and backups', () => {
+  // Without the flag, a shared English pick reopens as the recipient's browser language.
+  const shareKeys = app.match(/const SHARE_KEYS = \[([^\]]*)\]/)[1];
+  assert.match(shareKeys, /'langs','langsSet'/);
+  assert.match(app, /'langExclusive','langsSet'/, 'imports keep the flag when it is a boolean');
+});

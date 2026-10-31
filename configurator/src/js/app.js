@@ -692,7 +692,7 @@ function sanitizeCustomFormatter(value) {
   return { name, d:description, label };
 }
 // Only wizard selections are shareable — never credentials, tokens, UUIDs, or passwords
-const SHARE_KEYS = ['device','resolution','audio','content','name','multiServices','sizeLimit','formatter','p2pEnabled','qualityFirst','resolutionFirst','foreignLangKill','matchMode','exclude4K','excludeDV','quickStart','langs','langExclusive','cacheMode','streamPool','instanceHost','simpleMode','outputProfile','aiostreamsVersion','pseArch','subtitleLangs','subtitleAddons','catalogs','dedupMerge','optionalScrapers','preloadEnabled','autoPlayMethod','addonTimeout','bandwidthMbps','patchCinemeta','installAIOMeta','libraryBoost','nzbFailover','nzbFailoverPosition','maxFailoverNzbs'];
+const SHARE_KEYS = ['device','resolution','audio','content','name','multiServices','sizeLimit','formatter','p2pEnabled','qualityFirst','resolutionFirst','foreignLangKill','matchMode','exclude4K','excludeDV','quickStart','langs','langsSet','langExclusive','cacheMode','streamPool','instanceHost','simpleMode','outputProfile','aiostreamsVersion','pseArch','subtitleLangs','subtitleAddons','catalogs','dedupMerge','optionalScrapers','preloadEnabled','autoPlayMethod','addonTimeout','bandwidthMbps','patchCinemeta','installAIOMeta','libraryBoost','nzbFailover','nzbFailoverPosition','maxFailoverNzbs'];
 function shareConfig() {
   try {
     const pub = {};
