@@ -19,16 +19,19 @@ const pin = JSON.parse(readFileSync(new URL('configurator/UPSTREAM.pin', ROOT), 
 const EVALUATOR = `${pin.rawBase}/${pin.sha}/packages/frontend/src/lib/templates/processors/conditionals.ts`;
 
 async function loadEvaluator() {
+  let source;
   try {
     const res = await fetch(EVALUATOR, { signal: AbortSignal.timeout(15000) });
     if (!res.ok) throw new Error(`HTTP ${res.status} for ${EVALUATOR}`);
-    const file = join(mkdtempSync(join(tmpdir(), 'aio-eval-')), 'conditionals.ts');
-    writeFileSync(file, await res.text());
-    return await import(pathToFileURL(file).href);
+    source = await res.text();
   } catch (err) {
     if (process.env.CI) throw new Error(`could not load the AIOStreams evaluator at the pin: ${err.message}`);
-    return null;
+    return null;   // offline: skip locally
   }
+  // Anything past the download (a Node without type stripping, say) fails loudly instead of skipping.
+  const file = join(mkdtempSync(join(tmpdir(), 'aio-eval-')), 'conditionals.ts');
+  writeFileSync(file, source);
+  return import(pathToFileURL(file).href);
 }
 const evaluator = await loadEvaluator();
 const skip = evaluator ? false : 'AIOStreams evaluator unreachable (offline); CI requires it';

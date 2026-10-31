@@ -21,8 +21,10 @@ AIOStreams itself. CI: `.github/workflows/aio-save-test.yml`.
    `SERVICE_DETAILS`) and POSTs `/api/v1/user`.
 4. The smart template (`Templates/Smart/core-builds.json`) is resolved with
    AIOStreams' own evaluator, fetched at the pin, for single and combined service
-   picks across three answer sets, and saved the same way. Combined picks are the
-   only smart output not already proven equal to generator output.
+   picks across three answer sets, and saved the same way. Single picks are also
+   checked against generator output for every other answer (one language each; the
+   compiler itself reads every language), so combined picks are the case only this
+   harness covers.
 
 ## Variants
 
