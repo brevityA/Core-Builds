@@ -21,7 +21,8 @@ test('"Your other addons stay": a Stremio install keeps every addon unless Clean
 });
 
 test('"Core Builds never keeps a copy": the relay logs a fixed, body-free field list only', () => {
-  assert.match(app, /Your keys go only to your AIOStreams host and are remembered in this browser\. Core Builds never keeps a copy\./);
+  assert.match(app, /Your keys go to your AIOStreams host through the Core Builds relay, which passes them on and keeps nothing\. They are remembered in this browser\./);
+  assert.doesNotMatch(app, /keys go only to/, 'the relay is a second recipient, so no "only" claim');
   const logs = worker.match(/console\.(log|info|warn|error|debug)\(/g) || [];
   assert.equal(logs.length, 1, 'the worker has exactly one console sink');
   assert.match(worker, /const allowed = \['cls', 'host', 'status', 'scope', 'store', 'attempts'\];/);
@@ -37,4 +38,11 @@ test('the QuackStart note opens Quick install and claims only what Quick install
   assert.match(app, /id="expressFullStack" \$\{S\.installAIOMeta !== false\?'checked':''\}/);
   // "just a manifest URL for any app": the Other app target.
   assert.match(app, /\['manifest','Other app','Copy manifest'\]/);
+});
+
+test('Full stack says the Cinemeta patch goes through Cinebye with the Stremio sign-in', () => {
+  // patchCinemeta posts the Stremio authKey to these hosts; the option must say so.
+  assert.match(app, /const CINEBYE_HOSTS = \[/);
+  assert.match(app, /body: JSON\.stringify\(\{ authKey, patches \}\)/);
+  assert.match(app, /Cinebye, a separate service, makes the Cinemeta patch using your Stremio sign-in\./);
 });
