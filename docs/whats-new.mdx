@@ -1,14 +1,33 @@
 ---
-title: "What's New — Configurator v3.30"
+title: "What's New — Configurator v3.31"
 sidebarTitle: "What's New"
-description: "Latest Core Builds Configurator releases (v3.30 and earlier), auto-generated from the in-app changelog."
+description: "Latest Core Builds Configurator releases (v3.31 and earlier), auto-generated from the in-app changelog."
 ---
 
 # What's New in the Configurator
 
-This page is regenerated from `configurator/src/data/changelog.js` by `scripts/sync-docs.py`, so it always reflects the latest shipped configurator version (currently **v3.30**).
+This page is regenerated from `configurator/src/data/changelog.js` by `scripts/sync-docs.py`, so it always reflects the latest shipped configurator version (currently **v3.31**).
 
 For the template-suite release log, see the [Changelog](https://corebuilds-docs.docsalot.dev/changelog).
+
+## Configurator v3.31 (Oct 31 2026)
+
+<CardGroup cols={2}>
+  <Card title="One Core Builds template inside AIOStreams" icon="sparkles">
+    a single template asks what you watch on (26 devices), the picture you want, what matters most, whether to show only streams that play straight away, your language and whether you mostly watch anime, then uses the service you pick in AIOStreams (none gives the free P2P setup). It builds the same config Quick install would for those answers. It is first in the template directory, with Import buttons for every host.
+  </Card>
+  <Card title="Proven against AIOStreams itself" icon="bolt">
+    a test runs the template through AIOStreams’ own template code, fetched at the pinned release, for every answer and service, and fails on any difference from the configurator’s output. Picking two services at once gives one config with both, and those combinations are saved in a real AIOStreams on every pull request.
+  </Card>
+  <Card title="Smaller operator collection" icon="shield-check">
+    the collection hosts add to TEMPLATE_URLS now holds just this template (94 KB instead of 3.4 MB) and no longer includes personal templates. It still carries every regex pattern and synced address the other templates use, so instances that trusted them keep trusting them.
+  </Card>
+  <Card title="Generated output unchanged" icon="sliders">
+    every config the configurator and the CLI build is byte-for-byte what 3.30 produced apart from the version stamp; the new template is a separate file that reproduces that output.
+  </Card>
+</CardGroup>
+
+---
 
 ## Configurator v3.30 (Oct 30 2026)
 
@@ -50,21 +69,5 @@ For the template-suite release log, see the [Changelog](https://corebuilds-docs.
   </Card>
   <Card title="Generated output unchanged" icon="bolt">
     every config the configurator and the CLI build is byte-for-byte what 3.27 produced apart from the version stamp; only the first screen gained a line.
-  </Card>
-</CardGroup>
-
----
-
-## Configurator v3.27 (Oct 30 2026)
-
-<CardGroup cols={2}>
-  <Card title="Quick install says where your keys go" icon="sparkles">
-    under the key fields: your keys go only to your AIOStreams host and are remembered in this browser; Core Builds never keeps a copy. The line is hidden on P2P, which needs no key.
-  </Card>
-  <Card title="Quick install says your other addons stay" icon="bolt">
-    under the Stremio login: Core Builds is added to your account and your other addons stay; only Clean reinstall replaces earlier Core Builds addons. Both lines describe what the installer already does, and tests now fail if either stops being true.
-  </Card>
-  <Card title="Generated output unchanged" icon="shield-check">
-    every config the configurator and the CLI build is byte-for-byte what 3.26 produced apart from the version stamp; only Quick install’s wording changed.
   </Card>
 </CardGroup>
