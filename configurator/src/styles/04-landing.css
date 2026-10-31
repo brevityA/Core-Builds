@@ -116,6 +116,8 @@
 .start-quick .start-card-icon{color:var(--th-accent);background:rgba(0,212,255,.12);border:1px solid rgba(0,212,255,.28)}
 .start-custom{border-color:rgba(167,139,250,.3);background:linear-gradient(150deg,rgba(167,139,250,.11),rgba(10,15,23,.85))}
 .start-custom .start-card-icon{color:var(--th-purple);background:rgba(167,139,250,.12);border:1px solid rgba(167,139,250,.28)}
+.start-update{width:100%;margin:22px 0 -10px;min-height:0;border-color:rgba(52,211,153,.35)}
+.start-update .start-card-icon{color:#34d399;background:rgba(52,211,153,.12);border:1px solid rgba(52,211,153,.3)}
 .start-card:hover{transform:translateY(-1px)}
 .start-quick:hover{border-color:rgba(0,212,255,.6);box-shadow:0 10px 30px rgba(0,212,255,.12)}
 .start-custom:hover{border-color:rgba(167,139,250,.6);box-shadow:0 10px 30px rgba(167,139,250,.12)}

@@ -48,7 +48,7 @@ const STEPS = 6;
 // workflow) the raw x.y here expands to x.y.0 in package.json / versions.json and
 // the release tag; the built badge drops the trailing .0. At the 2026-09-06
 // audit the release tag was v3.7.0 while this said 3.1 — they must move together.
-const CONFIGURATOR_VERSION = '3.29';
+const CONFIGURATOR_VERSION = '3.30';
 // Set to a collector endpoint to enable the opt-in anonymous usage ping (service+device+resolution only).
 // Leave empty to keep the feature fully disabled and hidden.
 const USAGE_BEACON_URL = '';
@@ -746,6 +746,117 @@ function saveLastGen() {
     localStorage.setItem('coreBuildLastGen', JSON.stringify(snap));
   } catch(e) {}
   saveBackup();
+}
+
+// What Core Builds last saved to AIOStreams for this browser: the host and UUID it
+// went to, and the config with credentials stripped (the same scrub the import link
+// uses). "Update my setup" diffs a fresh build against it, then saves over that UUID.
+const LAST_SAVED_KEY = 'coreBuildLastSaved';
+function recordSavedConfig(host, uuid, config) {
+  try {
+    // A custom URL can arrive with a trailing slash; lastSavedConfig compares without one.
+    const base = String(host || '').trim().replace(/\/+$/, '');
+    if (!base || !validateUuid(uuid)) return;
+    const scrubbed = sanitizeTemplateForRemoteImport({ metadata: {}, config }).config;
+    localStorage.setItem(LAST_SAVED_KEY, JSON.stringify({ host: base, uuid, ver: CONFIGURATOR_VERSION, ts: Date.now(), config: scrubbed }));
+  } catch(e) {}
+}
+// Only offered while the saved password and UUID still match the record, and only
+// for a host the user could have picked, since the update sends the password there.
+function lastSavedConfig() {
+  try {
+    const rec = JSON.parse(localStorage.getItem(LAST_SAVED_KEY) || 'null');
+    if (!rec || typeof rec !== 'object' || !rec.config || typeof rec.config !== 'object') return null;
+    const custom = (S.instanceUrl || '').trim().replace(/\/$/, '');
+    const hostOk = Object.values(HOST_BASE_URLS).includes(rec.host) || (!!custom && rec.host === custom);
+    if (!hostOk || !validateUuid(rec.uuid) || rec.uuid !== (S.instanceUuid || '').trim() || !S.instancePassword) return null;
+    return rec;
+  } catch(e) { return null; }
+}
+function savedHostLabel(host) {
+  const id = Object.keys(HOST_BASE_URLS).find(k => HOST_BASE_URLS[k] === host);
+  return id ? (HOST_LABEL_MAP[id] || id) : String(host).replace(/^https?:\/\//, '').split('/')[0];
+}
+function splashUpdateCard() {
+  const rec = lastSavedConfig();
+  if (!rec) return '';
+  const when = new Date(rec.ts).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+  const older = rec.ver && rec.ver !== CONFIGURATOR_VERSION ? ` with v${escHtml(String(rec.ver))}` : '';
+  return `<button type="button" class="start-card start-update" data-action="update-my-setup">
+          <span class="start-card-icon">${ICO.refresh(20,'currentColor')}</span>
+          <span class="start-card-title">Update my setup</span>
+          <span class="start-card-desc">Saved on ${escHtml(savedHostLabel(rec.host))} ${escHtml(when)}${older}. See what changes, then save it over the same config. Your Stremio link keeps working.</span>
+        </button>`;
+}
+
+// Rebuild from the saved choices, show the difference against what was saved last,
+// then save over the same UUID. Never creates a new config: a failed update leaves
+// the existing one alone and offers the paste flow instead.
+function updateMySetup() {
+  const rec = lastSavedConfig();
+  if (!rec || !S.service) { showUpdateTemplateModal(); return; }
+  let built;
+  try { built = buildFinal(); } catch(e) { showUpdateTemplateModal(); return; }
+  const sections = diffConfigs(rec.config, sanitizeTemplateForRemoteImport(built).config);
+  document.getElementById('updateSetupModal')?.remove();
+  const overlay = document.createElement('div');
+  overlay.id = 'updateSetupModal';
+  overlay.className = 'modal-overlay';
+  const hostLbl = escHtml(savedHostLabel(rec.host));
+  const list = sections.length ? sections.map(sec => {
+    const counts = [sec.added ? `<span class="u-green">+${sec.added}</span>` : '', sec.removed ? `<span class="u-red">&minus;${sec.removed}</span>` : '', sec.changed ? `<span class="u-yellow">~${sec.changed}</span>` : ''].filter(Boolean).join(' ');
+    const rows = sec.rows.slice(0, 6).map(r => `<li>${r.text}</li>`).join('') + (sec.rows.length > 6 ? `<li class="u-dim">and ${sec.rows.length - 6} more</li>` : '');
+    return `<details class="upd-sec"><summary>${sec.icon} ${escHtml(sec.label || sec.key || 'Changes')} ${counts}</summary><ul>${rows}</ul></details>`;
+  }).join('') : `<p class="upd-none">No changes. This release builds the same config for your choices.</p>`;
+  overlay.innerHTML = `
+    <div class="modal-box upd-box" role="dialog" aria-modal="true" aria-label="Update my setup">
+      <button class="modal-close" data-upd-close aria-label="Close">×</button>
+      <div class="modal-title upd-title">${ICO.refresh(18,'currentColor')} Update my setup</div>
+      <div class="u-mb8 modal-sub">Rebuilt with Core Builds v${escHtml(CONFIGURATOR_VERSION)} from the choices saved in this browser, compared with what was last saved to ${hostLbl}.</div>
+      <div class="upd-list">${list}</div>
+      <p class="fastlane-trust">Saving replaces the config on ${hostLbl} and keeps its address, so Stremio uses it the next time it loads streams. Catalog changes show after reinstalling from your manifest link.</p>
+      <div class="upd-actions">
+        <button type="button" class="upd-go" id="updSetupGo">${sections.length ? 'Save to my AIOStreams' : 'Save anyway'}</button>
+        <button type="button" class="upd-cancel" data-upd-close>Cancel</button>
+      </div>
+      <div id="updSetupResult" aria-live="polite"></div>
+    </div>`;
+  document.body.appendChild(overlay);
+  const close = () => overlay.remove();
+  bindModalEsc(overlay, close);
+  overlay.querySelector('#updSetupGo')?.focus();
+  overlay.addEventListener('click', async e => {
+    if (e.target === overlay || e.target.closest('[data-upd-close]')) { close(); return; }
+    if (e.target.closest('[data-upd-paste]')) { close(); showUpdateTemplateModal(); return; }
+    const go = e.target.closest('#updSetupGo');
+    if (!go || go.disabled) return;
+    const out = document.getElementById('updSetupResult');
+    const cfg = built.config;
+    const sz = payloadSizeGuard(cfg);
+    if (sz.over) { out.innerHTML = payloadTooLargeHtml(sz); return; }
+    go.disabled = true; go.textContent = 'Saving…'; out.innerHTML = '';
+    const pasteBtn = '<button type="button" class="upd-cancel upd-paste" data-upd-paste>Use the paste method instead</button>';
+    try {
+      const res = await writeHostFetch(rec.host, `/api/v1/user/${rec.uuid}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ config: cfg, password: S.instancePassword }) }, 10000);
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || data?.success === false) throw new Error(data?.error?.message || data?.message || data?.detail || `Server returned ${res.status}`);
+      recordSavedConfig(rec.host, rec.uuid, cfg);
+      saveLastGen();
+      go.textContent = 'Saved';
+      out.innerHTML = `<div class="upd-ok">Updated on ${hostLbl}. Streams use it straight away.</div>`;
+      showToast('Your setup is updated');
+      render();
+    } catch(err) {
+      logError('deploy', 'Update in place failed', { host: S.instanceHost, error: err?.message });
+      go.disabled = false; go.textContent = 'Try again';
+      // A timeout can land after the host applied the PATCH; only a refusal is known to change nothing.
+      // Retrying is safe: it saves the same config to the same UUID.
+      const timedOut = err?.name === 'AbortError';
+      out.innerHTML = timedOut
+        ? `<div class="upd-err"><b>No answer.</b> The host did not reply in time, so the update may or may not have been saved. Try again to be sure.</div>${pasteBtn}`
+        : `<div class="upd-err"><b>Not saved.</b> ${escHtml(String(err?.message || err))} Your existing config is unchanged.</div>${pasteBtn}`;
+    }
+  });
 }
 const BACKUP_MAX = 20;
 function saveBackup() {
@@ -2008,6 +2119,7 @@ function splashHtml() {
         <!-- Two equal ways in (v3.20 redesign). Quick install opens the Express lane;
              Custom build opens the full builder. Same data-actions as before, so the
              #express / #advanced deep links, the tour and every spec keep working. -->
+        ${splashUpdateCard()}
         <div class="splash-start" id="splashStart" role="group" aria-label="Start a build">
           <button type="button" class="start-card start-quick" data-action="open-express-lane">
             <span class="start-card-icon">${ICO.bolt(20,'currentColor')}</span>
@@ -3271,6 +3383,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     if (action === 'paste-manifest-splash') { S.simpleMode = false; document.getElementById('main').classList.remove('nav-back'); step = STEPS; pasteMode = true; pushStep(); saveState(); render(); window.scrollTo(0,0); }
     if (action === 'update-template') { showUpdateTemplateModal(); }
+    if (action === 'update-my-setup') { updateMySetup(); }
     if (action === 'test-drive') { showTestDriveModal(); }
     if (action === 'reset-state') { if (confirm('Start over? Your current selections will be cleared.')) { showAdvanced = false; clearState(); } }
     if (action === 'tut-start') { tutGo(1); }
@@ -8050,7 +8163,7 @@ async function simpleInstall(target, { profile = '' } = {}) {
     {
       const uuid = data?.data?.uuid || data?.uuid || data?.user?.uuid || data?.id;
       const epwd = data?.data?.encryptedPassword || encodeURIComponent(pwd);
-      if (uuid) { S.instanceUuid = uuid; S.instancePassword = pwd; saveState(); }
+      if (uuid) { S.instanceUuid = uuid; S.instancePassword = pwd; saveState(); recordSavedConfig(fastest, uuid, cfg); }
       const manifestUrl = `${fastest}/stremio/${uuid}/${epwd}/manifest.json`;
       const hostLbl = hostLabels[fastest] || fastest.replace('https://','').split('/')[0];
       saveLastGen();
@@ -8567,7 +8680,7 @@ async function openInAIOStreams() {
         if (existingUuid) winner = await attempt(null);
         else throw err;
       }
-      if (winner.uuid) { S.instanceUuid = winner.uuid; saveState(); }
+      if (winner.uuid) { S.instanceUuid = winner.uuid; saveState(); recordSavedConfig(winner.host, winner.uuid, cfg); }
       const manifestPwd = winner.epwd || encodeURIComponent(pwd);
       resetBtn(origHtml);
       showManifestModal(`${winner.host}/stremio/${winner.uuid}/${manifestPwd}/manifest.json`, pwd, HOST_LABELS[winner.host] || winner.host.replace('https://','').split('/')[0]);
@@ -8644,6 +8757,7 @@ async function openInAIOStreams() {
         const outUuid = data?.data?.uuid || data?.uuid || data?.user?.uuid || data?.id || uuid;
         const epwd = data?.data?.encryptedPassword || encodeURIComponent(pwd);
         if (outUuid && !uuid) { S.instanceUuid = outUuid; saveState(); }
+        recordSavedConfig(resolvedBase, outUuid, cfg);
         resetBtn(origHtml);
         showManifestModal(`${resolvedBase}/stremio/${outUuid}/${epwd}/manifest.json`, pwd, hostLabel);
       } else throw new Error('API Error');

@@ -1,4 +1,9 @@
 export const CHANGELOG = [
+  { v:'3.30', date:'Oct 30 2026', items:[
+    'Update my setup — once Core Builds has saved a config to your AIOStreams and this browser still has its UUID and password, the first screen offers Update my setup. It rebuilds from your saved choices, shows what changes against what was last saved, and saves over the same config, so your Stremio link keeps working. Streams use the update straight away; changed catalogs show after reinstalling from your manifest link.',
+    'An update never makes a second config — if the host refuses, your existing config is left as it was and the paste method is offered. If it does not answer in time, the update may or may not have landed, and trying again is safe. Your password goes to a host from the list or your own custom address, passing through the Core Builds relay, which forwards it and keeps nothing.',
+    'Generated output unchanged — every config the configurator and the CLI build is byte-for-byte what 3.29 produced apart from the version stamp; only the way an existing setup is updated changed.',
+  ]},
   { v:'3.29', date:'Oct 30 2026', items:[
     'Quick install asks your language — under Optional, filled in from your browser’s language (a language you already chose in Custom build wins). It goes first in the preferred-language list with English kept behind it, so releases in your language come first when everything else is equal. Nothing is made strict: English and original-audio releases still show.',
     'Chinese saves again — the language list offered “Chinese (Simplified)” and “Chinese (Traditional)”, but AIOStreams only knows “Chinese”, so any config carrying either was refused when saved. Both are now “Chinese”, including in settings saved in your browser and in share links, and a test checks every offered language against AIOStreams’ own list.',
