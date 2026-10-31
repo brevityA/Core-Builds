@@ -99,3 +99,11 @@ test('the collection entry resolves exactly like the template and carries the st
     assert.deepStrictEqual(run(entry.config, answers, selected), run(template.config, answers, selected), `${selected}`);
   }
 });
+
+test('the template version rises exactly when the compiled config changes', async () => {
+  const { nextVersion } = await import('../../../scripts/smart-template/compile.mjs');
+  const prev = { metadata: { version: '1.0.4' }, config: { a: 1 } };
+  assert.equal(nextVersion(prev, { a: 1 }), '1.0.4');
+  assert.equal(nextVersion(prev, { a: 2 }), '1.0.5');
+  assert.equal(nextVersion(null, { a: 1 }), '1.0.0');
+});

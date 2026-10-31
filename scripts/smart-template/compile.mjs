@@ -10,7 +10,7 @@
 //
 //   node scripts/smart-template/compile.mjs           # write Templates/Smart/core-builds.json
 //   node scripts/smart-template/compile.mjs --stdout  # print instead
-import { writeFileSync, mkdirSync } from 'node:fs';
+import { writeFileSync, mkdirSync, readFileSync, existsSync } from 'node:fs';
 import { dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { DIMS, INPUTS, SERVICES, combinations, generateFor } from './dimensions.mjs';
@@ -18,8 +18,16 @@ import { DIMS, INPUTS, SERVICES, combinations, generateFor } from './dimensions.
 const ROOT = fileURLToPath(new URL('../../', import.meta.url));
 export const OUT_PATH = 'Templates/Smart/core-builds.json';
 export const RAW_URL = `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/${OUT_PATH}`;
-// Bump when the compiled output changes; AIOStreams offers the update to users who imported it.
-export const TEMPLATE_VERSION = '1.0.0';
+// AIOStreams offers an update to people who imported the template when its version
+// rises, so the version follows the output: the patch number goes up whenever the
+// compiled config differs from the committed one, and stays put when it does not.
+const FIRST_VERSION = '1.0.0';
+export function nextVersion(previous, config) {
+  if (!previous?.metadata?.version) return FIRST_VERSION;
+  if (JSON.stringify(previous.config) === JSON.stringify(config)) return previous.metadata.version;
+  const [maj, min, pat] = previous.metadata.version.split('.').map(Number);
+  return `${maj}.${min}.${pat + 1}`;
+}
 
 const SIZES = DIMS.map(d => d.values.length);
 const STRIDES = SIZES.map((_, i) => SIZES.slice(i + 1).reduce((a, b) => a * b, 1));
@@ -216,7 +224,7 @@ function compilePresets(fn) {
   });
 }
 
-export function compileSmartTemplate() {
+export function compileSmartTemplate(previous = null) {
   const keyFns = buildAll();
   const config = {};
   for (const [k, fn] of keyFns) {
@@ -231,7 +239,7 @@ export function compileSmartTemplate() {
       name: 'Core Builds',
       description: 'One Core Builds setup for any device and service. Answer a few questions (device, picture, what matters most, language) and pick your service; you get the same config the Core Builds configurator would build.',
       author: 'Brevity',
-      version: TEMPLATE_VERSION,
+      version: nextVersion(previous, config),
       category: 'Debrid',
       services: SERVICES.map(([id]) => id),
       serviceRequired: false,
@@ -246,12 +254,13 @@ export function compileSmartTemplate() {
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const t0 = Date.now();
-  const tpl = compileSmartTemplate();
+  const previous = existsSync(ROOT + OUT_PATH) ? JSON.parse(readFileSync(ROOT + OUT_PATH, 'utf8')) : null;
+  const tpl = compileSmartTemplate(previous);
   const text = JSON.stringify(tpl, null, 2) + '\n';
   if (process.argv.includes('--stdout')) process.stdout.write(text);
   else {
     mkdirSync(dirname(ROOT + OUT_PATH), { recursive: true });
     writeFileSync(ROOT + OUT_PATH, text);
-    console.error(`wrote ${OUT_PATH}: ${(text.length / 1024).toFixed(1)} KB from ${N} builds in ${((Date.now() - t0) / 1000).toFixed(0)}s`);
+    console.error(`wrote ${OUT_PATH} v${tpl.metadata.version}: ${(text.length / 1024).toFixed(1)} KB from ${N} builds in ${((Date.now() - t0) / 1000).toFixed(0)}s`);
   }
 }
