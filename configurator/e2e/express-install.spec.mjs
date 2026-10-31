@@ -215,11 +215,8 @@ test.describe('Express language from a Spanish browser', () => {
 
   test('an English choice made earlier beats the Spanish browser guess', async ({ page }) => {
     await fresh(page);
-    await page.evaluate(() => {
-      const st = JSON.parse(localStorage.getItem('coreBuild') || '{}');
-      Object.assign(st, { langs: ['English'], langsSet: true });
-      localStorage.setItem('coreBuild', JSON.stringify(st));
-    });
+    // Only the language fields: the rest of the state falls back to its defaults.
+    await page.evaluate(() => localStorage.setItem('coreBuild', JSON.stringify({ langs: ['English'], langsSet: true })));
     await page.reload();
     await page.locator('[data-action="open-express-lane"]').click();
     await expect(page.locator('#expressLang')).toHaveValue('English');
