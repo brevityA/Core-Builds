@@ -1,8 +1,16 @@
 #!/usr/bin/env python3
 """
-Regenerate core-builds-template-collection.json from the active template suite
-(non-Legacy, non-Deprecated, non-Nightly) so the host-preload collection stays
-in sync with the templates it references.
+Regenerate core-builds-template-collection.json, the catalog operators add to
+AIOStreams' TEMPLATE_URLS. It holds one entry: the Core Builds smart template
+(Templates/Smart/core-builds.json, compiled by scripts/smart-template/compile.mjs),
+which asks a few questions and builds the matching setup.
+
+AIOStreams also whitelists every regex pattern and synced URL a trusted template
+carries (registerTemplateTrust). So that operators keep trusting what the static
+templates use, the entry carries their union in a __switch case keyed
+"core-builds-trust": AIOStreams' trust scan reads every case, while the wizard
+never selects it (it switches on the picked services, joined with commas), so the
+resolved config is exactly the smart template's.
 
 Usage:
   python3 scripts/sync_template_collection.py            # write (regenerate)
@@ -51,6 +59,23 @@ def render_allowlist():
     return _ALLOWLIST_HEADER + 'export const REGEX_ALLOWLIST = {\n' + lines + ',\n};\n'
 
 EXCLUDED_TOP = {'Legacy', 'Deprecated'}
+SMART = TEMPLATES / 'Smart' / 'core-builds.json'
+TRUST_CASE = 'core-builds-trust'
+# Core Builds' own synced file, documented as whitelisted through this collection.
+# Only a Personal template still references it, and those are no longer collected.
+EXTRA_TRUST = {
+    'syncedRankedRegexUrls': ['https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Filtering/ranked-regex-patterns.json'],
+}
+# The fields AIOStreams reads trust from (packages/core/src/utils/template-sanitise.ts).
+TRUST_FIELDS = [
+    'excludedRegexPatterns', 'includedRegexPatterns', 'requiredRegexPatterns',
+    'preferredRegexPatterns', 'rankedRegexPatterns',
+    'syncedExcludedStreamExpressionUrls', 'syncedIncludedStreamExpressionUrls',
+    'syncedRequiredStreamExpressionUrls', 'syncedPreferredStreamExpressionUrls',
+    'syncedRankedStreamExpressionUrls',
+    'syncedExcludedRegexUrls', 'syncedIncludedRegexUrls', 'syncedRequiredRegexUrls',
+    'syncedPreferredRegexUrls', 'syncedRankedRegexUrls',
+]
 
 
 def collect():
@@ -62,6 +87,9 @@ def collect():
         # Templates/Torbox/Deprecated/Dual/), so check every path part —
         # a top-level-only check shipped 15 deprecated templates to hosts.
         if any(p in EXCLUDED_TOP for p in parts) or 'Nightly' in parts:
+            continue
+        # Personal templates are never exposed; the smart template is the entry itself.
+        if parts[0] in ('Personal', 'Smart'):
             continue
         # Parent/base configs are inherited by children, not imported directly.
         if parts[0] == 'Base' or f.name == 'Core-Builds-Base-Config.json':
@@ -79,6 +107,34 @@ def collect():
             continue
         entries.append({'metadata': meta, 'config': d['config']})
     return entries
+
+
+def trust_strings(entries):
+    """Per trust field, every pattern or URL the active static templates carry, in first-seen order."""
+    out = {}
+    for field in TRUST_FIELDS:
+        seen = list(EXTRA_TRUST.get(field, []))
+        for e in entries:
+            for item in e['config'].get(field) or []:
+                value = item.get('pattern') if isinstance(item, dict) else item
+                if isinstance(value, str) and value and value not in seen:
+                    seen.append(value)
+        if seen:
+            out[field] = seen
+    return out
+
+
+def smart_entry(entries):
+    """The smart template, carrying the static templates' trust in a case the wizard never picks."""
+    tpl = json.loads(SMART.read_text(encoding='utf-8'))
+    config = tpl['config']
+    for field, values in trust_strings(entries).items():
+        config[field] = {
+            '__switch': 'services',
+            'cases': {TRUST_CASE: values},
+            'default': config[field] if field in config else {'__remove': True},
+        }
+    return {'metadata': tpl['metadata'], 'config': config}
 
 
 def render(entries):
@@ -107,20 +163,20 @@ def main():
             out_path.write_text(want, encoding='utf-8')
             print(f'✅ regenerated {out_path.relative_to(ROOT)} ({n} patterns)')
         return
-    entries = collect()
+    entries = [smart_entry(collect())]
     out = render(entries)
     if '--check' in sys.argv:
         current = OUT.read_text(encoding='utf-8') if OUT.exists() else ''
         if current != out:
             print(f'❌ core-builds-template-collection.json is STALE '
-                  f'({len(entries)} active templates). '
+                  f'(smart template + static-template trust). '
                   f'Run: python3 scripts/sync_template_collection.py')
             sys.exit(1)
-        print(f'✅ collection in sync ({len(entries)} active templates)')
+        print('✅ collection in sync (smart template + static-template trust)')
         return
     OUT.write_text(out, encoding='utf-8')
     print(f'✅ regenerated core-builds-template-collection.json '
-          f'({len(entries)} active templates, {len(out) // 1024} KB)')
+          f'(smart template + static-template trust, {len(out) // 1024} KB)')
 
 
 if __name__ == '__main__':

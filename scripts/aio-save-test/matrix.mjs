@@ -1,5 +1,11 @@
 // Generate a broad matrix of configs from the built configurator and save
 // each to the throwaway AIOStreams. Prints failures grouped by error message.
+// The smart-template cases import AIOStreams' conditionals.ts directly, which needs
+// Node's built-in type stripping.
+const [nodeMajor, nodeMinor] = process.versions.node.split('.').map(Number);
+if (!(nodeMajor > 23 || (nodeMajor === 23 && nodeMinor >= 6) || (nodeMajor === 22 && nodeMinor >= 18))) {
+  throw new Error(`matrix.mjs needs Node 22.18+, 23.6+ or 24+ to load TypeScript (found ${process.version})`);
+}
 const ROOT = new URL('../../configurator/', import.meta.url).pathname;
 const { chromium } = await import(ROOT + 'node_modules/playwright/index.mjs');
 import { readFileSync } from 'node:fs';
@@ -39,7 +45,19 @@ for (const d of OPTIONAL_SCRAPER_DEFS) for (const service of ['torbox-pro', 'p2p
     p2pEnabled: service === 'p2p', instanceHost: ONLY_HOST || 'fortheweak', optionalScrapers: [d.id], creds: DUMMY_CREDS } });
 }
 
+const pin = JSON.parse(readFileSync(ROOT + 'UPSTREAM.pin', 'utf8'));
+const { writeFileSync, mkdtempSync } = await import('node:fs');
+const { tmpdir } = await import('node:os');
+const evalFile = mkdtempSync(tmpdir() + '/aio-eval-') + '/conditionals.ts';
+const evalUrl = `${pin.rawBase}/${pin.sha}/packages/frontend/src/lib/templates/processors/conditionals.ts`;
+const evalRes = await fetch(evalUrl);
+if (!evalRes.ok) throw new Error(`AIOStreams evaluator: HTTP ${evalRes.status} for ${evalUrl}`);
+writeFileSync(evalFile, await evalRes.text());
+// Loaded before the server and browser start, so a failed download leaves nothing running.
+const { applyTemplateConditionals } = await import(evalFile);
+
 const srv = spawn('python3', ['-m', 'http.server', '4199', '-d', DIST], { stdio: 'ignore' });
+process.on('exit', () => srv.kill());
 await new Promise(r => setTimeout(r, 800));
 const browser = await chromium.launch(process.env.CHROMIUM_PATH ? { executablePath: process.env.CHROMIUM_PATH } : {});
 const page = await browser.newPage();
@@ -55,6 +73,29 @@ for (const c of cases) {
   if (r.ok) { pass++; continue; }
   const key = r.error.replace(/\b[0-9a-f-]{36}\b/g, '<uuid>').slice(0, 220);
   (failures.get(key) || failures.set(key, []).get(key)).push(c.name);
+}
+// The smart template, resolved by AIOStreams' own evaluator (fetched at the pin, never
+// vendored) for single and combined service picks. Single picks are checked against
+// generator output for every other answer, one language each
+// (packages/core/tests/smart-template.test.mjs); combined picks are saved only here.
+{
+  const smart = JSON.parse(readFileSync(new URL('../../Templates/Smart/core-builds.json', import.meta.url), 'utf8'));
+  const picks = [['torbox'], ['realdebrid'], ['easynews'], ['seedr'], ['torbox', 'realdebrid'], ['realdebrid', 'alldebrid', 'premiumize'], ['torbox', 'easynews'], ['debrider', 'offcloud'], ...(ONLY_HOST ? [] : [[]])];
+  const answerSets = [
+    { device: 'generic', resolution: '4k', profile: 'balanced', cachedOnly: false, anime: false, language: 'English' },
+    { device: 'shield', resolution: 'mixed', profile: 'maximum', cachedOnly: true, anime: true, language: 'Japanese' },
+    { device: 'firestick-hd', resolution: '1080p', profile: 'fast', cachedOnly: true, anime: false, language: 'Spanish' },
+  ];
+  for (const selected of picks) for (const answers of answerSets) {
+    const name = `smart:${selected.join('+') || 'p2p'}/${answers.device}/${answers.resolution}`;
+    cases.push({ name });
+    const config = applyTemplateConditionals(structuredClone(smart.config), answers, selected);
+    config.services = selected.map(id => ({ id, enabled: true, credentials: {} }));
+    const r = await save(withDummyCredentials(config, required));
+    if (r.ok) { pass++; continue; }
+    const key = r.error.replace(/\b[0-9a-f-]{36}\b/g, '<uuid>').slice(0, 220);
+    (failures.get(key) || failures.set(key, []).get(key)).push(name);
+  }
 }
 // Negative control for the restricted run: a pattern no allowlist carries must be
 // refused, or a green run would only mean the gate was never on.
