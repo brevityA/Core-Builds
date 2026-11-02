@@ -539,7 +539,7 @@ response and adds a **per-colo Cache API entry** instead:
 - TTL: 300 s default, clamped to 3600 s, `0` disables. An **empty** list is kept
   for only 60 s, because empty is the usual signature of a transient outage and
   a long-lived empty entry would hide a recovered source.
-- `?nocache=1` bypasses and repopulates.
+- `?nocache=1` skips the read, queries the providers, and rewrites the entry.
 - A configured `CORE_STREAMS_HTTP_SOURCE_MANIFEST` disables the cache by
   default, because that is the one source that may return short-lived signed
   URLs — the exact hazard the original no-store rule protected against. An

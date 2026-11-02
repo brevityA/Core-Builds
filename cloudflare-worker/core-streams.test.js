@@ -1432,9 +1432,20 @@ test('edge cache serves the second open without querying any provider, and can b
   assert.match(second.headers.get('X-Core-Streams-Sources'), /torrentio=ok 1/);
   assert.match(second.headers.get('X-Core-Streams-Sources'), /; cache=hit$/);
 
-  const bypass = await handleCoreStreams(new Request(`${url}?nocache=1`), env, { fetchImpl, cache });
+  // A bypass re-queries the providers and refreshes the entry for later opens.
+  const refreshed = async (input) => {
+    providerCalls++;
+    if (String(input).startsWith('https://torrentio.strem.fun/')) {
+      return jsonResponse({ streams: [{ infoHash: HASH('b'), name: '2160p', title: 'Film.2001.2160p.REMUX' }] });
+    }
+    return jsonResponse({ streams: [] });
+  };
+  const bypass = await handleCoreStreams(new Request(`${url}?nocache=1`), env, { fetchImpl: refreshed, cache });
   assert.equal(bypass.headers.get('X-Core-Streams-Cache'), 'bypass');
   assert.ok(providerCalls > firstCalls, 'a bypass re-queries the providers');
+  const repaired = await handleCoreStreams(new Request(url), env, { cache, fetchImpl: async () => { throw new Error('cache should have been refreshed'); } });
+  assert.equal(repaired.headers.get('X-Core-Streams-Cache'), 'hit');
+  assert.deepEqual((await repaired.json()).streams.map((stream) => stream.infoHash), [HASH('b')]);
 
   const off = await handleCoreStreams(new Request(url), env, { fetchImpl, cache: null });
   assert.equal(off.headers.get('X-Core-Streams-Cache'), 'off');

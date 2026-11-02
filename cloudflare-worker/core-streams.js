@@ -1614,8 +1614,10 @@ export async function handleCoreStreams(request, env, options = {}) {
   const cacheTtl = effectiveCacheTtl(env, httpBase);
   // A zero TTL means "do not cache at all", not "read but never write".
   const cache = cacheTtl > 0 ? (options.cache === undefined ? platformCache() : options.cache) : null;
+  // A bypass skips the read but still refreshes the entry, so one deliberate
+  // re-check repairs the cached list for every later open.
   const bypassCache = requestUrl.searchParams.get('nocache') === '1';
-  const cacheKey = cache && !bypassCache
+  const cacheKey = cache
     ? streamCacheKey(requestUrl, route.token, route.type, normalizedId, env, httpBase)
     : null;
   const report = {};
@@ -1650,7 +1652,7 @@ export async function handleCoreStreams(request, env, options = {}) {
     });
   };
 
-  if (cacheKey) {
+  if (cacheKey && !bypassCache) {
     const cached = await readCachedStreams(cache, cacheKey);
     if (cached) {
       const finalStreams = await enrich(cached.streams);
