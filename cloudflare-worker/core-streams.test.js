@@ -1433,3 +1433,9 @@ test('open-media rights notices and YouTube results are never rewritten', () => 
   const youtube = _coreStreamsTest.normalizeStream({ ytId: 'M7lc1UVf-VE', name: 'Trailer', title: 'Embedded player' }, 'HTTP source');
   assert.equal(_coreStreamsTest.formatStream(youtube), youtube);
 });
+
+test('a card shows the resolution the ranking used when the name and release disagree', () => {
+  const stream = _coreStreamsTest.normalizeStream({ infoHash: 'e'.repeat(40), name: '1080p', title: 'Film.2020.2160p.WEB-DL.x265-GRP' }, 'Torrentio');
+  assert.equal(_coreStreamsTest.inferredHeight(stream), 1080);
+  assert.equal(_coreStreamsTest.formatStream(stream).name, '🧲 P2P\n1080p');
+});

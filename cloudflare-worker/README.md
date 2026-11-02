@@ -134,7 +134,7 @@ Movie/episode lookups are rate-limited using the existing `RL_PROXY_CUSTOM` lane
 **Stream cards.** Every torrent, TorBox and configured-add-on result gets the same clean card, built by `core-streams-format.js` from the release name the way AIOStreams parses one:
 
 ```text
-⚡ TorBox    🎞 BluRay REMUX · HEVC · DV · HDR10
+🧲 P2P      🎞 BluRay REMUX · HEVC · DV · HDR10
 4K          🔊 TrueHD · Atmos · 7.1 · 🌐 🇬🇧 🇫🇷
             📦 58.20 GB · 👤 312 · 🔎 Torrentio · 1337x
             🏷 FraMeSToR · Extended · REPACK

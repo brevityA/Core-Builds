@@ -2,7 +2,7 @@
 // (resolution, source, codec, HDR, audio, languages, group, edition), the way
 // AIOStreams' parser does, and lays every video result out the same way:
 //
-//   name         ⚡ TorBox        description  🎞 BluRay REMUX · HEVC · DV · HDR10
+//   name         🧲 P2P          description  🎞 BluRay REMUX · HEVC · DV · HDR10
 //                4K                            🔊 TrueHD Atmos · 7.1 · 🌐 🇬🇧 🇫🇷
 //                                              📦 58.20 GB · 👤 312 · 🔎 Torrentio · 1337x
 //                                              🏷 FraMeSToR · Extended · REPACK
@@ -207,11 +207,14 @@ export function formatStream(stream, { inferHeight, inferSeeders }) {
   const release = facts.release || text.split('\n')[0] || '';
   const filename = stream.behaviorHints?.filename || facts.filename || '';
   const parsed = parseRelease(`${release} ${filename} ${facts.label || ''}`, inferHeight);
-  // Resolution reads the whole original card, as the ranking does: Torrentio,
-  // for one, gives it only in its own name ("Torrentio\n4k").
-  if (!parsed.height) {
-    parsed.height = inferHeight(stream);
-    parsed.resolution = resolutionLabel(parsed.height) || parsed.resolution;
+  // The card shows the resolution the ranking used, read from the whole
+  // original card: Torrentio, for one, gives it only in its own name
+  // ("Torrentio\n4k"), and a name and release that disagree must not rank as
+  // one resolution and display as another.
+  const rankedHeight = inferHeight(stream);
+  if (rankedHeight) {
+    parsed.height = rankedHeight;
+    parsed.resolution = resolutionLabel(rankedHeight);
   }
   // Providers such as Torrentio list audio languages as flags on a later line.
   if (!parsed.flags.length) parsed.flags = [...new Set(text.match(FLAG_RE) || [])];
