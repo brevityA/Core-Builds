@@ -1,6 +1,10 @@
-import test from 'node:test';
+import test, { beforeEach } from 'node:test';
 import assert from 'node:assert/strict';
 import { handleCoreStreams, _coreStreamsTest } from './core-streams.js';
+
+// Metadata caching is deliberately isolate-local; each test starts cold so
+// upstream call-count assertions remain independent of test execution order.
+beforeEach(() => _coreStreamsTest.resetCinemetaCache());
 
 const TOKEN = '0123456789abcdef0123456789abcdef';
 const secureHeaders = { 'Access-Control-Allow-Origin': '*' };
@@ -21,7 +25,7 @@ test('manifest is a Stremio stream-only manifest behind the install token', asyn
   assert.equal(response.headers.get('Cache-Control'), 'no-store');
   assert.deepEqual(await response.json(), {
     id: 'uk.corebuilds.core-streams',
-    version: '0.10.0',
+    version: '0.11.0',
     name: 'Core Streams',
     description: 'Quality-ranked streams: torrent add-ons and public indexes (YTS, The Pirate Bay, EZTV, Knaben), instant TorBox playback when configured, open media, and configurable sources.',
     resources: ['stream'],
@@ -1063,7 +1067,7 @@ test('series: The Pirate Bay returns single episodes first, then season packs th
   assert.deepEqual(tpb.map((stream) => stream.infoHash), [HASH('d'), HASH('a')],
     'the episode, then the season 2 pack; not season 3, an episode range, another show or another episode');
   assert.equal(tpb[0].fileMustInclude, undefined);
-  assert.deepEqual(tpb[1].fileMustInclude, ['[Ss]0*2[ ._-]?[Ee]0*1[^0-9]']);
+  assert.deepEqual(tpb[1].fileMustInclude, [_coreStreamsTest.episodeFilePattern(2, 1)]);
   assert.match(response.headers.get('X-Core-Streams-Sources'), /tpb=ok 2/);
   assert.ok(!response.headers.get('X-Core-Streams-Sources').includes('tpb-search'));
   _coreStreamsTest.resetSourceHealth();

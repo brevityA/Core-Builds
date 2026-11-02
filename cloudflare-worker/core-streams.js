@@ -782,10 +782,24 @@ async function fetchBlenderOpenMovie(id, expected, fetchImpl, deadlineSignal) {
   }
 }
 
-// One Cinemeta lookup per request, shared by the open-media matchers (movies)
-// and the EZTV title check (series). Resolves to { title, year } or null.
-async function fetchCinemetaTitleYear(type, imdb, fetchImpl, deadlineSignal) {
-  if (!sourceAllowed('cinemeta')) return null;
+// Public title/year metadata only: no tokens, credentials, or stream responses.
+// Bounded and isolate-local; a cache hit also keeps title-checked sources useful
+// during a Cinemeta outage. Never cache a missing title or a failed lookup.
+const CINEMETA_CACHE_TTL_MS = 6 * 60 * 60 * 1000;
+const CINEMETA_CACHE_MAX_ENTRIES = 256;
+const cinemetaCache = new Map();
+
+// One lookup per uncached title, shared by all indexers and open-media matchers.
+// Resolves to { title, year } or null.
+async function fetchCinemetaTitleYear(type, imdb, fetchImpl, deadlineSignal, report = {}) {
+  const cacheKey = `${type}:${imdb.toLowerCase()}`;
+  const cached = cinemetaCache.get(cacheKey);
+  if (cached && cached.expiresAt > Date.now()) {
+    report.cinemeta = 'cache hit';
+    return { ...cached.value };
+  }
+  if (cached) cinemetaCache.delete(cacheKey);
+  if (!sourceAllowed('cinemeta')) { report.cinemeta = 'paused'; return null; }
   try {
     const metaPayload = await fetchBoundedJson(
       `https://v3-cinemeta.strem.io/meta/${type}/${encodeURIComponent(imdb)}.json`,
@@ -797,10 +811,20 @@ async function fetchCinemetaTitleYear(type, imdb, fetchImpl, deadlineSignal) {
     // A missing item or a valid but metadata-free response is not an upstream
     // outage. Transport, HTTP, body-size, and JSON errors throw above instead.
     sourceSucceeded('cinemeta');
-    return cinemetaTitleYear(metaPayload);
+    const expected = cinemetaTitleYear(metaPayload);
+    if (expected) {
+      if (cinemetaCache.size >= CINEMETA_CACHE_MAX_ENTRIES) {
+        cinemetaCache.delete(cinemetaCache.keys().next().value);
+      }
+      cinemetaCache.set(cacheKey, { value: { ...expected }, expiresAt: Date.now() + CINEMETA_CACHE_TTL_MS });
+    }
+    report.cinemeta = expected ? 'ok' : 'no title';
+    return expected;
   } catch {
-    if (deadlineSignal.aborted) sourceDeadlineCancelled('cinemeta');
+    const timedOut = deadlineSignal.aborted;
+    if (timedOut) sourceDeadlineCancelled('cinemeta');
     else sourceFailed('cinemeta');
+    report.cinemeta = timedOut ? 'timeout' : 'network error';
     return null;
   }
 }
@@ -946,7 +970,10 @@ function indexerStream(sourceName, { hash, label, release, seeders, sizeBytes, f
 function episodeMatcher(season, episode) {
   const s = Number(season);
   const e = Number(episode);
-  return new RegExp(`(?:\\bS0*${s}[ ._-]?E0*${e}|\\b${s}x0*${e})(?![0-9]|-E?[0-9])`, 'i');
+  // Reject multi-episode releases, not quality suffixes such as `-1080p`.
+  const episodeNumber = '(?:E[0-9]+|[0-9]{1,3}(?![0-9A-Za-z]))';
+  const nextEpisode = `(?:[ ._-]*E[0-9]|[ ._-]*(?:-[ ._-]*)?${episodeNumber}|[ ._-]+(?:and|&)[ ._-]*${episodeNumber})`;
+  return new RegExp(`(?:\\bS0*${s}[ ._-]?E0*${e}|\\b${s}x0*${e})(?![0-9]|${nextEpisode})`, 'i');
 }
 
 // A whole-season pack for this season ("Season 2", "S02 Complete", "S02 1080p"),
@@ -959,7 +986,11 @@ function seasonPackMatcher(season) {
 // Hands the streaming server the episode to open inside a pack. Written
 // without lookarounds or flags so any regex engine reads it the same way.
 function episodeFilePattern(season, episode) {
-  return `[Ss]0*${Number(season)}[ ._-]?[Ee]0*${Number(episode)}[^0-9]`;
+  const s = Number(season);
+  const e = Number(episode);
+  // Unlike a release-title match, a multipart file containing the requested
+  // episode is valid. Support both S02E01 and 2x01, including the end of a name.
+  return `(?:^|[^0-9])(?:[Ss]0*${s}[ ._-]?[Ee]0*${e}|${s}[Xx]0*${e})(?:[^0-9]|$)`;
 }
 
 function releaseLabel(text) {
@@ -1076,7 +1107,8 @@ async function fetchPirateBay(type, id, fetchImpl, deadlineSignal, report, metaP
 // Bad id returns a different show), so a result must also carry the Cinemeta
 // title, optionally followed by a year or country tag ("The Office US").
 function showTitleMatches(releaseTitle, expectedTitle) {
-  const show = normalizeMatchTitle(String(releaseTitle).split(/\sS\d{1,3}E\d{1,4}\b/i)[0]);
+  const title = String(releaseTitle).replace(/[._]/g, ' ');
+  const show = normalizeMatchTitle(title.split(/\s(?:S\d{1,3}[ ._-]?E\d{1,4}|\d{1,3}x\d{1,4})\b/i)[0]);
   const expected = normalizeMatchTitle(expectedTitle);
   if (!show || !expected) return false;
   if (show === expected) return true;
@@ -1177,7 +1209,37 @@ const TORBOX_CHECK_TIMEOUT_MS = 3000;
 const TORBOX_PLAY_TIMEOUT_MS = 8000;
 const TORBOX_MAX_BYTES = 1024 * 1024;
 const VIDEO_FILE_RE = /\.(?:mkv|mp4|m4v|avi|webm|mov|ts|m2ts|wmv)$/i;
-const torboxTorrentIds = new Map(); // info hash -> TorBox torrent id; isolate-local, bounded
+// Account-scoped, isolate-local caches. Replacing the whole object on key
+// rotation also prevents an older in-flight add from populating the new account.
+const emptyTorboxCache = () => ({ key: null, ids: new Map(), pending: new Map() });
+let torboxCache = emptyTorboxCache();
+
+function torboxIdCache(key) {
+  if (torboxCache.key !== key) torboxCache = { key, ids: new Map(), pending: new Map() };
+  return torboxCache;
+}
+
+async function ensureTorboxTorrent(hash, key, fetchImpl, signal) {
+  const cache = torboxIdCache(key);
+  if (cache.ids.has(hash)) return { id: cache.ids.get(hash), cached: true };
+  if (cache.pending.has(hash)) return { id: await cache.pending.get(hash), cached: false };
+  // Share only the add operation. Each viewer still resolves their own file and
+  // CDN link, preserving their IP and expiry instead of sharing a signed URL.
+  const pending = (async () => {
+    const created = await torboxRequest('/torrents/createtorrent', key, fetchImpl, signal, {
+      method: 'POST',
+      form: { magnet: `magnet:?xt=urn:btih:${hash}`, seed: '3', allow_zip: 'false' },
+    });
+    const id = Number(created?.torrent_id ?? created?.id);
+    if (!Number.isSafeInteger(id) || id <= 0) throw Object.assign(new Error('no torrent id'), { torbox: 'NO_TORRENT_ID' });
+    if (cache.ids.size >= 200) cache.ids.delete(cache.ids.keys().next().value);
+    cache.ids.set(hash, id);
+    return id;
+  })();
+  cache.pending.set(hash, pending);
+  try { return { id: await pending, cached: false }; }
+  finally { if (cache.pending.get(hash) === pending) cache.pending.delete(hash); }
+}
 
 function torboxKey(env) {
   const key = env && env.TORBOX_API_KEY;
@@ -1225,7 +1287,7 @@ function chooseVideoFile(files, selector) {
   if (!videos.length) return null;
   const bySize = (a, b) => Number(b.size || 0) - Number(a.size || 0);
   if (selector.kind === 'episode') {
-    const match = episodeMatcher(selector.season, selector.episode);
+    const match = new RegExp(episodeFilePattern(selector.season, selector.episode));
     const hits = videos.filter((file) => match.test(file.path)).sort(bySize);
     if (hits.length) return hits[0];
     return videos.length === 1 ? videos[0] : null;
@@ -1318,25 +1380,27 @@ async function handleTorboxPlay(request, env, route, headers, fetchImpl) {
   if (!INFO_HASH_RE.test(route.hash) || !selector) return jsonResponse(404, { error: 'not found' }, headers);
   const hash = route.hash.toLowerCase();
   const signal = AbortSignal.timeout(TORBOX_PLAY_TIMEOUT_MS);
+  const cache = torboxIdCache(key);
+  let torrentId;
   try {
-    let torrentId = torboxTorrentIds.get(hash);
-    if (!torrentId) {
-      // Adding a torrent TorBox already has cached is instant and returns its id;
-      // adding one already in the account returns the existing id.
-      const created = await torboxRequest('/torrents/createtorrent', key, fetchImpl, signal, {
-        method: 'POST',
-        form: { magnet: `magnet:?xt=urn:btih:${hash}`, seed: '3', allow_zip: 'false' },
-      });
-      torrentId = Number(created?.torrent_id ?? created?.id);
-      if (!Number.isSafeInteger(torrentId) || torrentId <= 0) throw Object.assign(new Error('no torrent id'), { torbox: 'NO_TORRENT_ID' });
-      if (torboxTorrentIds.size >= 200) torboxTorrentIds.delete(torboxTorrentIds.keys().next().value);
-      torboxTorrentIds.set(hash, torrentId);
+    let torrent;
+    // A torrent can be removed from the account after its id was cached. Only
+    // retry a stale cached id, once; a fresh add that fails is reported as-is.
+    for (let attempt = 0; attempt < 2; attempt++) {
+      const ensured = await ensureTorboxTorrent(hash, key, fetchImpl, signal);
+      torrentId = ensured.id;
+      try {
+        torrent = await torboxRequest('/torrents/mylist', key, fetchImpl, signal, {
+          query: { id: torrentId, bypass_cache: 'true' },
+        });
+        break;
+      } catch (error) {
+        if (error?.torbox !== 'ITEM_NOT_FOUND' || !ensured.cached || attempt === 1) throw error;
+        if (cache.ids.get(hash) === torrentId) cache.ids.delete(hash);
+      }
     }
-    const torrent = await torboxRequest('/torrents/mylist', key, fetchImpl, signal, {
-      query: { id: torrentId, bypass_cache: 'true' },
-    });
     const file = chooseVideoFile(torrent?.files, selector);
-    if (!file || !Number.isSafeInteger(Number(file.id))) {
+    if (!file || !Number.isSafeInteger(Number(file.id)) || Number(file.id) < 0) {
       return jsonResponse(404, { error: torrent?.download_present === false ? 'TorBox is still preparing this torrent; try again shortly' : 'no matching video file in this torrent' }, headers);
     }
     const link = await torboxRequest('/torrents/requestdl', key, fetchImpl, signal, {
@@ -1346,7 +1410,7 @@ async function handleTorboxPlay(request, env, route, headers, fetchImpl) {
     if (!location) throw Object.assign(new Error('bad link'), { torbox: 'BAD_LINK' });
     return new Response(null, { status: 302, headers: { ...headers, Location: location, 'Cache-Control': 'no-store' } });
   } catch (error) {
-    if (error?.torbox === 'ITEM_NOT_FOUND') torboxTorrentIds.delete(hash);
+    if (error?.torbox === 'ITEM_NOT_FOUND' && cache.ids.get(hash) === torrentId) cache.ids.delete(hash);
     const status = error?.name === 'TimeoutError' ? 504 : 502;
     return jsonResponse(status, { error: `TorBox: ${error?.torbox || (status === 504 ? 'timed out' : 'unavailable')}` }, headers);
   }
@@ -1355,7 +1419,7 @@ async function handleTorboxPlay(request, env, route, headers, fetchImpl) {
 function manifest() {
   return {
     id: 'uk.corebuilds.core-streams',
-    version: '0.10.0',
+    version: '0.11.0',
     name: 'Core Streams',
     description: 'Quality-ranked streams: torrent add-ons and public indexes (YTS, The Pirate Bay, EZTV, Knaben), instant TorBox playback when configured, open media, and configurable sources.',
     resources: ['stream'],
@@ -1410,8 +1474,8 @@ export async function handleCoreStreams(request, env, { headers = {}, rateLimit 
   const normalizedId = route.id.toLowerCase();
   const imdb = normalizedId.split(':')[0];
   const deadlineSignal = AbortSignal.timeout(SOURCE_TIMEOUT_MS);
-  const metaPromise = fetchCinemetaTitleYear(route.type, imdb, fetchImpl, deadlineSignal);
   const report = {};
+  const metaPromise = fetchCinemetaTitleYear(route.type, imdb, fetchImpl, deadlineSignal, report);
   const responses = await Promise.all([
     ...sources.map((source) => fetchSource(source, route.type, normalizedId, fetchImpl, report)),
     fetchYts(route.type, normalizedId, fetchImpl, deadlineSignal, report),
@@ -1451,7 +1515,7 @@ export async function handleCoreStreams(request, env, { headers = {}, rateLimit 
     })).slice(0, MAX_STREAMS_TOTAL)
     : streams;
   // Per-source outcome, so an empty list can be explained from the outside
-  // (curl -I the stream URL). Source names and status only: no ids or URLs.
+  // (GET the stream URL with curl -D - -o /dev/null). Names/status only: no ids or URLs.
   const sourceStatus = Object.entries(report).map(([id, status]) => `${id}=${status}`).join('; ');
   return jsonResponse(200, { streams: finalStreams }, { ...headers, 'X-Core-Streams-Sources': sourceStatus });
 }
@@ -1460,7 +1524,9 @@ export const _coreStreamsTest = {
   chooseVideoFile,
   movieTitleMatches,
   parsePlaySelector,
-  resetTorboxIds: () => torboxTorrentIds.clear(),
+  resetTorboxIds: () => { torboxCache = emptyTorboxCache(); },
+  resetCinemetaCache: () => cinemetaCache.clear(),
+  fetchCinemetaTitleYear,
   episodeMatcher,
   seasonPackMatcher,
   episodeFilePattern,
