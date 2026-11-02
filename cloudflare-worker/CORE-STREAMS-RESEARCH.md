@@ -39,7 +39,7 @@ The research found [Magnetio](https://github.com/peterdsp/Magnetio), a recent se
 
 The manifest URL contains a random install token in its path, acting as a bearer credential. Use a long random token, distribute the URL only to the intended users, and rotate the secret if it escapes. The Worker code does not log request paths, tokens, upstream URLs, or stream payloads. A manifest URL should still be treated as private client data.
 
-The existing `RL_PROXY_CUSTOM` binding and local limiter are used for stream requests. The route returns `Cache-Control: no-store` because provider results and source URLs can be short-lived. It never proxies media bytes: Stremio connects to returned HTTPS URLs itself, and torrent results use Stremio's `infoHash` protocol.
+The existing `RL_PROXY_CUSTOM` binding and local limiter are used for stream requests. The route returns `Cache-Control: no-store` because provider results and source URLs can be short-lived; since v0.11.0 a bounded, server-side edge cache sits *behind* that header (see *Repeat opens, diagnostics and ranking* below). It never proxies media bytes: Stremio connects to returned HTTPS URLs itself, and torrent results use Stremio's `infoHash` protocol.
 
 ## MVP behavior
 
@@ -116,12 +116,12 @@ The Comet project documents Docker/source deployment and Torznab support ([repos
 4. Compare result counts before/after deduplication and shared infohashes across sources; repeat over a small set of common and less-common titles. A duplicated provider list should not be reported as incremental coverage.
 5. Install on Stremio Desktop and the actual target TV/mobile client. Test one HTTP result and one torrent result where lawful and technically supported; verify that `behaviorHints.notWebReady` and filenames behave as expected.
 6. Separately exercise AIOStreams with a second user-configured service by disabling TorBox for the test configuration. Confirm which configured add-ons use that service and verify cached/direct playback rather than treating a stream-list response as proof.
-7. Capture p50/p95 response time and source error rate over a representative period. Keep the current no-store behavior unless observed client behavior demonstrates a safe, useful cache policy; dynamic source links can expire.
+7. Capture p50/p95 response time and source error rate over a representative period. Keep the current no-store behavior unless observed client behavior demonstrates a safe, useful cache policy; dynamic source links can expire. (v0.11.0 keeps `no-store` for clients and adds a 300 s server-side edge cache behind it — see *Repeat opens, diagnostics and ranking* at the end of this document.)
 
 ### Protocol and platform checks from this pass
 
 - Stremio's stream response supports either a direct URL or torrent `infoHash`; the SDK specifically requires `behaviorHints.notWebReady: true` when `proxyHeaders` is used. It also recommends `behaviorHints.filename` for URL streams so subtitle lookup can work. The current normalizer forwards a filename when supplied, but a live test should confirm providers actually supply useful values. [Official stream response schema](https://github.com/Stremio/stremio-addon-sdk/blob/master/docs/api/responses/stream.md).
-- The SDK has per-handler `cacheMaxAge`, `staleRevalidate`, and `staleError` response controls. Core Streams currently returns `Cache-Control: no-store` by design, which avoids caching short-lived URLs and personalized/provider-specific results; changing this needs client tests. [Official stream handler docs](https://github.com/Stremio/stremio-addon-sdk/blob/master/docs/api/requests/defineStreamHandler.md).
+- The SDK has per-handler `cacheMaxAge`, `staleRevalidate`, and `staleError` response controls. Core Streams returns `Cache-Control: no-store` by design, which avoids client- and intermediary-level caching of short-lived or configuration-specific URLs; that header is unchanged in v0.11.0, whose cache is server-side only. Adopting the SDK's client-facing cache controls still needs client tests. [Official stream handler docs](https://github.com/Stremio/stremio-addon-sdk/blob/master/docs/api/requests/defineStreamHandler.md).
 - Current Cloudflare Workers limits documentation lists six concurrent outgoing connections, 50 subrequests per request on Free, 10 ms CPU per invocation on Free, and 128 MB per isolate. Three bounded source requests remain a modest fan-out; parsing/scraping broad HTML or relaying video bytes would change the risk and cost model materially. [Workers limits](https://developers.cloudflare.com/workers/platform/limits/).
 - Keep playback bytes off this Worker. It returns metadata/stream references only, which avoids turning the Worker into a video relay, avoids consuming its outbound bandwidth as a player transport, and preserves the current SSRF/security boundary. Review Cloudflare's current [Developer Platform Supplemental Terms](https://www.cloudflare.com/supplemental-terms/) and [abuse approach](https://www.cloudflare.com/trust-hub/abuse-approach/) before any product expansion; this research is not a legal determination.
 
@@ -517,3 +517,78 @@ The Worker mapping is pinned to the exact IMDb ID, Cinemeta title/year, official
 **Code-review follow-up:** the prioritized issues recorded during the PR review were fixed in the benchmark and source-scout. The benchmark now measures through complete JSON body parsing, rejects malformed/bodyless stream responses, blocks additional reserved local host suffixes, and stratifies limited runs so `--limit=3` still covers a popular movie, an episode, and open media. The source-scout now bounds provider bodies while streaming, redacts credential-like manifest paths and secret text, escapes untrusted Markdown text and URL destinations, retains provider metadata in Markdown, and is included in CI. The optional smoke check omits token-bearing URLs from network-error details. Regression tests were added for each behavior. No deployment was performed.
 
 Sources: [Cinemeta record](https://v3-cinemeta.strem.io/meta/movie/tt7993892.json), [official Blender PeerTube search](https://video.blender.org/api/v1/videos?search=Caminandes%3A%20Llamigos%26count=10), [official Blender PeerTube video record](https://video.blender.org/api/v1/videos/48), [official PeerTube watch page](https://video.blender.org/w/5ruRYckTcQMTMQvyqMnVsr), [Blender Cloud project](https://cloud.blender.org/p/caminandes-3), and [Internet Archive item metadata](https://archive.org/metadata/CaminandesLlamigos). Checked 2026-10-26.
+
+## Repeat opens, diagnostics and ranking (2026-11-02, add-on v0.11.0)
+
+This pass addresses three costs that only show up in daily use of a private install. None of it adds a source, a provider credential, or a media relay.
+
+### A bounded server-side cache, while clients still see `no-store`
+
+The earlier guidance (above, and the caching note in the follow-up list) was to keep `Cache-Control: no-store` until client tests justified anything else. That advice was about *client- and proxy-facing* caching of results that can be personalized or short-lived. A private install has a different avoidable cost: every re-open of the same title, on every device in the house, repeats the whole fan-out — three add-ons, four indexes, Cinemeta, and up to three open-media adapters. On the Workers Free plan that is also a subrequest-quota cost.
+
+The v0.11.0 implementation therefore keeps `Cache-Control: no-store` on every
+response and adds a **per-colo Cache API entry** instead:
+
+- Cached object: the validated, normalized, de-duplicated stream list only —
+  torrent info hashes, HTTPS URLs, labels and behavior hints. No provider
+  payloads, no request headers, no client IPs.
+- Key: `fnv1a(schema | install token | configured-source base | TorBox
+  present)`, so the token itself never appears in a cache key, a rotated token
+  starts from empty, and a changed source configuration cannot read another
+  configuration's list.
+- TTL: 300 s default, clamped to 3600 s, `0` disables. An **empty** list is kept
+  for only 60 s, because empty is the usual signature of a transient outage and
+  a long-lived empty entry would hide a recovered source.
+- `?nocache=1` bypasses and repopulates.
+- A configured `CORE_STREAMS_HTTP_SOURCE_MANIFEST` disables the cache by
+  default, because that is the one source that may return short-lived signed
+  URLs — the exact hazard the original no-store rule protected against. An
+  explicit `CORE_STREAMS_CACHE_TTL` opts back in.
+- TorBox enrichment is *not* cached: `checkcached` runs after a cache read, so
+  instant links stay current. If the request budget is exhausted, enrichment is
+  skipped and reported as `torbox=skipped (deadline)`.
+
+Known limits, recorded deliberately: the Cache API is per-colo, so a different
+location still pays a miss; TTLs are not invalidated by an upstream change; and
+a cached list can outlive a source that has just gone down (which is also the
+desired fallback behavior). With no client-facing cache header, the risk of a
+shared intermediary replaying one viewer's list to another is unchanged at zero.
+
+### A token-gated status route
+
+`GET /core-streams/<token>/status.json` exposes the add-on version, whether
+TorBox and a configured source are present, the effective cache TTL, and each
+source's isolate-local breaker state (`ready` / `failing` / `cooldown` with a
+retry hint). It answers the same 404 as every other route without the install
+token, and it contains no token, key, upstream URL, IMDb id, or provider text.
+This makes "why is my list empty?" diagnosable without reading Worker logs,
+which the privacy design deliberately keeps free of request detail.
+
+### Ranking: release tiers, codec compatibility, and cam suppression
+
+The previous heuristic treated `BluRay`/`WEB-DL` alike, ignored codecs, and
+merely pushed cam releases to the bottom. Now:
+
+| Signal | Effect |
+|---|---|
+| `REMUX` / `BluRay` / `WEB-DL` / `WEBRip` / `BRRip` / `DVDRip` / `HDRip` | +8 / +5 / +4 / +2 / +1 / −1 / −2, first match only |
+| `x264`/`h264` vs `x265`/`h265`/`hevc` vs `AV1` | +2 / −4 / −6, compatibility-first |
+| `HDR10`/`HDR`/`HLG` | +2 |
+| Dolby Vision | −1 (device-dependent downconversion) |
+| Cam/telesync/telecine/screener | ranked last, then dropped when a real release exists |
+| Resolution, seed hints, direct-play URL, `ytId` | unchanged |
+
+Cam detection deliberately matches only unambiguous tokens (`hdcam`,
+`camrip`, `hdts`, `telesync`, `telecine`, `dvdscr`, `screener`, `predvd`,
+`dvdsrc`) — not bare `cam` or `ts`, which appear in legitimate titles such as
+*Cam* (2018) and in `.ts` file names. Unknown labels still score on resolution
+and are never dropped. These remain advisory hints from provider-supplied text,
+not verified quality.
+
+### Verification status
+
+`node --test cloudflare-worker/*.test.js` covers the new behavior (cache miss →
+hit with zero provider calls, bypass, per-configuration key isolation,
+configured-source opt-out, TorBox-on-hit, status contents, breaker state,
+release/codec ordering, and cam suppression). No live deployment, no provider
+availability test, and no playback test was run in this pass.

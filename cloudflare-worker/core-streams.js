@@ -65,6 +65,18 @@ const OPEN_MEDIA_TIMEOUT_MS = 4000;
 const OPEN_MEDIA_MAX_BYTES = 768 * 1024;
 const SOURCE_FAILURE_THRESHOLD = 3;
 const SOURCE_BREAKER_COOLDOWN_MS = 30_000;
+// Whole-response budget. The fan-out deadline is SOURCE_TIMEOUT_MS; the rest is
+// headroom for the optional TorBox cache check. Enrichment is skipped rather
+// than letting a slow provider push playback past the client's own timeout.
+const REQUEST_BUDGET_MS = 9000;
+const TORBOX_MIN_BUDGET_MS = 800;
+// Aggregated stream lists are stable for minutes (info hashes and open-media
+// URLs do not change), so a short edge cache spares every provider re-query on
+// a re-open or a second device. TorBox enrichment still runs on every request.
+const CACHE_SCHEMA = 'v1';
+const DEFAULT_CACHE_TTL_SECONDS = 300;
+const EMPTY_RESULT_CACHE_TTL_SECONDS = 60;
+const MAX_CACHE_TTL_SECONDS = 3600;
 const sourceHealth = new Map(); // fixed provider IDs only; isolate-local best-effort breaker
 const INSTALL_TOKEN_RE = /^[A-Za-z0-9_-]{32,128}$/;
 const ID_RE = /^tt\d{6,12}(?::\d{1,3}:\d{1,3})?$/i;
@@ -123,6 +135,9 @@ function parseRequestPath(pathname) {
   const parts = pathname.split('/').filter(Boolean);
   if (parts.length === 3 && parts[0] === 'core-streams' && parts[2] === 'manifest.json') {
     return { token: parts[1], kind: 'manifest' };
+  }
+  if (parts.length === 3 && parts[0] === 'core-streams' && parts[2] === 'status.json') {
+    return { token: parts[1], kind: 'status' };
   }
   if (parts.length === 5 && parts[0] === 'core-streams' && parts[2] === 'stream' && parts[4].endsWith('.json')) {
     const type = parts[3];
@@ -296,19 +311,61 @@ function inferredSeeders(stream) {
   return matches.reduce((maximum, match) => Math.max(maximum, Number(match[1])), 0);
 }
 
-// Use only information already present in Stremio's stream card. This is a
-// ranking heuristic, not a claim that a mislabeled resolution or seeder count
-// has been independently verified. Preserve unknown-quality results as fallbacks.
-function smartStreamScore(stream) {
-  const text = [stream?.name, stream?.title, stream?.description, stream?.behaviorHints?.filename]
+// A cam/telecine/screener release. Only unambiguous tokens are matched: bare
+// "cam" or "ts" appear in legitimate film titles ("Cam", 2018) and file
+// extensions, and a false positive here removes a real result from the list.
+const CAM_SOURCE_RE = /\b(?:hdcam|cam-?rip|hd-?ts|telesync|telecine|dvdscr|screener|predvd|dvdsrc)\b/i;
+// Ordered release-source tiers: better source first, then lossy re-encodes.
+const RELEASE_TIERS = [
+  [/\bremux\b/, 8],
+  [/\bblu-?ray\b/, 5],
+  [/\b(?:web-?dl|webdl)\b/, 4],
+  [/\bweb-?rip\b/, 2],
+  [/\bbr-?rip\b/, 1],
+  [/\bdvd-?rip\b/, -1],
+  [/\bhd-?rip\b/, -2],
+];
+
+function streamText(stream) {
+  return [stream?.name, stream?.title, stream?.description, stream?.behaviorHints?.filename]
     .filter((part) => typeof part === 'string').join(' ').toLowerCase();
+}
+
+function isCamQuality(stream) {
+  return CAM_SOURCE_RE.test(streamText(stream));
+}
+
+// Use only information already present in Stremio's stream card. This is a
+// ranking heuristic, not a claim that a mislabeled resolution, codec or seeder
+// count has been independently verified. Preserve unknown-quality results as
+// fallbacks: an unrecognized label scores 0, it is never dropped.
+function smartStreamScore(stream) {
+  const text = streamText(stream);
   let score = inferredHeight(stream) / 10;
   score += Math.min(inferredSeeders(stream), 500) / 20;
   if (typeof stream?.url === 'string') score += 12;
   if (typeof stream?.ytId === 'string') score += 8;
-  if (/\b(?:bluray|blu-ray|web[ .-]?dl)\b/.test(text)) score += 5;
-  if (/\b(?:cam|hdcam|hdts|telesync|telecine|screener)\b/.test(text)) score -= 150;
+  for (const [pattern, weight] of RELEASE_TIERS) {
+    if (pattern.test(text)) { score += weight; break; }
+  }
+  // Compatibility first: HEVC and AV1 buy bitrate but not every TV stick plays
+  // them, so a well-encoded H.264 release ranks just above an equal-res HEVC one.
+  if (/\b(?:x265|h\.?265|hevc)\b/.test(text)) score -= 4;
+  else if (/\bav1\b/.test(text)) score -= 6;
+  else if (/\b(?:x264|h\.?264|avc)\b/.test(text)) score += 2;
+  if (/\b(?:hdr10\+?|hdr|hlg)\b/.test(text)) score += 2;
+  // Dolby Vision profiles fall back to HDR/SDR differently by device.
+  if (/\b(?:dolby[ .]?vision|dovi)\b/.test(text)) score -= 1;
+  if (CAM_SOURCE_RE.test(text)) score -= 150;
   return score;
+}
+
+// A cam recording is only worth offering when nothing else was found: it is
+// unwatchable next to a real release and would otherwise pad the tail of a
+// short list. Keep the whole list untouched when every result is a cam.
+function dropCamStreams(streams) {
+  if (!streams.some((stream) => !isCamQuality(stream))) return streams;
+  return streams.filter((stream) => !isCamQuality(stream));
 }
 
 function interleaveStreamGroups(groups) {
@@ -416,6 +473,94 @@ function cancelBody(response) {
     const pending = response?.body?.cancel();
     if (pending && typeof pending.catch === 'function') pending.catch(() => {});
   } catch { /* best-effort disposal */ }
+}
+
+// --- Edge cache ------------------------------------------------------------
+// Workers' Cache API is per-colo, so this is a latency and upstream-quota
+// saving, not a consistency layer. Keys are scoped to a fingerprint of the
+// install token and the source configuration, so a reissued token or a changed
+// configured source never reads another configuration's results.
+function fnv1a(value) {
+  let hash = 0x811c9dc5;
+  const text = String(value);
+  for (let i = 0; i < text.length; i++) {
+    hash ^= text.charCodeAt(i);
+    hash = Math.imul(hash, 0x01000193) >>> 0;
+  }
+  return hash.toString(16).padStart(8, '0');
+}
+
+function platformCache() {
+  try {
+    return typeof caches !== 'undefined' && caches.default ? caches.default : null;
+  } catch {
+    return null;
+  }
+}
+
+// CORE_STREAMS_CACHE_TTL is optional: seconds, 0 disables the cache, and the
+// value is clamped to an hour so a typo cannot pin results for days.
+function cacheTtlSeconds(env) {
+  const raw = env && env.CORE_STREAMS_CACHE_TTL;
+  if (raw === undefined || raw === null || raw === '') return DEFAULT_CACHE_TTL_SECONDS;
+  const value = Number(raw);
+  if (!Number.isFinite(value) || value < 0) return DEFAULT_CACHE_TTL_SECONDS;
+  return Math.min(Math.floor(value), MAX_CACHE_TTL_SECONDS);
+}
+
+// A configured add-on is the one source that may hand out short-lived signed
+// URLs (the case the no-store design was protecting). Its presence therefore
+// disables caching unless the operator opts in explicitly with
+// CORE_STREAMS_CACHE_TTL. The fixed sources return stable info hashes and
+// open-media URLs, which is what makes caching safe by default.
+function effectiveCacheTtl(env, httpBase) {
+  const raw = env && env.CORE_STREAMS_CACHE_TTL;
+  const explicit = raw !== undefined && raw !== null && raw !== '';
+  if (httpBase && !explicit) return 0;
+  return cacheTtlSeconds(env);
+}
+
+function streamCacheKey(requestUrl, token, type, id, env, httpBase) {
+  const fingerprint = fnv1a([
+    CACHE_SCHEMA,
+    token,
+    httpBase || '',
+    torboxKey(env) ? 'torbox' : 'no-torbox',
+  ].join('|'));
+  return `${requestUrl.origin}/__core-streams-cache/${fingerprint}/${type}/${encodeURIComponent(id)}`;
+}
+
+function cacheableStream(stream) {
+  return Boolean(stream) && typeof stream === 'object' && !Array.isArray(stream)
+    && (typeof stream.url === 'string' || typeof stream.infoHash === 'string' || typeof stream.ytId === 'string');
+}
+
+async function readCachedStreams(cache, key) {
+  if (!cache) return null;
+  try {
+    const hit = await cache.match(key);
+    if (!hit) return null;
+    const payload = await hit.json();
+    if (!payload || !Array.isArray(payload.streams)) return null;
+    return {
+      streams: payload.streams.filter(cacheableStream),
+      sources: typeof payload.sources === 'string' ? payload.sources : '',
+    };
+  } catch {
+    return null;
+  }
+}
+
+async function writeCachedStreams(cache, key, streams, sources, ttlSeconds) {
+  if (!cache || !(ttlSeconds > 0)) return;
+  // An empty list is often a transient provider outage; remember it only
+  // briefly so the next open retries instead of hiding a recovered source.
+  const ttl = streams.length ? ttlSeconds : Math.min(ttlSeconds, EMPTY_RESULT_CACHE_TTL_SECONDS);
+  try {
+    await cache.put(key, new Response(JSON.stringify({ streams, sources }), {
+      headers: { 'Content-Type': 'application/json', 'Cache-Control': `public, max-age=${ttl}` },
+    }));
+  } catch { /* the cache is an optimization; never fail the request for it */ }
 }
 
 function normalizeMatchTitle(value) {
@@ -1244,11 +1389,11 @@ function parsePlaySelector(value) {
   return match ? { kind: 'episode', season: Number(match[1]), episode: Number(match[2]) } : null;
 }
 
-async function torboxCachedHashes(hashes, key, fetchImpl, report) {
+async function torboxCachedHashes(hashes, key, fetchImpl, report, timeoutMs = TORBOX_CHECK_TIMEOUT_MS) {
   if (!hashes.length) return new Map();
   if (!sourceAllowed('torbox')) { report.torbox = 'paused'; return new Map(); }
   try {
-    const data = await torboxRequest('/torrents/checkcached', key, fetchImpl, AbortSignal.timeout(TORBOX_CHECK_TIMEOUT_MS), {
+    const data = await torboxRequest('/torrents/checkcached', key, fetchImpl, AbortSignal.timeout(timeoutMs), {
       query: { hash: hashes.join(','), format: 'list', list_files: 'true' },
     });
     sourceSucceeded('torbox');
@@ -1269,9 +1414,9 @@ async function torboxCachedHashes(hashes, key, fetchImpl, report) {
 
 // Swap cached torrents for TorBox HTTPS streams and put them first. The P2P
 // copy of a cached torrent is dropped: the TorBox one plays the same file faster.
-async function applyTorbox(streams, { key, origin, token, type, id, fetchImpl, report }) {
+async function applyTorbox(streams, { key, origin, token, type, id, fetchImpl, report, timeoutMs = TORBOX_CHECK_TIMEOUT_MS }) {
   const hashes = [...new Set(streams.filter((stream) => stream.infoHash).map((stream) => stream.infoHash))].slice(0, 100);
-  const cached = await torboxCachedHashes(hashes, key, fetchImpl, report);
+  const cached = await torboxCachedHashes(hashes, key, fetchImpl, report, timeoutMs);
   if (!cached.size) return streams;
   const selector = playSelector(type, id);
   const parsedSelector = parsePlaySelector(selector);
@@ -1355,13 +1500,66 @@ async function handleTorboxPlay(request, env, route, headers, fetchImpl) {
 function manifest() {
   return {
     id: 'uk.corebuilds.core-streams',
-    version: '0.10.0',
+    version: '0.11.0',
     name: 'Core Streams',
     description: 'Quality-ranked streams: torrent add-ons and public indexes (YTS, The Pirate Bay, EZTV, Knaben), instant TorBox playback when configured, open media, and configurable sources.',
+    logo: 'https://raw.githubusercontent.com/brevityA/Core-Builds/main/Assets/core_icon.svg',
     resources: ['stream'],
     types: ['movie', 'series'],
     catalogs: [],
     idPrefixes: ['tt'],
+  };
+}
+
+// Operator diagnostics. Useful when a private install returns fewer results
+// than expected: it shows which sources this isolate considers ready, without
+// exposing the token, ids, upstream URLs, provider payloads or the TorBox key.
+const STATUS_SOURCES = [
+  ['torrentio', 'Torrentio'],
+  ['torrentsdb', 'TorrentsDB'],
+  ['public-domain-movies', 'Public Domain Movies'],
+  ['yts', 'YTS'],
+  ['tpb', 'The Pirate Bay'],
+  ['eztv', 'EZTV'],
+  ['knaben', 'Knaben'],
+  ['torbox', 'TorBox'],
+  ['internet-archive', 'Internet Archive'],
+  ['blender-open-movies', 'Blender Open Movies'],
+  ['cinemeta', 'Cinemeta'],
+  ['http-source', 'Configured HTTP source'],
+];
+
+function statusPayload(env) {
+  const now = Date.now();
+  const httpSource = configuredAddonBase(env && env.CORE_STREAMS_HTTP_SOURCE_MANIFEST);
+  const sources = STATUS_SOURCES
+    .filter(([id]) => id !== 'http-source' || httpSource)
+    .map(([id, name]) => {
+      const state = sourceHealth.get(id);
+      const open = Boolean(state && state.openUntil > now);
+      return {
+        id,
+        name,
+        state: open ? 'cooldown' : (state && state.failures > 0 ? 'failing' : 'ready'),
+        failures: state ? state.failures : 0,
+        retryInMs: open ? state.openUntil - now : 0,
+      };
+    });
+  return {
+    ok: true,
+    addon: manifest().name,
+    version: manifest().version,
+    time: new Date(now).toISOString(),
+    note: 'Source health is per-isolate and best-effort; it describes this Worker instance only.',
+    features: {
+      torbox: Boolean(torboxKey(env)),
+      configuredHttpSource: Boolean(httpSource),
+    },
+    cache: {
+      ttlSeconds: effectiveCacheTtl(env, httpSource),
+      bypass: 'append ?nocache=1 to a stream URL',
+    },
+    sources,
   };
 }
 
@@ -1370,11 +1568,16 @@ function manifest() {
  * `rateLimit` is supplied by the parent Worker so the addon shares its existing
  * RL_PROXY_CUSTOM bucket. `headers` contains the Worker security/CORS headers.
  */
-export async function handleCoreStreams(request, env, { headers = {}, rateLimit = async () => true, fetchImpl = fetch } = {}) {
+export async function handleCoreStreams(request, env, options = {}) {
+  const { headers = {}, rateLimit = async () => true, fetchImpl = fetch } = options;
+  // `options.cache` overrides the platform Cache API (null disables caching);
+  // tests inject a fake, production leaves it undefined.
   const requestUrl = new URL(request.url);
   const route = parseRequestPath(requestUrl.pathname);
-  // Players may probe a stream URL with HEAD before playing it.
-  const allowedMethod = request.method === 'GET' || (request.method === 'HEAD' && route?.kind === 'play');
+  // Players may probe a stream URL with HEAD before playing it. Manifest and
+  // status probes are cheap and safe to answer to HEAD as well.
+  const allowedMethod = request.method === 'GET'
+    || (request.method === 'HEAD' && ['play', 'manifest', 'status'].includes(route?.kind));
   if (!allowedMethod) return jsonResponse(405, { error: 'method not allowed' }, headers);
   if (!route) return jsonResponse(404, { error: 'not found' }, headers);
 
@@ -1390,6 +1593,10 @@ export async function handleCoreStreams(request, env, { headers = {}, rateLimit 
     return jsonResponse(200, manifest(), headers);
   }
 
+  if (route.kind === 'status') {
+    return jsonResponse(200, statusPayload(env), headers);
+  }
+
   if (route.kind === 'play') {
     if (!(await rateLimit())) return jsonResponse(429, { error: 'rate limit exceeded' }, headers);
     return handleTorboxPlay(request, env, route, headers, fetchImpl);
@@ -1401,17 +1608,71 @@ export async function handleCoreStreams(request, env, { headers = {}, rateLimit 
 
   if (!(await rateLimit())) return jsonResponse(429, { streams: [], error: 'rate limit exceeded' }, headers);
 
-  const sources = SOURCES.filter((source) => !source.types || source.types.includes(route.type));
+  const startedAt = Date.now();
+  const normalizedId = route.id.toLowerCase();
   const httpBase = configuredAddonBase(env.CORE_STREAMS_HTTP_SOURCE_MANIFEST);
+  const cacheTtl = effectiveCacheTtl(env, httpBase);
+  // A zero TTL means "do not cache at all", not "read but never write".
+  const cache = cacheTtl > 0 ? (options.cache === undefined ? platformCache() : options.cache) : null;
+  const bypassCache = requestUrl.searchParams.get('nocache') === '1';
+  const cacheKey = cache && !bypassCache
+    ? streamCacheKey(requestUrl, route.token, route.type, normalizedId, env, httpBase)
+    : null;
+  const report = {};
+
+  // TorBox enrichment runs on cache hits too, so an instant link is never stale
+  // by more than the cache check itself. If the whole-request budget is already
+  // spent, skip it rather than delaying playback; P2P results still work.
+  const enrich = async (streams) => {
+    const key = torboxKey(env);
+    if (!key) return streams;
+    const remaining = REQUEST_BUDGET_MS - (Date.now() - startedAt);
+    if (remaining < TORBOX_MIN_BUDGET_MS) {
+      report.torbox = 'skipped (deadline)';
+      return streams;
+    }
+    const enriched = await applyTorbox(streams, {
+      key, origin: requestUrl.origin, token: route.token, type: route.type, id: normalizedId, fetchImpl, report,
+      timeoutMs: Math.min(TORBOX_CHECK_TIMEOUT_MS, remaining),
+    });
+    return enriched.slice(0, MAX_STREAMS_TOTAL);
+  };
+
+  const respond = async (streams, cacheState) => {
+    const finalStreams = await enrich(streams);
+    // Per-source outcome, so an empty list can be explained from the outside
+    // (curl -I the stream URL). Source names and status only: no ids or URLs.
+    const sourceStatus = Object.entries(report).map(([id, status]) => `${id}=${status}`).join('; ');
+    return jsonResponse(200, { streams: finalStreams }, {
+      ...headers,
+      'X-Core-Streams-Sources': sourceStatus || 'none',
+      'X-Core-Streams-Cache': cacheState,
+    });
+  };
+
+  if (cacheKey) {
+    const cached = await readCachedStreams(cache, cacheKey);
+    if (cached) {
+      const finalStreams = await enrich(cached.streams);
+      const torboxStatus = report.torbox ? `torbox=${report.torbox}; ` : '';
+      return jsonResponse(200, { streams: finalStreams }, {
+        ...headers,
+        // The provider outcomes ride along from the cache write, so a hit is
+        // still explainable. `cache=hit` marks that no providers were queried.
+        'X-Core-Streams-Sources': `${torboxStatus}${cached.sources ? `${cached.sources}; ` : ''}cache=hit`,
+        'X-Core-Streams-Cache': 'hit',
+      });
+    }
+  }
+
+  const sources = SOURCES.filter((source) => !source.types || source.types.includes(route.type));
   if (httpBase && !sources.some((source) => source.base === httpBase)) {
     sources.push({ id: 'http-source', name: 'HTTP source', base: httpBase });
   }
 
-  const normalizedId = route.id.toLowerCase();
   const imdb = normalizedId.split(':')[0];
   const deadlineSignal = AbortSignal.timeout(SOURCE_TIMEOUT_MS);
   const metaPromise = fetchCinemetaTitleYear(route.type, imdb, fetchImpl, deadlineSignal);
-  const report = {};
   const responses = await Promise.all([
     ...sources.map((source) => fetchSource(source, route.type, normalizedId, fetchImpl, report)),
     fetchYts(route.type, normalizedId, fetchImpl, deadlineSignal, report),
@@ -1444,16 +1705,18 @@ export async function handleCoreStreams(request, env, { headers = {}, rateLimit 
     streams.push(stream);
     if (streams.length >= MAX_STREAMS_TOTAL) break;
   }
-  const key = torboxKey(env);
-  const finalStreams = key
-    ? (await applyTorbox(streams, {
-      key, origin: requestUrl.origin, token: route.token, type: route.type, id: normalizedId, fetchImpl, report,
-    })).slice(0, MAX_STREAMS_TOTAL)
-    : streams;
-  // Per-source outcome, so an empty list can be explained from the outside
-  // (curl -I the stream URL). Source names and status only: no ids or URLs.
-  const sourceStatus = Object.entries(report).map(([id, status]) => `${id}=${status}`).join('; ');
-  return jsonResponse(200, { streams: finalStreams }, { ...headers, 'X-Core-Streams-Sources': sourceStatus });
+  // Cam recordings are kept only when they are all that exists; they never
+  // pad a list that already has a real release. Done before TorBox so a cam
+  // never spends a slot in the cache check.
+  const keptStreams = dropCamStreams(streams);
+  if (keptStreams.length !== streams.length) report.cams = `suppressed ${streams.length - keptStreams.length}`;
+
+  if (cacheKey) {
+    const providerStatus = Object.entries(report).map(([id, status]) => `${id}=${status}`).join('; ');
+    await writeCachedStreams(cache, cacheKey, keptStreams, providerStatus, cacheTtl);
+  }
+  const cacheState = !cache ? 'off' : (bypassCache ? 'bypass' : 'miss');
+  return respond(keptStreams, cacheState);
 }
 
 export const _coreStreamsTest = {
@@ -1474,6 +1737,13 @@ export const _coreStreamsTest = {
   inferredHeight,
   inferredSeeders,
   smartStreamScore,
+  isCamQuality,
+  dropCamStreams,
+  cacheTtlSeconds,
+  effectiveCacheTtl,
+  streamCacheKey,
+  statusPayload,
+  manifest,
   interleaveStreamGroups,
   fetchBoundedJson,
   fetchInternetArchiveFromMeta,

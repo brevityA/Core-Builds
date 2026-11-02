@@ -21,9 +21,10 @@ test('manifest is a Stremio stream-only manifest behind the install token', asyn
   assert.equal(response.headers.get('Cache-Control'), 'no-store');
   assert.deepEqual(await response.json(), {
     id: 'uk.corebuilds.core-streams',
-    version: '0.10.0',
+    version: '0.11.0',
     name: 'Core Streams',
     description: 'Quality-ranked streams: torrent add-ons and public indexes (YTS, The Pirate Bay, EZTV, Knaben), instant TorBox playback when configured, open media, and configurable sources.',
+    logo: 'https://raw.githubusercontent.com/brevityA/Core-Builds/main/Assets/core_icon.svg',
     resources: ['stream'],
     types: ['movie', 'series'],
     catalogs: [],
@@ -1360,4 +1361,189 @@ test('the video picker takes the largest film file and the requested episode, ne
   assert.equal(_coreStreamsTest.parsePlaySelector('../x'), null);
   assert.ok(_coreStreamsTest.movieTitleMatches('Oppenheimer (2023) [1080p]', 'Oppenheimer', 2023));
   assert.ok(!_coreStreamsTest.movieTitleMatches('Oppenheimer 1980', 'Oppenheimer', 2023));
+});
+
+// ── v0.11.0: ranking, cam suppression, edge cache, status route ──────────────
+
+function fakeCache() {
+  const store = new Map();
+  return {
+    store,
+    async match(key) {
+      const entry = store.get(String(key));
+      return entry ? new Response(entry.body, { headers: entry.headers }) : undefined;
+    },
+    async put(key, response) {
+      store.set(String(key), {
+        body: await response.text(),
+        headers: response.headers,
+      });
+    },
+  };
+}
+
+test('ordering prefers a better release source and a widely compatible codec at equal resolution', () => {
+  const score = (name, title) => _coreStreamsTest.smartStreamScore({ name, title });
+  assert.ok(score('Torrentio · 1080p', 'Film.2001.1080p.BluRay.REMUX') > score('Torrentio · 1080p', 'Film.2001.1080p.WEB-DL'));
+  assert.ok(score('Torrentio · 1080p', 'Film.2001.1080p.WEB-DL') > score('Torrentio · 1080p', 'Film.2001.1080p.WEBRip'));
+  assert.ok(score('Torrentio · 1080p', 'Film.2001.1080p.WEB-DL') > score('Torrentio · 1080p', 'Film.2001.1080p.HDRip'));
+  assert.ok(score('Torrentio · 1080p', 'Film.2001.1080p.WEB-DL.x264') > score('Torrentio · 1080p', 'Film.2001.1080p.WEB-DL.x265'));
+  assert.ok(score('Torrentio · 1080p', 'Film.2001.1080p.BluRay') > score('Torrentio · 1080p', 'Film.2001.1080p.BluRay.AV1'));
+  // Unknown labels still rank on resolution and are never treated as cams.
+  assert.equal(_coreStreamsTest.isCamQuality({ name: 'Torrentio · Unlabelled' }), false);
+});
+
+test('cam and telecine recordings are dropped only when a real release exists', () => {
+  assert.ok(_coreStreamsTest.isCamQuality({ title: 'Film.2001.HDCAM.x264' }));
+  assert.ok(_coreStreamsTest.isCamQuality({ title: 'Film.2001.TELESYNC' }));
+  assert.ok(!_coreStreamsTest.isCamQuality({ title: 'Cam.2018.1080p.WEB-DL' }), 'a film called "Cam" is not a cam recording');
+  assert.ok(!_coreStreamsTest.isCamQuality({ title: 'Film.2001.1080p.ts' }), 'a .ts container is not a telesync');
+  const real = { name: 'Torrentio · 1080p', title: 'Film.2001.1080p.WEB-DL' };
+  const cam = { name: 'Torrentio · CAM', title: 'Film.2001.HDCAM' };
+  assert.deepEqual(_coreStreamsTest.dropCamStreams([cam, real]), [real]);
+  assert.deepEqual(_coreStreamsTest.dropCamStreams([cam]), [cam], 'a cam stays when it is the only result');
+});
+
+test('edge cache serves the second open without querying any provider, and can be bypassed', async () => {
+  _coreStreamsTest.resetSourceHealth();
+  const cache = fakeCache();
+  let providerCalls = 0;
+  const fetchImpl = async (input) => {
+    providerCalls++;
+    if (String(input).startsWith('https://torrentio.strem.fun/')) {
+      return jsonResponse({ streams: [{ infoHash: HASH('a'), name: '1080p', title: 'Film.2001.1080p.WEB-DL' }] });
+    }
+    return jsonResponse({ streams: [] });
+  };
+  const env = makeEnv();
+  const url = `https://worker.example/core-streams/${TOKEN}/stream/movie/tt0133093.json`;
+
+  const first = await handleCoreStreams(new Request(url), env, { fetchImpl, cache });
+  assert.equal(first.headers.get('X-Core-Streams-Cache'), 'miss');
+  const firstCalls = providerCalls;
+  const firstStreams = (await first.json()).streams;
+  assert.equal(firstStreams.length, 1);
+  assert.equal(cache.store.size, 1);
+
+  const second = await handleCoreStreams(new Request(url), env, { cache, fetchImpl: async () => { throw new Error('providers must not be queried on a hit'); } });
+  assert.equal(second.headers.get('X-Core-Streams-Cache'), 'hit');
+  assert.equal(providerCalls, firstCalls, 'no provider was queried again');
+  assert.deepEqual((await second.json()).streams, firstStreams);
+  assert.match(second.headers.get('X-Core-Streams-Sources'), /torrentio=ok 1/);
+  assert.match(second.headers.get('X-Core-Streams-Sources'), /; cache=hit$/);
+
+  const bypass = await handleCoreStreams(new Request(`${url}?nocache=1`), env, { fetchImpl, cache });
+  assert.equal(bypass.headers.get('X-Core-Streams-Cache'), 'bypass');
+  assert.ok(providerCalls > firstCalls, 'a bypass re-queries the providers');
+
+  const off = await handleCoreStreams(new Request(url), env, { fetchImpl, cache: null });
+  assert.equal(off.headers.get('X-Core-Streams-Cache'), 'off');
+  _coreStreamsTest.resetSourceHealth();
+});
+
+test('cache entries are scoped per install token and configuration, and never contain the token', () => {
+  const requestUrl = new URL(`https://worker.example/core-streams/${TOKEN}/stream/movie/tt0133093.json`);
+  const base = _coreStreamsTest.streamCacheKey(requestUrl, TOKEN, 'movie', 'tt0133093', makeEnv(), '');
+  assert.ok(!base.includes(TOKEN), 'the install token is hashed out of the key');
+  assert.equal(base, _coreStreamsTest.streamCacheKey(requestUrl, TOKEN, 'movie', 'tt0133093', makeEnv(), ''));
+  assert.notEqual(base, _coreStreamsTest.streamCacheKey(requestUrl, 'f'.repeat(32), 'movie', 'tt0133093', makeEnv(), ''));
+  assert.notEqual(base, _coreStreamsTest.streamCacheKey(requestUrl, TOKEN, 'series', 'tt0133093:1:1', makeEnv(), ''));
+  assert.notEqual(base, _coreStreamsTest.streamCacheKey(requestUrl, TOKEN, 'movie', 'tt0133093', makeEnv(), 'https://addon.example.org/cfg'));
+  assert.notEqual(base, _coreStreamsTest.streamCacheKey(requestUrl, TOKEN, 'movie', 'tt0133093', makeEnv({ TORBOX_API_KEY: TORBOX_KEY }), ''));
+  assert.equal(_coreStreamsTest.cacheTtlSeconds(makeEnv()), 300);
+  assert.equal(_coreStreamsTest.cacheTtlSeconds(makeEnv({ CORE_STREAMS_CACHE_TTL: '0' })), 0);
+  assert.equal(_coreStreamsTest.cacheTtlSeconds(makeEnv({ CORE_STREAMS_CACHE_TTL: 'nope' })), 300);
+  assert.equal(_coreStreamsTest.cacheTtlSeconds(makeEnv({ CORE_STREAMS_CACHE_TTL: '86400' })), 3600);
+});
+
+test('a configured add-on disables caching by default, since it may sign short-lived URLs', () => {
+  const env = makeEnv();
+  const httpBase = 'https://addon.example.org/private/config';
+  assert.equal(_coreStreamsTest.effectiveCacheTtl(env, ''), 300);
+  assert.equal(_coreStreamsTest.effectiveCacheTtl(env, httpBase), 0, 'opt-in only once a configured source exists');
+  assert.equal(_coreStreamsTest.effectiveCacheTtl(makeEnv({ CORE_STREAMS_CACHE_TTL: '120' }), httpBase), 120, 'an explicit TTL wins');
+});
+
+test('a configured add-on leaves the cache off, so its signed URLs are re-fetched every time', async () => {
+  _coreStreamsTest.resetSourceHealth();
+  const cache = fakeCache();
+  let addonCalls = 0;
+  const fetchImpl = async (input) => {
+    if (String(input).startsWith('https://addon.example.org/')) {
+      addonCalls++;
+      return jsonResponse({ streams: [{ url: 'https://cdn.example.org/signed?exp=1', name: 'Direct' }] });
+    }
+    return jsonResponse({ streams: [] });
+  };
+  const env = makeEnv({ CORE_STREAMS_HTTP_SOURCE_MANIFEST: 'https://addon.example.org/private/config/manifest.json' });
+  const url = `https://worker.example/core-streams/${TOKEN}/stream/movie/tt0133093.json`;
+  await handleCoreStreams(new Request(url), env, { fetchImpl, cache });
+  const second = await handleCoreStreams(new Request(url), env, { fetchImpl, cache });
+  assert.equal(second.headers.get('X-Core-Streams-Cache'), 'off');
+  assert.equal(addonCalls, 2);
+  assert.equal(cache.store.size, 0);
+  _coreStreamsTest.resetSourceHealth();
+});
+
+test('a cached list still gets fresh TorBox instant links', async () => {
+  _coreStreamsTest.resetSourceHealth();
+  const cache = fakeCache();
+  const { calls, fetchImpl } = torboxFixture({ cached: { [HASH('a')]: [{ name: 'Cached.Film.2001.1080p.mkv', size: 8e9 }] } });
+  const env = makeEnv({ TORBOX_API_KEY: TORBOX_KEY });
+  const url = `https://worker.example/core-streams/${TOKEN}/stream/movie/tt0133093.json`;
+  const first = await handleCoreStreams(new Request(url), env, { fetchImpl, cache });
+  assert.ok((await first.json()).streams.some((stream) => stream.name.startsWith('TorBox')));
+  const second = await handleCoreStreams(new Request(url), env, { fetchImpl, cache });
+  assert.equal(second.headers.get('X-Core-Streams-Cache'), 'hit');
+  const streams = (await second.json()).streams;
+  assert.ok(streams.some((stream) => stream.name.startsWith('TorBox')), 'a hit still offers the instant link');
+  assert.equal(calls.filter(({ url: called }) => called.includes('/torrents/checkcached')).length, 2);
+  _coreStreamsTest.resetSourceHealth();
+});
+
+test('the status route is token-gated and reports sources, features and cache without secrets', async () => {
+  _coreStreamsTest.resetSourceHealth();
+  const request = (path, method = 'GET') => new Request(`https://worker.example${path}`, { method });
+  const response = await handleCoreStreams(request(`/core-streams/${TOKEN}/status.json`), makeEnv(), {});
+  assert.equal(response.status, 200);
+  assert.equal(response.headers.get('Cache-Control'), 'no-store');
+  const body = await response.json();
+  assert.equal(body.ok, true);
+  assert.equal(body.version, '0.11.0');
+  assert.equal(body.features.torbox, false);
+  assert.equal(body.features.configuredHttpSource, false);
+  assert.equal(body.cache.ttlSeconds, 300);
+  assert.ok(body.sources.some((source) => source.id === 'torrentio' && source.state === 'ready'));
+  assert.ok(!body.sources.some((source) => source.id === 'http-source'), 'an unconfigured source is not advertised');
+
+  assert.equal((await handleCoreStreams(request(`/core-streams/${'f'.repeat(32)}/status.json`), makeEnv(), {})).status, 404);
+  assert.equal((await handleCoreStreams(request(`/core-streams/${TOKEN}/status.json`, 'HEAD'), makeEnv(), {})).status, 200);
+
+  const configured = await handleCoreStreams(request(`/core-streams/${TOKEN}/status.json`), makeEnv({
+    TORBOX_API_KEY: TORBOX_KEY,
+    CORE_STREAMS_HTTP_SOURCE_MANIFEST: 'https://addon.example.org/private/config/manifest.json',
+  }), {});
+  const configuredText = await configured.text();
+  assert.match(configuredText, /"torbox":true/);
+  assert.match(configuredText, /"configuredHttpSource":true/);
+  assert.ok(!configuredText.includes(TORBOX_KEY), 'the TorBox key is never echoed');
+  assert.ok(!configuredText.includes('addon.example.org'), 'the configured manifest URL is never echoed');
+  _coreStreamsTest.resetSourceHealth();
+});
+
+test('the status route shows a source in cooldown after three failures', async () => {
+  _coreStreamsTest.resetSourceHealth();
+  const fetchImpl = async (input) => {
+    if (String(input).startsWith('https://torrentio.strem.fun/')) return new Response('down', { status: 503 });
+    return jsonResponse({ streams: [] });
+  };
+  for (let attempt = 0; attempt < 3; attempt++) {
+    await handleCoreStreams(makeRequest(`/core-streams/${TOKEN}/stream/movie/tt0133093.json`), makeEnv(), { fetchImpl, cache: null });
+  }
+  const body = await (await handleCoreStreams(makeRequest(`/core-streams/${TOKEN}/status.json`), makeEnv(), {})).json();
+  const torrentio = body.sources.find((source) => source.id === 'torrentio');
+  assert.equal(torrentio.state, 'cooldown');
+  assert.equal(torrentio.failures, 3);
+  assert.ok(torrentio.retryInMs > 0);
+  _coreStreamsTest.resetSourceHealth();
 });
