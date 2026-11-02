@@ -5,7 +5,8 @@ import { handleCoreStreams, _coreStreamsTest } from './core-streams.js';
 const TOKEN = '0123456789abcdef0123456789abcdef';
 const secureHeaders = { 'Access-Control-Allow-Origin': '*' };
 const makeRequest = (path, method = 'GET') => new Request(`https://worker.example${path}`, { method });
-const makeEnv = (overrides = {}) => ({ CORE_STREAMS_INSTALL_TOKEN: TOKEN, ...overrides });
+// Caching is off unless a test turns it on: most tests reuse one IMDb id with different fixtures.
+const makeEnv = (overrides = {}) => ({ CORE_STREAMS_INSTALL_TOKEN: TOKEN, CORE_STREAMS_CACHE_SECONDS: '0', ...overrides });
 // Video cards name their provider on the 🔎 line; open-media cards keep "Source · licence".
 const sourceOf = (stream) => (String(stream.description || '').match(/🔎 ([^·\n]+)/) || [])[1]?.trim() || String(stream.name).split(' · ')[0];
 const from = (stream, source) => (source === 'TorBox' ? String(stream.name).startsWith('⚡ TorBox') : sourceOf(stream) === source);
@@ -24,13 +25,13 @@ test('manifest is a Stremio stream-only manifest behind the install token', asyn
   assert.equal(response.headers.get('Cache-Control'), 'no-store');
   assert.deepEqual(await response.json(), {
     id: 'uk.corebuilds.core-streams',
-    version: '0.11.0',
+    version: '0.12.0',
     name: 'Core Streams',
-    description: 'Quality-ranked streams with clean file details: torrent add-ons and public indexes (YTS, The Pirate Bay, EZTV, Knaben), instant TorBox playback when configured, open media, and configurable sources.',
+    description: 'Quality-ranked streams with clean file details: torrent add-ons and public indexes (YTS, The Pirate Bay, EZTV, Knaben, Nyaa for anime with dubs first), instant TorBox playback when configured, open media, and configurable sources.',
     resources: ['stream'],
-    types: ['movie', 'series'],
+    types: ['movie', 'series', 'anime'],
     catalogs: [],
-    idPrefixes: ['tt'],
+    idPrefixes: ['tt', 'kitsu'],
   });
 });
 
@@ -104,7 +105,7 @@ test('smart ordering ranks quality and seed hints while interleaving provider re
   assert.equal(_coreStreamsTest.inferredSeeders(groups[0][1]), 40);
 });
 
-test('global result cap does not let high-volume providers starve later providers', async () => {
+test('the per-resolution cap keeps high-volume providers from starving the others', async () => {
   _coreStreamsTest.resetSourceHealth();
   const hash = (number) => number.toString(16).padStart(40, '0');
   const streamBatch = (count, makeStream) => Array.from({ length: count }, (_, index) => makeStream(index));
@@ -144,11 +145,12 @@ test('global result cap does not let high-volume providers starve later provider
     { fetchImpl },
   );
   const streams = (await response.json()).streams;
-  assert.equal(streams.length, 80);
-  assert.ok(streams.some((stream) => from(stream, 'Torrentio') && stream.name.endsWith('\n4K')));
-  assert.ok(streams.some((stream) => from(stream, 'TorrentsDB') && stream.name.endsWith('\n1080p')));
-  assert.ok(streams.some((stream) => from(stream, 'Public Domain Movies')));
-  assert.ok(streams.some((stream) => from(stream, 'HTTP source') && stream.name === '🌐 Direct\n4K'));
+  // 8 at 4K (the direct HTTPS ones outrank P2P), 8 at 1080p, and the 5
+  // open-media films, which are never capped.
+  assert.equal(streams.length, 21);
+  assert.equal(streams.filter((stream) => stream.name.endsWith('\n4K')).length, 8);
+  assert.ok(streams.filter((stream) => stream.name.endsWith('\n4K')).every((stream) => from(stream, 'HTTP source')));
+  assert.equal(streams.filter((stream) => from(stream, 'TorrentsDB')).length, 8, 'the 1080p provider is not crowded out by 78 4K results');
   assert.equal(streams.filter((stream) => from(stream, 'Public Domain Movies')).length, 5);
   _coreStreamsTest.resetSourceHealth();
 });
@@ -1438,4 +1440,164 @@ test('a card shows the resolution the ranking used when the name and release dis
   const stream = _coreStreamsTest.normalizeStream({ infoHash: 'e'.repeat(40), name: '1080p', title: 'Film.2020.2160p.WEB-DL.x265-GRP' }, 'Torrentio');
   assert.equal(_coreStreamsTest.inferredHeight(stream), 1080);
   assert.equal(_coreStreamsTest.formatStream(stream).name, '🧲 P2P\n1080p');
+});
+
+// --- Anime -------------------------------------------------------------------
+const nyaaItem = (title, hash, { seeders = 10, size = '1.4 GiB', trusted = 'No', remake = 'No' } = {}) => `<item>
+  <title>${title.replace(/&/g, '&amp;').replace(/'/g, '&#39;')}</title>
+  <nyaa:seeders>${seeders}</nyaa:seeders><nyaa:infoHash>${hash}</nyaa:infoHash>
+  <nyaa:size>${size}</nyaa:size><nyaa:trusted>${trusted}</nyaa:trusted><nyaa:remake>${remake}</nyaa:remake>
+</item>`;
+const nyaaFeed = (...items) => new Response(`<rss><channel>${items.join('')}</channel></rss>`, { headers: { 'Content-Type': 'application/xml' } });
+const kitsuFrieren = () => new Response(JSON.stringify({ data: { attributes: {
+  canonicalTitle: 'Sousou no Frieren', titles: { en: "Frieren: Beyond Journey's End", en_jp: 'Sousou no Frieren' }, startDate: '2023-09-29',
+} } }), { headers: { 'Content-Type': 'application/vnd.api+json' } });
+
+test('Kitsu anime episodes come from Nyaa and the add-ons, dubs first, with the season checked', async () => {
+  _coreStreamsTest.resetSourceHealth();
+  const calls = [];
+  const accepts = {};
+  const fetchImpl = async (input, init) => {
+    const url = String(input);
+    calls.push(url);
+    accepts[new URL(url).hostname] = init?.headers?.Accept;
+    if (url === 'https://kitsu.io/api/edge/anime/46474') return kitsuFrieren();
+    if (url.startsWith('https://torrentsdb.com/')) {
+      return jsonResponse({ streams: [{ infoHash: HASH('9'), name: '1080p', title: 'Frieren.Beyond.Journeys.End.S02E05.1080p.CR.WEB-DL.MULTi-VARYG' }] });
+    }
+    if (url.startsWith('https://nyaa.si/') && url.includes('dub')) {
+      return nyaaFeed(
+        nyaaItem("[ToonsHub] Frieren: Beyond Journey's End - 05 (Multi-Audio 1080p x264 AAC) [Multi-Subs]", HASH('b'), { seeders: 40 }),
+        nyaaItem("[Yameii] Frieren: Beyond Journey's End - S02E05 [English Dub] [CR WEB-DL 1080p]", HASH('c'), { seeders: 400 }),
+      );
+    }
+    if (url.startsWith('https://nyaa.si/')) {
+      return nyaaFeed(
+        nyaaItem('[SubsPlease] Sousou no Frieren - 05 (1080p) [ABCD1234]', HASH('a'), { seeders: 900, trusted: 'Yes' }),
+        nyaaItem('[Erai-raws] Sousou no Frieren 2nd Season - 05 [1080p CR WEBRip HEVC AAC]', HASH('d'), { seeders: 500 }),
+        nyaaItem('[Judas] Sousou no Frieren (Season 1) [1080p][HEVC x265 10bit][Dual-Audio] (Batch)', HASH('e'), { seeders: 30, size: '24 GiB' }),
+        nyaaItem('[Remaker] Sousou no Frieren - 05 [1080p]', HASH('f'), { remake: 'Yes' }),
+        nyaaItem('[Dead] Sousou no Frieren - 05 [1080p]', HASH('1'), { seeders: 0 }),
+      );
+    }
+    return jsonResponse({ streams: [] });
+  };
+  const response = await handleCoreStreams(makeRequest(`/core-streams/${TOKEN}/stream/series/kitsu%3A46474%3A5.json`), makeEnv(), { fetchImpl });
+  const { streams } = await response.json();
+  assert.equal(accepts['kitsu.io'], 'application/vnd.api+json', 'Kitsu answers 406 to plain JSON');
+  assert.ok(calls.includes('https://torrentio.strem.fun/stream/series/kitsu%3A46474%3A5.json'), 'add-ons get the Kitsu id as is');
+  assert.ok(calls.some((url) => decodeURIComponent(url).includes('q=Sousou no Frieren 05&')), 'romaji search');
+  assert.ok(calls.some((url) => decodeURIComponent(url).includes("q=Frieren: Beyond Journey's End 05 (dub|dual|multi)&")), 'English dub search');
+  assert.ok(!calls.some((url) => /accel\.li|apibay|eztvx|knaben|cinemeta|archive\.org/.test(url)), 'IMDb-only indexes are not asked');
+  assert.deepEqual(streams.map((stream) => stream.infoHash), [HASH('b'), HASH('e'), HASH('a')],
+    'dub and dual-audio first, then the sub; season 2 (from Nyaa or an add-on), remakes and dead torrents are dropped');
+  assert.match(streams[0].description, /🎙 Multi-audio/);
+  assert.match(streams[1].description, /🏷 .*Season pack/);
+  assert.deepEqual(streams[1].fileMustInclude, ['(?:[Ee][Pp]?|- |\\[)0*5(?:v[0-9])?[^0-9]']);
+  assert.match(streams[2].description, /🔎 Nyaa · Trusted/);
+  assert.match(response.headers.get('X-Core-Streams-Sources'), /nyaa=ok 3/);
+  _coreStreamsTest.resetSourceHealth();
+});
+
+test('anime under an IMDb id adds Nyaa; CORE_STREAMS_ANIME_AUDIO=sub skips the dub search', async () => {
+  _coreStreamsTest.resetSourceHealth();
+  const calls = [];
+  const fetchImpl = indexFetch([
+    ['https://v3-cinemeta.strem.io/', () => jsonResponse({ meta: { name: "Frieren: Beyond Journey's End", releaseInfo: '2023–', genres: ['Animation'], country: 'Japan' } })],
+    ['https://nyaa.si/', () => nyaaFeed(nyaaItem("[SubsPlease] Frieren: Beyond Journey's End - 05 (1080p)", HASH('a')))],
+  ], calls);
+  const response = await handleCoreStreams(makeRequest(`/core-streams/${TOKEN}/stream/series/tt22248376:1:5.json`),
+    makeEnv({ CORE_STREAMS_ANIME_AUDIO: 'sub' }), { fetchImpl });
+  const { streams } = await response.json();
+  assert.equal(calls.filter((url) => url.startsWith('https://nyaa.si/')).length, 1);
+  assert.ok(streams.some((stream) => stream.infoHash === HASH('a')));
+
+  const plain = [];
+  await handleCoreStreams(makeRequest(`/core-streams/${TOKEN}/stream/series/tt0903747:1:1.json`), makeEnv(), {
+    fetchImpl: indexFetch([['https://v3-cinemeta.strem.io/', () => jsonResponse({ meta: { name: 'Breaking Bad', releaseInfo: '2008', genres: ['Drama'], country: 'USA' } })]], plain),
+  });
+  assert.ok(!plain.some((url) => url.startsWith('https://nyaa.si/')), 'live action never asks Nyaa');
+  _coreStreamsTest.resetSourceHealth();
+});
+
+test('Kitsu ids are accepted only in their movie and episode shapes', () => {
+  const valid = _coreStreamsTest.validMediaRequest;
+  assert.equal(valid('series', 'kitsu:46474:5'), true);
+  assert.equal(valid('anime', 'kitsu:46474:5'), true);
+  assert.equal(valid('movie', 'kitsu:1234'), true);
+  assert.equal(valid('anime', 'kitsu:1234'), true);
+  assert.equal(valid('series', 'kitsu:1234'), false);
+  assert.equal(valid('movie', 'kitsu:46474:5'), false);
+  assert.equal(valid('series', 'kitsu:46474:0'), false);
+  assert.equal(valid('anime', 'tt0133093'), false);
+  assert.equal(valid('series', 'kitsu:abc:1'), false);
+});
+
+test('TorBox opens the anime episode inside a cached batch', () => {
+  const pick = (files, selector) => _coreStreamsTest.chooseVideoFile(files, _coreStreamsTest.parsePlaySelector(selector))?.name;
+  const batch = [
+    { name: 'Frieren/[Judas] Sousou no Frieren - 04.mkv', size: 9 },
+    { name: 'Frieren/[Judas] Sousou no Frieren - 05.mkv', size: 8 },
+    { name: 'Frieren/[Judas] Sousou no Frieren - 15.mkv', size: 7 },
+  ];
+  assert.equal(pick(batch, 'ep5'), 'Frieren/[Judas] Sousou no Frieren - 05.mkv');
+  assert.equal(pick(batch, '1x5'), 'Frieren/[Judas] Sousou no Frieren - 05.mkv', 'a first-season IMDb episode reads anime naming too');
+  assert.equal(pick(batch, '2x5'), undefined, 'a later season does not guess');
+});
+
+test('dubs come first for anime only', () => {
+  const sub = { infoHash: 'a'.repeat(40), name: '1080p', title: '[SubsPlease] Show - 05 (1080p)' };
+  const dub = { infoHash: 'b'.repeat(40), name: '720p', title: '[Group] Show - 05 (720p) [Dual Audio]' };
+  const sub4k = { infoHash: 'c'.repeat(40), name: '2160p', title: '[Group] Show - 05 (2160p WEB-DL)' };
+  const remux4k = { infoHash: 'e'.repeat(40), name: '2160p', title: 'Show.S01E05.2160p.BluRay.REMUX.DV.HDR10.TrueHD.Atmos 👤 500' };
+  const dub1080 = { infoHash: 'f'.repeat(40), name: '1080p', title: '[Group] Show - 05 (1080p) [English Dub]' };
+  const score = _coreStreamsTest.smartStreamScore;
+  const dubFirst = { anime: true, audio: 'dub' };
+  assert.ok(score(dub, dubFirst) > score(sub, dubFirst));
+  assert.ok(score(dub, dubFirst) > score(sub4k, dubFirst), 'a 720p dub comes before a 4K WEB-DL sub');
+  assert.ok(score(dub1080, dubFirst) > score(remux4k, dubFirst), 'a 1080p dub comes before even a 4K REMUX sub');
+  assert.ok(score(dub, { anime: true, audio: 'any' }) < score(sub, { anime: true, audio: 'any' }));
+  assert.ok(score(dub) < score(sub), 'live action is not reordered by "dual audio"');
+});
+
+test('CAM, 3D and upscaled copies are dropped while something better is left', () => {
+  const make = (title) => _coreStreamsTest.normalizeStream({ infoHash: HASH(String(title.length % 10)), name: 'x', title }, 'Torrentio');
+  const cam = make('New.Film.2026.HDCAM.x264');
+  const web = make('New.Film.2026.1080p.WEB-DL.x264');
+  const sbs = make('New.Film.2026.1080p.3D.Half-SBS');
+  assert.deepEqual(_coreStreamsTest.dropJunk([cam, web, sbs]), [web]);
+  assert.deepEqual(_coreStreamsTest.dropJunk([cam]), [cam], 'a film still in cinemas keeps its CAMs');
+  const film = make('Cam.2018.1080p.WEB-DL.x264');
+  assert.deepEqual(_coreStreamsTest.dropJunk([film]), [film], 'a film called Cam is not a camcorder copy');
+});
+
+test('each resolution keeps at most CORE_STREAMS_MAX_PER_RESOLUTION results, in order', () => {
+  const streams = ['2160p', '2160p', '2160p', '1080p', '1080p', '1080p', '720p', 'Film'].map((name, index) =>
+    _coreStreamsTest.normalizeStream({ infoHash: HASH(String(index)), name }, 'Torrentio'));
+  const kept = _coreStreamsTest.limitPerResolution(streams, 2);
+  assert.deepEqual(kept.map((stream) => stream.name.split(' · ')[1]), ['2160p', '2160p', '1080p', '1080p', '720p', 'Film']);
+  assert.equal(_coreStreamsTest.limitPerResolution(streams, 0).length, 8, '0 turns the cap off');
+});
+
+test('a title asked for again within the cache time is answered without asking any source', async () => {
+  _coreStreamsTest.resetSourceHealth();
+  _coreStreamsTest.resetResponseCache();
+  const calls = [];
+  const fetchImpl = indexFetch([
+    ['https://torrentio.strem.fun/', () => jsonResponse({ streams: [{ infoHash: HASH('a'), name: '1080p', title: 'Film.2001.1080p.WEB-DL' }] })],
+    ['https://v3-cinemeta.strem.io/', () => jsonResponse({ meta: { name: 'Film', year: '2001' } })],
+  ], calls);
+  const env = makeEnv({ CORE_STREAMS_CACHE_SECONDS: '600' });
+  const first = await handleCoreStreams(makeRequest(`/core-streams/${TOKEN}/stream/movie/tt0133093.json`), env, { fetchImpl });
+  assert.equal(first.headers.get('X-Core-Streams-Cache'), 'miss');
+  const asked = calls.length;
+  const second = await handleCoreStreams(makeRequest(`/core-streams/${TOKEN}/stream/movie/tt0133093.json`), env, { fetchImpl });
+  assert.equal(second.headers.get('X-Core-Streams-Cache'), 'hit');
+  assert.equal(calls.length, asked, 'no source is asked twice');
+  assert.deepEqual((await second.json()).streams, (await first.json()).streams);
+  assert.equal(second.headers.get('X-Core-Streams-Sources'), first.headers.get('X-Core-Streams-Sources'));
+  const episode = await handleCoreStreams(makeRequest(`/core-streams/${TOKEN}/stream/series/tt0133093:1:1.json`), env, { fetchImpl });
+  assert.equal(episode.headers.get('X-Core-Streams-Cache'), 'miss', 'another id is its own entry');
+  _coreStreamsTest.resetResponseCache();
+  _coreStreamsTest.resetSourceHealth();
 });

@@ -99,6 +99,16 @@ const EDITIONS = [
   ['Criterion', /\bcriterion\b/],
 ];
 
+import { dubLabel } from './core-streams-anime.js';
+
+// Copies AIOStreams excludes by default. Bare "CAM"/"TS" are left out on
+// purpose: a film called "Cam" or a ".ts" file is not a camcorder copy.
+const JUNK_RE = /\b(?:camrip|hdcam|hdts|telesync|telecine|hdtc|dvdscr|screener|3d|half[ .-]?(?:sbs|ou)|upscal(?:e|ed|ing)|ai[ .-]?upscale|sample)\b/i;
+
+export function isJunkRelease(text) {
+  return JUNK_RE.test(String(text || ''));
+}
+
 const FLAG_RE = /(?:[\u{1F1E6}-\u{1F1FF}]{2})/gu;
 const FILE_EXT_RE = /\.(?:mkv|mp4|m4v|avi|webm|mov|ts|m2ts|wmv)$/i;
 
@@ -225,14 +235,16 @@ export function formatStream(stream, { inferHeight, inferSeeders }) {
 
   const video = [parsed.quality, parsed.encode, ...parsed.visual].filter(Boolean);
   const audio = [...parsed.audio, parsed.channels].filter(Boolean);
-  const languages = parsed.flags.length ? parsed.flags.join(' ') : parsed.languages.join(', ');
+  const dub = dubLabel(`${release} ${filename}`);
+  const spoken = parsed.languages.filter((language) => language !== 'Dual Audio');
+  const languages = parsed.flags.length ? parsed.flags.join(' ') : spoken.join(', ');
   const group = releaseGroup(filename || release) || releaseGroup(release);
   const tags = [group, ...parsed.editions, parsed.repack ? 'REPACK' : '', facts.pack ? 'Season pack' : ''].filter(Boolean);
   const origin = [facts.source, tracker && tracker !== facts.source ? tracker : ''].filter(Boolean).join(' · ');
 
   const lines = [
     video.length ? `🎞 ${video.join(' · ')}` : '',
-    audio.length || languages ? [audio.length ? `🔊 ${audio.join(' · ')}` : '', languages ? `🌐 ${languages}` : ''].filter(Boolean).join(' · ') : '',
+    [audio.length ? `🔊 ${audio.join(' · ')}` : '', dub ? `🎙 ${dub}` : '', languages ? `🌐 ${languages}` : ''].filter(Boolean).join(' · '),
     [formatSize(size) ? `📦 ${formatSize(size)}` : '', !facts.cached && stream.infoHash && seeders > 0 ? `👤 ${seeders}` : '', origin ? `🔎 ${origin}` : ''].filter(Boolean).join(' · '),
     tags.length ? `🏷 ${tags.join(' · ')}` : '',
     filename || release ? `📄 ${clip(filename || release, 160)}` : '',

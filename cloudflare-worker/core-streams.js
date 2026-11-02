@@ -1,7 +1,10 @@
 // Core Streams: a small Stremio-compatible stream aggregator running on the
 // existing Cloudflare Worker. It uses fixed add-on endpoints and narrowly
 // allowlisted open-media APIs; it never scrapes arbitrary URLs or relays media.
-import { formatStream, getStreamFacts, parseRelease, setStreamFacts } from './core-streams-format.js';
+import { formatStream, getStreamFacts, isJunkRelease, parseRelease, resolutionLabel, setStreamFacts } from './core-streams-format.js';
+import {
+  animeEpisodeFilePattern, animeEpisodeRe, classifyAnimeRelease, dubLabel, parseKitsuId, parseNyaaRss, seasonOf,
+} from './core-streams-anime.js';
 
 const SOURCES = [
   { id: 'torrentio', name: 'Torrentio', base: 'https://torrentio.strem.fun' },
@@ -68,7 +71,7 @@ const SOURCE_FAILURE_THRESHOLD = 3;
 const SOURCE_BREAKER_COOLDOWN_MS = 30_000;
 const sourceHealth = new Map(); // fixed provider IDs only; isolate-local best-effort breaker
 const INSTALL_TOKEN_RE = /^[A-Za-z0-9_-]{32,128}$/;
-const ID_RE = /^tt\d{6,12}(?::\d{1,3}:\d{1,3})?$/i;
+const ID_RE = /^(?:tt\d{6,12}(?::\d{1,3}:\d{1,3})?|kitsu:\d{1,7}(?::\d{1,4})?)$/i;
 const INFO_HASH_RE = /^[a-f0-9]{40}$/i;
 const YOUTUBE_ID_RE = /^[A-Za-z0-9_-]{11}$/;
 const RESERVED_HOST_RE = /(^|\.)(localhost|local|internal|intranet|home|lan|corp|arpa|test|invalid|example|onion)$/i;
@@ -139,7 +142,13 @@ function parseRequestPath(pathname) {
 }
 
 function validMediaRequest(type, id) {
-  if (!['movie', 'series'].includes(type) || typeof id !== 'string' || !ID_RE.test(id)) return false;
+  if (!['movie', 'series', 'anime'].includes(type) || typeof id !== 'string' || !ID_RE.test(id)) return false;
+  // Kitsu ids (anime catalogs): "kitsu:<id>" for a film, "kitsu:<id>:<episode>"
+  // for an episode, numbered within that Kitsu entry. Clients send them as
+  // movie, series or anime.
+  const kitsu = parseKitsuId(id);
+  if (kitsu) return kitsu.episode === null ? type !== 'series' : type !== 'movie' && kitsu.episode >= 1;
+  if (type === 'anime') return false;
   const [imdb, season, episode] = id.split(':');
   if (!/^tt\d{6,12}$/i.test(imdb)) return false;
   if (type === 'movie') return season === undefined;
@@ -302,24 +311,44 @@ function inferredSeeders(stream) {
   return matches.reduce((maximum, match) => Math.max(maximum, Number(match[1])), 0);
 }
 
+// Points per release source, the way AIOStreams' default sort orders them
+// after resolution: REMUX, BluRay, WEB-DL, WEBRip, then broadcast and DVD.
+const SOURCE_POINTS = { 'BluRay REMUX': 30, BluRay: 20, 'WEB-DL': 15, WEBRip: 10, HDTV: 3, HDRip: 0, DVD: -10 };
+
 // Use only information already present in Stremio's stream card. This is a
 // ranking heuristic, not a claim that a mislabeled resolution or seeder count
 // has been independently verified. Preserve unknown-quality results as fallbacks.
-function smartStreamScore(stream) {
-  const text = [stream?.name, stream?.title, stream?.description, stream?.behaviorHints?.filename]
-    .filter((part) => typeof part === 'string').join(' ').toLowerCase();
+// Resolution leads (a 1080p step is 36+ points, more than any source bonus),
+// then source, HDR, audio and seeders. For anime, `audio: 'dub'` lifts dubbed,
+// dual-audio and multi-audio releases by 200 points: a 1080p dub comes before
+// even a 4K REMUX sub, and lower dubs before most 4K subs. `'sub'` sinks dub-only ones.
+function smartStreamScore(stream, { anime = false, audio = 'dub' } = {}) {
+  const raw = [stream?.name, stream?.title, stream?.description, stream?.behaviorHints?.filename]
+    .filter((part) => typeof part === 'string').join(' ');
+  const text = raw.toLowerCase();
+  const parsed = parseRelease(raw, inferredHeight);
   let score = inferredHeight(stream) / 10;
   score += Math.min(inferredSeeders(stream), 500) / 20;
   if (typeof stream?.url === 'string') score += 12;
   if (typeof stream?.ytId === 'string') score += 8;
-  if (/\b(?:bluray|blu-ray|web[ .-]?dl)\b/.test(text)) score += 5;
+  score += SOURCE_POINTS[parsed.quality] || 0;
+  if (parsed.visual.includes('DV')) score += 8;
+  if (parsed.visual.some((tag) => tag.startsWith('HDR'))) score += 6;
+  if (parsed.visual.includes('3D')) score -= 40;
+  if (parsed.audio.some((tag) => ['TrueHD', 'DTS-HD MA', 'DTS:X', 'Atmos'].includes(tag))) score += 4;
+  else if (parsed.audio.includes('DD+')) score += 2;
   if (/\b(?:cam|hdcam|hdts|telesync|telecine|screener)\b/.test(text)) score -= 150;
+  if (anime) {
+    const dub = dubLabel(raw);
+    if (audio === 'dub' && dub) score += 200;
+    if (audio === 'sub' && (dub === 'Dub' || dub === 'English dub')) score -= 200;
+  }
   return score;
 }
 
-function interleaveStreamGroups(groups) {
+function interleaveStreamGroups(groups, context = {}) {
   const ranked = groups.map((group) => (Array.isArray(group) ? group : [])
-    .map((stream, index) => ({ stream, index, score: smartStreamScore(stream) }))
+    .map((stream, index) => ({ stream, index, score: smartStreamScore(stream, context) }))
     .sort((a, b) => b.score - a.score || a.index - b.index)
     .map(({ stream, score }) => ({ stream, score })));
   const sourceOrder = ranked.map((_, index) => index);
@@ -453,12 +482,14 @@ function declaredOpenLicense(value) {
   return { url: url.href, label: match[1] === 'by-sa' ? `CC BY-SA ${match[2]}` : `CC BY ${match[2]}` };
 }
 
-async function fetchBoundedJson(url, fetchImpl, maxBytes = OPEN_MEDIA_MAX_BYTES, timeoutMs = OPEN_MEDIA_TIMEOUT_MS, deadlineSignal = null, redirectHosts = [], jsonBody = null) {
+// `accept` overrides the Accept header (Kitsu answers 406 to plain JSON);
+// `text: true` returns the body as a string (Nyaa's RSS is XML).
+async function fetchBoundedJson(url, fetchImpl, maxBytes = OPEN_MEDIA_MAX_BYTES, timeoutMs = OPEN_MEDIA_TIMEOUT_MS, deadlineSignal = null, redirectHosts = [], jsonBody = null, { accept = 'application/json', text = false } = {}) {
   const requestSignal = AbortSignal.timeout(timeoutMs);
   const signal = deadlineSignal ? AbortSignal.any([requestSignal, deadlineSignal]) : requestSignal;
   const init = jsonBody === null
-    ? { method: 'GET', headers: { Accept: 'application/json' }, redirect: 'manual', signal }
-    : { method: 'POST', headers: { Accept: 'application/json', 'Content-Type': 'application/json' }, body: JSON.stringify(jsonBody), redirect: 'manual', signal };
+    ? { method: 'GET', headers: { Accept: accept }, redirect: 'manual', signal }
+    : { method: 'POST', headers: { Accept: accept, 'Content-Type': 'application/json' }, body: JSON.stringify(jsonBody), redirect: 'manual', signal };
   let response = await fetchImpl(url, init);
   if (!response) throw new Error('Open-media request returned no response');
   // Redirects stay manual, but a caller may name hosts it trusts as the
@@ -490,6 +521,7 @@ async function fetchBoundedJson(url, fetchImpl, maxBytes = OPEN_MEDIA_MAX_BYTES,
   }
   const buffer = await readBounded(response, maxBytes);
   if (!buffer) throw new Error('Open-media response could not be read within size limit');
+  if (text) return new TextDecoder().decode(buffer);
   try { return JSON.parse(new TextDecoder().decode(buffer)); } catch {
     throw new Error('Open-media response was not valid JSON');
   }
@@ -580,7 +612,11 @@ function cinemetaTitleYear(payload) {
   const yearText = String(meta.year || meta.released || meta.releaseInfo || '');
   const yearValue = Number((yearText.match(/\d{4}/) || [])[0]);
   const year = Number.isInteger(yearValue) && yearValue >= 1880 && yearValue <= 2200 ? yearValue : null;
-  return title && year ? { title, year } : null;
+  // Cinemeta lists anime under IMDb ids too; Japanese animation is treated as
+  // anime, which adds Nyaa and the dub preference.
+  const genres = Array.isArray(meta.genres) ? meta.genres.map(String) : [];
+  const anime = genres.includes('Animation') && /\bjapan\b/i.test(String(meta.country || ''));
+  return title && year ? { title, year, ...(anime ? { anime: true } : {}) } : null;
 }
 
 async function fetchInternetArchiveFromMeta(id, expected, fetchImpl, deadlineSignal) {
@@ -811,6 +847,37 @@ async function fetchCinemetaTitleYear(type, imdb, fetchImpl, deadlineSignal) {
   }
 }
 
+// Kitsu's record for an anime id: its English and romaji titles, start year
+// and season. Romaji first for searching, since most fansub groups use it.
+async function fetchKitsuMeta(kitsuId, fetchImpl, deadlineSignal) {
+  if (!sourceAllowed('kitsu')) return null;
+  try {
+    const payload = await fetchBoundedJson(`https://kitsu.io/api/edge/anime/${encodeURIComponent(kitsuId)}`, fetchImpl,
+      OPEN_MEDIA_MAX_BYTES, OPEN_MEDIA_TIMEOUT_MS, deadlineSignal, [], null, { accept: 'application/vnd.api+json' });
+    sourceSucceeded('kitsu');
+    const attributes = payload?.data?.attributes;
+    if (!attributes || typeof attributes !== 'object') return null;
+    const names = attributes.titles && typeof attributes.titles === 'object' ? attributes.titles : {};
+    const english = cleanText(names.en || names.en_us, 200);
+    const romaji = cleanText(names.en_jp || attributes.canonicalTitle, 200);
+    const titles = [...new Set([english, romaji, cleanText(attributes.canonicalTitle, 200)].filter(Boolean))];
+    if (!titles.length) return null;
+    const year = Number(String(attributes.startDate || '').slice(0, 4));
+    return {
+      title: english || titles[0],
+      romaji: romaji || titles[0],
+      titles,
+      year: Number.isInteger(year) && year >= 1900 ? year : null,
+      season: seasonOf(romaji || titles[0]),
+      anime: true,
+    };
+  } catch {
+    if (deadlineSignal.aborted) sourceDeadlineCancelled('kitsu');
+    else sourceFailed('kitsu');
+    return null;
+  }
+}
+
 async function fetchOpenMedia(type, id, fetchImpl, deadlineSignal, metaPromise) {
   if (type !== 'movie') return [];
   const imdb = id.split(':')[0].toLowerCase();
@@ -977,10 +1044,10 @@ function releaseLabel(text) {
   return height ? `${height}p` : 'Torrent';
 }
 
-async function fetchIndexer(sourceId, url, fetchImpl, deadlineSignal, report, toStreams, jsonBody = null) {
+async function fetchIndexer(sourceId, url, fetchImpl, deadlineSignal, report, toStreams, jsonBody = null, options = {}) {
   if (!sourceAllowed(sourceId)) { report[sourceId] = 'paused'; return []; }
   try {
-    const payload = await fetchBoundedJson(url, fetchImpl, INDEXER_MAX_BYTES, SOURCE_TIMEOUT_MS, deadlineSignal, [], jsonBody);
+    const payload = await fetchBoundedJson(url, fetchImpl, INDEXER_MAX_BYTES, SOURCE_TIMEOUT_MS, deadlineSignal, [], jsonBody, options);
     sourceSucceeded(sourceId);
     const streams = payload ? toStreams(payload).filter(Boolean).slice(0, MAX_STREAMS_PER_SOURCE) : [];
     report[sourceId] = `ok ${streams.length}`;
@@ -1176,6 +1243,60 @@ async function fetchKnaben(type, id, fetchImpl, deadlineSignal, report, metaProm
       }), body);
 }
 
+// --- Nyaa (anime) ------------------------------------------------------------
+// The main anime tracker, read through its RSS feed (English-translated anime,
+// sorted by seeders). Two searches run together: the romaji title, which most
+// fansub groups use, and the English title with dub|dual|multi, which is how
+// dub releases are named. Every hit must carry the title, the requested
+// season, and the episode (or be a batch that spans it).
+function nyaaUrl(query) {
+  return `https://nyaa.si/?page=rss&q=${encodeURIComponent(query)}&c=1_2&f=0&s=seeders&o=desc`;
+}
+
+async function fetchNyaa(type, id, fetchImpl, deadlineSignal, report, metaPromise, audioPreference) {
+  const meta = await metaPromise;
+  if (!meta?.anime) return [];
+  const kitsu = parseKitsuId(id);
+  const [, seasonText, episodeText] = id.split(':');
+  const episode = kitsu ? kitsu.episode : (type === 'series' ? Number(episodeText) : null);
+  const season = kitsu ? meta.season || 1 : (type === 'series' ? Number(seasonText) : 1);
+  const titles = meta.titles || [meta.title];
+  const token = episode === null ? '' : ` ${String(episode).padStart(2, '0')}`;
+  const toItems = (xml) => parseNyaaRss(typeof xml === 'string' ? xml : '')
+    .filter((item) => item.seeders > 0 && !item.remake);
+  const options = { accept: 'application/rss+xml, application/xml;q=0.9', text: true };
+  const searches = [fetchIndexer('nyaa', nyaaUrl(`${meta.romaji || meta.title}${token}`), fetchImpl, deadlineSignal, report, toItems, null, options)];
+  if (audioPreference !== 'sub') {
+    searches.push(fetchIndexer('nyaa-dub', nyaaUrl(`${meta.title}${token} (dub|dual|multi)`), fetchImpl, deadlineSignal, report, toItems, null, options));
+  }
+  const items = (await Promise.all(searches)).flat().sort((a, b) => b.seeders - a.seeders);
+  const seen = new Set();
+  const episodes = [];
+  const packs = [];
+  for (const item of items) {
+    if (seen.has(item.hash)) continue;
+    seen.add(item.hash);
+    const release = cleanText(item.title, 200);
+    const kind = classifyAnimeRelease(release, { titles, season, episode });
+    if (!kind) continue;
+    const stream = indexerStream('Nyaa', {
+      hash: item.hash,
+      label: releaseLabel(release),
+      release,
+      seeders: item.seeders,
+      sizeBytes: item.sizeBytes,
+      tracker: item.trusted ? 'Trusted' : '',
+      ...(kind === 'pack' ? { fileMustInclude: [animeEpisodeFilePattern(episode)] } : {}),
+    });
+    (kind === 'pack' ? packs : episodes).push(stream);
+  }
+  const streams = [...episodes, ...packs].filter(Boolean).slice(0, MAX_STREAMS_PER_SOURCE);
+  const ok = report.nyaa?.startsWith('ok') || report['nyaa-dub']?.startsWith('ok');
+  report.nyaa = ok ? `ok ${streams.length}` : (report.nyaa || report['nyaa-dub'] || 'failed');
+  delete report['nyaa-dub'];
+  return streams;
+}
+
 // --- TorBox (optional, owner's own account) --------------------------------
 // With TORBOX_API_KEY set as a Worker secret, every torrent result is checked
 // against TorBox's cache. Cached ones are offered first as HTTPS links to this
@@ -1235,22 +1356,32 @@ function chooseVideoFile(files, selector) {
     .filter((file) => VIDEO_FILE_RE.test(file.path) && !/(?:^|[\/ ._-])(?:sample|trailer|extras?|featurettes?)(?:[\/ ._-]|$)/i.test(file.path));
   if (!videos.length) return null;
   const bySize = (a, b) => Number(b.size || 0) - Number(a.size || 0);
-  if (selector.kind === 'episode') {
-    const match = episodeMatcher(selector.season, selector.episode);
-    const hits = videos.filter((file) => match.test(file.path)).sort(bySize);
-    if (hits.length) return hits[0];
+  if (selector.kind === 'episode' || selector.kind === 'anime') {
+    // Anime files are usually "Show - 05.mkv"; a first-season IMDb episode
+    // also accepts that naming, since anime packs rarely say "S01E05".
+    const matchers = selector.kind === 'anime'
+      ? [animeEpisodeRe(selector.episode)]
+      : [episodeMatcher(selector.season, selector.episode), ...(selector.season === 1 ? [animeEpisodeRe(selector.episode)] : [])];
+    for (const match of matchers) {
+      const hits = videos.filter((file) => match.test(file.path.split('/').pop())).sort(bySize);
+      if (hits.length) return hits[0];
+    }
     return videos.length === 1 ? videos[0] : null;
   }
   return videos.sort(bySize)[0];
 }
 
 function playSelector(type, id) {
+  const kitsu = parseKitsuId(id);
+  if (kitsu) return kitsu.episode === null ? 'movie' : `ep${kitsu.episode}`;
   const [, season, episode] = id.split(':');
   return type === 'series' ? `${Number(season)}x${Number(episode)}` : 'movie';
 }
 
 function parsePlaySelector(value) {
   if (value === 'movie') return { kind: 'movie' };
+  const anime = /^ep(\d{1,4})$/.exec(value || '');
+  if (anime) return { kind: 'anime', episode: Number(anime[1]) };
   const match = /^(\d{1,3})x(\d{1,4})$/.exec(value || '');
   return match ? { kind: 'episode', season: Number(match[1]), episode: Number(match[2]) } : null;
 }
@@ -1280,7 +1411,7 @@ async function torboxCachedHashes(hashes, key, fetchImpl, report) {
 
 // Swap cached torrents for TorBox HTTPS streams and put them first. The P2P
 // copy of a cached torrent is dropped: the TorBox one plays the same file faster.
-async function applyTorbox(streams, { key, origin, token, type, id, fetchImpl, report }) {
+async function applyTorbox(streams, { key, origin, token, type, id, fetchImpl, report, context = {} }) {
   const hashes = [...new Set(streams.filter((stream) => stream.infoHash).map((stream) => stream.infoHash))].slice(0, 100);
   const cached = await torboxCachedHashes(hashes, key, fetchImpl, report);
   if (!cached.size) return streams;
@@ -1313,7 +1444,7 @@ async function applyTorbox(streams, { key, origin, token, type, id, fetchImpl, r
       },
     }, { ...getStreamFacts(stream), cached: true, ...(filename ? { filename } : {}) }));
   }
-  instant.sort((a, b) => smartStreamScore(b) - smartStreamScore(a));
+  instant.sort((a, b) => smartStreamScore(b, context) - smartStreamScore(a, context));
   return [...instant, ...rest];
 }
 
@@ -1363,16 +1494,102 @@ async function handleTorboxPlay(request, env, route, headers, fetchImpl) {
   }
 }
 
+// --- Result shaping -----------------------------------------------------------
+const OPEN_MEDIA_NAMES = new Set(['Public Domain Movies', 'Internet Archive', 'Blender Open Movies', 'Library of Congress']);
+const isOpenMedia = (stream) => OPEN_MEDIA_NAMES.has(getStreamFacts(stream)?.source);
+const streamText = (stream) => [stream?.name, stream?.title, stream?.description, stream?.behaviorHints?.filename]
+  .filter((part) => typeof part === 'string').join(' ');
+
+// CAM/telesync/screener copies, 3D, AI upscales and samples are dropped as
+// AIOStreams drops them, but only while something better is left: a film
+// still in cinemas keeps its CAMs rather than showing an empty list.
+function dropJunk(streams) {
+  const junk = (stream) => !isOpenMedia(stream) && isJunkRelease(streamText(stream));
+  const kept = streams.filter((stream) => !junk(stream));
+  return kept.some((stream) => !isOpenMedia(stream)) ? kept : streams;
+}
+
+// At most `max` results per resolution (AIOStreams' result limits), so one
+// resolution cannot fill the list. Order is kept, so TorBox-cached and
+// best-ranked results are the ones that stay. Open media is never capped.
+function limitPerResolution(streams, max) {
+  if (!Number.isInteger(max) || max <= 0) return streams;
+  const counts = new Map();
+  return streams.filter((stream) => {
+    if (isOpenMedia(stream)) return true;
+    const key = resolutionLabel(inferredHeight(stream)) || 'unknown';
+    counts.set(key, (counts.get(key) || 0) + 1);
+    return counts.get(key) <= max;
+  });
+}
+
+// Add-ons sometimes answer an anime episode with another season's file
+// (TorrentsDB returned "S02E05" for Frieren's first season). For anime, a
+// result whose file names a different SxxEyy is dropped; packs that name no
+// episode are kept.
+function dropWrongEpisode(streams, season, episode) {
+  if (!Number.isInteger(season) || !Number.isInteger(episode)) return streams;
+  return streams.filter((stream) => {
+    // The file name is what will play; the release line may name a whole pack.
+    const pattern = /\bS(\d{1,2})E(\d{1,4})\b(?![-E]\d)/i;
+    const tagged = String(stream.behaviorHints?.filename || '').match(pattern) || streamText(stream).match(pattern);
+    return !tagged || (Number(tagged[1]) === season && Number(tagged[2]) === episode);
+  });
+}
+
+function envInteger(value, fallback, min, max) {
+  const number = Number(value);
+  return value !== undefined && value !== '' && Number.isInteger(number) && number >= min && number <= max ? number : fallback;
+}
+
+// Results stay for CORE_STREAMS_CACHE_SECONDS (default 600) in this isolate,
+// and in Cloudflare's cache where it works (a custom domain; on workers.dev
+// the Cache API does nothing). A response where a source failed or timed out
+// is kept for a minute only, so a passing outage does not stick.
+const responseCache = new Map();
+const RESPONSE_CACHE_MAX = 300;
+const PARTIAL_CACHE_SECONDS = 60;
+
+function cacheRequest(key) {
+  return new Request(`https://core-streams.cache/${encodeURIComponent(key)}`);
+}
+
+async function readCachedStreams(key) {
+  const memory = responseCache.get(key);
+  if (memory && memory.expires > Date.now()) return memory;
+  if (memory) responseCache.delete(key);
+  try {
+    if (typeof caches === 'undefined' || !caches.default) return null;
+    const hit = await caches.default.match(cacheRequest(key));
+    if (!hit) return null;
+    const entry = await hit.json();
+    if (!Array.isArray(entry?.streams) || !(entry.expires > Date.now())) return null;
+    responseCache.set(key, entry);
+    return entry;
+  } catch { return null; }
+}
+
+async function writeCachedStreams(key, entry, seconds) {
+  if (responseCache.size >= RESPONSE_CACHE_MAX) responseCache.delete(responseCache.keys().next().value);
+  responseCache.set(key, entry);
+  try {
+    if (typeof caches === 'undefined' || !caches.default) return;
+    await caches.default.put(cacheRequest(key), new Response(JSON.stringify(entry), {
+      headers: { 'Content-Type': 'application/json', 'Cache-Control': `max-age=${seconds}` },
+    }));
+  } catch { /* best effort */ }
+}
+
 function manifest() {
   return {
     id: 'uk.corebuilds.core-streams',
-    version: '0.11.0',
+    version: '0.12.0',
     name: 'Core Streams',
-    description: 'Quality-ranked streams with clean file details: torrent add-ons and public indexes (YTS, The Pirate Bay, EZTV, Knaben), instant TorBox playback when configured, open media, and configurable sources.',
+    description: 'Quality-ranked streams with clean file details: torrent add-ons and public indexes (YTS, The Pirate Bay, EZTV, Knaben, Nyaa for anime with dubs first), instant TorBox playback when configured, open media, and configurable sources.',
     resources: ['stream'],
-    types: ['movie', 'series'],
+    types: ['movie', 'series', 'anime'],
     catalogs: [],
-    idPrefixes: ['tt'],
+    idPrefixes: ['tt', 'kitsu'],
   };
 }
 
@@ -1412,19 +1629,40 @@ export async function handleCoreStreams(request, env, { headers = {}, rateLimit 
 
   if (!(await rateLimit())) return jsonResponse(429, { streams: [], error: 'rate limit exceeded' }, headers);
 
-  const sources = SOURCES.filter((source) => !source.types || source.types.includes(route.type));
+  const normalizedId = route.id.toLowerCase();
+  const kitsu = parseKitsuId(normalizedId);
+  const torbox = torboxKey(env);
+  const audio = ['dub', 'sub', 'any'].includes(env.CORE_STREAMS_ANIME_AUDIO) ? env.CORE_STREAMS_ANIME_AUDIO : 'dub';
+  const maxPerResolution = envInteger(env.CORE_STREAMS_MAX_PER_RESOLUTION, 8, 0, 80);
+  const cacheSeconds = envInteger(env.CORE_STREAMS_CACHE_SECONDS, 600, 0, 3600);
+  // The token is part of the key because TorBox links carry it.
+  const cacheKey = [route.token, route.type, normalizedId, torbox ? 'torbox' : 'p2p', audio, maxPerResolution].join('|');
+  if (cacheSeconds > 0) {
+    const cached = await readCachedStreams(cacheKey);
+    if (cached) {
+      return jsonResponse(200, { streams: cached.streams }, {
+        ...headers, 'X-Core-Streams-Sources': cached.sources, 'X-Core-Streams-Cache': 'hit',
+      });
+    }
+  }
+
+  // Kitsu ids go to the add-ons that understand them (Torrentio, TorrentsDB,
+  // a configured add-on) and to Nyaa; the IMDb-keyed indexes and open media
+  // have nothing to look up.
+  const sources = SOURCES.filter((source) => (!source.types || source.types.includes(route.type))
+    && !(kitsu && source.id === 'public-domain-movies'));
   const httpBase = configuredAddonBase(env.CORE_STREAMS_HTTP_SOURCE_MANIFEST);
   if (httpBase && !sources.some((source) => source.base === httpBase)) {
     sources.push({ id: 'http-source', name: 'HTTP source', base: httpBase });
   }
 
-  const normalizedId = route.id.toLowerCase();
   const imdb = normalizedId.split(':')[0];
   const deadlineSignal = AbortSignal.timeout(SOURCE_TIMEOUT_MS);
-  const metaPromise = fetchCinemetaTitleYear(route.type, imdb, fetchImpl, deadlineSignal);
+  const metaPromise = kitsu
+    ? fetchKitsuMeta(kitsu.kitsuId, fetchImpl, deadlineSignal)
+    : fetchCinemetaTitleYear(route.type, imdb, fetchImpl, deadlineSignal);
   const report = {};
-  const responses = await Promise.all([
-    ...sources.map((source) => fetchSource(source, route.type, normalizedId, fetchImpl, report)),
+  const imdbIndexes = kitsu ? [] : [
     fetchYts(route.type, normalizedId, fetchImpl, deadlineSignal, report),
     fetchPirateBay(route.type, normalizedId, fetchImpl, deadlineSignal, report, metaPromise),
     fetchEztv(route.type, normalizedId, fetchImpl, deadlineSignal, report, metaPromise),
@@ -1433,15 +1671,22 @@ export async function handleCoreStreams(request, env, { headers = {}, rateLimit 
       if (route.type === 'movie') report['open-media'] = `ok ${streams.length}`;
       return streams;
     }),
+  ];
+  const responses = await Promise.all([
+    ...sources.map((source) => fetchSource(source, route.type, normalizedId, fetchImpl, report)),
+    ...imdbIndexes,
+    fetchNyaa(route.type, normalizedId, fetchImpl, deadlineSignal, report, metaPromise, audio),
   ]);
+  const meta = await metaPromise;
+  const context = { anime: Boolean(meta?.anime), audio };
   // Rank within each provider, then interleave providers before de-duplicating.
   // This stops an early high-volume source from consuming the result cap and
   // hiding every later provider or the curated open-media matches.
   const seen = new Set();
   const bareHashes = new Set();
   const anyHashes = new Set();
-  const streams = [];
-  for (const stream of interleaveStreamGroups(responses)) {
+  const unique = [];
+  for (const stream of interleaveStreamGroups(responses, context)) {
     const key = dedupeKey(stream);
     if (seen.has(key)) continue;
     // Indexers return a hash with no fileIdx; add-ons return the same torrent
@@ -1452,23 +1697,52 @@ export async function handleCoreStreams(request, env, { headers = {}, rateLimit 
       if (stream.fileIdx === undefined) bareHashes.add(stream.infoHash);
     }
     seen.add(key);
-    streams.push(stream);
-    if (streams.length >= MAX_STREAMS_TOTAL) break;
+    unique.push(stream);
   }
-  const key = torboxKey(env);
-  const finalStreams = key
-    ? (await applyTorbox(streams, {
-      key, origin: requestUrl.origin, token: route.token, type: route.type, id: normalizedId, fetchImpl, report,
-    })).slice(0, MAX_STREAMS_TOTAL)
+  // Junk goes first so it never takes a slot. The pool is taken from the
+  // interleaved order, so every provider gets into it, then sorted by score as
+  // AIOStreams sorts: best first whichever provider found it. The TorBox check
+  // sees up to 100 hashes, and the per-resolution cap runs after it so cached
+  // results count first.
+  let pool = dropJunk(unique);
+  if (context.anime && route.type !== 'movie') {
+    const [, seasonText, episodeText] = normalizedId.split(':');
+    pool = kitsu
+      ? dropWrongEpisode(pool, meta?.season || 1, kitsu.episode)
+      : dropWrongEpisode(pool, Number(seasonText), Number(episodeText));
+  }
+  const streams = pool.slice(0, MAX_STREAMS_TOTAL + 40)
+    .map((stream, index) => ({ stream, index, score: smartStreamScore(stream, context) }))
+    .sort((a, b) => b.score - a.score || a.index - b.index)
+    .map(({ stream }) => stream);
+  const ranked = torbox
+    ? await applyTorbox(streams, {
+      key: torbox, origin: requestUrl.origin, token: route.token, type: route.type, id: normalizedId, fetchImpl, report, context,
+    })
     : streams;
+  // Open media is curated and rights-checked, and it is all an HTTPS-only
+  // player such as WuPlay can use, so it always keeps its place in the 80.
+  const capped = limitPerResolution(ranked, maxPerResolution);
+  const openCount = capped.filter(isOpenMedia).length;
+  let others = 0;
+  const finalStreams = capped.filter((stream) => isOpenMedia(stream) || ++others <= MAX_STREAMS_TOTAL - openCount);
   const cards = finalStreams.map((stream) => formatStream(stream, { inferHeight: inferredHeight, inferSeeders: inferredSeeders }));
   // Per-source outcome, so an empty list can be explained from the outside
   // (curl -I the stream URL). Source names and status only: no ids or URLs.
   const sourceStatus = Object.entries(report).map(([id, status]) => `${id}=${status}`).join('; ');
-  return jsonResponse(200, { streams: cards }, { ...headers, 'X-Core-Streams-Sources': sourceStatus });
+  if (cacheSeconds > 0 && cards.length) {
+    const partial = Object.values(report).some((status) => !/^(?:ok|cached|skipped)/.test(status));
+    const seconds = partial ? Math.min(cacheSeconds, PARTIAL_CACHE_SECONDS) : cacheSeconds;
+    await writeCachedStreams(cacheKey, { streams: cards, sources: sourceStatus, expires: Date.now() + seconds * 1000 }, seconds);
+  }
+  return jsonResponse(200, { streams: cards }, { ...headers, 'X-Core-Streams-Sources': sourceStatus, 'X-Core-Streams-Cache': 'miss' });
 }
 
 export const _coreStreamsTest = {
+  dropJunk,
+  limitPerResolution,
+  classifyAnimeRelease,
+  resetResponseCache: () => responseCache.clear(),
   formatStream: (stream) => formatStream(stream, { inferHeight: inferredHeight, inferSeeders: inferredSeeders }),
   parseRelease: (text) => parseRelease(text, inferredHeight),
   indexerStream,
