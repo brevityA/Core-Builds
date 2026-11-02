@@ -126,10 +126,25 @@ Movie/episode lookups are rate-limited using the existing `RL_PROXY_CUSTOM` lane
 **TorBox (optional, your own account).** Set `TORBOX_API_KEY` as a Worker secret (dashboard: Workers & Pages → `core-builds-cors-proxy` → Settings → Variables and Secrets, type *Secret*; or `npx wrangler secret put TORBOX_API_KEY`). Not a GitHub secret: the deploy workflow does not forward it, and Worker secrets survive deploys. With it set:
 
 - After the sources answer, one `GET /torrents/checkcached` (up to 100 hashes, 3-second timeout) asks which torrents TorBox already has.
-- Each cached torrent is offered first as `TorBox ⚡ · 1080p`, an HTTPS link to `/core-streams/:token/play/:hash/{movie|SxE}` on this Worker, and its P2P copy is dropped. A cached season pack that lacks the requested episode stays a P2P result. These links play in HTTPS-only clients such as WuPlay.
+- Each cached torrent is offered first as a `⚡ TorBox` card, an HTTPS link to `/core-streams/:token/play/:hash/{movie|SxE}` on this Worker, and its P2P copy is dropped. A cached season pack that lacks the requested episode stays a P2P result. These links play in HTTPS-only clients such as WuPlay.
 - `/play` (GET or HEAD, same token and rate limit) adds the torrent (`createtorrent`, instant when cached), reads its file list (`mylist`), picks the requested episode or the largest video (never samples or extras), asks for a link (`requestdl`, `redirect=false`, with the viewer's IP so TorBox can pick a nearby CDN) and answers **302** to TorBox's CDN. The torrent id is remembered per isolate, so seeks and HEAD probes skip the add.
 - The key is only ever sent to `api.torbox.app`. It never appears in a stream URL, a response body or the status header; TorBox errors come back as their code (e.g. `TorBox: ACTIVE_LIMIT`). No media passes through the Worker.
 - Without the secret nothing is sent to TorBox and `/play` answers 404. Personal use only: the play links carry the install token, and every play counts against your TorBox account.
+
+**Stream cards.** Every torrent, TorBox and configured-add-on result gets the same clean card, built by `core-streams-format.js` from the release name the way AIOStreams parses one:
+
+```text
+⚡ TorBox    🎞 BluRay REMUX · HEVC · DV · HDR10
+4K          🔊 TrueHD · Atmos · 7.1 · 🌐 🇬🇧 🇫🇷
+            📦 58.20 GB · 👤 312 · 🔎 Torrentio · 1337x
+            🏷 FraMeSToR · Extended · REPACK
+            📄 The.Matrix.1999.2160p.UHD.BluRay.REMUX.DV.HDR10.HEVC.TrueHD.7.1.Atmos-FraMeSToR.mkv
+```
+
+- The name column is the way it plays (`⚡ TorBox`, `🧲 P2P`, `🌐 Direct`) over the resolution. Lines with nothing to say are left out; seeders are hidden on TorBox cards, where they no longer matter.
+- Parsed: resolution, source (REMUX, BluRay, WEB-DL, WEBRip, HDTV, DVD, CAM/TS/TC/SCR), codec, DV/HDR10+/HDR10/HLG/10-bit, audio codec and channels, languages (a provider's flags first), release group, edition and REPACK. A season pack is labelled. Tags are what the release name claims, not checked against the file.
+- `bingeGroup` is `core-streams|service|resolution|source|codec|HDR|group`, so autoplay of the next episode stays on the same kind of release, as AIOStreams' binge groups do.
+- Open-media cards (Public Domain Movies, Internet Archive, Blender, Library of Congress) keep their rights notices word for word, and YouTube results keep the provider's card.
 
 Every stream response carries `X-Core-Streams-Sources`, e.g. `torrentio=http 403; tpb=ok 12; yts=ok 3`, so an empty list can be explained with `curl -sI` on a stream URL. It names sources and outcomes only, never IDs, URLs or the token. Outcomes are `ok N`, `http NNN`, `timeout`, `network error`, or `paused` (breaker open).
 

@@ -1,6 +1,7 @@
 // Core Streams: a small Stremio-compatible stream aggregator running on the
 // existing Cloudflare Worker. It uses fixed add-on endpoints and narrowly
 // allowlisted open-media APIs; it never scrapes arbitrary URLs or relays media.
+import { formatStream, getStreamFacts, parseRelease, setStreamFacts } from './core-streams-format.js';
 
 const SOURCES = [
   { id: 'torrentio', name: 'Torrentio', base: 'https://torrentio.strem.fun' },
@@ -268,7 +269,12 @@ function normalizeStream(stream, sourceName) {
     if (filename) hints.filename = filename;
   }
   if (Object.keys(hints).length) normalized.behaviorHints = hints;
-  return normalized;
+  return setStreamFacts(normalized, {
+    source: sourceName,
+    label: name,
+    release: String(title || description || '').split('\n')[0],
+    pack: Boolean(normalized.fileMustInclude),
+  });
 }
 
 function dedupeKey(stream) {
@@ -918,7 +924,7 @@ function formatBytes(bytes) {
 
 // Build a raw Stremio torrent stream, then run it through normalizeStream so
 // indexer results get exactly the validation add-on results get.
-function indexerStream(sourceName, { hash, label, release, seeders, sizeBytes, filename, fileMustInclude }) {
+function indexerStream(sourceName, { hash, label, release, seeders, sizeBytes, filename, fileMustInclude, tracker }) {
   if (typeof hash !== 'string' || !INFO_HASH_RE.test(hash)) return null;
   const infoHash = hash.toLowerCase();
   const seeds = Number(seeders);
@@ -927,7 +933,7 @@ function indexerStream(sourceName, { hash, label, release, seeders, sizeBytes, f
     Number.isFinite(seeds) && seeds >= 0 ? `👤 ${Math.floor(seeds)}` : '',
     formatBytes(size) ? `💾 ${formatBytes(size)}` : '',
   ].filter(Boolean).join(' ');
-  return normalizeStream({
+  const stream = normalizeStream({
     infoHash,
     name: label || 'Torrent',
     title: [release, stats].filter(Boolean).join('\n'),
@@ -939,6 +945,10 @@ function indexerStream(sourceName, { hash, label, release, seeders, sizeBytes, f
       ...(Number.isSafeInteger(size) && size > 0 ? { videoSize: size } : {}),
     },
   }, sourceName);
+  return setStreamFacts(stream, {
+    ...(Number.isFinite(seeds) && seeds >= 0 ? { seeders: Math.floor(seeds) } : {}),
+    ...(tracker ? { tracker } : {}),
+  });
 }
 
 // Matches a single-episode release name ("S01E01", "s1e1", "1x01") but not a
@@ -1158,7 +1168,8 @@ async function fetchKnaben(type, id, fetchImpl, deadlineSignal, report, metaProm
         return indexerStream('Knaben', {
           hash: hit.hash,
           label: releaseLabel(release),
-          release: tracker ? `${release} · ${tracker}` : release,
+          release,
+          tracker,
           seeders: hit.seeders,
           sizeBytes: hit.bytes,
         });
@@ -1288,7 +1299,7 @@ async function applyTorbox(streams, { key, origin, token, type, id, fetchImpl, r
     const [source, label] = String(stream.name).split(' · ');
     const filename = file ? cleanText(String(file.path).split('/').pop(), 255) : '';
     const size = Number(file?.size);
-    instant.push({
+    instant.push(setStreamFacts({
       url: `${origin}/core-streams/${token}/play/${stream.infoHash}/${selector}`,
       name: `TorBox ⚡ · ${label || source}`,
       ...(stream.title ? { title: `${stream.title}\nCached on TorBox · via ${source}` } : {}),
@@ -1300,7 +1311,7 @@ async function applyTorbox(streams, { key, origin, token, type, id, fetchImpl, r
         // Stremio's web player only handles MP4/WebM natively.
         ...(!/\.(?:mp4|webm)$/i.test(filename) ? { notWebReady: true } : {}),
       },
-    });
+    }, { ...getStreamFacts(stream), cached: true, ...(filename ? { filename } : {}) }));
   }
   instant.sort((a, b) => smartStreamScore(b) - smartStreamScore(a));
   return [...instant, ...rest];
@@ -1355,9 +1366,9 @@ async function handleTorboxPlay(request, env, route, headers, fetchImpl) {
 function manifest() {
   return {
     id: 'uk.corebuilds.core-streams',
-    version: '0.10.0',
+    version: '0.11.0',
     name: 'Core Streams',
-    description: 'Quality-ranked streams: torrent add-ons and public indexes (YTS, The Pirate Bay, EZTV, Knaben), instant TorBox playback when configured, open media, and configurable sources.',
+    description: 'Quality-ranked streams with clean file details: torrent add-ons and public indexes (YTS, The Pirate Bay, EZTV, Knaben), instant TorBox playback when configured, open media, and configurable sources.',
     resources: ['stream'],
     types: ['movie', 'series'],
     catalogs: [],
@@ -1450,13 +1461,17 @@ export async function handleCoreStreams(request, env, { headers = {}, rateLimit 
       key, origin: requestUrl.origin, token: route.token, type: route.type, id: normalizedId, fetchImpl, report,
     })).slice(0, MAX_STREAMS_TOTAL)
     : streams;
+  const cards = finalStreams.map((stream) => formatStream(stream, { inferHeight: inferredHeight, inferSeeders: inferredSeeders }));
   // Per-source outcome, so an empty list can be explained from the outside
   // (curl -I the stream URL). Source names and status only: no ids or URLs.
   const sourceStatus = Object.entries(report).map(([id, status]) => `${id}=${status}`).join('; ');
-  return jsonResponse(200, { streams: finalStreams }, { ...headers, 'X-Core-Streams-Sources': sourceStatus });
+  return jsonResponse(200, { streams: cards }, { ...headers, 'X-Core-Streams-Sources': sourceStatus });
 }
 
 export const _coreStreamsTest = {
+  formatStream: (stream) => formatStream(stream, { inferHeight: inferredHeight, inferSeeders: inferredSeeders }),
+  parseRelease: (text) => parseRelease(text, inferredHeight),
+  indexerStream,
   chooseVideoFile,
   movieTitleMatches,
   parsePlaySelector,
