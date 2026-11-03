@@ -173,7 +173,7 @@ These are best-effort per-isolate controls, not global guarantees. `.mp4` does n
 
 ### Repeat-lookup speed and ranking (0.12.0)
 
-Stream lists are cached only inside the current Worker isolate: 64 entries / 4 MiB, 90 seconds for complete responses and 15 seconds when any source failed or timed out. Empty responses are never cached. Simultaneous requests for the same title share one in-flight provider fan-out. The cache key is a SHA-256 hash of the origin, install token, media id, TorBox key, configured source manifest and result-cap setting; raw tokens and keys are never cache keys, and nothing is written to the shared Cloudflare Cache API. Responses still send `Cache-Control: no-store`.
+Stream lists are cached only inside the current Worker isolate: 64 entries / 4 MiB, by default 90 seconds for complete responses and the lower of the configured TTL or 15 seconds when any source failed or timed out. `CORE_STREAMS_CACHE_SECONDS=0` disables the cache; empty responses are never cached. Simultaneous requests for the same title share one in-flight provider fan-out. Request-wide deadline cancellations do not count against provider breakers, and Archive lookup runs concurrently with the independent Blender chain once Cinemeta metadata is ready. The cache key is a SHA-256 hash of the origin, install token, media id, TorBox key, configured source manifest and result-cap setting; raw tokens and keys are never cache keys, and nothing is written to the shared Cloudflare Cache API. Responses still send `Cache-Control: no-store`.
 
 Optional Worker variables:
 

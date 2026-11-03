@@ -1068,6 +1068,13 @@ test('series: The Pirate Bay returns single episodes first, then season packs th
     'the episode, then the season 2 pack; not season 3, an episode range, another show or another episode');
   assert.equal(tpb[0].fileMustInclude, undefined);
   assert.deepEqual(tpb[1].fileMustInclude, [_coreStreamsTest.episodeFilePattern(2, 1)]);
+  const packPattern = new RegExp(tpb[1].fileMustInclude[0]);
+  for (const filename of ['The.Office.US.S02E01.mkv', 'The Office US 2x01.mp4', 'Season 2/The.Office.US.S02E01-E02.mkv']) {
+    assert.ok(packPattern.test(filename), filename);
+  }
+  for (const filename of ['The.Office.US.S02E02.mkv', 'The.Office.US.2x02.mp4', 'The.Office.US.S02E10.mkv']) {
+    assert.ok(!packPattern.test(filename), filename);
+  }
   assert.match(response.headers.get('X-Core-Streams-Sources'), /tpb=ok 2/);
   assert.ok(!response.headers.get('X-Core-Streams-Sources').includes('tpb-search'));
   _coreStreamsTest.resetSourceHealth();

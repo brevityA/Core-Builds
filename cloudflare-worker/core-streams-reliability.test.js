@@ -260,3 +260,132 @@ test('TorBox opens NxN episode files and multipart episode files inside a pack',
   const selected = _coreStreamsTest.chooseVideoFile(files, _coreStreamsTest.parsePlaySelector('2x1'));
   assert.equal(selected.id, 2);
 });
+
+test('a shared TorBox add outlives its first viewer and keeps the next viewer on the same add', async () => {
+  const gate = deferred();
+  const started = deferred();
+  let addSignal;
+  let creates = 0;
+  const fetchImpl = async (_input, init = {}) => {
+    creates++;
+    addSignal = init.signal;
+    started.resolve();
+    await gate.promise;
+    return json({ success: true, data: { torrent_id: 42 } });
+  };
+  const firstViewer = new AbortController();
+  const secondViewer = new AbortController();
+  const first = _coreStreamsTest.ensureTorboxTorrent(HASH, KEY, fetchImpl, firstViewer.signal);
+  await started.promise;
+  const second = _coreStreamsTest.ensureTorboxTorrent(HASH, KEY, fetchImpl, secondViewer.signal);
+  firstViewer.abort(Object.assign(new Error('first viewer timed out'), { name: 'TimeoutError' }));
+  await assert.rejects(first, /first viewer timed out/);
+  assert.equal(creates, 1);
+  assert.equal(addSignal.aborted, false, 'the shared add is not owned by the first viewer');
+  gate.resolve();
+  assert.deepEqual(await second, { id: 42, cached: false });
+  assert.equal(creates, 1);
+});
+
+test('a joined viewer whose deadline is still live replaces an aborted shared add once, and other waiters join that replacement', async () => {
+  const firstGate = deferred();
+  const firstStarted = deferred();
+  const replacementStarted = deferred();
+  let creates = 0;
+  const fetchImpl = async () => {
+    creates++;
+    if (creates === 1) {
+      firstStarted.resolve();
+      await firstGate.promise;
+      throw Object.assign(new Error('shared add timed out'), { name: 'TimeoutError' });
+    }
+    replacementStarted.resolve();
+    return json({ success: true, data: { torrent_id: 43 } });
+  };
+  const ownerViewer = new AbortController();
+  const joinedViewer = new AbortController();
+  const otherViewer = new AbortController();
+  const owner = _coreStreamsTest.ensureTorboxTorrent(HASH, KEY, fetchImpl, ownerViewer.signal);
+  await firstStarted.promise;
+  const joined = _coreStreamsTest.ensureTorboxTorrent(HASH, KEY, fetchImpl, joinedViewer.signal);
+  const other = _coreStreamsTest.ensureTorboxTorrent(HASH, KEY, fetchImpl, otherViewer.signal);
+  firstGate.resolve();
+  const [ownerResult, joinedResult, otherResult] = await Promise.allSettled([owner, joined, other]);
+  assert.equal(ownerResult.status, 'rejected', 'the original add still reports its own failure');
+  assert.equal(joinedResult.status, 'fulfilled');
+  assert.equal(otherResult.status, 'fulfilled');
+  assert.deepEqual(joinedResult.value, { id: 43, cached: false });
+  assert.deepEqual(otherResult.value, { id: 43, cached: false });
+  assert.equal(creates, 2, 'waiters coalesce behind one replacement');
+  assert.equal(joinedViewer.signal.aborted, false);
+  assert.equal(otherViewer.signal.aborted, false);
+  await replacementStarted.promise;
+});
+
+test('a viewer whose own deadline aborts does not start a replacement TorBox add', async () => {
+  const gate = deferred();
+  const started = deferred();
+  let creates = 0;
+  const fetchImpl = async () => {
+    creates++;
+    started.resolve();
+    await gate.promise;
+    return json({ success: true, data: { torrent_id: 42 } });
+  };
+  const ownerViewer = new AbortController();
+  const joinedViewer = new AbortController();
+  const owner = _coreStreamsTest.ensureTorboxTorrent(HASH, KEY, fetchImpl, ownerViewer.signal);
+  await started.promise;
+  const joined = _coreStreamsTest.ensureTorboxTorrent(HASH, KEY, fetchImpl, joinedViewer.signal);
+  joinedViewer.abort(Object.assign(new Error('viewer timed out'), { name: 'TimeoutError' }));
+  await assert.rejects(joined, /viewer timed out/);
+  assert.equal(creates, 1);
+  gate.resolve();
+  assert.deepEqual(await owner, { id: 42, cached: false });
+  assert.equal(creates, 1);
+});
+
+test('a joined viewer gets at most one replacement when the shared TorBox add keeps timing out', async () => {
+  let creates = 0;
+  const fetchImpl = async () => {
+    creates++;
+    throw Object.assign(new Error('shared add timed out'), { name: 'TimeoutError' });
+  };
+  const ownerViewer = new AbortController();
+  const joinedViewer = new AbortController();
+  const owner = _coreStreamsTest.ensureTorboxTorrent(HASH, KEY, fetchImpl, ownerViewer.signal);
+  // Let the first add settle before the second viewer joins, so the second
+  // viewer exercises the replacement path rather than the initial add.
+  await assert.rejects(owner, /shared add timed out/);
+  await assert.rejects(
+    _coreStreamsTest.ensureTorboxTorrent(HASH, KEY, fetchImpl, joinedViewer.signal),
+    /shared add timed out/,
+  );
+  assert.equal(creates, 2, 'one initial add and one replacement, not an unbounded retry loop');
+  assert.equal(joinedViewer.signal.aborted, false);
+});
+
+test('replacement TorBox adds are bounded even when the replacement also aborts', async () => {
+  const firstGate = deferred();
+  const firstStarted = deferred();
+  let creates = 0;
+  const fetchImpl = async () => {
+    creates++;
+    if (creates === 1) {
+      firstStarted.resolve();
+      await firstGate.promise;
+    }
+    throw Object.assign(new Error('shared add timed out'), { name: 'TimeoutError' });
+  };
+  const ownerViewer = new AbortController();
+  const joinedViewer = new AbortController();
+  const owner = _coreStreamsTest.ensureTorboxTorrent(HASH, KEY, fetchImpl, ownerViewer.signal);
+  await firstStarted.promise;
+  const joined = _coreStreamsTest.ensureTorboxTorrent(HASH, KEY, fetchImpl, joinedViewer.signal);
+  firstGate.resolve();
+  const [ownerResult, joinedResult] = await Promise.allSettled([owner, joined]);
+  assert.equal(ownerResult.status, 'rejected');
+  assert.equal(joinedResult.status, 'rejected');
+  assert.equal(creates, 2, 'the replacement is not retried again');
+  assert.equal(joinedViewer.signal.aborted, false);
+});

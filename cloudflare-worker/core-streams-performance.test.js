@@ -15,6 +15,12 @@ const json = (data, status = 200) => new Response(JSON.stringify(data), {
 const request = (id = 'tt0133093', origin = 'https://worker.example') =>
   new Request(`${origin}/core-streams/${TOKEN}/stream/movie/${id}.json`);
 
+function deferred() {
+  let resolve;
+  const promise = new Promise((done) => { resolve = done; });
+  return { promise, resolve };
+}
+
 beforeEach(() => {
   _coreStreamsTest.resetCinemetaCache();
   _coreStreamsTest.resetResponseCache();
@@ -220,4 +226,77 @@ test('rotating the TorBox key or changing the request origin misses the handler 
   assert.equal(rotated.headers.get('X-Core-Streams-Cache'), 'miss');
   const otherOrigin = await handleCoreStreams(request('tt0133093', 'https://other.example'), env({ TORBOX_API_KEY: KEY_B }), { fetchImpl });
   assert.equal(otherOrigin.headers.get('X-Core-Streams-Cache'), 'miss');
+});
+
+test('a request-wide deadline does not count fixed-source cancellations against provider health', async () => {
+  const source = { id: 'torrentio', name: 'Torrentio', base: 'https://torrentio.strem.fun' };
+  let calls = 0;
+  const fetchImpl = async (_url, init) => {
+    calls++;
+    if (init.signal.aborted) throw init.signal.reason;
+    return json({ streams: [{ infoHash: 'a'.repeat(40), name: '1080p' }] });
+  };
+  for (let i = 0; i < 3; i++) {
+    const deadline = new AbortController();
+    deadline.abort(Object.assign(new Error('request budget expired'), { name: 'TimeoutError' }));
+    const report = {};
+    const streams = await _coreStreamsTest.fetchSource(source, 'movie', 'tt0133093', fetchImpl, report, deadline.signal);
+    assert.deepEqual(streams, []);
+    assert.equal(report.torrentio, 'timeout');
+  }
+  const report = {};
+  const recovered = await _coreStreamsTest.fetchSource(source, 'movie', 'tt0133093', fetchImpl, report, AbortSignal.timeout(1000));
+  assert.equal(recovered.length, 1, 'three queued deadline cancellations did not open the breaker');
+  assert.equal(report.torrentio, 'ok 1');
+  assert.equal(calls, 4);
+});
+
+test('queued header waits are cancelled by their own signal without consuming a connection slot', async () => {
+  const gate = deferred();
+  let started = 0;
+  const limited = createHeaderLimiter(async () => {
+    started++;
+    await gate.promise;
+    return json({ ok: true });
+  }, 1);
+  const active = limited('https://active.example', { signal: AbortSignal.timeout(1000) });
+  const deadline = new AbortController();
+  const queued = limited('https://queued.example', { signal: deadline.signal });
+  assert.equal(started, 1);
+  deadline.abort(Object.assign(new Error('request budget expired'), { name: 'TimeoutError' }));
+  await assert.rejects(queued, /request budget expired/);
+  assert.equal(started, 1);
+  gate.resolve();
+  await active;
+  const next = await limited('https://next.example', { signal: AbortSignal.timeout(1000) });
+  assert.equal(next.status, 200);
+  assert.equal(started, 2);
+});
+
+test('Archive starts as soon as Cinemeta is ready instead of waiting for Blender', async () => {
+  const blenderGate = deferred();
+  let archiveStarted = false;
+  let blenderStarted = false;
+  const fetchImpl = async (input) => {
+    const url = String(input);
+    if (url.startsWith('https://video.blender.org/')) {
+      blenderStarted = true;
+      await blenderGate.promise;
+      return json({ data: [] });
+    }
+    if (url.startsWith('https://archive.org/advancedsearch.php')) {
+      archiveStarted = true;
+      return json({ response: { docs: [] } });
+    }
+    return json({});
+  };
+  const result = _coreStreamsTest.fetchOpenMedia(
+    'movie', 'tt1254207', fetchImpl, AbortSignal.timeout(1000),
+    Promise.resolve({ title: 'Big Buck Bunny', year: 2008 }),
+  );
+  await new Promise((resolve) => setImmediate(resolve));
+  assert.equal(blenderStarted, true);
+  assert.equal(archiveStarted, true, 'Archive is not serialized behind the Blender chain');
+  blenderGate.resolve();
+  assert.deepEqual(await result, []);
 });

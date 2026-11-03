@@ -3,7 +3,7 @@
 // allowlisted open-media APIs; it never scrapes arbitrary URLs or relays media.
 import {
   createResponseCache, createHeaderLimiter, responseCacheKey, envInteger,
-  RESPONSE_CACHE_DEFAULT_SECONDS,
+  awaitWithSignal, abortError, RESPONSE_CACHE_DEFAULT_SECONDS,
 } from './core-streams-performance.js';
 
 const responseCache = createResponseCache();
@@ -900,16 +900,28 @@ async function fetchOpenMedia(type, id, fetchImpl, deadlineSignal, metaPromise) 
     : Promise.resolve([]);
 
   const expected = await metaPromise;
-  const blenderStreams = await blenderPromise;
-  if (!expected) return [...locStreams, ...blenderStreams];
-  const archiveStreams = await fetchInternetArchiveFromMeta(imdb, expected, fetchImpl, deadlineSignal);
+  // Archive only needs Cinemeta, not Blender. Start it as soon as the title is
+  // known and let the two independent open-media chains run concurrently.
+  const archivePromise = expected
+    ? fetchInternetArchiveFromMeta(imdb, expected, fetchImpl, deadlineSignal)
+    : Promise.resolve([]);
+  const [archiveStreams, blenderStreams] = await Promise.all([archivePromise, blenderPromise]);
   return [...locStreams, ...archiveStreams, ...blenderStreams];
 }
 
 async function fetchSource(source, type, id, fetchImpl, report = {}, deadlineSignal = null) {
   if (!sourceAllowed(source.id)) { report[source.id] = 'paused'; return []; }
   const url = sourceRequestUrl(source.base, type, id);
-  const fail = (reason) => { report[source.id] = reason; sourceFailed(source.id); return []; };
+  const fail = (reason) => {
+    if (deadlineSignal?.aborted) {
+      sourceDeadlineCancelled(source.id);
+      report[source.id] = 'timeout';
+      return [];
+    }
+    report[source.id] = reason;
+    sourceFailed(source.id);
+    return [];
+  };
   try {
     const requestSignal = AbortSignal.timeout(SOURCE_TIMEOUT_MS);
     const response = await fetchImpl(url, {
@@ -937,7 +949,14 @@ async function fetchSource(source, type, id, fetchImpl, report = {}, deadlineSig
       return fail('too large');
     }
     const buffer = await readBounded(response, MAX_SOURCE_RESPONSE_BYTES);
-    if (!buffer) return fail('too large');
+    if (!buffer) {
+      if (deadlineSignal?.aborted) {
+        sourceDeadlineCancelled(source.id);
+        report[source.id] = 'timeout';
+        return [];
+      }
+      return fail('too large');
+    }
     let payload;
     try { payload = JSON.parse(new TextDecoder().decode(buffer)); } catch {
       return fail('not json');
@@ -959,6 +978,14 @@ async function fetchSource(source, type, id, fetchImpl, report = {}, deadlineSig
     report[source.id] = `ok ${streams.length}`;
     return streams;
   } catch (error) {
+    // A request-wide budget expiry (including time spent in the header-wait
+    // queue) says nothing about this provider's health. Only actual provider
+    // failures/timeouts count toward the isolate-local breaker.
+    if (deadlineSignal?.aborted) {
+      sourceDeadlineCancelled(source.id);
+      report[source.id] = 'timeout';
+      return [];
+    }
     // Providers are independent: one outage or timeout must not erase results
     // returned by the other configured providers. An isolate-local breaker also
     // stops repeatedly waiting on a provider that has failed three times.
@@ -1270,24 +1297,47 @@ function torboxIdCache(key) {
 
 async function ensureTorboxTorrent(hash, key, fetchImpl, signal) {
   const cache = torboxIdCache(key);
-  if (cache.ids.has(hash)) return { id: cache.ids.get(hash), cached: true };
-  if (cache.pending.has(hash)) return { id: await cache.pending.get(hash), cached: false };
-  // Share only the add operation. Each viewer still resolves their own file and
-  // CDN link, preserving their IP and expiry instead of sharing a signed URL.
-  const pending = (async () => {
-    const created = await torboxRequest('/torrents/createtorrent', key, fetchImpl, signal, {
-      method: 'POST',
-      form: { magnet: `magnet:?xt=urn:btih:${hash}`, seed: '3', allow_zip: 'false' },
-    });
-    const id = Number(created?.torrent_id ?? created?.id);
-    if (!Number.isSafeInteger(id) || id <= 0) throw Object.assign(new Error('no torrent id'), { torbox: 'NO_TORRENT_ID' });
-    if (cache.ids.size >= 200) cache.ids.delete(cache.ids.keys().next().value);
-    cache.ids.set(hash, id);
-    return id;
-  })();
-  cache.pending.set(hash, pending);
-  try { return { id: await pending, cached: false }; }
-  finally { if (cache.pending.get(hash) === pending) cache.pending.delete(hash); }
+  // A shared add has its own bounded lifetime. One viewer timing out must not
+  // abort the add for every other viewer; each viewer only bounds its own wait.
+  // A joined viewer whose deadline is still live may replace an aborted shared
+  // add once. Re-checking pending on every attempt keeps that replacement
+  // single-flight too, and non-abort failures (for example ACTIVE_LIMIT) are
+  // still reported to all current waiters without an immediate retry storm.
+  for (let attempt = 0; attempt < 2; attempt++) {
+    if (signal?.aborted) throw abortError(signal);
+    if (cache.ids.has(hash)) return { id: cache.ids.get(hash), cached: true };
+    let pending = cache.pending.get(hash);
+    const joined = Boolean(pending);
+    if (!pending) {
+      const operationSignal = AbortSignal.timeout(TORBOX_PLAY_TIMEOUT_MS);
+      pending = (async () => {
+        const created = await torboxRequest('/torrents/createtorrent', key, fetchImpl, operationSignal, {
+          method: 'POST',
+          form: { magnet: `magnet:?xt=urn:btih:${hash}`, seed: '3', allow_zip: 'false' },
+        });
+        const id = Number(created?.torrent_id ?? created?.id);
+        if (!Number.isSafeInteger(id) || id <= 0) throw Object.assign(new Error('no torrent id'), { torbox: 'NO_TORRENT_ID' });
+        if (cache.ids.size >= 200) cache.ids.delete(cache.ids.keys().next().value);
+        cache.ids.set(hash, id);
+        return id;
+      })();
+      const clear = () => { if (cache.pending.get(hash) === pending) cache.pending.delete(hash); };
+      // Handle settlement even if every viewer has already stopped waiting.
+      pending.then(clear, clear);
+      cache.pending.set(hash, pending);
+    }
+    try {
+      return { id: await awaitWithSignal(pending, signal), cached: false };
+    } catch (error) {
+      const sharedAbort = error?.name === 'TimeoutError' || error?.name === 'AbortError';
+      if (joined && attempt === 0 && sharedAbort && !signal?.aborted) {
+        if (cache.pending.get(hash) === pending) cache.pending.delete(hash);
+        continue;
+      }
+      throw error;
+    }
+  }
+  throw Object.assign(new Error('TorBox add retry exhausted'), { torbox: 'ADD_RETRY_EXHAUSTED' });
 }
 
 function torboxKey(env) {
@@ -1627,6 +1677,9 @@ export const _coreStreamsTest = {
   movieTitleMatches,
   parsePlaySelector,
   resetTorboxIds: () => { torboxCache = emptyTorboxCache(); },
+  ensureTorboxTorrent,
+  fetchSource,
+  fetchOpenMedia,
   resetCinemetaCache: () => cinemetaCache.clear(),
   resetResponseCache: () => responseCache.clear(),
   responseCacheStats: () => responseCache.stats(),

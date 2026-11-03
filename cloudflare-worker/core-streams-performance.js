@@ -92,6 +92,26 @@ export function createResponseCache({
   };
 }
 
+export function abortError(signal) {
+  return signal?.reason || Object.assign(new Error('operation aborted'), { name: 'AbortError' });
+}
+
+// Await a shared operation without letting one caller's signal cancel it. The
+// caller still stops waiting at its own deadline; the operation keeps its own
+// bounded lifetime and can be joined by other callers.
+export function awaitWithSignal(promise, signal) {
+  if (!signal) return promise;
+  if (signal.aborted) return Promise.reject(abortError(signal));
+  return new Promise((resolve, reject) => {
+    const onAbort = () => reject(abortError(signal));
+    signal.addEventListener('abort', onAbort, { once: true });
+    promise.then(
+      (value) => { signal.removeEventListener('abort', onAbort); resolve(value); },
+      (error) => { signal.removeEventListener('abort', onAbort); reject(error); },
+    );
+  });
+}
+
 // Cloudflare allows six outgoing connections per invocation while waiting for
 // response headers. Queue explicitly instead of letting the runtime reorder a
 // larger fan-out implicitly. A slot is released as soon as headers arrive; the
@@ -99,16 +119,37 @@ export function createResponseCache({
 export function createHeaderLimiter(fetchImpl, limit = SOURCE_HEADER_CONCURRENCY) {
   let active = 0;
   const queue = [];
+  const abortReason = (signal) => signal?.reason
+    || Object.assign(new Error('header wait aborted'), { name: 'AbortError' });
   const pump = () => {
     while (active < limit && queue.length) {
       const next = queue.shift();
+      next.signal?.removeEventListener('abort', next.onAbort);
+      if (next.signal?.aborted) {
+        next.reject(abortReason(next.signal));
+        continue;
+      }
       active++;
-      next();
+      next.resolve();
     }
   };
   return async (...args) => {
-    if (active >= limit) await new Promise((resolve) => queue.push(resolve));
-    else active++;
+    const signal = args[1]?.signal;
+    if (signal?.aborted) throw abortReason(signal);
+    if (active >= limit) {
+      await new Promise((resolve, reject) => {
+        const entry = { resolve, reject, signal, onAbort: null };
+        entry.onAbort = () => {
+          const index = queue.indexOf(entry);
+          if (index >= 0) queue.splice(index, 1);
+          reject(abortReason(signal));
+        };
+        signal?.addEventListener('abort', entry.onAbort, { once: true });
+        queue.push(entry);
+      });
+    } else {
+      active++;
+    }
     try {
       return await fetchImpl(...args);
     } finally {
