@@ -345,7 +345,7 @@ test('a viewer whose own deadline aborts does not start a replacement TorBox add
   assert.equal(creates, 1);
 });
 
-test('a joined viewer gets at most one replacement when the shared TorBox add keeps timing out', async () => {
+test('a viewer arriving after a failed shared TorBox add starts a fresh add and is not retried', async () => {
   let creates = 0;
   const fetchImpl = async () => {
     creates++;
@@ -354,14 +354,14 @@ test('a joined viewer gets at most one replacement when the shared TorBox add ke
   const ownerViewer = new AbortController();
   const joinedViewer = new AbortController();
   const owner = _coreStreamsTest.ensureTorboxTorrent(HASH, KEY, fetchImpl, ownerViewer.signal);
-  // Let the first add settle before the second viewer joins, so the second
-  // viewer exercises the replacement path rather than the initial add.
+  // Let the first add settle and clear from the pending map first. The second
+  // viewer then owns a new add and does not take the joined-replacement path.
   await assert.rejects(owner, /shared add timed out/);
   await assert.rejects(
     _coreStreamsTest.ensureTorboxTorrent(HASH, KEY, fetchImpl, joinedViewer.signal),
     /shared add timed out/,
   );
-  assert.equal(creates, 2, 'one initial add and one replacement, not an unbounded retry loop');
+  assert.equal(creates, 2, 'one add per viewer, with no retry of a failed owned add');
   assert.equal(joinedViewer.signal.aborted, false);
 });
 
