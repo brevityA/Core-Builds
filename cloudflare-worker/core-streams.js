@@ -1,6 +1,13 @@
 // Core Streams: a small Stremio-compatible stream aggregator running on the
 // existing Cloudflare Worker. It uses fixed add-on endpoints and narrowly
 // allowlisted open-media APIs; it never scrapes arbitrary URLs or relays media.
+import {
+  createResponseCache, createHeaderLimiter, responseCacheKey, envInteger,
+  RESPONSE_CACHE_DEFAULT_SECONDS,
+} from './core-streams-performance.js';
+
+const responseCache = createResponseCache();
+const streamScoreCache = new WeakMap();
 
 const SOURCES = [
   { id: 'torrentio', name: 'Torrentio', base: 'https://torrentio.strem.fun' },
@@ -300,15 +307,56 @@ function inferredSeeders(stream) {
 // ranking heuristic, not a claim that a mislabeled resolution or seeder count
 // has been independently verified. Preserve unknown-quality results as fallbacks.
 function smartStreamScore(stream) {
+  if (stream && typeof stream === 'object' && streamScoreCache.has(stream)) return streamScoreCache.get(stream);
   const text = [stream?.name, stream?.title, stream?.description, stream?.behaviorHints?.filename]
     .filter((part) => typeof part === 'string').join(' ').toLowerCase();
   let score = inferredHeight(stream) / 10;
   score += Math.min(inferredSeeders(stream), 500) / 20;
   if (typeof stream?.url === 'string') score += 12;
   if (typeof stream?.ytId === 'string') score += 8;
-  if (/\b(?:bluray|blu-ray|web[ .-]?dl)\b/.test(text)) score += 5;
-  if (/\b(?:cam|hdcam|hdts|telesync|telecine|screener)\b/.test(text)) score -= 150;
+  // Release-source weights follow the same broad order AIOStreams uses. They
+  // are advisory labels from the provider, not verified file properties.
+  if (/\bremux\b/.test(text)) score += 30;
+  else if (/\b(?:bluray|blu-ray|bdrip|brrip)\b/.test(text)) score += 20;
+  else if (/\bweb[ .-]?dl\b|\b(?:amzn|nf|dsnp|hmax|atvp|pcok|hulu)[ .-]web\b/.test(text)) score += 15;
+  else if (/\bweb[ .-]?rip\b/.test(text)) score += 10;
+  else if (/\b(?:hdtv|pdtv)\b/.test(text)) score += 3;
+  else if (/\bdvd(?:rip|r)?\b/.test(text)) score -= 10;
+  if (/\b(?:dv|dovi|dolby[ .-]?vision)\b/.test(text)) score += 8;
+  if (/\bhdr(?:10(?:\+|plus)?)?\b/.test(text)) score += 6;
+  if (/\b(?:truehd|dts[ .-]?hd|flac)\b/.test(text)) score += 4;
+  if (/\b3d\b/.test(text)) score -= 40;
+  if (/\b(?:camrip|hdcam|hdts|telesync|telecine|screener|dvdscr)\b/.test(text)) score -= 150;
+  if (stream && typeof stream === 'object') streamScoreCache.set(stream, score);
   return score;
+}
+
+const JUNK_RELEASE_RE = /\b(?:camrip|hdcam|hdts|telesync|telecine|hdtc|dvdscr|screener|sample)\b/i;
+const OPEN_MEDIA_NAMES = new Set(['Public Domain Movies', 'Internet Archive', 'Blender Open Movies', 'Library of Congress']);
+function isOpenMedia(stream) {
+  return OPEN_MEDIA_NAMES.has(String(stream?.name || '').split(' · ')[0]);
+}
+function streamText(stream) {
+  return [stream?.name, stream?.title, stream?.description, stream?.behaviorHints?.filename]
+    .filter((part) => typeof part === 'string').join(' ');
+}
+// Obvious low-quality copies never consume a slot while better releases exist,
+// but a title with only CAM/screener hits still gets those fallbacks.
+function dropJunk(streams) {
+  const clean = streams.filter((stream) => isOpenMedia(stream) || !JUNK_RELEASE_RE.test(streamText(stream)));
+  return clean.length ? clean : streams;
+}
+function limitPerResolution(streams, maximum) {
+  if (!maximum) return streams;
+  const counts = new Map();
+  return streams.filter((stream) => {
+    if (isOpenMedia(stream)) return true;
+    const height = inferredHeight(stream);
+    const count = counts.get(height) || 0;
+    if (count >= maximum) return false;
+    counts.set(height, count + 1);
+    return true;
+  });
 }
 
 function interleaveStreamGroups(groups) {
@@ -858,16 +906,17 @@ async function fetchOpenMedia(type, id, fetchImpl, deadlineSignal, metaPromise) 
   return [...locStreams, ...archiveStreams, ...blenderStreams];
 }
 
-async function fetchSource(source, type, id, fetchImpl, report = {}) {
+async function fetchSource(source, type, id, fetchImpl, report = {}, deadlineSignal = null) {
   if (!sourceAllowed(source.id)) { report[source.id] = 'paused'; return []; }
   const url = sourceRequestUrl(source.base, type, id);
   const fail = (reason) => { report[source.id] = reason; sourceFailed(source.id); return []; };
   try {
+    const requestSignal = AbortSignal.timeout(SOURCE_TIMEOUT_MS);
     const response = await fetchImpl(url, {
       method: 'GET',
       headers: { Accept: 'application/json' },
       redirect: 'manual',
-      signal: AbortSignal.timeout(SOURCE_TIMEOUT_MS),
+      signal: deadlineSignal ? AbortSignal.any([requestSignal, deadlineSignal]) : requestSignal,
     });
     if (response && response.status === 404) {
       // Add-ons answer 404 for a type or id they do not serve (the configured
@@ -1419,9 +1468,9 @@ async function handleTorboxPlay(request, env, route, headers, fetchImpl) {
 function manifest() {
   return {
     id: 'uk.corebuilds.core-streams',
-    version: '0.11.0',
+    version: '0.12.0',
     name: 'Core Streams',
-    description: 'Quality-ranked streams: torrent add-ons and public indexes (YTS, The Pirate Bay, EZTV, Knaben), instant TorBox playback when configured, open media, and configurable sources.',
+    description: 'Quality-ranked streams with fast repeat lookups: torrent add-ons and public indexes (YTS, The Pirate Bay, EZTV, Knaben), instant TorBox playback when configured, open media, and configurable sources.',
     resources: ['stream'],
     types: ['movie', 'series'],
     catalogs: [],
@@ -1465,59 +1514,112 @@ export async function handleCoreStreams(request, env, { headers = {}, rateLimit 
 
   if (!(await rateLimit())) return jsonResponse(429, { streams: [], error: 'rate limit exceeded' }, headers);
 
-  const sources = SOURCES.filter((source) => !source.types || source.types.includes(route.type));
-  const httpBase = configuredAddonBase(env.CORE_STREAMS_HTTP_SOURCE_MANIFEST);
-  if (httpBase && !sources.some((source) => source.base === httpBase)) {
-    sources.push({ id: 'http-source', name: 'HTTP source', base: httpBase });
-  }
-
   const normalizedId = route.id.toLowerCase();
-  const imdb = normalizedId.split(':')[0];
-  const deadlineSignal = AbortSignal.timeout(SOURCE_TIMEOUT_MS);
-  const report = {};
-  const metaPromise = fetchCinemetaTitleYear(route.type, imdb, fetchImpl, deadlineSignal, report);
-  const responses = await Promise.all([
-    ...sources.map((source) => fetchSource(source, route.type, normalizedId, fetchImpl, report)),
-    fetchYts(route.type, normalizedId, fetchImpl, deadlineSignal, report),
-    fetchPirateBay(route.type, normalizedId, fetchImpl, deadlineSignal, report, metaPromise),
-    fetchEztv(route.type, normalizedId, fetchImpl, deadlineSignal, report, metaPromise),
-    fetchKnaben(route.type, normalizedId, fetchImpl, deadlineSignal, report, metaPromise),
-    fetchOpenMedia(route.type, normalizedId, fetchImpl, deadlineSignal, metaPromise).then((streams) => {
-      if (route.type === 'movie') report['open-media'] = `ok ${streams.length}`;
-      return streams;
-    }),
+  const torbox = torboxKey(env);
+  const httpBase = configuredAddonBase(env.CORE_STREAMS_HTTP_SOURCE_MANIFEST);
+  const maxPerResolution = envInteger(env.CORE_STREAMS_MAX_PER_RESOLUTION, 0, 0, MAX_STREAMS_TOTAL);
+  const cacheSeconds = envInteger(env.CORE_STREAMS_CACHE_SECONDS, RESPONSE_CACHE_DEFAULT_SECONDS, 0, 300);
+  // Hash every input that can change the answer or the account a play URL
+  // belongs to. Raw tokens/keys/source URLs never become cache keys.
+  const cacheKey = await responseCacheKey([
+    'core-streams/0.12.0', requestUrl.origin, route.token, route.type, normalizedId,
+    torbox || '', httpBase || '', maxPerResolution,
   ]);
-  // Rank within each provider, then interleave providers before de-duplicating.
-  // This stops an early high-volume source from consuming the result cap and
-  // hiding every later provider or the curated open-media matches.
-  const seen = new Set();
-  const bareHashes = new Set();
-  const anyHashes = new Set();
-  const streams = [];
-  for (const stream of interleaveStreamGroups(responses)) {
-    const key = dedupeKey(stream);
-    if (seen.has(key)) continue;
-    // Indexers return a hash with no fileIdx; add-ons return the same torrent
-    // with one. Treat those as one result whichever arrives first.
-    if (stream.infoHash) {
-      if (stream.fileIdx === undefined ? anyHashes.has(stream.infoHash) : bareHashes.has(stream.infoHash)) continue;
-      anyHashes.add(stream.infoHash);
-      if (stream.fileIdx === undefined) bareHashes.add(stream.infoHash);
+  const { value, cache } = await responseCache.run(cacheKey, async () => {
+    const sources = SOURCES.filter((source) => !source.types || source.types.includes(route.type));
+    if (httpBase && !sources.some((source) => source.base === httpBase)) {
+      sources.push({ id: 'http-source', name: 'HTTP source', base: httpBase });
     }
-    seen.add(key);
-    streams.push(stream);
-    if (streams.length >= MAX_STREAMS_TOTAL) break;
-  }
-  const key = torboxKey(env);
-  const finalStreams = key
-    ? (await applyTorbox(streams, {
-      key, origin: requestUrl.origin, token: route.token, type: route.type, id: normalizedId, fetchImpl, report,
-    })).slice(0, MAX_STREAMS_TOTAL)
-    : streams;
-  // Per-source outcome, so an empty list can be explained from the outside
-  // (GET the stream URL with curl -D - -o /dev/null). Names/status only: no ids or URLs.
-  const sourceStatus = Object.entries(report).map(([id, status]) => `${id}=${status}`).join('; ');
-  return jsonResponse(200, { streams: finalStreams }, { ...headers, 'X-Core-Streams-Sources': sourceStatus });
+    // Explicitly bound the header-wait fan-out to Cloudflare's six-connection
+    // relaxed limit. Body reads remain bounded separately by each adapter.
+    const limitedFetch = createHeaderLimiter(fetchImpl);
+    const imdb = normalizedId.split(':')[0];
+    const deadlineSignal = AbortSignal.timeout(SOURCE_TIMEOUT_MS);
+    const report = {};
+    const metaPromise = fetchCinemetaTitleYear(route.type, imdb, limitedFetch, deadlineSignal, report);
+    const responses = await Promise.all([
+      ...sources.map((source) => fetchSource(source, route.type, normalizedId, limitedFetch, report, deadlineSignal)),
+      fetchYts(route.type, normalizedId, limitedFetch, deadlineSignal, report),
+      fetchPirateBay(route.type, normalizedId, limitedFetch, deadlineSignal, report, metaPromise),
+      fetchEztv(route.type, normalizedId, limitedFetch, deadlineSignal, report, metaPromise),
+      fetchKnaben(route.type, normalizedId, limitedFetch, deadlineSignal, report, metaPromise),
+      fetchOpenMedia(route.type, normalizedId, limitedFetch, deadlineSignal, metaPromise).then((streams) => {
+        if (route.type === 'movie') report['open-media'] = `ok ${streams.length}`;
+        return streams;
+      }),
+    ]);
+    // Rank within each provider, then interleave providers before de-duplicating.
+    // This stops an early high-volume source from consuming the result cap and
+    // hiding every later provider or the curated open-media matches.
+    const seen = new Set();
+    const bareHashes = new Set();
+    const anyHashes = new Set();
+    const unique = [];
+    for (const stream of interleaveStreamGroups(responses)) {
+      const key = dedupeKey(stream);
+      if (seen.has(key)) continue;
+      if (stream.infoHash) {
+        if (stream.fileIdx === undefined ? anyHashes.has(stream.infoHash) : bareHashes.has(stream.infoHash)) continue;
+        anyHashes.add(stream.infoHash);
+        if (stream.fileIdx === undefined) bareHashes.add(stream.infoHash);
+      }
+      seen.add(key);
+      unique.push(stream);
+    }
+    // Global quality pass after the fair interleaving/dedupe pass. Scores are
+    // memoized per object, so sorting does not re-parse release text.
+    const sorted = dropJunk(unique)
+      .map((stream, index) => ({ stream, index, score: smartStreamScore(stream) }))
+      .sort((a, b) => b.score - a.score || a.index - b.index)
+      .map(({ stream }) => stream);
+    // Curated open media is the only HTTPS path for some players; reserve its
+    // slots before the general quality pool is truncated.
+    const open = sorted.filter(isOpenMedia);
+    const pool = [
+      ...sorted.filter((stream) => !isOpenMedia(stream)).slice(0, MAX_STREAMS_TOTAL + 40 - open.length),
+      ...open,
+    ];
+    const ranked = torbox
+      ? await applyTorbox(pool, {
+        key: torbox, origin: requestUrl.origin, token: route.token, type: route.type, id: normalizedId, fetchImpl: limitedFetch, report,
+      })
+      : pool;
+    const capped = limitPerResolution(ranked, maxPerResolution);
+    // Quality decides order, but the final 80 still keeps a best-effort seat
+    // for every provider that returned something. Without this, a global sort
+    // can let one high-volume 2160p source erase every independent fallback.
+    const openStreams = capped.filter(isOpenMedia);
+    const general = capped.filter((stream) => !isOpenMedia(stream));
+    const seats = new Map();
+    for (const stream of general) {
+      const source = String(stream.name || '').split(' · ')[0];
+      if (!seats.has(source)) seats.set(source, stream);
+    }
+    const room = Math.max(0, MAX_STREAMS_TOTAL - openStreams.length);
+    const selected = general.slice(0, room);
+    const selectedSet = new Set(selected);
+    for (const seat of seats.values()) {
+      if (selectedSet.has(seat) || room === 0) continue;
+      if (selected.length < room) { selected.push(seat); selectedSet.add(seat); continue; }
+      // Replace the lowest-ranked surplus result, not the head of the list.
+      for (let i = selected.length - 1; i >= 0; i--) {
+        const source = String(selected[i].name || '').split(' · ')[0];
+        if (selected.filter((stream) => String(stream.name || '').split(' · ')[0] === source).length > 1) {
+          selectedSet.delete(selected[i]);
+          selected[i] = seat;
+          selectedSet.add(seat);
+          break;
+        }
+      }
+    }
+    const finalStreams = [...openStreams, ...selected].slice(0, MAX_STREAMS_TOTAL);
+    const sourceStatus = Object.entries(report).map(([id, status]) => `${id}=${status}`).join('; ');
+    const partial = Object.values(report).some((status) => !/^(?:ok|cached|skipped|cache hit)/.test(status));
+    return { streams: finalStreams, sources: sourceStatus, partial };
+  }, cacheSeconds);
+  return jsonResponse(200, { streams: value.streams }, {
+    ...headers, 'X-Core-Streams-Sources': value.sources, 'X-Core-Streams-Cache': cache,
+  });
 }
 
 export const _coreStreamsTest = {
@@ -1526,6 +1628,10 @@ export const _coreStreamsTest = {
   parsePlaySelector,
   resetTorboxIds: () => { torboxCache = emptyTorboxCache(); },
   resetCinemetaCache: () => cinemetaCache.clear(),
+  resetResponseCache: () => responseCache.clear(),
+  responseCacheStats: () => responseCache.stats(),
+  dropJunk,
+  limitPerResolution,
   fetchCinemetaTitleYear,
   episodeMatcher,
   seasonPackMatcher,

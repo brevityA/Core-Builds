@@ -17,6 +17,7 @@ beforeEach(() => {
   _coreStreamsTest.resetCinemetaCache();
   _coreStreamsTest.resetTorboxIds();
   _coreStreamsTest.resetSourceHealth();
+  _coreStreamsTest.resetResponseCache();
 });
 
 function playbackFixture({ create, list, link } = {}) {

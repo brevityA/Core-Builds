@@ -4,7 +4,7 @@ import { handleCoreStreams, _coreStreamsTest } from './core-streams.js';
 
 // Metadata caching is deliberately isolate-local; each test starts cold so
 // upstream call-count assertions remain independent of test execution order.
-beforeEach(() => _coreStreamsTest.resetCinemetaCache());
+beforeEach(() => { _coreStreamsTest.resetCinemetaCache(); _coreStreamsTest.resetResponseCache(); });
 
 const TOKEN = '0123456789abcdef0123456789abcdef';
 const secureHeaders = { 'Access-Control-Allow-Origin': '*' };
@@ -25,9 +25,9 @@ test('manifest is a Stremio stream-only manifest behind the install token', asyn
   assert.equal(response.headers.get('Cache-Control'), 'no-store');
   assert.deepEqual(await response.json(), {
     id: 'uk.corebuilds.core-streams',
-    version: '0.11.0',
+    version: '0.12.0',
     name: 'Core Streams',
-    description: 'Quality-ranked streams: torrent add-ons and public indexes (YTS, The Pirate Bay, EZTV, Knaben), instant TorBox playback when configured, open media, and configurable sources.',
+    description: 'Quality-ranked streams with fast repeat lookups: torrent add-ons and public indexes (YTS, The Pirate Bay, EZTV, Knaben), instant TorBox playback when configured, open media, and configurable sources.',
     resources: ['stream'],
     types: ['movie', 'series'],
     catalogs: [],

@@ -171,6 +171,25 @@ Blender Open Movies is statically mapped only for seven exact IMDb/title/year ma
 
 These are best-effort per-isolate controls, not global guarantees. `.mp4` does not prove a supported codec/container profile. The Internet Archive documents H.264 video, AAC audio, `yuv420p`, and a front-loaded `moov` atom for MP4 web playback, but Core Streams does not inspect media bytes. Codec compatibility and actual playback remain untested until checked in the target Stremio client.
 
+### Repeat-lookup speed and ranking (0.12.0)
+
+Stream lists are cached only inside the current Worker isolate: 64 entries / 4 MiB, 90 seconds for complete responses and 15 seconds when any source failed or timed out. Empty responses are never cached. Simultaneous requests for the same title share one in-flight provider fan-out. The cache key is a SHA-256 hash of the origin, install token, media id, TorBox key, configured source manifest and result-cap setting; raw tokens and keys are never cache keys, and nothing is written to the shared Cloudflare Cache API. Responses still send `Cache-Control: no-store`.
+
+Optional Worker variables:
+
+- `CORE_STREAMS_CACHE_SECONDS` — `0` disables the response cache (single-flight coalescing still applies); default `90`, maximum `300`. Partial responses are always capped at 15 seconds.
+- `CORE_STREAMS_MAX_PER_RESOLUTION` — optional diversity cap after TorBox promotion, `0`–`80`; default `0` (off). Curated open-media results are exempt.
+
+After provider-fair interleaving and dedupe, a global quality pass ranks release-source labels (REMUX/BluRay/WEB-DL/WEBRip), resolution, seed hints, HDR/DV and lossless audio. Obvious CAM/screener/sample releases are kept only as fallbacks. The final 80 still reserve best-effort seats for each responding provider and all curated open-media results. Scores are memoized per stream object so sorting does not re-parse release text.
+
+Offline orchestration benchmark (simulated 120 ms provider headers, no live network):
+
+```bash
+node cloudflare-worker/core-streams-latency-benchmark.mjs
+```
+
+It reports cold/warm/coalesced latency shape and asserts header-wait concurrency never exceeds six. It is not a live provider or playback benchmark; use the authorized-manifest comparison harness below for that.
+
 ### Optional configured stream add-on
 
 If you have a Stremio-compatible stream add-on manifest URL and its terms allow forwarding its stream results, store the URL as a Worker secret:
@@ -186,7 +205,7 @@ Core Streams remains a bounded aggregator, not a debrid resolver or HTML scraper
 Tests:
 
 ```bash
-node --test cloudflare-worker/*.test.js
+node --test cloudflare-worker/*.test.js cloudflare-worker/*.test.mjs tools/source-scout/*.test.mjs
 ```
 
 ## Wire it into the configurator
@@ -228,7 +247,7 @@ Set `CORS_PROXY = ''` to disable the proxy and fall back to direct-fetch-only.
 | `/t/:id` | GET | read paste | 60/min | `ACAO: *`, `no-store` |
 | `/core-streams/:token/manifest.json` | GET | private Stremio add-on manifest | none | token is a bearer secret; `ACAO: *`, `no-store` |
 | `/core-streams/:token/play/:hash/{movie\|SxE}` | GET, HEAD | TorBox instant play: add torrent, pick file, 302 to TorBox CDN (only when `TORBOX_API_KEY` is set; otherwise 404) | 20/min/IP (shared) | normally 3 TorBox API calls (2 with a remembered id; up to 5 on stale-id recovery); concurrent adds coalesced per account/hash; 8 s timeout; key stays server-side; no media relay |
-| `/core-streams/:token/stream/{movie\|series}/{imdb-id}.json` | GET | Torrentio + TorrentsDB + YTS/The Pirate Bay/Knaben (movies) or The Pirate Bay/EZTV/Knaben (episodes) + optional TorBox cache check + movie-only Public Domain Movies + optional configured add-on (HTTPS, torrent, or native YouTube ID); open-media lookup via Cinemeta/Internet Archive, four LOC films, and seven mapped Blender films | 20/min/IP | ≤17 total upstream requests worst case (movies; ≤11 for episodes) and ≤9 concurrent, inside the Workers Free 50-subrequest limit; add-on timeout 5.5 s / open-media chain deadline 5.5 s with 4 s per metadata request; per-source isolate-local breakers; no media relay; `X-Core-Streams-Sources` per-source status; `ACAO: *`, `no-store` |
+| `/core-streams/:token/stream/{movie\|series}/{imdb-id}.json` | GET | Torrentio + TorrentsDB + YTS/The Pirate Bay/Knaben (movies) or The Pirate Bay/EZTV/Knaben (episodes) + optional TorBox cache check + movie-only Public Domain Movies + optional configured add-on (HTTPS, torrent, or native YouTube ID); open-media lookup via Cinemeta/Internet Archive, four LOC films, and seven mapped Blender films | 20/min/IP | ≤17 total upstream requests worst case (movies; ≤11 for episodes), with header-wait fan-out explicitly capped at 6; add-on timeout 5.5 s / open-media chain deadline 5.5 s with 4 s per metadata request; per-source isolate-local breakers; isolate-local response cache (90 s full / 15 s partial, 64 entries / 4 MiB) and single-flight coalescing; no media relay; `X-Core-Streams-Sources` per-source status and `X-Core-Streams-Cache` hit/miss/coalesced/bypass; `ACAO: *`, `no-store` |
 | `/proxy<path>?host=` | GET/POST/PATCH | allowlisted lane | 60/min | every allowlisted host is scoped to its own surface — AIOStreams hosts: `GET /api/v1/status`, `POST/PATCH /api/v1/user[/id]`, `GET /stremio/<uuid>/<pwd>/{manifest.json,stream/*/*.json}` (origin form) or `GET /stream/*/*.json` (manifest-base form); `api.wuplay.app`: `GET /app/version`, `POST /devices/register`, `GET/POST/PATCH /sync/**` and is the **only** host that receives `Authorization`; `api.torbox.app`: `GET /v1/api/speedtest`. An allowlisted host matching no scope is refused |
 | `/proxy<path>?host=` | GET/POST/PATCH | custom lane | 20/min | `https://` origin → `GET /api/v1/status`, `POST/PATCH /api/v1/user[/id]` (same bounded id shape as the allowlisted lane, so a self-hosted config can be updated in place); manifest base → `GET /stream/*/*.json`; no IP literals, no userinfo/port/query, no dotless or reserved names (`.local .internal .lan .corp .home .test .example .invalid .onion .arpa`) |
 

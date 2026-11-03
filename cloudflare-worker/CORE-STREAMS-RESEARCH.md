@@ -530,3 +530,23 @@ Core Streams advances to **0.11.0** without adding a source, changing credential
 Nine focused regression tests cover cache reuse/isolation/expiry/eviction, outage fallback, concurrent GET/HEAD adds, failed-add recovery, key rotation, stale-id recovery, and episode/file matching. The Worker build tag, strict smoke expectation, and deploy wait-loop advance together to `2026-11-03`.
 
 Validation is local mocked-provider testing and a Wrangler dry-run bundle; no private manifest, live TorBox account, deployed playback, or provider availability was tested in this pass. Existing open-media rights caveats and the advisory nature of stream ranking are unchanged.
+
+
+## Speed, responsiveness and ranking pass — 2026-11-03
+
+Core Streams advances to **0.12.0** after reviewing Claude's stacked PRs #823/#824 and testing the #824 snapshot in isolation (163/163 tests passed). The useful ideas were ported selectively rather than merging the branch wholesale:
+
+- **Isolate-local response cache + single-flight.** Complete stream lists are cached for 90 s, partial lists for 15 s, bounded to 64 entries / 4 MiB. Empty lists are never cached. Identical concurrent requests share one provider fan-out. The key is a SHA-256 hash over origin, install token, media id, TorBox key, configured source manifest and result-cap setting. No raw credential becomes a cache key; no stream list or token-bearing play URL is written to `caches.default`. This avoids the account/config isolation gap in #824 and the Cache API's datacenter-local, custom-domain and subrequest-quota caveats.
+- **Explicit header-wait concurrency.** Cloudflare documents six simultaneous outgoing connections per invocation while waiting for response headers (Free and Paid; later connections queue). Core Streams now queues explicitly at six instead of relying on implicit runtime ordering. Body reads remain bounded by the existing per-source byte limits and deadlines.
+- **Global quality pass with fallback preservation.** Provider-fair interleaving/dedupe still runs first. A memoized score then ranks release-source labels, resolution, seed hints, HDR/DV and lossless audio; obvious CAM/screener/sample releases are fallback-only. The final cap reserves best-effort provider seats and all curated open-media slots. An optional `CORE_STREAMS_MAX_PER_RESOLUTION` cap can add diversity after TorBox promotion.
+- **Anime discovery deferred.** #824's Kitsu/Nyaa path is promising but its episode classifier mishandles absolute-numbered and season-labelled releases, and Stremio's stream protocol does not support `fileMustInclude` for torrents. Shipping it before those matching/pack-selection gaps are fixed would turn false negatives into missing episodes. The review is recorded on #824.
+
+Primary sources checked for this pass:
+
+- Cloudflare Workers limits: six header-wait connections, 50 subrequests Free / 10,000 Paid, 128 MiB isolate memory; Cache API operations share subrequest quota. <https://github.com/cloudflare/cloudflare-docs/blob/production/src/content/docs/workers/platform/limits.mdx>
+- Cloudflare Cache API: datacenter-local, ephemeral, non-replicating; custom-domain/Pages constraints; incompatible with tiered caching. <https://github.com/cloudflare/cloudflare-docs/blob/production/src/content/docs/workers/runtime-apis/cache.mdx>
+- Knaben API: title-search fields and seeders ordering; no documented IMDb-id search field, so Knaben cannot safely start before title metadata. <https://github.com/knaben-database/knaben-api>
+- Stremio stream response contract: `fileMustInclude` is documented for archive/nzb sources, not torrents; `description` is preferred over deprecated `title`; `bingeGroup` and `notWebReady` semantics. <https://github.com/Stremio/stremio-addon-sdk/blob/master/docs/api/responses/stream.md>
+- AIOStreams pipeline: fetch → parse → filter → dedupe → precompute → sort → format, validating parse-once/precomputed ranking. <https://github.com/Viren070/AIOStreams>
+
+Validation: 178 local mocked-provider tests, an offline simulated-header latency benchmark (`core-streams-latency-benchmark.mjs`), syntax checks and a Wrangler dry-run bundle. The offline benchmark is an orchestration measurement, not a live network result. No private manifest, live TorBox call, deployment or playback test was performed. Existing credentials, install URL, source/security boundaries and no-media-relay architecture are unchanged.
