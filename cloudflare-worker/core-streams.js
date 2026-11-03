@@ -2,7 +2,7 @@
 // existing Cloudflare Worker. It uses fixed add-on endpoints and narrowly
 // allowlisted open-media APIs; it never scrapes arbitrary URLs or relays media.
 import {
-  createResponseCache, createHeaderLimiter, responseCacheKey, envInteger,
+  createResponseCache, createHeaderLimiter, createRequestTimeout, responseCacheKey, envInteger,
   awaitWithSignal, abortError, RESPONSE_CACHE_DEFAULT_SECONDS,
 } from './core-streams-performance.js';
 
@@ -68,6 +68,9 @@ const MAX_SOURCE_RESPONSE_BYTES = 1024 * 1024;
 const MAX_STREAMS_PER_SOURCE = 40;
 const MAX_STREAMS_TOTAL = 80;
 const SOURCE_TIMEOUT_MS = 5500;
+// Strictly longer than a provider timeout so a real provider hang is attributable
+// to that provider, while queue/deadline cancellations are not.
+const REQUEST_DEADLINE_MS = 8000;
 const OPEN_MEDIA_TIMEOUT_MS = 4000;
 const OPEN_MEDIA_MAX_BYTES = 768 * 1024;
 const SOURCE_FAILURE_THRESHOLD = 3;
@@ -102,8 +105,10 @@ function sourceOutcome(status) {
 function torboxPlayOutage(error) {
   if (error?.name === 'TimeoutError' || error?.name === 'AbortError') return true;
   const code = String(error?.torbox || '');
-  return !code || Number(error?.httpStatus) >= 500 || /^HTTP 5\d\d$/.test(code)
-    || ['ITEM_NOT_FOUND', 'BAD_LINK', 'NO_TORRENT_ID'].includes(code);
+  // Per-torrent conditions (stale/missing item, bad link, missing id) are not
+  // account-wide outages; they are already retried/reported per play request.
+  if (['ITEM_NOT_FOUND', 'BAD_LINK', 'NO_TORRENT_ID'].includes(code)) return false;
+  return !code || Number(error?.httpStatus) >= 500 || /^HTTP 5\d\d$/.test(code);
 }
 const INSTALL_TOKEN_RE = /^[A-Za-z0-9_-]{32,128}$/;
 const ID_RE = /^tt\d{6,12}(?::\d{1,3}:\d{1,3})?$/i;
@@ -389,9 +394,11 @@ function streamText(stream) {
   return [stream?.name, stream?.title, stream?.description, stream?.behaviorHints?.filename]
     .filter((part) => typeof part === 'string').join(' ');
 }
-// Obvious low-quality copies never consume a slot while better releases exist,
-// but a title with only CAM/screener hits still gets those fallbacks.
-/** Remove obvious CAM/screener/sample releases unless they are the only fallback. */
+/**
+ * Remove obvious CAM/screener/sample releases unless they are the only fallback.
+ * `sample` is a heuristic: a legitimately titled release containing that word
+ * may be dropped from a mixed list, so keep the all-junk fallback conservative.
+ */
 function dropJunk(streams) {
   const clean = streams.filter((stream) => isOpenMedia(stream) || !JUNK_RELEASE_RE.test(streamText(stream)));
   return clean.length ? clean : streams;
@@ -517,6 +524,17 @@ function sourceDeadlineCancelled(sourceId) {
   getSourceHealth(sourceId).probeInFlight = false;
 }
 
+/** Run a fetch task after a header slot is granted when the fetch impl is limited. */
+function runWithHeaderSlot(fetchImpl, task, signal) {
+  return typeof fetchImpl?.run === 'function' ? fetchImpl.run(task, signal) : task(fetchImpl);
+}
+
+/** Distinguish a provider's own timeout from a request-wide deadline cancellation. */
+function isProviderTimeout(error, deadlineSignal) {
+  return error?.providerTimeout === true
+    || (error?.name === 'TimeoutError' && !deadlineSignal?.aborted);
+}
+
 /** Best-effort disposal of an unread response body. */
 function cancelBody(response) {
   try {
@@ -558,44 +576,63 @@ function declaredOpenLicense(value) {
 
 /** Fetch JSON with a byte cap, timeout, manual redirects and optional allowlisted hop. */
 async function fetchBoundedJson(url, fetchImpl, maxBytes = OPEN_MEDIA_MAX_BYTES, timeoutMs = OPEN_MEDIA_TIMEOUT_MS, deadlineSignal = null, redirectHosts = [], jsonBody = null) {
-  const requestSignal = AbortSignal.timeout(timeoutMs);
-  const signal = deadlineSignal ? AbortSignal.any([requestSignal, deadlineSignal]) : requestSignal;
+  const timeout = createRequestTimeout(timeoutMs);
+  const signal = deadlineSignal ? AbortSignal.any([timeout.signal, deadlineSignal]) : timeout.signal;
   const init = jsonBody === null
     ? { method: 'GET', headers: { Accept: 'application/json' }, redirect: 'manual', signal }
     : { method: 'POST', headers: { Accept: 'application/json', 'Content-Type': 'application/json' }, body: JSON.stringify(jsonBody), redirect: 'manual', signal };
-  let response = await fetchImpl(url, init);
-  if (!response) throw new Error('Open-media request returned no response');
-  // Redirects stay manual, but a caller may name hosts it trusts as the
-  // destination of one hop (Cinemeta sends cache misses to cinemeta-live).
-  if ([301, 302, 303, 307, 308].includes(response.status) && redirectHosts.length) {
-    const location = response.headers && response.headers.get('location');
-    cancelBody(response);
-    let next = null;
-    try { next = new URL(location, url); } catch { /* invalid Location */ }
-    if (!next || next.protocol !== 'https:' || !redirectHosts.includes(next.hostname)
-      || next.username || next.password || next.port) {
-      throw new Error('Open-media redirect is not allowed');
-    }
-    response = await fetchImpl(next.href, init);
+  const request = (target) => runWithHeaderSlot(fetchImpl, async (fetch) => {
+    timeout.start();
+    return fetch(target, init);
+  }, deadlineSignal);
+  try {
+    let response = await request(url);
     if (!response) throw new Error('Open-media request returned no response');
-  }
-  if (response.status === 404) {
-    cancelBody(response);
-    return null;
-  }
-  if (response.status < 200 || response.status >= 300) {
-    cancelBody(response);
-    throw new Error(`Open-media request failed with HTTP ${response.status}`);
-  }
-  const contentLength = Number(response.headers && response.headers.get('content-length'));
-  if (Number.isFinite(contentLength) && contentLength > maxBytes) {
-    cancelBody(response);
-    throw new Error('Open-media response exceeds size limit');
-  }
-  const buffer = await readBounded(response, maxBytes);
-  if (!buffer) throw new Error('Open-media response could not be read within size limit');
-  try { return JSON.parse(new TextDecoder().decode(buffer)); } catch {
-    throw new Error('Open-media response was not valid JSON');
+    // Redirects stay manual, but a caller may name hosts it trusts as the
+    // destination of one hop (Cinemeta sends cache misses to cinemeta-live).
+    if ([301, 302, 303, 307, 308].includes(response.status) && redirectHosts.length) {
+      const location = response.headers && response.headers.get('location');
+      cancelBody(response);
+      let next = null;
+      try { next = new URL(location, url); } catch { /* invalid Location */ }
+      if (!next || next.protocol !== 'https:' || !redirectHosts.includes(next.hostname)
+        || next.username || next.password || next.port) {
+        throw new Error('Open-media redirect is not allowed');
+      }
+      response = await request(next.href);
+      if (!response) throw new Error('Open-media request returned no response');
+    }
+    if (response.status === 404) {
+      cancelBody(response);
+      return null;
+    }
+    if (response.status < 200 || response.status >= 300) {
+      cancelBody(response);
+      throw new Error(`Open-media request failed with HTTP ${response.status}`);
+    }
+    const contentLength = Number(response.headers && response.headers.get('content-length'));
+    if (Number.isFinite(contentLength) && contentLength > maxBytes) {
+      cancelBody(response);
+      throw new Error('Open-media response exceeds size limit');
+    }
+    const buffer = await readBounded(response, maxBytes);
+    if (!buffer) {
+      if (timeout.signal.aborted) throw timeout.signal.reason;
+      throw new Error('Open-media response could not be read within size limit');
+    }
+    try { return JSON.parse(new TextDecoder().decode(buffer)); } catch {
+      throw new Error('Open-media response was not valid JSON');
+    }
+  } catch (error) {
+    if (timeout.signal.aborted) {
+      // Do not mutate the platform's abort reason; tag a wrapper instead.
+      throw Object.assign(new Error('provider request timed out'), {
+        name: 'TimeoutError', providerTimeout: true, cause: timeout.signal.reason,
+      });
+    }
+    throw error;
+  } finally {
+    timeout.cancel();
   }
 }
 
@@ -731,8 +768,9 @@ async function fetchInternetArchiveFromMeta(id, expected, fetchImpl, deadlineSig
     return records.flat().slice(0, 6)
       .map((stream) => normalizeStream(stream, 'Internet Archive'))
       .filter(Boolean);
-  } catch {
-    if (deadlineSignal?.aborted) sourceDeadlineCancelled('internet-archive');
+  } catch (error) {
+    if (isProviderTimeout(error, deadlineSignal)) sourceFailed('internet-archive');
+    else if (deadlineSignal?.aborted) sourceDeadlineCancelled('internet-archive');
     else sourceFailed('internet-archive');
     return [];
   }
@@ -885,8 +923,9 @@ async function fetchBlenderOpenMovie(id, expected, fetchImpl, deadlineSignal) {
     }));
     sourceSucceeded('blender-open-movies');
     return details.flat().slice(0, 4);
-  } catch {
-    if (deadlineSignal?.aborted) sourceDeadlineCancelled('blender-open-movies');
+  } catch (error) {
+    if (isProviderTimeout(error, deadlineSignal)) sourceFailed('blender-open-movies');
+    else if (deadlineSignal?.aborted) sourceDeadlineCancelled('blender-open-movies');
     else sourceFailed('blender-open-movies');
     return [];
   }
@@ -930,9 +969,11 @@ async function fetchCinemetaTitleYear(type, imdb, fetchImpl, deadlineSignal, rep
     }
     report.cinemeta = expected ? 'ok' : 'no title';
     return expected;
-  } catch {
-    const timedOut = deadlineSignal.aborted;
-    if (timedOut) sourceDeadlineCancelled('cinemeta');
+  } catch (error) {
+    const providerTimeout = isProviderTimeout(error, deadlineSignal);
+    const timedOut = providerTimeout || deadlineSignal?.aborted;
+    if (providerTimeout) sourceFailed('cinemeta');
+    else if (deadlineSignal?.aborted) sourceDeadlineCancelled('cinemeta');
     else sourceFailed('cinemeta');
     report.cinemeta = timedOut ? 'timeout' : 'network error';
     return null;
@@ -976,7 +1017,13 @@ async function fetchOpenMedia(type, id, fetchImpl, deadlineSignal, metaPromise) 
 async function fetchSource(source, type, id, fetchImpl, report = {}, deadlineSignal = null) {
   if (!sourceAllowed(source.id)) { report[source.id] = 'paused'; return []; }
   const url = sourceRequestUrl(source.base, type, id);
+  const timeout = createRequestTimeout(SOURCE_TIMEOUT_MS);
   const fail = (reason) => {
+    if (timeout.signal.aborted) {
+      report[source.id] = 'timeout';
+      sourceFailed(source.id);
+      return [];
+    }
     if (deadlineSignal?.aborted) {
       sourceDeadlineCancelled(source.id);
       report[source.id] = 'timeout';
@@ -987,13 +1034,16 @@ async function fetchSource(source, type, id, fetchImpl, report = {}, deadlineSig
     return [];
   };
   try {
-    const requestSignal = AbortSignal.timeout(SOURCE_TIMEOUT_MS);
-    const response = await fetchImpl(url, {
-      method: 'GET',
-      headers: { Accept: 'application/json' },
-      redirect: 'manual',
-      signal: deadlineSignal ? AbortSignal.any([requestSignal, deadlineSignal]) : requestSignal,
-    });
+    const response = await runWithHeaderSlot(fetchImpl, async (fetch) => {
+      timeout.start();
+      const signal = deadlineSignal ? AbortSignal.any([timeout.signal, deadlineSignal]) : timeout.signal;
+      return fetch(url, {
+        method: 'GET',
+        headers: { Accept: 'application/json' },
+        redirect: 'manual',
+        signal,
+      });
+    }, deadlineSignal);
     if (response && response.status === 404) {
       // Add-ons answer 404 for a type or id they do not serve (the configured
       // source may be movie-only). Three of those used to open the breaker and
@@ -1014,6 +1064,7 @@ async function fetchSource(source, type, id, fetchImpl, report = {}, deadlineSig
     }
     const buffer = await readBounded(response, MAX_SOURCE_RESPONSE_BYTES);
     if (!buffer) {
+      if (timeout.signal.aborted) return fail('timeout');
       if (deadlineSignal?.aborted) {
         sourceDeadlineCancelled(source.id);
         report[source.id] = 'timeout';
@@ -1042,9 +1093,9 @@ async function fetchSource(source, type, id, fetchImpl, report = {}, deadlineSig
     report[source.id] = `ok ${streams.length}`;
     return streams;
   } catch (error) {
-    // A request-wide budget expiry (including time spent in the header-wait
-    // queue) says nothing about this provider's health. Only actual provider
-    // failures/timeouts count toward the isolate-local breaker.
+    // A provider timeout counts against that provider. A request-wide budget
+    // expiry (including time spent in the header-wait queue) does not.
+    if (timeout.signal.aborted || error?.name === 'TimeoutError') return fail('timeout');
     if (deadlineSignal?.aborted) {
       sourceDeadlineCancelled(source.id);
       report[source.id] = 'timeout';
@@ -1053,7 +1104,9 @@ async function fetchSource(source, type, id, fetchImpl, report = {}, deadlineSig
     // Providers are independent: one outage or timeout must not erase results
     // returned by the other configured providers. An isolate-local breaker also
     // stops repeatedly waiting on a provider that has failed three times.
-    return fail(error?.name === 'TimeoutError' ? 'timeout' : 'network error');
+    return fail('network error');
+  } finally {
+    timeout.cancel();
   }
 }
 
@@ -1112,7 +1165,9 @@ function episodeMatcher(season, episode) {
   const e = Number(episode);
   // Reject multi-episode releases, not quality suffixes such as `-1080p`.
   const episodeNumber = '(?:E[0-9]+|[0-9]{1,3}(?![0-9A-Za-z]))';
-  const nextEpisode = `(?:[ ._-]*E[0-9]|[ ._-]*(?:-[ ._-]*)?${episodeNumber}|[ ._-]+(?:and|&)[ ._-]*${episodeNumber})`;
+  // Audio-channel suffixes such as 5.1/7.1/2.0 are not episode continuations.
+  const audioChannels = '(?:2\\.0|5\\.1|7\\.1)(?![0-9])';
+  const nextEpisode = `(?:[ ._-]*E[0-9]|[ ._-]*(?:-[ ._-]*)?(?!${audioChannels})${episodeNumber}|[ ._-]+(?:and|&)[ ._-]*${episodeNumber})`;
   return new RegExp(`(?:\\bS0*${s}[ ._-]?E0*${e}|\\b${s}x0*${e})(?![0-9]|${nextEpisode})`, 'i');
 }
 
@@ -1147,7 +1202,10 @@ async function fetchIndexer(sourceId, url, fetchImpl, deadlineSignal, report, to
     report[sourceId] = `ok ${streams.length}`;
     return streams;
   } catch (error) {
-    if (deadlineSignal.aborted) {
+    if (isProviderTimeout(error, deadlineSignal)) {
+      sourceFailed(sourceId);
+      report[sourceId] = 'timeout';
+    } else if (deadlineSignal?.aborted) {
       sourceDeadlineCancelled(sourceId);
       report[sourceId] = 'timeout';
     } else {
@@ -1356,9 +1414,14 @@ let torboxCache = emptyTorboxCache();
 
 function torboxIdCache(key) {
   if (torboxCache.key !== key) {
+    // Only a real key rotation clears breaker state. The first play after boot
+    // must not erase a cache-check breaker a concurrent lookup just opened.
+    const rotating = torboxCache.key !== null && torboxCache.key !== key;
     torboxCache = { key, ids: new Map(), pending: new Map() };
-    sourceHealth.delete('torbox');
-    sourceHealth.delete('torbox-play');
+    if (rotating) {
+      sourceHealth.delete('torbox');
+      sourceHealth.delete('torbox-play');
+    }
   }
   return torboxCache;
 }
@@ -1702,7 +1765,7 @@ export async function handleCoreStreams(request, env, { headers = {}, rateLimit 
     // relaxed limit. Body reads remain bounded separately by each adapter.
     const limitedFetch = createHeaderLimiter(fetchImpl);
     const imdb = normalizedId.split(':')[0];
-    const deadlineSignal = AbortSignal.timeout(SOURCE_TIMEOUT_MS);
+    const deadlineSignal = AbortSignal.timeout(REQUEST_DEADLINE_MS);
     const report = {};
     const metaPromise = track('cinemeta', fetchCinemetaTitleYear(route.type, imdb, limitedFetch, deadlineSignal, report));
     const responses = await Promise.all([

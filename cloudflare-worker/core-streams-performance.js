@@ -124,50 +124,87 @@ export function awaitWithSignal(promise, signal) {
 }
 
 /**
+ * A provider timeout that is started only when its header-wait slot is granted.
+ * Queue time is charged to the request-wide deadline, not to provider health.
+ * The timer remains active through the bounded body read and is cancelled by
+ * the adapter in `finally`.
+ */
+export function createRequestTimeout(timeoutMs, {
+  setTimeout: schedule = globalThis.setTimeout,
+  clearTimeout: cancel = globalThis.clearTimeout,
+} = {}) {
+  const controller = new AbortController();
+  let timer = null;
+  let started = false;
+  return {
+    signal: controller.signal,
+    start() {
+      if (started || controller.signal.aborted) return;
+      started = true;
+      timer = schedule(() => {
+        const reason = typeof DOMException === 'function'
+          ? new DOMException('provider request timed out', 'TimeoutError')
+          : Object.assign(new Error('provider request timed out'), { name: 'TimeoutError' });
+        controller.abort(reason);
+      }, timeoutMs);
+    },
+    cancel() {
+      if (timer !== null) cancel(timer);
+      timer = null;
+    },
+  };
+}
+
+/**
  * Wrap fetch with an explicit header-wait concurrency cap. Cloudflare allows
  * six outgoing connections per invocation while waiting for headers; queued
  * calls are removed on abort and never consume a slot after their deadline.
- * A slot is released when headers arrive; body reads remain bounded separately.
+ * `run` starts a task after a slot is granted and releases the slot when the
+ * task settles (for fetch adapters, when headers arrive). Body reads remain
+ * bounded separately and may keep their own provider timeout active.
  */
 export function createHeaderLimiter(fetchImpl, limit = SOURCE_HEADER_CONCURRENCY) {
   let active = 0;
   const queue = [];
-  const abortReason = (signal) => signal?.reason
-    || Object.assign(new Error('header wait aborted'), { name: 'AbortError' });
   const pump = () => {
     while (active < limit && queue.length) {
       const next = queue.shift();
       next.signal?.removeEventListener('abort', next.onAbort);
       if (next.signal?.aborted) {
-        next.reject(abortReason(next.signal));
+        next.reject(abortError(next.signal));
         continue;
       }
       active++;
       next.resolve();
     }
   };
-  return async (...args) => {
-    const signal = args[1]?.signal;
-    if (signal?.aborted) throw abortReason(signal);
-    if (active >= limit) {
-      await new Promise((resolve, reject) => {
-        const entry = { resolve, reject, signal, onAbort: null };
-        entry.onAbort = () => {
-          const index = queue.indexOf(entry);
-          if (index >= 0) queue.splice(index, 1);
-          reject(abortReason(signal));
-        };
-        signal?.addEventListener('abort', entry.onAbort, { once: true });
-        queue.push(entry);
-      });
-    } else {
+  const acquire = async (signal) => {
+    if (signal?.aborted) throw abortError(signal);
+    if (active < limit) {
       active++;
+      return;
     }
+    await new Promise((resolve, reject) => {
+      const entry = { resolve, reject, signal, onAbort: null };
+      entry.onAbort = () => {
+        const index = queue.indexOf(entry);
+        if (index >= 0) queue.splice(index, 1);
+        reject(abortError(signal));
+      };
+      signal?.addEventListener('abort', entry.onAbort, { once: true });
+      queue.push(entry);
+    });
+  };
+  const run = async (task, signal) => {
+    await acquire(signal);
     try {
-      return await fetchImpl(...args);
+      return await task(fetchImpl);
     } finally {
       active--;
       pump();
     }
   };
+  const limited = (url, init = {}) => run((fetch) => fetch(url, init), init.signal);
+  limited.run = (task, signal) => run(task, signal);
+  return limited;
 }

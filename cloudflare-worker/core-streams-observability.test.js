@@ -10,7 +10,7 @@ const json = (data, status = 200) => new Response(JSON.stringify(data), {
   status, headers: { 'Content-Type': 'application/json' },
 });
 const streamRequest = (id = 'tt0133093') => new Request(`https://worker.example/core-streams/${TOKEN}/stream/movie/${id}.json`);
-const playRequest = () => new Request(`https://worker.example/core-streams/${TOKEN}/play/${HASH}/movie`);
+const playRequest = (hash = HASH) => new Request(`https://worker.example/core-streams/${TOKEN}/play/${hash}/movie`);
 
 beforeEach(() => {
   _coreStreamsTest.resetCinemetaCache();
@@ -129,4 +129,74 @@ test('TorBox account limits do not open the outage breaker', async () => {
     assert.match(await response.text(), /ACTIVE_LIMIT/);
   }
   assert.equal(creates, 4, 'account-limit errors are reported, not treated as a TorBox outage');
+});
+
+test('per-torrent TorBox errors do not open the account-wide play outage breaker', async () => {
+  for (const code of ['ITEM_NOT_FOUND', 'BAD_LINK', 'NO_TORRENT_ID']) {
+    _coreStreamsTest.resetSourceHealth();
+    _coreStreamsTest.resetTorboxIds();
+    let creates = 0;
+    const fetchImpl = async (input) => {
+      const url = new URL(String(input));
+      if (url.pathname.endsWith('/createtorrent')) {
+        creates++;
+        return code === 'NO_TORRENT_ID'
+          ? json({ success: true, data: {} })
+          : json({ success: true, data: { torrent_id: creates } });
+      }
+      if (url.pathname.endsWith('/mylist')) {
+        return code === 'ITEM_NOT_FOUND'
+          ? json({ success: false, error: code }, 404)
+          : json({ success: true, data: { files: [{ id: 7, name: 'Film.mkv', size: 100 }] } });
+      }
+      if (url.pathname.endsWith('/requestdl')) {
+        return code === 'BAD_LINK'
+          ? json({ success: true, data: 'not-a-url' })
+          : json({ success: true, data: 'https://cdn.example.net/film.mkv' });
+      }
+      return json({ success: false, error: 'NOPE' }, 500);
+    };
+    for (let i = 0; i < 4; i++) {
+      const hash = String(i + 1).padStart(40, 'a');
+      const response = await handleCoreStreams(playRequest(hash), env({ TORBOX_API_KEY: KEY }), { fetchImpl });
+      assert.equal(response.status, 502, `${code} attempt ${i + 1}`);
+    }
+    assert.equal(creates, 4, `${code} is per-torrent, so the fourth play still reaches TorBox`);
+  }
+});
+
+test('the first play after boot preserves a cache-check breaker opened by lookup, while key rotation clears it', async () => {
+  _coreStreamsTest.resetSourceHealth();
+  _coreStreamsTest.resetTorboxIds();
+  let checks = 0;
+  const fetchImpl = async (input) => {
+    const url = new URL(String(input));
+    if (url.pathname.endsWith('/checkcached')) {
+      checks++;
+      return json({ success: false, error: 'UPSTREAM_UNAVAILABLE' }, 503);
+    }
+    if (url.pathname.endsWith('/createtorrent')) return json({ success: true, data: { torrent_id: 42 } });
+    if (url.pathname.endsWith('/mylist')) return json({ success: true, data: { files: [{ id: 7, name: 'Film.mkv', size: 100 }] } });
+    if (url.pathname.endsWith('/requestdl')) return json({ success: true, data: 'https://cdn.example.net/film.mkv' });
+    if (String(input).startsWith('https://torrentio.strem.fun/')) return json({ streams: [{ infoHash: HASH, name: '1080p' }] });
+    if (String(input).startsWith('https://v3-cinemeta.strem.io/')) return json({ meta: { name: 'A Film', year: 2001 } });
+    return json({ streams: [] });
+  };
+  const options = { fetchImpl };
+  const lookupEnv = env({ TORBOX_API_KEY: KEY, CORE_STREAMS_CACHE_SECONDS: 0 });
+  for (let i = 0; i < 3; i++) {
+    const response = await handleCoreStreams(streamRequest(`tt013309${i}`), lookupEnv, options);
+    assert.match(response.headers.get('X-Core-Streams-Sources'), /torbox=(?:http 503|error UPSTREAM_UNAVAILABLE)/);
+  }
+  assert.equal(checks, 3);
+  assert.equal((await handleCoreStreams(playRequest(), lookupEnv, options)).status, 302);
+  const stillPaused = await handleCoreStreams(streamRequest('tt0133099'), lookupEnv, options);
+  assert.match(stillPaused.headers.get('X-Core-Streams-Sources'), /torbox=paused/);
+  assert.equal(checks, 3, 'first play did not erase the lookup breaker');
+
+  const rotatedEnv = env({ TORBOX_API_KEY: 'test-torbox-key-bbbbbbbbbbbb', CORE_STREAMS_CACHE_SECONDS: 0 });
+  assert.equal((await handleCoreStreams(playRequest(), rotatedEnv, options)).status, 302);
+  const afterRotation = await handleCoreStreams(streamRequest('tt0133100'), rotatedEnv, options);
+  assert.match(afterRotation.headers.get('X-Core-Streams-Sources'), /torbox=(?:http 503|error UPSTREAM_UNAVAILABLE)/);
+  assert.equal(checks, 4, 'a genuine key rotation starts fresh account health');
 });

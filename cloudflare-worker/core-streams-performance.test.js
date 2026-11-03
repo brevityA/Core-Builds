@@ -83,7 +83,6 @@ test('simultaneous identical requests share one provider fan-out', async () => {
 
 test('cache entries are isolated by TorBox key, configured source, origin and media id', async () => {
   const fixture = sourceFixture();
-  const base = env({ TORBOX_API_KEY: KEY_A, CORE_STREAMS_HTTP_SOURCE_MANIFEST: 'https://addon.example/manifest.json' });
   // Avoid live TorBox semantics: this test only exercises key isolation through
   // the pure key function plus handler cache misses for non-TorBox config changes.
   const k1 = await responseCacheKey(['v', 'https://worker.example', TOKEN, 'movie', 'tt1', KEY_A, 'https://a/manifest.json', 0]);
@@ -101,7 +100,6 @@ test('cache entries are isolated by TorBox key, configured source, origin and me
   assert.equal(changed.headers.get('X-Core-Streams-Cache'), 'miss');
   const otherId = await handleCoreStreams(request('tt0133094'), env(), { fetchImpl: fixture.fetchImpl });
   assert.equal(otherId.headers.get('X-Core-Streams-Cache'), 'miss');
-  assert.ok(base); // documents the account/config inputs covered by the hash above
 });
 
 test('partial results get a short TTL, empty results are never cached, and cache can be disabled', async () => {
@@ -260,6 +258,7 @@ test('queued header waits are cancelled by their own signal without consuming a 
     return json({ ok: true });
   }, 1);
   const active = limited('https://active.example', { signal: AbortSignal.timeout(1000) });
+  await new Promise((resolve) => setImmediate(resolve));
   const deadline = new AbortController();
   const queued = limited('https://queued.example', { signal: deadline.signal });
   assert.equal(started, 1);

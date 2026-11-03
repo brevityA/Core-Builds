@@ -1134,8 +1134,8 @@ test('the stream response names each source\'s outcome, so an empty list can be 
 
 test('episode, season-pack and file patterns accept common release names and reject neighbours', () => {
   const ep = _coreStreamsTest.episodeMatcher('2', '1');
-  for (const name of ['Show.S02E01.1080p', 'Show S2E1 720p', 'show.s02.e01.web', 'Show 2x01 HDTV']) assert.ok(ep.test(name), name);
-  for (const name of ['Show.S02E10.1080p', 'Show.S12E01', 'Show.S02E01-E03', 'Show.S02E011']) assert.ok(!ep.test(name), name);
+  for (const name of ['Show.S02E01.1080p', 'Show S2E1 720p', 'show.s02.e01.web', 'Show 2x01 HDTV', 'Show.S02E01.5.1.1080p', 'Show.S02E01.5.1.WEB-DL']) assert.ok(ep.test(name), name);
+  for (const name of ['Show.S02E10.1080p', 'Show.S12E01', 'Show.S02E01-E03', 'Show.S02E011', 'Show.S02E01.02.03']) assert.ok(!ep.test(name), name);
 
   const pack = _coreStreamsTest.seasonPackMatcher('2');
   for (const name of ['Show Season 2 Complete 720p', 'Show S02 1080p WEB-DL', 'Show.S02.Complete', 'Show Complete Series 1080p']) assert.ok(pack.test(name), name);

@@ -235,10 +235,16 @@ test('a stale TorBox id is invalidated and recreated once in the same playback r
 
 test('common episode spellings are matched consistently without accepting neighbouring episodes or ranges', () => {
   const matcher = _coreStreamsTest.episodeMatcher(2, 1);
-  for (const name of ['Show.S02E01.1080p', 'Show.2x01.720p', 'Show.S02E01-1080p', 'Show.S02E01']) {
+  for (const name of [
+    'Show.S02E01.1080p', 'Show.2x01.720p', 'Show.S02E01-1080p', 'Show.S02E01',
+    'Show.S02E01.5.1.1080p', 'Show.S02E01.5.1.WEB-DL', 'Show.S02E01.7.1', 'Show.S02E01.2.0',
+  ]) {
     assert.ok(matcher.test(name), name);
   }
-  for (const name of ['Show.S02E01E02', 'Show.S02E01-E02', 'Show.2x01-02', 'Show.S02E01.02', 'Show.S02E01.and.E02', 'Show.S02E10', 'Show.S12E01']) {
+  for (const name of [
+    'Show.S02E01E02', 'Show.S02E01-E02', 'Show.2x01-02', 'Show.S02E01.02',
+    'Show.S02E01.02.03', 'Show.S02E01.and.E02', 'Show.S02E10', 'Show.S12E01', 'Show.S02E01.1.2',
+  ]) {
     assert.ok(!matcher.test(name), name);
   }
   const file = new RegExp(_coreStreamsTest.episodeFilePattern(2, 1));
