@@ -1,5 +1,6 @@
 import test, { beforeEach } from 'node:test';
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import { handleCoreStreams, _coreStreamsTest } from './core-streams.js';
 import { createHeaderLimiter } from './core-streams-performance.js';
 
@@ -215,4 +216,14 @@ test('a provider body hang still counts as a provider timeout after headers arri
   const recovered = {};
   assert.equal((await _coreStreamsTest.fetchSource(source, 'movie', 'tt0133093', fetchImpl, recovered, new AbortController().signal)).length, 1);
   assert.equal(recovered.torrentio, 'ok 1');
+});
+
+
+test('Worker config enables cross-request promise resolution for shared in-flight caches', () => {
+  const config = readFileSync(new URL('./wrangler.toml', import.meta.url), 'utf8');
+  const flag = 'handle_cross_request_promise_resolution';
+  const topLevel = config.split('[env.staging]')[0];
+  const staging = config.split('[env.staging]')[1] || '';
+  assert.match(topLevel, new RegExp(`compatibility_flags\\s*=\\s*\\[[^\\]]*"${flag}"`));
+  assert.match(staging, new RegExp(`compatibility_flags\\s*=\\s*\\[[^\\]]*"${flag}"`));
 });
