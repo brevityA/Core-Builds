@@ -73,12 +73,45 @@ const OPEN_MEDIA_MAX_BYTES = 768 * 1024;
 const SOURCE_FAILURE_THRESHOLD = 3;
 const SOURCE_BREAKER_COOLDOWN_MS = 30_000;
 const sourceHealth = new Map(); // fixed provider IDs only; isolate-local best-effort breaker
+
+/** Emit only reviewed, secret-free Core Streams telemetry through the Worker sink. */
+function emitLog(logEvent, event, fields) {
+  if (typeof logEvent !== 'function') return;
+  try { logEvent(event, fields); } catch { /* telemetry must never affect playback */ }
+}
+
+/** Reduce a source report string to a bounded telemetry outcome label. */
+function sourceOutcome(status) {
+  const text = String(status || '');
+  if (/^ok\b/.test(text)) return 'ok';
+  if (/^cached\b/.test(text)) return 'cached';
+  if (/^cache hit/.test(text)) return 'cache_hit';
+  if (/^skipped/.test(text)) return 'skipped';
+  if (/^paused/.test(text)) return 'paused';
+  if (/^timeout/.test(text)) return 'timeout';
+  if (/^http /.test(text)) return 'http_error';
+  if (/^network error/.test(text)) return 'network_error';
+  if (/^too large/.test(text)) return 'too_large';
+  if (/^not json/.test(text)) return 'invalid_json';
+  if (/^no streams array/.test(text)) return 'invalid_payload';
+  if (/^error /.test(text)) return 'upstream_error';
+  return 'other';
+}
+
+/** True when repeated TorBox play failures should fast-fail new play requests. */
+function torboxPlayOutage(error) {
+  if (error?.name === 'TimeoutError' || error?.name === 'AbortError') return true;
+  const code = String(error?.torbox || '');
+  return !code || Number(error?.httpStatus) >= 500 || /^HTTP 5\d\d$/.test(code)
+    || ['ITEM_NOT_FOUND', 'BAD_LINK', 'NO_TORRENT_ID'].includes(code);
+}
 const INSTALL_TOKEN_RE = /^[A-Za-z0-9_-]{32,128}$/;
 const ID_RE = /^tt\d{6,12}(?::\d{1,3}:\d{1,3})?$/i;
 const INFO_HASH_RE = /^[a-f0-9]{40}$/i;
 const YOUTUBE_ID_RE = /^[A-Za-z0-9_-]{11}$/;
 const RESERVED_HOST_RE = /(^|\.)(localhost|local|internal|intranet|home|lan|corp|arpa|test|invalid|example|onion)$/i;
 
+/** Build a JSON response with no-store and the caller's security/CORS headers. */
 function jsonResponse(status, body, headers) {
   return new Response(JSON.stringify(body), {
     status,
@@ -90,6 +123,7 @@ function jsonResponse(status, body, headers) {
   });
 }
 
+/** Compare equal-length bearer tokens without an early exit on matching prefix. */
 function constantTimeEqual(a, b) {
   if (typeof a !== 'string' || typeof b !== 'string' || a.length !== b.length) return false;
   let difference = 0;
@@ -97,6 +131,7 @@ function constantTimeEqual(a, b) {
   return difference === 0;
 }
 
+/** Reject localhost, reserved suffixes, IP literals and dotless hosts for fetch targets. */
 function isPublicHostname(hostname) {
   const host = hostname.toLowerCase().replace(/\.$/, '');
   if (!host.includes('.') || RESERVED_HOST_RE.test(host)) return false;
@@ -126,6 +161,7 @@ function configuredAddonBase(manifestUrl) {
   return parsed.origin + path.slice(0, -'/manifest.json'.length);
 }
 
+/** Parse only the fixed manifest/stream/play route shapes; return null otherwise. */
 function parseRequestPath(pathname) {
   const parts = pathname.split('/').filter(Boolean);
   if (parts.length === 3 && parts[0] === 'core-streams' && parts[2] === 'manifest.json') {
@@ -144,6 +180,7 @@ function parseRequestPath(pathname) {
   return null;
 }
 
+/** Validate Stremio movie/series IMDb ids before any provider fan-out. */
 function validMediaRequest(type, id) {
   if (!['movie', 'series'].includes(type) || typeof id !== 'string' || !ID_RE.test(id)) return false;
   const [imdb, season, episode] = id.split(':');
@@ -156,6 +193,7 @@ function sourceRequestUrl(base, type, id) {
   return `${base}/stream/${type}/${encodeURIComponent(id)}.json`;
 }
 
+/** Accept only public HTTPS URLs without credentials or control characters. */
 function normalizeHttpsUrl(value) {
   if (typeof value !== 'string' || value.length > 8192 || value.includes('\\') || /[\u0000-\u001f\u007f]/.test(value)) return null;
   try {
@@ -167,6 +205,7 @@ function normalizeHttpsUrl(value) {
   }
 }
 
+/** Bound and sanitize provider text before it reaches a stream card or header. */
 function cleanText(value, maxLength, multiline = false) {
   if (typeof value !== 'string') return '';
   const normalized = multiline
@@ -175,6 +214,7 @@ function cleanText(value, maxLength, multiline = false) {
   return normalized.trim().slice(0, maxLength);
 }
 
+/** Validate a DHT info-hash or public tracker URL advertised by a provider. */
 function isSafeTorrentSource(value) {
   if (typeof value !== 'string' || value.length > 512 || value.includes('\\') || /[\u0000-\u0020\u007f]/.test(value)) return false;
   if (/^dht:[a-f0-9]{40}$/i.test(value)) return true;
@@ -188,6 +228,7 @@ function isSafeTorrentSource(value) {
   }
 }
 
+/** Allow only a bounded set of playback request headers for direct HTTPS streams. */
 function cleanPlaybackRequestHeaders(value) {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
   const allowed = new Set(['accept', 'accept-language', 'origin', 'referer', 'user-agent']);
@@ -209,6 +250,7 @@ function cleanPlaybackRequestHeaders(value) {
   return Object.keys(output).length ? output : null;
 }
 
+/** Normalize one provider stream to the supported Stremio contract, or drop it. */
 function normalizeStream(stream, sourceName) {
   if (!stream || typeof stream !== 'object' || Array.isArray(stream)) return null;
   const normalized = {};
@@ -278,12 +320,14 @@ function normalizeStream(stream, sourceName) {
   return normalized;
 }
 
+/** Stable identity for de-duplicating torrent, YouTube and direct-URL streams. */
 function dedupeKey(stream) {
   if (stream.infoHash) return `hash:${stream.infoHash}:${stream.fileIdx ?? ''}`;
   if (stream.ytId) return `youtube:${stream.ytId}`;
   return `url:${stream.url}`;
 }
 
+/** Infer an advertised resolution from card text; 0 means unknown. */
 function inferredHeight(stream) {
   const text = [stream?.name, stream?.title, stream?.description, stream?.behaviorHints?.filename]
     .filter((part) => typeof part === 'string').join(' ').toLowerCase();
@@ -296,6 +340,7 @@ function inferredHeight(stream) {
   return 0;
 }
 
+/** Extract the largest advertised seeder hint; this is not verified swarm data. */
 function inferredSeeders(stream) {
   const text = [stream?.name, stream?.title, stream?.description]
     .filter((part) => typeof part === 'string').join(' ');
@@ -303,9 +348,11 @@ function inferredSeeders(stream) {
   return matches.reduce((maximum, match) => Math.max(maximum, Number(match[1])), 0);
 }
 
-// Use only information already present in Stremio's stream card. This is a
-// ranking heuristic, not a claim that a mislabeled resolution or seeder count
-// has been independently verified. Preserve unknown-quality results as fallbacks.
+/**
+ * Score a stream using only advertised card text. This is a heuristic, not
+ * verified file/swarm data; unknown quality remains a fallback. Scores are
+ * memoized per object so global sorting does not re-parse release names.
+ */
 function smartStreamScore(stream) {
   if (stream && typeof stream === 'object' && streamScoreCache.has(stream)) return streamScoreCache.get(stream);
   const text = [stream?.name, stream?.title, stream?.description, stream?.behaviorHints?.filename]
@@ -333,19 +380,23 @@ function smartStreamScore(stream) {
 
 const JUNK_RELEASE_RE = /\b(?:camrip|hdcam|hdts|telesync|telecine|hdtc|dvdscr|screener|sample)\b/i;
 const OPEN_MEDIA_NAMES = new Set(['Public Domain Movies', 'Internet Archive', 'Blender Open Movies', 'Library of Congress']);
+/** True for curated open-media providers whose slots are reserved. */
 function isOpenMedia(stream) {
   return OPEN_MEDIA_NAMES.has(String(stream?.name || '').split(' · ')[0]);
 }
+/** Join the bounded card fields used by ranking and junk heuristics. */
 function streamText(stream) {
   return [stream?.name, stream?.title, stream?.description, stream?.behaviorHints?.filename]
     .filter((part) => typeof part === 'string').join(' ');
 }
 // Obvious low-quality copies never consume a slot while better releases exist,
 // but a title with only CAM/screener hits still gets those fallbacks.
+/** Remove obvious CAM/screener/sample releases unless they are the only fallback. */
 function dropJunk(streams) {
   const clean = streams.filter((stream) => isOpenMedia(stream) || !JUNK_RELEASE_RE.test(streamText(stream)));
   return clean.length ? clean : streams;
 }
+/** Optionally cap results per advertised resolution, exempting curated open media. */
 function limitPerResolution(streams, maximum) {
   if (!maximum) return streams;
   const counts = new Map();
@@ -359,6 +410,7 @@ function limitPerResolution(streams, maximum) {
   });
 }
 
+/** Rank within providers, then interleave groups so one source cannot erase fallbacks. */
 function interleaveStreamGroups(groups) {
   const ranked = groups.map((group) => (Array.isArray(group) ? group : [])
     .map((stream, index) => ({ stream, index, score: smartStreamScore(stream) }))
@@ -388,6 +440,7 @@ function interleaveStreamGroups(groups) {
   return output;
 }
 
+/** Read a response body up to a byte cap; return null on overflow or read failure. */
 async function readBounded(response, maximumBytes) {
   if (!response.body || typeof response.body.getReader !== 'function') {
     const buffer = await response.arrayBuffer();
@@ -420,6 +473,7 @@ async function readBounded(response, maximumBytes) {
   return result;
 }
 
+/** Get or create the isolate-local breaker state for a fixed source id. */
 function getSourceHealth(sourceId) {
   let state = sourceHealth.get(sourceId);
   if (!state) {
@@ -429,6 +483,7 @@ function getSourceHealth(sourceId) {
   return state;
 }
 
+/** Allow a request, including one half-open probe after breaker cooldown. */
 function sourceAllowed(sourceId) {
   const state = getSourceHealth(sourceId);
   if (state.openUntil > Date.now()) return false;
@@ -440,10 +495,12 @@ function sourceAllowed(sourceId) {
   return true;
 }
 
+/** Reset a source breaker after a successful or valid empty response. */
 function sourceSucceeded(sourceId) {
   sourceHealth.set(sourceId, { failures: 0, openUntil: 0, probeInFlight: false });
 }
 
+/** Count a real provider failure and open the breaker at the threshold. */
 function sourceFailed(sourceId) {
   const state = getSourceHealth(sourceId);
   state.probeInFlight = false;
@@ -453,12 +510,14 @@ function sourceFailed(sourceId) {
   }
 }
 
+/** Release a half-open probe when the request-wide deadline, not the provider, expired. */
 function sourceDeadlineCancelled(sourceId) {
   // The request-wide budget expired; this says nothing about source health.
   // Release a half-open probe without changing its failure count or cooldown.
   getSourceHealth(sourceId).probeInFlight = false;
 }
 
+/** Best-effort disposal of an unread response body. */
 function cancelBody(response) {
   try {
     const pending = response?.body?.cancel();
@@ -466,6 +525,7 @@ function cancelBody(response) {
   } catch { /* best-effort disposal */ }
 }
 
+/** Normalize titles for exact open-media/indexer matching without locale guessing. */
 function normalizeMatchTitle(value) {
   return cleanText(value, 300)
     .normalize('NFKD')
@@ -477,6 +537,7 @@ function normalizeMatchTitle(value) {
     .replace(/\s+/g, ' ');
 }
 
+/** Recognize only allowlisted Creative Commons/public-domain license URLs. */
 function declaredOpenLicense(value) {
   if (typeof value !== 'string' || value.length > 512) return null;
   let url;
@@ -495,6 +556,7 @@ function declaredOpenLicense(value) {
   return { url: url.href, label: match[1] === 'by-sa' ? `CC BY-SA ${match[2]}` : `CC BY ${match[2]}` };
 }
 
+/** Fetch JSON with a byte cap, timeout, manual redirects and optional allowlisted hop. */
 async function fetchBoundedJson(url, fetchImpl, maxBytes = OPEN_MEDIA_MAX_BYTES, timeoutMs = OPEN_MEDIA_TIMEOUT_MS, deadlineSignal = null, redirectHosts = [], jsonBody = null) {
   const requestSignal = AbortSignal.timeout(timeoutMs);
   const signal = deadlineSignal ? AbortSignal.any([requestSignal, deadlineSignal]) : requestSignal;
@@ -877,6 +939,7 @@ async function fetchCinemetaTitleYear(type, imdb, fetchImpl, deadlineSignal, rep
   }
 }
 
+/** Resolve curated LOC/Blender matches and metadata-gated Archive streams concurrently. */
 async function fetchOpenMedia(type, id, fetchImpl, deadlineSignal, metaPromise) {
   if (type !== 'movie') return [];
   const imdb = id.split(':')[0].toLowerCase();
@@ -909,6 +972,7 @@ async function fetchOpenMedia(type, id, fetchImpl, deadlineSignal, metaPromise) 
   return [...locStreams, ...archiveStreams, ...blenderStreams];
 }
 
+/** Fetch one fixed Stremio add-on with bounded body, timeout and breaker accounting. */
 async function fetchSource(source, type, id, fetchImpl, report = {}, deadlineSignal = null) {
   if (!sourceAllowed(source.id)) { report[source.id] = 'paused'; return []; }
   const url = sourceRequestUrl(source.base, type, id);
@@ -1291,11 +1355,16 @@ const emptyTorboxCache = () => ({ key: null, ids: new Map(), pending: new Map() 
 let torboxCache = emptyTorboxCache();
 
 function torboxIdCache(key) {
-  if (torboxCache.key !== key) torboxCache = { key, ids: new Map(), pending: new Map() };
+  if (torboxCache.key !== key) {
+    torboxCache = { key, ids: new Map(), pending: new Map() };
+    sourceHealth.delete('torbox');
+    sourceHealth.delete('torbox-play');
+  }
   return torboxCache;
 }
 
-async function ensureTorboxTorrent(hash, key, fetchImpl, signal) {
+/** Ensure an account-scoped torrent id, coalescing adds and bounding joined retries. */
+async function ensureTorboxTorrent(hash, key, fetchImpl, signal, logEvent = null) {
   const cache = torboxIdCache(key);
   // A shared add has its own bounded lifetime. One viewer timing out must not
   // abort the add for every other viewer; each viewer only bounds its own wait.
@@ -1310,16 +1379,26 @@ async function ensureTorboxTorrent(hash, key, fetchImpl, signal) {
     const joined = Boolean(pending);
     if (!pending) {
       const operationSignal = AbortSignal.timeout(TORBOX_PLAY_TIMEOUT_MS);
+      const startedAt = Date.now();
       pending = (async () => {
-        const created = await torboxRequest('/torrents/createtorrent', key, fetchImpl, operationSignal, {
-          method: 'POST',
-          form: { magnet: `magnet:?xt=urn:btih:${hash}`, seed: '3', allow_zip: 'false' },
-        });
-        const id = Number(created?.torrent_id ?? created?.id);
-        if (!Number.isSafeInteger(id) || id <= 0) throw Object.assign(new Error('no torrent id'), { torbox: 'NO_TORRENT_ID' });
-        if (cache.ids.size >= 200) cache.ids.delete(cache.ids.keys().next().value);
-        cache.ids.set(hash, id);
-        return id;
+        try {
+          const created = await torboxRequest('/torrents/createtorrent', key, fetchImpl, operationSignal, {
+            method: 'POST',
+            form: { magnet: `magnet:?xt=urn:btih:${hash}`, seed: '3', allow_zip: 'false' },
+          });
+          const id = Number(created?.torrent_id ?? created?.id);
+          if (!Number.isSafeInteger(id) || id <= 0) throw Object.assign(new Error('no torrent id'), { torbox: 'NO_TORRENT_ID' });
+          if (cache.ids.size >= 200) cache.ids.delete(cache.ids.keys().next().value);
+          cache.ids.set(hash, id);
+          emitLog(logEvent, 'core_streams_torbox_add', { outcome: 'success', ms: Date.now() - startedAt });
+          return id;
+        } catch (error) {
+          emitLog(logEvent, 'core_streams_torbox_add', {
+            outcome: error?.name === 'TimeoutError' || error?.name === 'AbortError' ? 'timeout' : 'error',
+            ms: Date.now() - startedAt,
+          });
+          throw error;
+        }
       })();
       const clear = () => { if (cache.pending.get(hash) === pending) cache.pending.delete(hash); };
       // Handle settlement even if every viewer has already stopped waiting.
@@ -1340,11 +1419,13 @@ async function ensureTorboxTorrent(hash, key, fetchImpl, signal) {
   throw Object.assign(new Error('TorBox add retry exhausted'), { torbox: 'ADD_RETRY_EXHAUSTED' });
 }
 
+/** Return a syntactically valid operator-owned TorBox key, or null. */
 function torboxKey(env) {
   const key = env && env.TORBOX_API_KEY;
   return typeof key === 'string' && TORBOX_KEY_RE.test(key.trim()) ? key.trim() : null;
 }
 
+/** Call a fixed TorBox API path with the secret kept server-side and a bounded body. */
 async function torboxRequest(path, key, fetchImpl, signal, { method = 'GET', query = {}, form = null } = {}) {
   const url = new URL(`${TORBOX_API}${path}`);
   for (const [name, value] of Object.entries(query)) {
@@ -1370,6 +1451,7 @@ async function torboxRequest(path, key, fetchImpl, signal, { method = 'GET', que
     const code = cleanText(payload?.error, 40) || `HTTP ${response.status}`;
     const error = new Error(code);
     error.torbox = code;
+    error.httpStatus = response.status;
     throw error;
   }
   return payload.data;
@@ -1378,6 +1460,7 @@ async function torboxRequest(path, key, fetchImpl, signal, { method = 'GET', que
 // Which video inside a torrent to play: the requested episode for a series
 // (a single-video torrent counts), the largest video for a film. Samples and
 // extras are never picked.
+/** Pick the requested episode or largest film video, never samples/extras. */
 function chooseVideoFile(files, selector) {
   const videos = (Array.isArray(files) ? files : [])
     .filter((file) => file && typeof file === 'object')
@@ -1394,17 +1477,20 @@ function chooseVideoFile(files, selector) {
   return videos.sort(bySize)[0];
 }
 
+/** Build the public play selector for a movie or series episode. */
 function playSelector(type, id) {
   const [, season, episode] = id.split(':');
   return type === 'series' ? `${Number(season)}x${Number(episode)}` : 'movie';
 }
 
+/** Parse the public play selector into a movie or season/episode target. */
 function parsePlaySelector(value) {
   if (value === 'movie') return { kind: 'movie' };
   const match = /^(\d{1,3})x(\d{1,4})$/.exec(value || '');
   return match ? { kind: 'episode', season: Number(match[1]), episode: Number(match[2]) } : null;
 }
 
+/** Ask TorBox which hashes are cached; failures fall back to P2P results. */
 async function torboxCachedHashes(hashes, key, fetchImpl, report) {
   if (!hashes.length) return new Map();
   if (!sourceAllowed('torbox')) { report.torbox = 'paused'; return new Map(); }
@@ -1430,7 +1516,13 @@ async function torboxCachedHashes(hashes, key, fetchImpl, report) {
 
 // Swap cached torrents for TorBox HTTPS streams and put them first. The P2P
 // copy of a cached torrent is dropped: the TorBox one plays the same file faster.
+/** Promote cached torrents to token-bearing TorBox play URLs, keeping P2P fallbacks. */
 async function applyTorbox(streams, { key, origin, token, type, id, fetchImpl, report }) {
+  const playHealth = sourceHealth.get('torbox-play');
+  if (playHealth && playHealth.openUntil > Date.now()) {
+    report.torbox = 'paused';
+    return streams;
+  }
   const hashes = [...new Set(streams.filter((stream) => stream.infoHash).map((stream) => stream.infoHash))].slice(0, 100);
   const cached = await torboxCachedHashes(hashes, key, fetchImpl, report);
   if (!cached.size) return streams;
@@ -1467,26 +1559,36 @@ async function applyTorbox(streams, { key, origin, token, type, id, fetchImpl, r
   return [...instant, ...rest];
 }
 
+/** Extract a bounded Cloudflare client IP hint for TorBox CDN selection. */
 function clientIp(request) {
   const ip = request.headers.get('CF-Connecting-IP') || '';
   return /^[0-9a-f.:]{3,45}$/i.test(ip) ? ip : '';
 }
 
-async function handleTorboxPlay(request, env, route, headers, fetchImpl) {
+/** Resolve a TorBox play request to a per-viewer CDN redirect, or a safe error. */
+async function handleTorboxPlay(request, env, route, headers, fetchImpl, logEvent = null) {
+  const startedAt = Date.now();
+  const finish = (response, outcome) => {
+    emitLog(logEvent, 'core_streams_play', { status: response.status, outcome, ms: Date.now() - startedAt });
+    return response;
+  };
   const key = torboxKey(env);
-  if (!key) return jsonResponse(404, { error: 'TorBox is not configured' }, headers);
+  if (!key) return finish(jsonResponse(404, { error: 'TorBox is not configured' }, headers), 'not_configured');
   const selector = parsePlaySelector(route.selector);
-  if (!INFO_HASH_RE.test(route.hash) || !selector) return jsonResponse(404, { error: 'not found' }, headers);
+  if (!INFO_HASH_RE.test(route.hash) || !selector) return finish(jsonResponse(404, { error: 'not found' }, headers), 'not_found');
   const hash = route.hash.toLowerCase();
-  const signal = AbortSignal.timeout(TORBOX_PLAY_TIMEOUT_MS);
   const cache = torboxIdCache(key);
+  if (!sourceAllowed('torbox-play')) {
+    return finish(jsonResponse(503, { error: 'TorBox is temporarily unavailable' }, { ...headers, 'Retry-After': '30' }), 'paused');
+  }
+  const signal = AbortSignal.timeout(TORBOX_PLAY_TIMEOUT_MS);
   let torrentId;
   try {
     let torrent;
     // A torrent can be removed from the account after its id was cached. Only
     // retry a stale cached id, once; a fresh add that fails is reported as-is.
     for (let attempt = 0; attempt < 2; attempt++) {
-      const ensured = await ensureTorboxTorrent(hash, key, fetchImpl, signal);
+      const ensured = await ensureTorboxTorrent(hash, key, fetchImpl, signal, logEvent);
       torrentId = ensured.id;
       try {
         torrent = await torboxRequest('/torrents/mylist', key, fetchImpl, signal, {
@@ -1500,21 +1602,26 @@ async function handleTorboxPlay(request, env, route, headers, fetchImpl) {
     }
     const file = chooseVideoFile(torrent?.files, selector);
     if (!file || !Number.isSafeInteger(Number(file.id)) || Number(file.id) < 0) {
-      return jsonResponse(404, { error: torrent?.download_present === false ? 'TorBox is still preparing this torrent; try again shortly' : 'no matching video file in this torrent' }, headers);
+      sourceSucceeded('torbox-play');
+      return finish(jsonResponse(404, { error: torrent?.download_present === false ? 'TorBox is still preparing this torrent; try again shortly' : 'no matching video file in this torrent' }, headers), 'no_file');
     }
     const link = await torboxRequest('/torrents/requestdl', key, fetchImpl, signal, {
       query: { token: key, torrent_id: torrentId, file_id: Number(file.id), redirect: 'false', user_ip: clientIp(request) },
     });
     const location = normalizeHttpsUrl(typeof link === 'string' ? link : '');
     if (!location) throw Object.assign(new Error('bad link'), { torbox: 'BAD_LINK' });
-    return new Response(null, { status: 302, headers: { ...headers, Location: location, 'Cache-Control': 'no-store' } });
+    sourceSucceeded('torbox-play');
+    return finish(new Response(null, { status: 302, headers: { ...headers, Location: location, 'Cache-Control': 'no-store' } }), 'success');
   } catch (error) {
     if (error?.torbox === 'ITEM_NOT_FOUND' && cache.ids.get(hash) === torrentId) cache.ids.delete(hash);
+    if (torboxPlayOutage(error)) sourceFailed('torbox-play');
+    else sourceDeadlineCancelled('torbox-play');
     const status = error?.name === 'TimeoutError' ? 504 : 502;
-    return jsonResponse(status, { error: `TorBox: ${error?.torbox || (status === 504 ? 'timed out' : 'unavailable')}` }, headers);
+    return finish(jsonResponse(status, { error: `TorBox: ${error?.torbox || (status === 504 ? 'timed out' : 'unavailable')}` }, headers), status === 504 ? 'timeout' : 'error');
   }
 }
 
+/** Return the stream-only Stremio manifest for the private install token. */
 function manifest() {
   return {
     id: 'uk.corebuilds.core-streams',
@@ -1533,7 +1640,7 @@ function manifest() {
  * `rateLimit` is supplied by the parent Worker so the addon shares its existing
  * RL_PROXY_CUSTOM bucket. `headers` contains the Worker security/CORS headers.
  */
-export async function handleCoreStreams(request, env, { headers = {}, rateLimit = async () => true, fetchImpl = fetch } = {}) {
+export async function handleCoreStreams(request, env, { headers = {}, rateLimit = async () => true, fetchImpl = fetch, logEvent = null } = {}) {
   const requestUrl = new URL(request.url);
   const route = parseRequestPath(requestUrl.pathname);
   // Players may probe a stream URL with HEAD before playing it.
@@ -1555,7 +1662,7 @@ export async function handleCoreStreams(request, env, { headers = {}, rateLimit 
 
   if (route.kind === 'play') {
     if (!(await rateLimit())) return jsonResponse(429, { error: 'rate limit exceeded' }, headers);
-    return handleTorboxPlay(request, env, route, headers, fetchImpl);
+    return handleTorboxPlay(request, env, route, headers, fetchImpl, logEvent);
   }
 
   if (!validMediaRequest(route.type, route.id)) {
@@ -1575,7 +1682,18 @@ export async function handleCoreStreams(request, env, { headers = {}, rateLimit 
     'core-streams/0.12.0', requestUrl.origin, route.token, route.type, normalizedId,
     torbox || '', httpBase || '', maxPerResolution,
   ]);
+  const lookupStartedAt = Date.now();
   const { value, cache } = await responseCache.run(cacheKey, async () => {
+    const track = (sourceId, promise) => {
+      const startedAt = Date.now();
+      return Promise.resolve(promise).then((result) => {
+        emitLog(logEvent, 'core_streams_source', { source: sourceId, outcome: sourceOutcome(report[sourceId]), ms: Date.now() - startedAt });
+        return result;
+      }, (error) => {
+        emitLog(logEvent, 'core_streams_source', { source: sourceId, outcome: 'error', ms: Date.now() - startedAt });
+        throw error;
+      });
+    };
     const sources = SOURCES.filter((source) => !source.types || source.types.includes(route.type));
     if (httpBase && !sources.some((source) => source.base === httpBase)) {
       sources.push({ id: 'http-source', name: 'HTTP source', base: httpBase });
@@ -1586,17 +1704,17 @@ export async function handleCoreStreams(request, env, { headers = {}, rateLimit 
     const imdb = normalizedId.split(':')[0];
     const deadlineSignal = AbortSignal.timeout(SOURCE_TIMEOUT_MS);
     const report = {};
-    const metaPromise = fetchCinemetaTitleYear(route.type, imdb, limitedFetch, deadlineSignal, report);
+    const metaPromise = track('cinemeta', fetchCinemetaTitleYear(route.type, imdb, limitedFetch, deadlineSignal, report));
     const responses = await Promise.all([
-      ...sources.map((source) => fetchSource(source, route.type, normalizedId, limitedFetch, report, deadlineSignal)),
-      fetchYts(route.type, normalizedId, limitedFetch, deadlineSignal, report),
-      fetchPirateBay(route.type, normalizedId, limitedFetch, deadlineSignal, report, metaPromise),
-      fetchEztv(route.type, normalizedId, limitedFetch, deadlineSignal, report, metaPromise),
-      fetchKnaben(route.type, normalizedId, limitedFetch, deadlineSignal, report, metaPromise),
-      fetchOpenMedia(route.type, normalizedId, limitedFetch, deadlineSignal, metaPromise).then((streams) => {
+      ...sources.map((source) => track(source.id, fetchSource(source, route.type, normalizedId, limitedFetch, report, deadlineSignal))),
+      track('yts', fetchYts(route.type, normalizedId, limitedFetch, deadlineSignal, report)),
+      track('tpb', fetchPirateBay(route.type, normalizedId, limitedFetch, deadlineSignal, report, metaPromise)),
+      track('eztv', fetchEztv(route.type, normalizedId, limitedFetch, deadlineSignal, report, metaPromise)),
+      track('knaben', fetchKnaben(route.type, normalizedId, limitedFetch, deadlineSignal, report, metaPromise)),
+      track('open-media', fetchOpenMedia(route.type, normalizedId, limitedFetch, deadlineSignal, metaPromise).then((streams) => {
         if (route.type === 'movie') report['open-media'] = `ok ${streams.length}`;
         return streams;
-      }),
+      })),
     ]);
     // Rank within each provider, then interleave providers before de-duplicating.
     // This stops an early high-volume source from consuming the result cap and
@@ -1630,9 +1748,9 @@ export async function handleCoreStreams(request, env, { headers = {}, rateLimit 
       ...open,
     ];
     const ranked = torbox
-      ? await applyTorbox(pool, {
+      ? await track('torbox', applyTorbox(pool, {
         key: torbox, origin: requestUrl.origin, token: route.token, type: route.type, id: normalizedId, fetchImpl: limitedFetch, report,
-      })
+      }))
       : pool;
     const capped = limitPerResolution(ranked, maxPerResolution);
     // Quality decides order, but the final 80 still keeps a best-effort seat
@@ -1667,6 +1785,9 @@ export async function handleCoreStreams(request, env, { headers = {}, rateLimit 
     const partial = Object.values(report).some((status) => !/^(?:ok|cached|skipped|cache hit)/.test(status));
     return { streams: finalStreams, sources: sourceStatus, partial };
   }, cacheSeconds);
+  emitLog(logEvent, 'core_streams_lookup', {
+    cache, scope: route.type, count: value.streams.length, partial: value.partial ? 1 : 0, ms: Date.now() - lookupStartedAt,
+  });
   return jsonResponse(200, { streams: value.streams }, {
     ...headers, 'X-Core-Streams-Sources': value.sources, 'X-Core-Streams-Cache': cache,
   });

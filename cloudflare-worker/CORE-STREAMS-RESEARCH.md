@@ -549,7 +549,7 @@ Primary sources checked for this pass:
 - Stremio stream response contract: `fileMustInclude` is documented for archive/nzb sources, not torrents; `description` is preferred over deprecated `title`; `bingeGroup` and `notWebReady` semantics. <https://github.com/Stremio/stremio-addon-sdk/blob/master/docs/api/responses/stream.md>
 - AIOStreams pipeline: fetch → parse → filter → dedupe → precompute → sort → format, validating parse-once/precomputed ranking. <https://github.com/Viren070/AIOStreams>
 
-Validation: 186 local mocked-provider tests, an offline simulated-header latency benchmark (`core-streams-latency-benchmark.mjs`), syntax checks and a Wrangler dry-run bundle. The offline benchmark is an orchestration measurement, not a live network result. No private manifest, live TorBox call, deployment or playback test was performed. Existing credentials, install URL, source/security boundaries and no-media-relay architecture are unchanged.
+Validation: 192 local mocked-provider tests, an offline simulated-header latency benchmark (`core-streams-latency-benchmark.mjs`), syntax checks and a Wrangler dry-run bundle. The offline benchmark is an orchestration measurement, not a live network result. No private manifest, live TorBox call, deployment or playback test was performed. Existing credentials, install URL, source/security boundaries and no-media-relay architecture are unchanged.
 
 
 ### Review hardening follow-up
@@ -562,3 +562,15 @@ The post-review pass keeps the same 0.12.0 manifest and install contract while t
 - The emitted TPB season-pack pattern is tested behaviorally against `S02E01`, `2x01`, multipart and neighbouring-episode filenames. Cache documentation now states the configurable/default TTL and the `CORE_STREAMS_CACHE_SECONDS=0` bypass explicitly.
 
 These are mocked-provider regressions and bundle checks, not live TorBox or playback verification.
+
+
+### Pre-merge review closure
+
+The remaining #825 review items are closed on this branch without merging the stacked card/anime PRs:
+
+- **Load/deadline regression:** a saturated six-slot header queue cancels queued requests at their own deadlines without starting extra fetches or opening the provider breaker. A separate regression proves a real provider timeout opens the breaker briefly and a half-open probe can recover it.
+- **Secret-free observability:** the Worker passes its reviewed `logEvent` sink into Core Streams. Lookup, per-source, TorBox-add and play events carry only bounded labels/counts/durations; tests assert install tokens, TorBox keys, info-hashes, media ids and URLs are absent.
+- **TorBox play outage isolation:** repeated play outages open a 30-second isolate-local `torbox-play` breaker. Playback fast-fails with `503 + Retry-After`, stream lookup keeps P2P fallbacks, and key rotation clears the old account's breaker state. `ACTIVE_LIMIT` is not treated as an outage.
+- **Maintainability:** concise docstrings now cover the cache/key/concurrency helpers, ranking/filter helpers, source breaker helpers, TorBox add/play helpers and stream normalization path.
+
+Still separate from #825: #823 needs release-parser fuzz/conflicting-tag/open-media-bypass tests before merge; #824 needs the anime episode matrix and dub/sub cache-isolation tests after rebasing. Canary rollout and AIOStreams template contract tests are operational/follow-up work, not blockers hidden inside this PR.

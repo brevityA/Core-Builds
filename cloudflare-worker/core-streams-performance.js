@@ -9,20 +9,28 @@ export const RESPONSE_CACHE_DEFAULT_SECONDS = 90;
 export const RESPONSE_CACHE_PARTIAL_SECONDS = 15;
 export const SOURCE_HEADER_CONCURRENCY = 6;
 
+/** Parse a bounded integer Worker variable, falling back for absent/invalid input. */
 export function envInteger(value, fallback, minimum, maximum) {
   if (value === undefined || value === null || value === '') return fallback;
   const number = Number(value);
   return Number.isInteger(number) && number >= minimum && number <= maximum ? number : fallback;
 }
 
-// SHA-256 keeps install tokens, TorBox keys and configured source URLs out of
-// cache keys. The inputs are length-prefixed JSON, so concatenation is unambiguous.
+/**
+ * Build a credential-safe cache key. JSON array encoding separates inputs
+ * unambiguously; SHA-256 keeps tokens, keys and source URLs out of the key.
+ */
 export async function responseCacheKey(parts) {
   const bytes = new TextEncoder().encode(JSON.stringify(parts));
   const digest = await crypto.subtle.digest('SHA-256', bytes);
   return [...new Uint8Array(digest)].map((byte) => byte.toString(16).padStart(2, '0')).join('');
 }
 
+/**
+ * Create a bounded isolate-local LRU response cache with single-flight loading.
+ * `run` returns hit/coalesced/miss/bypass; partial responses use a shorter TTL.
+ * Nothing is written to the shared Cloudflare Cache API.
+ */
 export function createResponseCache({
   maxEntries = RESPONSE_CACHE_MAX_ENTRIES,
   maxBytes = RESPONSE_CACHE_MAX_BYTES,
@@ -92,13 +100,16 @@ export function createResponseCache({
   };
 }
 
+/** Return the signal's abort reason, or a generic AbortError when absent. */
 export function abortError(signal) {
   return signal?.reason || Object.assign(new Error('operation aborted'), { name: 'AbortError' });
 }
 
-// Await a shared operation without letting one caller's signal cancel it. The
-// caller still stops waiting at its own deadline; the operation keeps its own
-// bounded lifetime and can be joined by other callers.
+/**
+ * Await a shared operation without letting one caller's signal cancel it.
+ * The caller still stops waiting at its own deadline; the operation keeps its
+ * own bounded lifetime and can be joined by other callers.
+ */
 export function awaitWithSignal(promise, signal) {
   if (!signal) return promise;
   if (signal.aborted) return Promise.reject(abortError(signal));
@@ -112,10 +123,12 @@ export function awaitWithSignal(promise, signal) {
   });
 }
 
-// Cloudflare allows six outgoing connections per invocation while waiting for
-// response headers. Queue explicitly instead of letting the runtime reorder a
-// larger fan-out implicitly. A slot is released as soon as headers arrive; the
-// bounded body reader still applies afterwards.
+/**
+ * Wrap fetch with an explicit header-wait concurrency cap. Cloudflare allows
+ * six outgoing connections per invocation while waiting for headers; queued
+ * calls are removed on abort and never consume a slot after their deadline.
+ * A slot is released when headers arrive; body reads remain bounded separately.
+ */
 export function createHeaderLimiter(fetchImpl, limit = SOURCE_HEADER_CONCURRENCY) {
   let active = 0;
   const queue = [];

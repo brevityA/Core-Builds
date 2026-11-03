@@ -521,10 +521,11 @@ function isPublicStatsBody(text) {
 
 // ── Structured, secret-free logging (INFRA-AUDIT O6) ────────────────────────
 // The ONLY console sink in this worker. Fields are a fixed, reviewed set: event
-// name, error class, hostname label, HTTP status. Never a URL, path, body, IP,
-// header, or paste id — those can carry config passwords or PII.
+// name, error class, hostname label, HTTP status, and bounded Core Streams
+// cache/source/outcome labels. Never a URL, path, body, IP, header, paste id,
+// install token, TorBox key, info-hash or media id — those can carry secrets/PII.
 function logEvent(event, fields = {}) {
-  const allowed = ['cls', 'host', 'status', 'scope', 'store', 'attempts'];
+  const allowed = ['cls', 'host', 'status', 'scope', 'store', 'attempts', 'cache', 'source', 'ms', 'count', 'partial', 'outcome'];
   const out = { event, v: WORKER_VERSION };
   for (const k of allowed) if (fields[k] !== undefined) out[k] = fields[k];
   try { console.log(JSON.stringify(out)); } catch { /* never throw from logging */ }
@@ -737,6 +738,7 @@ export default {
       return handleCoreStreams(request, env, {
         headers: { ...SECURE_DOC_HEADERS, ...publicCors },
         rateLimit: () => rateAllow(env, 'proxy_custom', getClientIp(request), CUSTOM_HOST_PER_MIN, 60),
+        logEvent,
       });
     }
 
