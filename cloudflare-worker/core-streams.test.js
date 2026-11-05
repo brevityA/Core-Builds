@@ -1471,7 +1471,7 @@ test('Kitsu anime episodes come from Nyaa and the add-ons, dubs first, with the 
     const url = String(input);
     calls.push(url);
     accepts[new URL(url).hostname] = init?.headers?.Accept;
-    if (url === 'https://kitsu.io/api/edge/anime/46474') return kitsuFrieren();
+    if (url === 'https://kitsu.app/api/edge/anime/46474') return kitsuFrieren();
     if (url.startsWith('https://torrentsdb.com/')) {
       return jsonResponse({ streams: [{ infoHash: HASH('9'), name: '1080p', title: 'Frieren.Beyond.Journeys.End.S02E05.1080p.CR.WEB-DL.MULTi-VARYG' }] });
     }
@@ -1494,7 +1494,7 @@ test('Kitsu anime episodes come from Nyaa and the add-ons, dubs first, with the 
   };
   const response = await handleCoreStreams(makeRequest(`/core-streams/${TOKEN}/stream/series/kitsu%3A46474%3A5.json`), makeEnv(), { fetchImpl });
   const { streams } = await response.json();
-  assert.equal(accepts['kitsu.io'], 'application/vnd.api+json', 'Kitsu answers 406 to plain JSON');
+  assert.equal(accepts['kitsu.app'], 'application/vnd.api+json', 'Kitsu answers 406 to plain JSON');
   assert.ok(calls.includes('https://torrentio.strem.fun/stream/series/kitsu%3A46474%3A5.json'), 'add-ons get the Kitsu id as is');
   assert.ok(calls.some((url) => decodeURIComponent(url).includes('q=Sousou no Frieren 05&')), 'romaji search');
   assert.ok(calls.some((url) => decodeURIComponent(url).includes("q=Frieren: Beyond Journey's End 05 (dub|dual|multi)&")), 'English dub search');
@@ -1635,13 +1635,13 @@ test('Kitsu titles are cached, so the next episode skips the title lookup; the d
   const fetchImpl = async (input) => {
     const url = String(input);
     calls.push(url);
-    if (url.startsWith('https://kitsu.io/')) return kitsuFrieren();
+    if (url.startsWith('https://kitsu.app/')) return kitsuFrieren();
     if (url.startsWith('https://nyaa.si/')) return nyaaFeed(nyaaItem('[SubsPlease] Sousou no Frieren - 05 (1080p)', HASH('a')));
     return jsonResponse({ streams: [] });
   };
   await handleCoreStreams(makeRequest(`/core-streams/${TOKEN}/stream/series/kitsu%3A46474%3A5.json`), makeEnv(), { fetchImpl });
   await handleCoreStreams(makeRequest(`/core-streams/${TOKEN}/stream/series/kitsu%3A46474%3A6.json`), makeEnv(), { fetchImpl });
-  assert.equal(calls.filter((url) => url.startsWith('https://kitsu.io/')).length, 1);
+  assert.equal(calls.filter((url) => url.startsWith('https://kitsu.app/')).length, 1);
 
   const env = makeEnv({ CORE_STREAMS_CACHE_SECONDS: '60' });
   const dub = await handleCoreStreams(makeRequest(`/core-streams/${TOKEN}/stream/series/kitsu%3A46474%3A7.json`), env, { fetchImpl });

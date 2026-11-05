@@ -1474,7 +1474,7 @@ async function fetchKitsuMeta(kitsuId, fetchImpl, deadlineSignal, report = {}) {
   if (cached) kitsuCache.delete(kitsuId);
   if (!sourceAllowed('kitsu')) { report.kitsu = 'paused'; return null; }
   try {
-    const payload = await fetchBoundedJson(`https://kitsu.io/api/edge/anime/${encodeURIComponent(kitsuId)}`, fetchImpl,
+    const payload = await fetchBoundedJson(`https://kitsu.app/api/edge/anime/${encodeURIComponent(kitsuId)}`, fetchImpl,
       OPEN_MEDIA_MAX_BYTES, OPEN_MEDIA_TIMEOUT_MS, deadlineSignal, [], null, { accept: 'application/vnd.api+json' });
     sourceSucceeded('kitsu');
     const attributes = payload?.data?.attributes;
