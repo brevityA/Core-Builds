@@ -39,6 +39,7 @@ export function createResponseCache({
   const entries = new Map();
   const pending = new Map();
   let bytes = 0;
+  let coalesced = 0; // requests that joined an in-flight load (diagnostics/tests)
 
   const remove = (key) => {
     const entry = entries.get(key);
@@ -76,7 +77,10 @@ export function createResponseCache({
   const run = async (key, load, ttlSeconds = 0) => {
     const cached = ttlSeconds > 0 ? get(key) : null;
     if (cached) return { value: cached, cache: 'hit' };
-    if (pending.has(key)) return { value: await pending.get(key), cache: 'coalesced' };
+    if (pending.has(key)) {
+      coalesced++;
+      return { value: await pending.get(key), cache: 'coalesced' };
+    }
     const promise = (async () => load())();
     pending.set(key, promise);
     try {
@@ -95,8 +99,8 @@ export function createResponseCache({
     run,
     get,
     set,
-    clear() { entries.clear(); pending.clear(); bytes = 0; },
-    stats() { return { entries: entries.size, bytes, pending: pending.size }; },
+    clear() { entries.clear(); pending.clear(); bytes = 0; coalesced = 0; },
+    stats() { return { entries: entries.size, bytes, pending: pending.size, coalesced }; },
   };
 }
 

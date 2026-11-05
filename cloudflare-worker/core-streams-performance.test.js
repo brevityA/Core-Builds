@@ -73,6 +73,10 @@ test('simultaneous identical requests share one provider fan-out', async () => {
   const a = handleCoreStreams(request(), env(), { fetchImpl });
   const b = handleCoreStreams(request(), env(), { fetchImpl });
   while (calls === 0) await new Promise((resolve) => setImmediate(resolve));
+  // Request b hashes its cache key asynchronously (SHA-256); under CPU load
+  // that can finish after a's fan-out. Open the gate only once b has joined,
+  // or b would legitimately see a cache hit instead of a coalesced load.
+  while (_coreStreamsTest.responseCacheStats().coalesced === 0) await new Promise((resolve) => setImmediate(resolve));
   const afterFanOut = calls;
   release();
   const [ra, rb] = await Promise.all([a, b]);
