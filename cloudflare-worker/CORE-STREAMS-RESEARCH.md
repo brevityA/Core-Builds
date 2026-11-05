@@ -25,7 +25,7 @@ Repo evidence for the initial torrent sources is in [`tools/benchmark/addon-inve
 
 Cloudflare's current [Workers limits](https://developers.cloudflare.com/workers/platform/limits/) list 50 subrequests per invocation and six simultaneous outgoing connections on Free, alongside 100,000 Worker requests/day and 10 ms CPU time per invocation. Network wait time is not CPU time, but parsing/scraping HTML and large payloads still consumes CPU and memory.
 
-Before the widened-search integration below, Core Streams fanned out to at most three JSON add-ons (two fixed sources and one optional configured source). It now fans out to at most four (three fixed movie sources and one optional configured source), streams each response through a 1 MiB bounded reader, and applies a 5.5-second timeout. Each provider has an isolate-local circuit breaker (three failures, then a 30-second cooldown); it is deliberately best-effort, not a globally consistent outage detector. Core Streams does **not** fetch/relay video bytes. The new source's bounded lookup and sequential Archive metadata reads keep the worst case within 10 upstream requests and six concurrent connections. A future implementation that scrapes many sites directly should use a separately operated scraper backend or indexer, with the Worker serving only as a protected edge/API layer.
+Before the widened-search integration below, Core Streams fanned out to at most three JSON add-ons (two fixed sources and one optional configured source). It now fans out to at most four (three fixed movie sources and one optional configured source), streams each response through a 1 MiB bounded reader, and applies a 5.5-second provider timeout inside an 8-second request-wide deadline. Each provider has an isolate-local circuit breaker (three provider failures/timeouts, then a 30-second cooldown); it is deliberately best-effort, not a globally consistent outage detector. Core Streams does **not** fetch/relay video bytes. The new source's bounded lookup and sequential Archive metadata reads keep the worst case within 10 upstream requests and six concurrent connections. A future implementation that scrapes many sites directly should use a separately operated scraper backend or indexer, with the Worker serving only as a protected edge/API layer.
 
 ### Direct HTTP source status
 
@@ -517,3 +517,66 @@ The Worker mapping is pinned to the exact IMDb ID, Cinemeta title/year, official
 **Code-review follow-up:** the prioritized issues recorded during the PR review were fixed in the benchmark and source-scout. The benchmark now measures through complete JSON body parsing, rejects malformed/bodyless stream responses, blocks additional reserved local host suffixes, and stratifies limited runs so `--limit=3` still covers a popular movie, an episode, and open media. The source-scout now bounds provider bodies while streaming, redacts credential-like manifest paths and secret text, escapes untrusted Markdown text and URL destinations, retains provider metadata in Markdown, and is included in CI. The optional smoke check omits token-bearing URLs from network-error details. Regression tests were added for each behavior. No deployment was performed.
 
 Sources: [Cinemeta record](https://v3-cinemeta.strem.io/meta/movie/tt7993892.json), [official Blender PeerTube search](https://video.blender.org/api/v1/videos?search=Caminandes%3A%20Llamigos%26count=10), [official Blender PeerTube video record](https://video.blender.org/api/v1/videos/48), [official PeerTube watch page](https://video.blender.org/w/5ruRYckTcQMTMQvyqMnVsr), [Blender Cloud project](https://cloud.blender.org/p/caminandes-3), and [Internet Archive item metadata](https://archive.org/metadata/CaminandesLlamigos). Checked 2026-10-26.
+
+## Playback reliability and repeat-lookup pass — 2026-11-03
+
+Core Streams advances to **0.11.0** without adding a source, changing credentials, or relaxing URL, rights, rate-limit, or response-size checks. This pass addresses failure modes found in the existing implementation:
+
+- **Account-safe TorBox playback:** torrent ids are scoped to the configured API key. Concurrent requests for the same account/hash share only the in-flight `createtorrent` operation; file selection and signed CDN links remain per request. A stale cached id receives one bounded recreation attempt after `ITEM_NOT_FOUND`. The id cache remains capped at 200 entries per isolate.
+- **Repeat metadata lookups:** successful public Cinemeta title/year records are cached for six hours, with a 256-title bound and no persistence. Cache hits bypass an open Cinemeta breaker; missing or failed lookups are not cached. No token, credential, stream list, or media byte enters this cache.
+- **Episode identity:** release matching recognizes common `S02E01`/`2x01` spellings while continuing to reject neighbouring episodes and multi-episode releases. Pack-file selection and `fileMustInclude` now share a portable pattern that supports both spellings, end-of-string names, and multipart files containing the requested episode. Show-title checks understand the same spellings.
+- **Diagnostics:** the source header reports `cinemeta=cache hit`, `ok`, `no title`, `paused`, `timeout`, or `network error` without request identifiers. The operator example uses a GET with headers dumped, because the stream-list route does not accept HEAD.
+
+Focused regression tests cover cache reuse/isolation/expiry/eviction, outage fallback, concurrent GET/HEAD adds, failed-add recovery, key rotation, stale-id recovery, and episode/file matching. The Worker build tag, strict smoke expectation, and deploy wait-loop advance together to `2026-11-03`.
+
+Validation is local mocked-provider testing and a Wrangler dry-run bundle; no private manifest, live TorBox account, deployed playback, or provider availability was tested in this pass. Existing open-media rights caveats and the advisory nature of stream ranking are unchanged.
+
+
+## Speed, responsiveness and ranking pass — 2026-11-03
+
+Core Streams advances to **0.12.0** after reviewing Claude's stacked PRs #823/#824 and testing the #824 snapshot in isolation (163/163 tests passed). The useful ideas were ported selectively rather than merging the branch wholesale:
+
+- **Isolate-local response cache + single-flight.** By default, complete stream lists are cached for 90 s; partial lists use the lower of the configured TTL and 15 s. `CORE_STREAMS_CACHE_SECONDS=0` disables this cache (single-flight coalescing still applies). The cache is bounded to 64 entries / 4 MiB, and empty lists are never cached. Identical concurrent requests share one provider fan-out. The key is a SHA-256 hash over origin, install token, media id, TorBox key, configured source manifest and result-cap setting. No raw credential becomes a cache key; no stream list or token-bearing play URL is written to `caches.default`. This avoids the account/config isolation gap in #824 and the Cache API's datacenter-local, custom-domain and subrequest-quota caveats.
+- **Explicit header-wait concurrency.** Cloudflare documents six simultaneous outgoing connections per invocation while waiting for response headers (Free and Paid; later connections queue). Core Streams now queues explicitly at six instead of relying on implicit runtime ordering. Body reads remain bounded by the existing per-source byte limits and deadlines.
+- **Global quality pass with fallback preservation.** Provider-fair interleaving/dedupe still runs first. A memoized score then ranks release-source labels, resolution, seed hints, HDR/DV and lossless audio; obvious CAM/screener/sample releases are fallback-only. The final cap reserves best-effort provider seats and all curated open-media slots. An optional `CORE_STREAMS_MAX_PER_RESOLUTION` cap can add diversity after TorBox promotion.
+- **Anime discovery deferred.** #824's Kitsu/Nyaa path is promising but its episode classifier mishandles absolute-numbered and season-labelled releases, and Stremio's stream protocol does not support `fileMustInclude` for torrents. Shipping it before those matching/pack-selection gaps are fixed would turn false negatives into missing episodes. The review is recorded on #824.
+
+Primary sources checked for this pass:
+
+- Cloudflare Workers limits: six header-wait connections, 50 subrequests Free / 10,000 Paid, 128 MiB isolate memory; Cache API operations share subrequest quota. <https://github.com/cloudflare/cloudflare-docs/blob/production/src/content/docs/workers/platform/limits.mdx>
+- Cloudflare Cache API: datacenter-local, ephemeral, non-replicating; custom-domain/Pages constraints; incompatible with tiered caching. <https://github.com/cloudflare/cloudflare-docs/blob/production/src/content/docs/workers/runtime-apis/cache.mdx>
+- Knaben API: title-search fields and seeders ordering; no documented IMDb-id search field, so Knaben cannot safely start before title metadata. <https://github.com/knaben-database/knaben-api>
+- Stremio stream response contract: `fileMustInclude` is documented for archive/nzb sources, not torrents; `description` is preferred over deprecated `title`; `bingeGroup` and `notWebReady` semantics. <https://github.com/Stremio/stremio-addon-sdk/blob/master/docs/api/responses/stream.md>
+- AIOStreams pipeline: fetch → parse → filter → dedupe → precompute → sort → format, validating parse-once/precomputed ranking. <https://github.com/Viren070/AIOStreams>
+
+Validation: 198 local mocked-provider tests, an offline simulated-header latency benchmark (`core-streams-latency-benchmark.mjs`), syntax checks and a Wrangler dry-run bundle. The offline benchmark is an orchestration measurement, not a live network result. No private manifest, live TorBox call, deployment or playback test was performed. Existing credentials, install URL, source/security boundaries and no-media-relay architecture are unchanged.
+
+
+### Review hardening follow-up
+
+The post-review pass keeps the same 0.12.0 manifest and install contract while tightening cancellation and concurrency behavior:
+
+- A fixed-source request cancelled by the request-wide deadline no longer counts toward that provider's breaker, including cancellation while queued for a header-wait slot or while reading a bounded body. Queued header waits now remove themselves on abort instead of later consuming a connection slot.
+- A shared TorBox `createtorrent` operation has its own bounded lifetime instead of inheriting the first viewer's signal. Each viewer still bounds its own wait; a joined viewer whose deadline remains live may replace an aborted shared add once, and other waiters coalesce behind that replacement. Non-abort failures such as `ACTIVE_LIMIT` are not immediately retried.
+- Internet Archive lookup starts as soon as Cinemeta metadata is available and runs concurrently with the independent Blender chain, rather than waiting for Blender to finish.
+- The emitted TPB season-pack pattern is tested behaviorally against `S02E01`, `2x01`, multipart and neighbouring-episode filenames. Cache documentation now states the configurable/default TTL and the `CORE_STREAMS_CACHE_SECONDS=0` bypass explicitly.
+
+These are mocked-provider regressions and bundle checks, not live TorBox or playback verification.
+
+
+### Pre-merge review closure
+
+The remaining #825 review items are closed on this branch without merging the stacked card/anime PRs:
+
+- **Load/deadline regression:** a saturated six-slot header queue cancels queued requests at their own deadlines without starting extra fetches or opening the provider breaker. Separate regressions hang the fetch (header, body and Cinemeta metadata) and prove provider timeouts open the breaker briefly, a half-open probe can recover it, and queue time does not start the provider timer.
+- **Secret-free observability:** the Worker passes its reviewed `logEvent` sink into Core Streams. Lookup, per-source, TorBox-add and play events carry only bounded labels/counts/durations; tests assert install tokens, TorBox keys, info-hashes, media ids and URLs are absent.
+- **TorBox play outage isolation:** repeated play outages open a 30-second isolate-local `torbox-play` breaker. Playback fast-fails with `503 + Retry-After`, stream lookup keeps P2P fallbacks, and key rotation clears the old account's breaker state. `ACTIVE_LIMIT` and per-torrent conditions (`ITEM_NOT_FOUND`, `BAD_LINK`, `NO_TORRENT_ID`) are not treated as account-wide outages.
+- **Maintainability:** concise docstrings now cover the cache/key/concurrency helpers, ranking/filter helpers, source breaker helpers, TorBox add/play helpers and stream normalization path.
+
+Still separate from #825: #823 needs release-parser fuzz/conflicting-tag/open-media-bypass tests before merge; #824 needs the anime episode matrix and dub/sub cache-isolation tests after rebasing. Canary rollout and AIOStreams template contract tests are operational/follow-up work, not blockers hidden inside this PR.
+
+### Timeout-accounting review closure
+
+The blocking #825 review finding was that the request-wide deadline and per-source timeout both used `SOURCE_TIMEOUT_MS`, so `AbortSignal.any` surfaced the request deadline first and real provider hangs never reached `sourceFailed`. The fix separates the budgets: an 8-second request-wide deadline, a 5.5-second provider timer started only after the header-wait slot is granted, and a 4-second open-media metadata timer. Provider timers remain active through bounded body reads and are cancelled in `finally`. Provider timeout classification is checked before request-deadline cancellation, while queued/deadline aborts still release half-open probes without counting as provider failures.
+
+The Worker configuration also pins `handle_cross_request_promise_resolution` (default only from 2024-10-14) because the response cache and TorBox add cache deliberately share in-flight promises across requests; a regression checks both production and staging config. The load suite now mocks the clock and `AbortSignal.timeout` together, then hangs fetch until the composed signal aborts. It proves: three real Torrentio header hangs open the breaker and a half-open probe recovers; a queued provider does not start its own timeout until a slot is granted; a Cinemeta metadata hang opens its breaker; and a body hang after headers still counts as a provider timeout. The same regressions fail against the previous shared-constant design. The episode matcher now accepts audio-channel suffixes such as `S02E01.5.1.1080p` while still rejecting multipart episode continuations, and the TorBox play breaker excludes per-torrent error codes.

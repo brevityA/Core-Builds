@@ -1,6 +1,10 @@
 name = "core-builds-cors-proxy"
 main = "worker.js"
 compatibility_date = "2024-09-25"
+# Core Streams shares in-flight lookup/add promises across requests. The corrected
+# cross-request promise semantics became default on 2024-10-14; pin the flag so
+# the older compatibility date cannot schedule continuations in the wrong request.
+compatibility_flags = ["handle_cross_request_promise_resolution"]
 
 # Workers Logs (structured, secret-free events from logEvent()). Free plan includes
 # Workers Logs with sampling; keep head_sampling_rate at 1 while volume is < 100k/day.
@@ -84,6 +88,7 @@ ALLOWED_ORIGIN = "*"
 # their ids below. The DO class and ratelimits are declared again explicitly.
 [env.staging]
 name = "core-builds-cors-proxy-staging"
+compatibility_flags = ["handle_cross_request_promise_resolution"]
 [env.staging.observability]
 enabled = true
 [env.staging.vars]

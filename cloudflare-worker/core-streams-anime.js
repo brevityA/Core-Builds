@@ -52,7 +52,7 @@ function normalize(value) {
     .replace(/&/g, ' and ').replace(/[^a-z0-9]+/g, ' ').trim();
 }
 
-const SEASON_WORDS = /\b(?:\d{1,2}(?:st|nd|rd|th) season|season \d{1,2}|s\d{1,2}|part \d{1,2}|cour \d{1,2})\b/g;
+const SEASON_WORDS = /\b(?:\d{1,2}(?:st|nd|rd|th) season|season \d{1,2}|s\d{1,2}|part \d{1,2}|cour \d{1,2}|ii|iii|iv|vi)\b/g;
 
 // "Sousou no Frieren 2nd Season" -> "sousou no frieren": the season is checked
 // separately, because releases write it as "S2", "Season 2" or "2nd Season".
@@ -60,10 +60,16 @@ export function baseTitle(title) {
   return normalize(title).replace(SEASON_WORDS, ' ').replace(/\s+/g, ' ').trim();
 }
 
+// "V" is left out: as a lone letter it is too often part of a title.
+const ROMAN = { ii: 2, iii: 3, iv: 4, vi: 6 };
+
 export function seasonOf(text) {
-  const value = normalize(text);
+  const value = normalize(String(text).replace(/\[[^\]]*\]|\([^)]*\)/g, (tag) => (/season|\bs\d/i.test(tag) ? tag : ' ')));
   const match = value.match(/\bs0*(\d{1,2})(?:e\d|\b)/) || value.match(/\b(\d{1,2})(?:st|nd|rd|th) season\b/) || value.match(/\bseason 0*(\d{1,2})\b/);
-  return match ? Number(match[1]) : 1;
+  if (match) return Number(match[1]);
+  // "Mushoku Tensei II: ...": a Roman numeral in the title, before any " - 05".
+  const roman = value.split(/ \d{1,4}(?: |$)/)[0].match(/ (ii|iii|iv|vi)\b/);
+  return roman ? ROMAN[roman[1]] : 1;
 }
 
 // The release name without its leading/trailing "[Group]", "(1080p)" tags.
@@ -71,10 +77,18 @@ function releaseCore(release) {
   return normalize(String(release).replace(/\[[^\]]*\]|\([^)]*\)/g, ' '));
 }
 
+// Kitsu titles often carry a subtitle releases leave out ("Mushoku Tensei II:
+// Isekai Ittara Honki Dasu" is released as "Mushoku Tensei S2"), so the part
+// before a colon also counts when it is at least two words. Season words are
+// removed on both sides; the season itself is checked by seasonOf().
 export function titleMatches(release, titles) {
-  const core = ` ${releaseCore(release)} `;
-  const full = ` ${normalize(release)} `;
-  return titles.map(baseTitle).filter((title) => title.length >= 2)
+  const core = ` ${baseTitle(releaseCore(release))} `;
+  const full = ` ${baseTitle(release)} `;
+  const candidates = titles.flatMap((title) => {
+    const main = String(title).split(/[:：]/)[0];
+    return main !== title && baseTitle(main).split(' ').length >= 2 ? [title, main] : [title];
+  });
+  return candidates.map(baseTitle).filter((title) => title.length >= 2)
     .some((title) => core.includes(` ${title} `) || full.includes(` ${title} `));
 }
 

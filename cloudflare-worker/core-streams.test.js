@@ -1,6 +1,10 @@
-import test from 'node:test';
+import test, { beforeEach } from 'node:test';
 import assert from 'node:assert/strict';
 import { handleCoreStreams, _coreStreamsTest } from './core-streams.js';
+
+// Metadata caching is deliberately isolate-local; each test starts cold so
+// upstream call-count assertions remain independent of test execution order.
+beforeEach(() => { _coreStreamsTest.resetCinemetaCache(); _coreStreamsTest.resetResponseCache(); });
 
 const TOKEN = '0123456789abcdef0123456789abcdef';
 const secureHeaders = { 'Access-Control-Allow-Origin': '*' };
@@ -25,9 +29,9 @@ test('manifest is a Stremio stream-only manifest behind the install token', asyn
   assert.equal(response.headers.get('Cache-Control'), 'no-store');
   assert.deepEqual(await response.json(), {
     id: 'uk.corebuilds.core-streams',
-    version: '0.12.0',
+    version: '0.13.0',
     name: 'Core Streams',
-    description: 'Quality-ranked streams with clean file details: torrent add-ons and public indexes (YTS, The Pirate Bay, EZTV, Knaben, Nyaa for anime with dubs first), instant TorBox playback when configured, open media, and configurable sources.',
+    description: 'Quality-ranked streams with clean file details and fast repeat lookups: torrent add-ons and public indexes (YTS, The Pirate Bay, EZTV, Knaben, Nyaa for anime with dubs first), instant TorBox playback when configured, open media, and configurable sources.',
     resources: ['stream'],
     types: ['movie', 'series', 'anime'],
     catalogs: [],
@@ -105,7 +109,7 @@ test('smart ordering ranks quality and seed hints while interleaving provider re
   assert.equal(_coreStreamsTest.inferredSeeders(groups[0][1]), 40);
 });
 
-test('the per-resolution cap keeps high-volume providers from starving the others', async () => {
+test('global result cap does not let high-volume providers starve later providers', async () => {
   _coreStreamsTest.resetSourceHealth();
   const hash = (number) => number.toString(16).padStart(40, '0');
   const streamBatch = (count, makeStream) => Array.from({ length: count }, (_, index) => makeStream(index));
@@ -145,12 +149,11 @@ test('the per-resolution cap keeps high-volume providers from starving the other
     { fetchImpl },
   );
   const streams = (await response.json()).streams;
-  // 8 at 4K (the direct HTTPS ones outrank P2P), 8 at 1080p, and the 5
-  // open-media films, which are never capped.
-  assert.equal(streams.length, 21);
-  assert.equal(streams.filter((stream) => stream.name.endsWith('\n4K')).length, 8);
-  assert.ok(streams.filter((stream) => stream.name.endsWith('\n4K')).every((stream) => from(stream, 'HTTP source')));
-  assert.equal(streams.filter((stream) => from(stream, 'TorrentsDB')).length, 8, 'the 1080p provider is not crowded out by 78 4K results');
+  assert.equal(streams.length, 80);
+  assert.ok(streams.some((stream) => from(stream, 'Torrentio') && stream.name === '🧲 P2P\n4K'));
+  assert.ok(streams.some((stream) => from(stream, 'TorrentsDB') && stream.name === '🧲 P2P\n1080p'));
+  assert.ok(streams.some((stream) => from(stream, 'Public Domain Movies')));
+  assert.ok(streams.some((stream) => from(stream, 'HTTP source') && stream.name === '🌐 Direct\n4K'));
   assert.equal(streams.filter((stream) => from(stream, 'Public Domain Movies')).length, 5);
   _coreStreamsTest.resetSourceHealth();
 });
@@ -1074,7 +1077,14 @@ test('series: The Pirate Bay returns single episodes first, then season packs th
   assert.deepEqual(tpb.map((stream) => stream.infoHash), [HASH('d'), HASH('a')],
     'the episode, then the season 2 pack; not season 3, an episode range, another show or another episode');
   assert.equal(tpb[0].fileMustInclude, undefined);
-  assert.deepEqual(tpb[1].fileMustInclude, ['[Ss]0*2[ ._-]?[Ee]0*1[^0-9]']);
+  assert.deepEqual(tpb[1].fileMustInclude, [_coreStreamsTest.episodeFilePattern(2, 1)]);
+  const packPattern = new RegExp(tpb[1].fileMustInclude[0]);
+  for (const filename of ['The.Office.US.S02E01.mkv', 'The Office US 2x01.mp4', 'Season 2/The.Office.US.S02E01-E02.mkv']) {
+    assert.ok(packPattern.test(filename), filename);
+  }
+  for (const filename of ['The.Office.US.S02E02.mkv', 'The.Office.US.2x02.mp4', 'The.Office.US.S02E10.mkv']) {
+    assert.ok(!packPattern.test(filename), filename);
+  }
   assert.match(response.headers.get('X-Core-Streams-Sources'), /tpb=ok 2/);
   assert.ok(!response.headers.get('X-Core-Streams-Sources').includes('tpb-search'));
   _coreStreamsTest.resetSourceHealth();
@@ -1136,8 +1146,8 @@ test('the stream response names each source\'s outcome, so an empty list can be 
 
 test('episode, season-pack and file patterns accept common release names and reject neighbours', () => {
   const ep = _coreStreamsTest.episodeMatcher('2', '1');
-  for (const name of ['Show.S02E01.1080p', 'Show S2E1 720p', 'show.s02.e01.web', 'Show 2x01 HDTV']) assert.ok(ep.test(name), name);
-  for (const name of ['Show.S02E10.1080p', 'Show.S12E01', 'Show.S02E01-E03', 'Show.S02E011']) assert.ok(!ep.test(name), name);
+  for (const name of ['Show.S02E01.1080p', 'Show S2E1 720p', 'show.s02.e01.web', 'Show 2x01 HDTV', 'Show.S02E01.5.1.1080p', 'Show.S02E01.5.1.WEB-DL']) assert.ok(ep.test(name), name);
+  for (const name of ['Show.S02E10.1080p', 'Show.S12E01', 'Show.S02E01-E03', 'Show.S02E011', 'Show.S02E01.02.03']) assert.ok(!ep.test(name), name);
 
   const pack = _coreStreamsTest.seasonPackMatcher('2');
   for (const name of ['Show Season 2 Complete 720p', 'Show S02 1080p WEB-DL', 'Show.S02.Complete', 'Show Complete Series 1080p']) assert.ok(pack.test(name), name);
@@ -1489,8 +1499,10 @@ test('Kitsu anime episodes come from Nyaa and the add-ons, dubs first, with the 
   assert.ok(calls.some((url) => decodeURIComponent(url).includes('q=Sousou no Frieren 05&')), 'romaji search');
   assert.ok(calls.some((url) => decodeURIComponent(url).includes("q=Frieren: Beyond Journey's End 05 (dub|dual|multi)&")), 'English dub search');
   assert.ok(!calls.some((url) => /accel\.li|apibay|eztvx|knaben|cinemeta|archive\.org/.test(url)), 'IMDb-only indexes are not asked');
-  assert.deepEqual(streams.map((stream) => stream.infoHash), [HASH('b'), HASH('e'), HASH('a')],
-    'dub and dual-audio first, then the sub; season 2 (from Nyaa or an add-on), remakes and dead torrents are dropped');
+  assert.deepEqual(streams.map((stream) => stream.infoHash), [HASH('b'), HASH('e'), HASH('a'), HASH('9')],
+    'the multi-audio episode, then the dual-audio pack (below the episode with dub audio), then the sub; '
+    + 'season 2 from Nyaa, remakes and dead torrents are dropped, '
+    + "and the add-on's S02E05 file is kept but sinks to the bottom, so a misread numbering never hides a file");
   assert.match(streams[0].description, /🎙 Multi-audio/);
   assert.match(streams[1].description, /🏷 .*Season pack/);
   assert.deepEqual(streams[1].fileMustInclude, ['(?:[Ee][Pp]?|- |\\[)0*5(?:v[0-9])?[^0-9]']);
@@ -1551,7 +1563,7 @@ test('dubs come first for anime only', () => {
   const sub4k = { infoHash: 'c'.repeat(40), name: '2160p', title: '[Group] Show - 05 (2160p WEB-DL)' };
   const remux4k = { infoHash: 'e'.repeat(40), name: '2160p', title: 'Show.S01E05.2160p.BluRay.REMUX.DV.HDR10.TrueHD.Atmos 👤 500' };
   const dub1080 = { infoHash: 'f'.repeat(40), name: '1080p', title: '[Group] Show - 05 (1080p) [English Dub]' };
-  const score = _coreStreamsTest.smartStreamScore;
+  const score = _coreStreamsTest.rankScore;
   const dubFirst = { anime: true, audio: 'dub' };
   assert.ok(score(dub, dubFirst) > score(sub, dubFirst));
   assert.ok(score(dub, dubFirst) > score(sub4k, dubFirst), 'a 720p dub comes before a 4K WEB-DL sub');
@@ -1560,17 +1572,17 @@ test('dubs come first for anime only', () => {
   assert.ok(score(dub) < score(sub), 'live action is not reordered by "dual audio"');
 });
 
-test('CAM, 3D and upscaled copies are dropped while something better is left', () => {
-  const make = (title) => _coreStreamsTest.normalizeStream({ infoHash: HASH(String(title.length % 10)), name: 'x', title }, 'Torrentio');
-  const cam = make('New.Film.2026.HDCAM.x264');
-  const web = make('New.Film.2026.1080p.WEB-DL.x264');
-  const sbs = make('New.Film.2026.1080p.3D.Half-SBS');
-  assert.deepEqual(_coreStreamsTest.dropJunk([cam, web, sbs]), [web]);
+test('CAM copies are dropped while something better is left; 3D only sinks', () => {
+  const make = (title, n) => _coreStreamsTest.normalizeStream({ infoHash: HASH(String(n)), name: 'x', title }, 'Torrentio');
+  const cam = make('New.Film.2026.HDCAM.x264', 1);
+  const web = make('New.Film.2026.1080p.WEB-DL.x264', 2);
+  const sbs = make('New.Film.2026.1080p.3D.Half-SBS', 3);
+  assert.deepEqual(_coreStreamsTest.dropJunk([cam, web, sbs]), [web, sbs]);
+  assert.ok(_coreStreamsTest.smartStreamScore(sbs) < _coreStreamsTest.smartStreamScore(web), '3D ranks below the 2D copy');
   assert.deepEqual(_coreStreamsTest.dropJunk([cam]), [cam], 'a film still in cinemas keeps its CAMs');
-  const film = make('Cam.2018.1080p.WEB-DL.x264');
+  const film = make('Cam.2018.1080p.WEB-DL.x264', 4);
   assert.deepEqual(_coreStreamsTest.dropJunk([film]), [film], 'a film called Cam is not a camcorder copy');
 });
-
 test('each resolution keeps at most CORE_STREAMS_MAX_PER_RESOLUTION results, in order', () => {
   const streams = ['2160p', '2160p', '2160p', '1080p', '1080p', '1080p', '720p', 'Film'].map((name, index) =>
     _coreStreamsTest.normalizeStream({ infoHash: HASH(String(index)), name }, 'Torrentio'));
@@ -1599,5 +1611,44 @@ test('a title asked for again within the cache time is answered without asking a
   const episode = await handleCoreStreams(makeRequest(`/core-streams/${TOKEN}/stream/series/tt0133093:1:1.json`), env, { fetchImpl });
   assert.equal(episode.headers.get('X-Core-Streams-Cache'), 'miss', 'another id is its own entry');
   _coreStreamsTest.resetResponseCache();
+  _coreStreamsTest.resetSourceHealth();
+});
+
+test('anime matching skips what it cannot place instead of guessing', () => {
+  const classify = _coreStreamsTest.classifyAnimeRelease;
+  const frieren = { titles: ['Sousou no Frieren', "Frieren: Beyond Journey's End"], season: 2, episode: 5 };
+  assert.equal(classify('[X] Sousou no Frieren - 33 (1080p)', frieren), null, 'absolute numbering (S2E5 = 33) is left out, not misread');
+  assert.equal(classify('[X] Sousou no Frieren S2 - 105 (1080p)', frieren), null, '" - 105" is not episode 5');
+  assert.equal(classify('[X] Sousou no Frieren - 05 (1080p)', frieren), null, 'an unlabelled release is season 1');
+  assert.equal(classify('[X] Sousou no Frieren S2 - 05 (1080p)', frieren), 'episode');
+  const mushoku = { titles: ['Mushoku Tensei II: Isekai Ittara Honki Dasu'], season: 2, episode: 5 };
+  assert.equal(classify('[SubsPlease] Mushoku Tensei S2 - 05 (1080p)', mushoku), 'episode', 'the title before the colon counts');
+  assert.equal(classify('[Erai-raws] Mushoku Tensei II - 05 [1080p]', mushoku), 'episode', 'a Roman numeral is the season');
+  assert.equal(classify('[SubsPlease] Mushoku Tensei - 05 (1080p)', mushoku), null);
+  assert.equal(classify('[X] Re:Zero S2 - 05', mushoku), null);
+});
+
+test('Kitsu titles are cached, so the next episode skips the title lookup; the dub setting is part of the cache key', async () => {
+  _coreStreamsTest.resetSourceHealth();
+  _coreStreamsTest.resetKitsuCache();
+  const calls = [];
+  const fetchImpl = async (input) => {
+    const url = String(input);
+    calls.push(url);
+    if (url.startsWith('https://kitsu.io/')) return kitsuFrieren();
+    if (url.startsWith('https://nyaa.si/')) return nyaaFeed(nyaaItem('[SubsPlease] Sousou no Frieren - 05 (1080p)', HASH('a')));
+    return jsonResponse({ streams: [] });
+  };
+  await handleCoreStreams(makeRequest(`/core-streams/${TOKEN}/stream/series/kitsu%3A46474%3A5.json`), makeEnv(), { fetchImpl });
+  await handleCoreStreams(makeRequest(`/core-streams/${TOKEN}/stream/series/kitsu%3A46474%3A6.json`), makeEnv(), { fetchImpl });
+  assert.equal(calls.filter((url) => url.startsWith('https://kitsu.io/')).length, 1);
+
+  const env = makeEnv({ CORE_STREAMS_CACHE_SECONDS: '60' });
+  const dub = await handleCoreStreams(makeRequest(`/core-streams/${TOKEN}/stream/series/kitsu%3A46474%3A7.json`), env, { fetchImpl });
+  const sub = await handleCoreStreams(makeRequest(`/core-streams/${TOKEN}/stream/series/kitsu%3A46474%3A7.json`),
+    { ...env, CORE_STREAMS_ANIME_AUDIO: 'sub' }, { fetchImpl });
+  assert.equal(dub.headers.get('X-Core-Streams-Cache'), 'miss');
+  assert.equal(sub.headers.get('X-Core-Streams-Cache'), 'miss', 'a different audio order is a different answer');
+  _coreStreamsTest.resetKitsuCache();
   _coreStreamsTest.resetSourceHealth();
 });

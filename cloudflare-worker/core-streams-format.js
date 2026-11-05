@@ -101,14 +101,6 @@ const EDITIONS = [
 
 import { dubLabel } from './core-streams-anime.js';
 
-// Copies AIOStreams excludes by default. Bare "CAM"/"TS" are left out on
-// purpose: a film called "Cam" or a ".ts" file is not a camcorder copy.
-const JUNK_RE = /\b(?:camrip|hdcam|hdts|telesync|telecine|hdtc|dvdscr|screener|3d|half[ .-]?(?:sbs|ou)|upscal(?:e|ed|ing)|ai[ .-]?upscale|sample)\b/i;
-
-export function isJunkRelease(text) {
-  return JUNK_RE.test(String(text || ''));
-}
-
 const FLAG_RE = /(?:[\u{1F1E6}-\u{1F1FF}]{2})/gu;
 const FILE_EXT_RE = /\.(?:mkv|mp4|m4v|avi|webm|mov|ts|m2ts|wmv)$/i;
 
