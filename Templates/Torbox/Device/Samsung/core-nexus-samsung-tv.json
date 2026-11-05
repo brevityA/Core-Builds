@@ -5,7 +5,7 @@
     "description": "Stream template tuned for Samsung smart TVs and other devices without Dolby Vision support. DV-only streams are excluded — only HDR10, HDR10+, HLG, and SDR content appears. Based on Core Nexus Stream (1080p · TorBox Essential · Library, Comet, Zilean).",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "0.3.14",
+    "version": "0.3.15",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -17,6 +17,11 @@
       "v232Action": "remove legacy preset; configure the separate Newznab endpoint only after validation"
     },
     "changelog": [
+      {
+        "date": "2026-11-02",
+        "version": "0.3.15",
+        "content": "Inline regex sync: patterns re-derived from the current Vidhin05 English ranked list (3D, LQ (Sonarr), LQ (Sonarr) [B], Upscaled). No filter/sort/formatter changes."
+      },
       {
         "date": "2026-10-22",
         "version": "0.3.14",
@@ -180,7 +185,7 @@
       "Unknown"
     ],
     "excludedRegexPatterns": [
-      "/(\\bAI[ ._-]?(Upscaled?|Enhanced|Remaster(ed)?)?\\b)|(\\b(AIUS|RW|GuyZo|BR-GuyZo)\\b)|(\\b((Upscale)?Re-?graded?)\\b)|(\\b(The[ ._-]?Upscaler)\\b)|(\\b(AI[ ._-]?Enhanced?|UPS(UHD)?|Upscaled?([ ._-]?UHD)?|UpRez)\\b)/i",
+      "/(\\bAI[ ._-]?(Upscaled?|Enhanced|Remaster(ed)?)?\\b)|(\\b(AIUS|RW|GuyZo|BR-GuyZo)\\b)|(\\b((Upscale)?Re-?graded?)\\b)|(\\b(The[ ._-]?Upscaler)\\b)|(\\b(AI[ ._-]?(Enhanced?|Remaster(ed)?)|UPS(UHD)?|Upscaled?([ ._-]?UHD)?|UpRez)\\b)/i",
       "/(?<=\\b[12]\\d{3}\\b).*\\b(Extras|Bonus|Extended[ ._-]Clip)\\b/i",
       "/(?<=\\bS\\d+\\b).*\\b(Extras|Bonus|Extended[ ._-]Clip)\\b/i",
       "/(?<=\\b[12]\\d{3}\\b).*\\b(Sing[-_. ]Along)\\b/i",
@@ -833,7 +838,7 @@
         "score": -25
       },
       {
-        "pattern": "/(?<=\\b[12]\\d{3}\\b).*\\b(3d|sbs|half[ .-]ou|half[ .-]sbs|BluRay3D|BD3D)\\b/i",
+        "pattern": "/(?<=\\b[12]\\d{3}\\b).*((\\b|_)(3d|[fh]?sbs|half[ ._-]ou)(\\b|_)|\\b(BluRay3D|BD3D)\\b)/i",
         "name": "3D",
         "score": -50
       },
@@ -893,7 +898,7 @@
         "score": -75
       },
       {
-        "pattern": "/(\\bAI[ ._-]?(Upscaled?|Enhanced|Remaster(ed)?)?\\b)|(\\b(AIUS|RW|GuyZo|BR-GuyZo)\\b)|(\\b((Upscale)?Re-?graded?)\\b)|(\\b(The[ ._-]?Upscaler)\\b)|(\\b(AI[ ._-]?Enhanced?|UPS(UHD)?|Upscaled?([ ._-]?UHD)?|UpRez)\\b)/i",
+        "pattern": "/(\\bAI[ ._-]?(Upscaled?|Enhanced|Remaster(ed)?)?\\b)|(\\b(AIUS|RW|GuyZo|BR-GuyZo)\\b)|(\\b((Upscale)?Re-?graded?)\\b)|(\\b(The[ ._-]?Upscaler)\\b)|(\\b(AI[ ._-]?(Enhanced?|Remaster(ed)?)|UPS(UHD)?|Upscaled?([ ._-]?UHD)?|UpRez)\\b)/i",
         "name": "Upscaled",
         "score": -75
       },
@@ -1032,7 +1037,7 @@
       {
         "originalName": "3D",
         "name": "3D",
-        "pattern": "/(?<=\\b[12]\\d{3}\\b).*\\b(3d|sbs|half[ .-]ou|half[ .-]sbs|BluRay3D|BD3D)\\b/i",
+        "pattern": "/(?<=\\b[12]\\d{3}\\b).*((\\b|_)(3d|[fh]?sbs|half[ ._-]ou)(\\b|_)|\\b(BluRay3D|BD3D)\\b)/i",
         "score": -50
       },
       {
@@ -1044,7 +1049,7 @@
       {
         "originalName": "Upscaled",
         "name": "Upscaled",
-        "pattern": "/(\\bAI[ ._-]?(Upscaled?|Enhanced|Remaster(ed)?)?\\b)|(\\b(AIUS|RW|GuyZo|BR-GuyZo)\\b)|(\\b((Upscale)?Re-?graded?)\\b)|(\\b(The[ ._-]?Upscaler)\\b)|(\\b(AI[ ._-]?Enhanced?|UPS(UHD)?|Upscaled?([ ._-]?UHD)?|UpRez)\\b)/i",
+        "pattern": "/(\\bAI[ ._-]?(Upscaled?|Enhanced|Remaster(ed)?)?\\b)|(\\b(AIUS|RW|GuyZo|BR-GuyZo)\\b)|(\\b((Upscale)?Re-?graded?)\\b)|(\\b(The[ ._-]?Upscaler)\\b)|(\\b(AI[ ._-]?(Enhanced?|Remaster(ed)?)|UPS(UHD)?|Upscaled?([ ._-]?UHD)?|UpRez)\\b)/i",
         "score": -75
       },
       {
@@ -1164,13 +1169,13 @@
       {
         "originalName": "LQ (Sonarr)",
         "name": "LQ (Sonarr)",
-        "pattern": "/\\b(iVy)\\b/",
+        "pattern": "/\\b(GHOSTS|iVy)\\b/",
         "score": -75
       },
       {
         "originalName": "LQ (Sonarr)",
         "name": "LQ (Sonarr) [B]",
-        "pattern": "/\\b(126811|BRiNK|BTM|CHX|CTFOH|d3g|DepraveD|EVO|Feranki1980|FGT|FMD|GHOSTS|HiQVE|iNTENSO|JFF|KC|MeGusta|nhanc3|OFT|PSA|SasukeducK|SHD|ShieldBearer|TBS|TG|VIDEOHOLE|worldmkv|XLF|Zero00)\\b|Pahe(\\.(ph|in))?\\b/i",
+        "pattern": "/\\b(126811|BRiNK|BTM|CHX|CTFOH|d3g|DepraveD|EVO|Feranki1980|FGT|FMD|HiQVE|iNTENSO|JFF|KC|MeGusta|nhanc3|OFT|PSA|SasukeducK|SHD|ShieldBearer|TBS|TG|VIDEOHOLE|worldmkv|XLF|Zero00)\\b|Pahe(\\.(ph|in))?\\b/i",
         "score": -75
       },
       {

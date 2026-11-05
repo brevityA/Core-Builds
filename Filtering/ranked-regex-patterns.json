@@ -460,7 +460,7 @@
     "score": -25
   },
   {
-    "pattern": "/(?<=\\b[12]\\d{3}\\b).*\\b(3d|sbs|half[ .-]ou|half[ .-]sbs|BluRay3D|BD3D)\\b/i",
+    "pattern": "/(?<=\\b[12]\\d{3}\\b).*((\\b|_)(3d|[fh]?sbs|half[ ._-]ou)(\\b|_)|\\b(BluRay3D|BD3D)\\b)/i",
     "name": "3D",
     "score": -50
   },
@@ -520,7 +520,7 @@
     "score": -75
   },
   {
-    "pattern": "/(\\bAI[ ._-]?(Upscaled?|Enhanced|Remaster(ed)?)?\\b)|(\\b(AIUS|RW|GuyZo|BR-GuyZo)\\b)|(\\b((Upscale)?Re-?graded?)\\b)|(\\b(The[ ._-]?Upscaler)\\b)|(\\b(AI[ ._-]?Enhanced?|UPS(UHD)?|Upscaled?([ ._-]?UHD)?|UpRez)\\b)/i",
+    "pattern": "/(\\bAI[ ._-]?(Upscaled?|Enhanced|Remaster(ed)?)?\\b)|(\\b(AIUS|RW|GuyZo|BR-GuyZo)\\b)|(\\b((Upscale)?Re-?graded?)\\b)|(\\b(The[ ._-]?Upscaler)\\b)|(\\b(AI[ ._-]?(Enhanced?|Remaster(ed)?)|UPS(UHD)?|Upscaled?([ ._-]?UHD)?|UpRez)\\b)/i",
     "name": "Upscaled",
     "score": -75
   },

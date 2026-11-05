@@ -5,7 +5,7 @@
     "description": "4K template tuned for Samsung RU7100 (UA65RU7100W) and compatible TVs. Native video containers: MKV, MP4, AVI, MOV, FLV, ASF, 3GP, VOB. Native audio: FLAC, AAC, MP3, M4A, WMA, WAV. No AV1 or Dolby Vision — DV streams excluded. HDR10+, HDR10, HLG priority. HEVC/AVC encodes only. Audio prioritises FLAC and AAC for native playback; Atmos/TrueHD/DTS ranked lower (passthrough/transcode). Full Core Builds expression layer: IQR Apex PSEs · REPACK/PROPER Passthrough · Per-Addon Flood Guard · Usenet Propagation Guard · AI Upscale Exclusion · Codec Efficiency Booster · Audio Pinnacle (native-first) · HDR Priority (no DV) · Ranked regex pool · Full CB ESE stack.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "0.3.14",
+    "version": "0.3.15",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -17,6 +17,11 @@
       "v232Action": "remove legacy preset; configure the separate Newznab endpoint only after validation"
     },
     "changelog": [
+      {
+        "date": "2026-11-02",
+        "version": "0.3.15",
+        "content": "Inline regex sync: patterns re-derived from the current Vidhin05 English ranked list (3D, Upscaled). No filter/sort/formatter changes."
+      },
       {
         "date": "2026-10-22",
         "version": "0.3.14",
@@ -180,7 +185,7 @@
       "Unknown"
     ],
     "excludedRegexPatterns": [
-      "/(\\bAI[ ._-]?(Upscaled?|Enhanced|Remaster(ed)?)?\\b)|(\\b(AIUS|RW|GuyZo|BR-GuyZo)\\b)|(\\b((Upscale)?Re-?graded?)\\b)|(\\b(The[ ._-]?Upscaler)\\b)|(\\b(AI[ ._-]?Enhanced?|UPS(UHD)?|Upscaled?([ ._-]?UHD)?|UpRez)\\b)/i",
+      "/(\\bAI[ ._-]?(Upscaled?|Enhanced|Remaster(ed)?)?\\b)|(\\b(AIUS|RW|GuyZo|BR-GuyZo)\\b)|(\\b((Upscale)?Re-?graded?)\\b)|(\\b(The[ ._-]?Upscaler)\\b)|(\\b(AI[ ._-]?(Enhanced?|Remaster(ed)?)|UPS(UHD)?|Upscaled?([ ._-]?UHD)?|UpRez)\\b)/i",
       "/(?<=\\b[12]\\d{3}\\b).*\\b(Extras|Bonus|Extended[ ._-]Clip)\\b/i",
       "/(?<=\\bS\\d+\\b).*\\b(Extras|Bonus|Extended[ ._-]Clip)\\b/i",
       "/(?<=\\b[12]\\d{3}\\b).*\\b(Sing[-_. ]Along)\\b/i",
@@ -869,7 +874,7 @@
         "score": -25
       },
       {
-        "pattern": "/(?<=\\b[12]\\d{3}\\b).*\\b(3d|sbs|half[ .-]ou|half[ .-]sbs|BluRay3D|BD3D)\\b/i",
+        "pattern": "/(?<=\\b[12]\\d{3}\\b).*((\\b|_)(3d|[fh]?sbs|half[ ._-]ou)(\\b|_)|\\b(BluRay3D|BD3D)\\b)/i",
         "name": "3D",
         "score": -50
       },
@@ -929,7 +934,7 @@
         "score": -75
       },
       {
-        "pattern": "/(\\bAI[ ._-]?(Upscaled?|Enhanced|Remaster(ed)?)?\\b)|(\\b(AIUS|RW|GuyZo|BR-GuyZo)\\b)|(\\b((Upscale)?Re-?graded?)\\b)|(\\b(The[ ._-]?Upscaler)\\b)|(\\b(AI[ ._-]?Enhanced?|UPS(UHD)?|Upscaled?([ ._-]?UHD)?|UpRez)\\b)/i",
+        "pattern": "/(\\bAI[ ._-]?(Upscaled?|Enhanced|Remaster(ed)?)?\\b)|(\\b(AIUS|RW|GuyZo|BR-GuyZo)\\b)|(\\b((Upscale)?Re-?graded?)\\b)|(\\b(The[ ._-]?Upscaler)\\b)|(\\b(AI[ ._-]?(Enhanced?|Remaster(ed)?)|UPS(UHD)?|Upscaled?([ ._-]?UHD)?|UpRez)\\b)/i",
         "name": "Upscaled",
         "score": -75
       },
@@ -1050,7 +1055,7 @@
       {
         "originalName": "3D",
         "name": "3D",
-        "pattern": "/(?<=\\b[12]\\d{3}\\b).*\\b(3d|sbs|half[ .-]ou|half[ .-]sbs|BluRay3D|BD3D)\\b/i",
+        "pattern": "/(?<=\\b[12]\\d{3}\\b).*((\\b|_)(3d|[fh]?sbs|half[ ._-]ou)(\\b|_)|\\b(BluRay3D|BD3D)\\b)/i",
         "score": -50
       },
       {
@@ -1062,7 +1067,7 @@
       {
         "originalName": "Upscaled",
         "name": "Upscaled",
-        "pattern": "/(\\bAI[ ._-]?(Upscaled?|Enhanced|Remaster(ed)?)?\\b)|(\\b(AIUS|RW|GuyZo|BR-GuyZo)\\b)|(\\b((Upscale)?Re-?graded?)\\b)|(\\b(The[ ._-]?Upscaler)\\b)|(\\b(AI[ ._-]?Enhanced?|UPS(UHD)?|Upscaled?([ ._-]?UHD)?|UpRez)\\b)/i",
+        "pattern": "/(\\bAI[ ._-]?(Upscaled?|Enhanced|Remaster(ed)?)?\\b)|(\\b(AIUS|RW|GuyZo|BR-GuyZo)\\b)|(\\b((Upscale)?Re-?graded?)\\b)|(\\b(The[ ._-]?Upscaler)\\b)|(\\b(AI[ ._-]?(Enhanced?|Remaster(ed)?)|UPS(UHD)?|Upscaled?([ ._-]?UHD)?|UpRez)\\b)/i",
         "score": -75
       },
       {
