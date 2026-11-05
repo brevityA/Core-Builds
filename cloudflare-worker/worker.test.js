@@ -1354,7 +1354,7 @@ test('Core Streams: private manifest route returns a Stremio stream manifest', a
   const manifest = await res.json();
   assert.equal(manifest.name, 'Core Streams');
   assert.deepEqual(manifest.resources, ['stream']);
-  assert.deepEqual(manifest.types, ['movie', 'series']);
+  assert.deepEqual(manifest.types, ['movie', 'series', 'anime']);
 });
 
 test('Core Streams: install token is required and failed auth does not reach sources', async () => {

@@ -8,6 +8,7 @@ import { readFile } from 'node:fs/promises';
 
 const app = await readFile(new URL('../src/js/app.js', import.meta.url), 'utf8');
 const worker = await readFile(new URL('../../cloudflare-worker/worker.js', import.meta.url), 'utf8');
+const streams = await readFile(new URL('../../cloudflare-worker/core-streams.js', import.meta.url), 'utf8');
 
 test('"Your other addons stay": a Stremio install keeps every addon unless Clean reinstall is on', () => {
   assert.match(app, /Adds Core Builds to your Stremio account\. Your other addons stay; only <b>Clean reinstall<\/b> replaces earlier Core Builds addons\./);
@@ -25,7 +26,16 @@ test('"Core Builds never keeps a copy": the relay logs a fixed, body-free field 
   assert.doesNotMatch(app, /keys go only to/, 'the relay is a second recipient, so no "only" claim');
   const logs = worker.match(/console\.(log|info|warn|error|debug)\(/g) || [];
   assert.equal(logs.length, 1, 'the worker has exactly one console sink');
-  assert.match(worker, /const allowed = \['cls', 'host', 'status', 'scope', 'store', 'attempts'\];/);
+  assert.match(worker, /const allowed = \['cls', 'host', 'status', 'scope', 'store', 'attempts', 'cache', 'source', 'ms', 'count', 'partial', 'outcome'\];/);
+  // The Core Streams fields added with its telemetry carry labels and numbers only:
+  // a provider id, an outcome or cache label, a duration, a count, a 0/1 flag.
+  const calls = [...streams.matchAll(/emitLog\(logEvent, '([a-z_]+)', \{([^}]*)\}/g)];
+  assert.ok(calls.length >= 4, 'Core Streams telemetry calls found');
+  for (const [, event, fields] of calls) {
+    for (const key of fields.match(/\b[a-z]+(?=:)/g) || []) {
+      assert.ok(['source', 'outcome', 'ms', 'status', 'cache', 'scope', 'count', 'partial'].includes(key), `${event}.${key} is a reviewed field`);
+    }
+  }
 });
 
 test('the key note shows only when Quick install asks for a key', () => {
