@@ -39,6 +39,14 @@ jobs:
         working-directory: configurator
         run: npm test
 
+      - name: Check host compatibility report
+        working-directory: configurator
+        run: npm run host-report:check
+
+      - name: Validate template host compatibility
+        working-directory: configurator
+        run: npm run validate:template-hosts
+
       - name: Validate modules
         working-directory: configurator
         run: npm run validate
@@ -54,7 +62,7 @@ jobs:
           BUILT_VER=$(grep -o "CONFIGURATOR_VERSION[^']*'[^']*'" configurator/dist/web/assets/app.js | head -1 || true)
           SOURCE_VER=$(grep -o "CONFIGURATOR_VERSION[^']*'[^']*'" configurator/src/js/app.js | head -1 || true)
           echo "Source: $SOURCE_VER"
-          echo "Built:  $BUILT_VER"
+          echo "Built: $BUILT_VER"
 
       - name: Check committed standalone build is fresh
         run: |

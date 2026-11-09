@@ -1,0 +1,206 @@
+{
+  "schemaVersion": 1,
+  "sourceAuditDate": "2026-10-22",
+  "minAiostreamsVersion": "2.32.0",
+  "issueCount": 0,
+  "publicHosts": [
+    {
+      "id": "elfhosted",
+      "label": "ElfHosted",
+      "url": "https://aiostreams.elfhosted.com",
+      "channel": "stable",
+      "priority": 1,
+      "aiostreamsVersion": "2.36.0",
+      "supports": {
+        "p2p": false,
+        "http": false,
+        "debrid": true,
+        "nuvioInstant": false
+      },
+      "regexAccess": "none",
+      "rateLimited": true,
+      "requiresProbe": false,
+      "disabledPresetIds": [
+        "bitmagnet",
+        "torrentio",
+        "anime-kitsu",
+        "torrent-catalogs"
+      ],
+      "allowedRegexUrls": [
+        "https://raw.githubusercontent.com/Vidhin05/Releases-Regex/main/English/regexes.json"
+      ],
+      "issues": []
+    },
+    {
+      "id": "fortheweak",
+      "label": "Yeb's / ForTheWeak",
+      "url": "https://aiostreams.fortheweak.cloud",
+      "channel": "stable",
+      "priority": 2,
+      "aiostreamsVersion": "2.36.0",
+      "supports": {
+        "p2p": true,
+        "http": true,
+        "debrid": true,
+        "nuvioInstant": true
+      },
+      "regexAccess": "trusted",
+      "rateLimited": true,
+      "requiresProbe": false,
+      "disabledPresetIds": [],
+      "allowedRegexUrls": [],
+      "issues": []
+    },
+    {
+      "id": "midnight",
+      "label": "Midnight's",
+      "url": "https://aiostreamsfortheweebsstable.midnightignite.me",
+      "channel": "stable",
+      "priority": 3,
+      "aiostreamsVersion": "2.36.0",
+      "supports": {
+        "p2p": true,
+        "http": true,
+        "debrid": true,
+        "nuvioInstant": true
+      },
+      "regexAccess": "trusted",
+      "rateLimited": true,
+      "requiresProbe": false,
+      "disabledPresetIds": [],
+      "allowedRegexUrls": [],
+      "issues": []
+    },
+    {
+      "id": "kuu",
+      "label": "Kuu's",
+      "url": "https://aiostreams.stremio.ru",
+      "channel": "stable",
+      "priority": 4,
+      "aiostreamsVersion": "2.36.0",
+      "supports": {
+        "p2p": true,
+        "http": true,
+        "debrid": true,
+        "nuvioInstant": true
+      },
+      "regexAccess": "trusted",
+      "rateLimited": true,
+      "requiresProbe": false,
+      "disabledPresetIds": [],
+      "allowedRegexUrls": [],
+      "issues": []
+    },
+    {
+      "id": "atbp",
+      "label": "ATBP",
+      "url": "https://aio.atbphosting.com",
+      "channel": "stable",
+      "priority": 5,
+      "aiostreamsVersion": "2.36.0",
+      "supports": {
+        "p2p": true,
+        "http": true,
+        "debrid": true,
+        "nuvioInstant": true
+      },
+      "regexAccess": "all",
+      "rateLimited": true,
+      "requiresProbe": false,
+      "disabledPresetIds": [
+        "bitmagnet"
+      ],
+      "allowedRegexUrls": [],
+      "issues": []
+    },
+    {
+      "id": "wizaardd",
+      "label": "Wizaardd",
+      "url": "https://aiostreams-stable.forthewizards.uk",
+      "channel": "stable",
+      "priority": 6,
+      "aiostreamsVersion": "2.36.0",
+      "supports": {
+        "p2p": true,
+        "http": true,
+        "debrid": true,
+        "nuvioInstant": true
+      },
+      "regexAccess": "all",
+      "rateLimited": true,
+      "requiresProbe": false,
+      "disabledPresetIds": [
+        "bitmagnet"
+      ],
+      "allowedRegexUrls": [],
+      "issues": []
+    },
+    {
+      "id": "viren",
+      "label": "Viren's Nightly",
+      "url": "https://aiostreams.viren070.me",
+      "channel": "nightly",
+      "priority": 20,
+      "aiostreamsVersion": "2.36.0",
+      "supports": {
+        "p2p": true,
+        "http": true,
+        "debrid": true,
+        "nuvioInstant": true
+      },
+      "regexAccess": "all",
+      "rateLimited": true,
+      "requiresProbe": false,
+      "disabledPresetIds": [
+        "torrentio"
+      ],
+      "allowedRegexUrls": [],
+      "issues": []
+    },
+    {
+      "id": "omni",
+      "label": "Omni's (legacy)",
+      "url": "https://aiostreams.12312023.xyz",
+      "channel": "stable",
+      "priority": 30,
+      "aiostreamsVersion": "2.35.9",
+      "supports": {
+        "p2p": true,
+        "http": true,
+        "debrid": true,
+        "nuvioInstant": true
+      },
+      "regexAccess": "trusted",
+      "rateLimited": true,
+      "requiresProbe": false,
+      "disabledPresetIds": [
+        "bitmagnet"
+      ],
+      "allowedRegexUrls": [],
+      "issues": []
+    }
+  ],
+  "internalProfiles": [
+    {
+      "id": "custom",
+      "label": "Self-hosted / Docker",
+      "kind": "self-hosted",
+      "requiresProbe": true,
+      "unverified": false
+    },
+    {
+      "id": "elfhosted-private",
+      "label": "ElfHosted (private / paid)",
+      "kind": "private",
+      "requiresProbe": true,
+      "unverified": false
+    },
+    {
+      "id": "torbox",
+      "label": "TorBox-hosted AIOStreams",
+      "kind": "vendor",
+      "requiresProbe": true,
+      "unverified": true
+    }
+  ]
+}
