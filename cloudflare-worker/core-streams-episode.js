@@ -93,8 +93,12 @@ function judge(claim, request) {
   }
   if (claim.kind === 'range') {
     if (!seasonMatches) return { state: 'MISMATCH' };
+    // An unnamed range in a later season may be another season's numbers or
+    // absolute numbering: an unverified fallback, as for a bare number.
+    const mapped = seasonKnown || season === 1 || request.entryNumbering;
+    if (!mapped) return { state: 'UNKNOWN', ambiguous: true };
     if (claim.from <= episode && episode <= claim.to) return { state: 'PACK', range: [claim.from, claim.to] };
-    return seasonKnown || season === 1 || request.entryNumbering ? { state: 'MISMATCH' } : { state: 'UNKNOWN', ambiguous: true };
+    return { state: 'MISMATCH' };
   }
   if (claim.kind === 'season') return seasonMatches ? { state: 'PACK' } : { state: 'MISMATCH' };
   if (claim.kind === 'volume') return seasonMatches ? { state: 'PACK', volume: true } : { state: 'MISMATCH' };

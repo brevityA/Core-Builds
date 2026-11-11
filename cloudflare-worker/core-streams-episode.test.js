@@ -70,3 +70,12 @@ test('a range that repeats the season is one pack, and three-digit seasons parse
   assert.equal(state({ filename: 'Show.S100E05.mkv' }, { season: 100, episode: 5 }), 'EXACT');
   assert.equal(state({ filename: 'Show.S100E06.mkv' }, { season: 100, episode: 5 }), 'MISMATCH');
 });
+
+test('an unnamed range is only a pack when its numbering maps to the request', () => {
+  const later = { season: 2, episode: 5 };
+  assert.deepEqual(classifyEpisode(later, { release: '[G] Show - 01-12 (1080p)' }).ambiguous, true);
+  assert.equal(state({ release: '[G] Show - 01-12 (1080p)' }, later), 'UNKNOWN');
+  assert.equal(state({ release: '[G] Show S2 - 01-12 (1080p)' }, later), 'PACK', 'the season is named');
+  assert.equal(state({ release: '[G] Show - 01-12 (1080p)' }, { ...later, entryNumbering: true }), 'PACK', 'Kitsu numbering');
+  assert.equal(state({ release: '[G] Show - 01-12 (1080p)' }), 'PACK', 'a first season');
+});
