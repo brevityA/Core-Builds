@@ -591,3 +591,13 @@ The 0.12.0 branch (#825) was merged into #824 unchanged, and the stream cards (#
 - **Audio preference.** `CORE_STREAMS_ANIME_AUDIO` (`dub` default, `sub`, `any`) is part of the hashed response-cache key, so a different order is a different cache entry.
 - Live check (no TorBox key): Frieren `kitsu:46474:5` returned dual-audio releases first with no season-2 files; the IMDb id for the same episode added Nyaa; a repeat lookup was a cache hit. No TorBox account, deployment or playback was tested.
 
+
+## Episode-aware ranking — 0.14.0, 2026-11-11
+
+- New `core-streams-episode.js`: each episode result gets a state (`EXACT`, `LIKELY`, `PACK`, `UNKNOWN`, `MISMATCH`). It is read from the file name, `fileIdx`, `fileMustInclude`, `folderName` and TorBox's file pick before the release title.
+- `MISMATCH` results are excluded; 0.13.0 only sank them, and for anime only.
+- The order is lexicographic: episode state → delivery → anime audio → device → quality → diversity → a stable key. A better-quality copy of the wrong episode can never pass the right one.
+- The dub preference now applies only within one episode state. 0.13.0 lifted a dual-audio batch above a sub single; that no longer happens.
+- Absolute anime numbering stays a labelled `UNKNOWN` unless the season is named, it is a first season, or a Kitsu id numbers episodes per entry.
+- The dedupe key includes `fileMustInclude`. A selection-less copy of a hash folds into the selected one; different selections stay distinct.
+- Results are re-ranked after TorBox promotion, so a cached exact copy takes its place by episode state first.

@@ -9,6 +9,7 @@ import { formatStream, getStreamFacts, parseRelease, setStreamFacts } from './co
 import {
   animeEpisodeFilePattern, animeEpisodeRe, classifyAnimeRelease, dubLabel, parseKitsuId, parseNyaaRss, seasonOf,
 } from './core-streams-anime.js';
+import { classifyEpisode, episodeLine, episodeScore } from './core-streams-episode.js';
 
 const responseCache = createResponseCache();
 const streamScoreCache = new WeakMap();
@@ -333,17 +334,25 @@ function normalizeStream(stream, sourceName) {
   }
   if (Object.keys(hints).length) normalized.behaviorHints = hints;
   // Facts for the card formatter, kept beside the object (never serialized).
+  // Structured AIOStreams-style fields are read before any text inference.
+  const folderName = cleanText(stream.behaviorHints?.folderName || stream.folderName, 255);
+  const seeders = Number(stream.seeders ?? stream.behaviorHints?.seeders);
+  const indexer = cleanText(stream.indexer, 40);
   return setStreamFacts(normalized, {
     source: sourceName,
     label: name,
     release: String(title || description || '').split('\n')[0],
     pack: Boolean(normalized.fileMustInclude),
+    ...(folderName ? { folderName } : {}),
+    ...(Number.isFinite(seeders) && seeders >= 0 ? { seeders: Math.floor(seeders) } : {}),
+    ...(indexer ? { tracker: indexer } : {}),
   });
 }
 
 /** Stable identity for de-duplicating torrent, YouTube and direct-URL streams. */
 function dedupeKey(stream) {
-  if (stream.infoHash) return `hash:${stream.infoHash}:${stream.fileIdx ?? ''}`;
+  // The same torrent with a different file selection is a different result.
+  if (stream.infoHash) return `hash:${stream.infoHash}:${stream.fileIdx ?? ''}:${(stream.fileMustInclude || []).join('|')}`;
   if (stream.ytId) return `youtube:${stream.ytId}`;
   return `url:${stream.url}`;
 }
@@ -433,37 +442,91 @@ function limitPerResolution(streams, maximum) {
   });
 }
 
-// "S02E05" in a result's file name. The file is what plays; the release line
-// may name a whole pack, so it is only read when there is no file name.
-function taggedEpisode(stream) {
-  const pattern = /\bS(\d{1,2})E(\d{1,4})\b(?![-E]\d)/i;
-  const tagged = String(stream?.behaviorHints?.filename || '').match(pattern) || streamText(stream).match(pattern);
-  return tagged ? { season: Number(tagged[1]), episode: Number(tagged[2]) } : null;
-}
-
 /**
- * The request-aware score used for the global sort: `smartStreamScore` plus
- *  - P2P season packs 60 below single episodes with the same audio: they open
- *    the episode through `fileMustInclude`, which Stremio's torrent engine
- *    reads but the stream protocol does not promise, so a pack is a fallback
- *    to a single episode, and its card says it is a season pack;
- *  - for anime, the audio preference: `dub` (default) lifts English-dub,
- *    dual-audio and multi-audio releases by 200, so a 1080p dub comes before
- *    even a 4K REMUX sub; `sub` sinks dub-only ones;
- *  - for anime, a result whose file names another season or episode (add-ons
- *    sometimes answer S1E5 with S02E05) sinks to the bottom. It is kept rather
- *    than dropped, so a numbering scheme we misread never hides a real file.
+ * The film score used for the global sort: `smartStreamScore` plus, for
+ * anime, the audio preference: `dub` (default) lifts English-dub, dual-audio
+ * and multi-audio releases by 200, so a 1080p dub comes before even a 4K
+ * REMUX sub; `sub` sinks dub-only ones. Episodes use rankEpisodes() instead.
  */
-function rankScore(stream, { anime = false, audio = 'dub', season = null, episode = null } = {}) {
+function rankScore(stream, { anime = false, audio = 'dub' } = {}) {
   let score = smartStreamScore(stream);
-  if (Array.isArray(stream?.fileMustInclude)) score -= 60;
   if (!anime) return score;
   const dub = dubLabel(streamText(stream));
   if (audio === 'dub' && dub) score += 200;
   if (audio === 'sub' && (dub === 'Dub' || dub === 'English dub')) score -= 200;
-  const tagged = Number.isInteger(season) && Number.isInteger(episode) ? taggedEpisode(stream) : null;
-  if (tagged && (tagged.season !== season || tagged.episode !== episode)) score -= 300;
   return score;
+}
+
+/** Playable delivery: TorBox-cached and direct HTTPS before P2P. */
+function deliveryScore(stream) {
+  if (getStreamFacts(stream).cached) return 40;
+  if (typeof stream?.url === 'string') return 36;
+  if (typeof stream?.ytId === 'string') return 30;
+  return 0;
+}
+
+/** The anime audio preference, scored only among equally certain episodes. */
+function audioScore(stream, { anime = false, audio = 'dub' } = {}) {
+  if (!anime || audio === 'any') return 0;
+  const dub = dubLabel(streamText(stream));
+  if (audio === 'dub') return dub ? 30 : 0;
+  return dub === 'Dub' || dub === 'English dub' ? 0 : 30;
+}
+
+/** Device compatibility: AV1, 3D and DV without an HDR fallback play on fewer devices. */
+function deviceScore(stream) {
+  const text = streamText(stream).toLowerCase();
+  if (/av1|3d/.test(text)) return 0;
+  if (/(?:dv|dovi|dolby[ .-]?vision)/.test(text) && !/hdr(?:10)?/.test(text)) return 4;
+  return 10;
+}
+
+const sourceOf = (stream) => String(stream?.name || '').split(' · ')[0];
+const RANK_KEYS = ['episode', 'delivery', 'audio', 'device', 'quality', 'diversity'];
+
+/**
+ * Episode-aware ranking. Each result is classified (EXACT, LIKELY, PACK,
+ * UNKNOWN, MISMATCH) from its file name, fileIdx, fileMustInclude and folder
+ * before its title; MISMATCH results are removed. The rest are ordered by
+ * episode state, then delivery, anime audio, device, quality and source
+ * diversity, and last by a stable key, so the order never depends on which
+ * provider answered first. A 4K REMUX of the wrong episode is gone; a better
+ * pack never passes an exact single.
+ */
+function rankEpisodes(streams, request, context = {}, showTitle = '') {
+  const kept = [];
+  const counts = new Map();
+  for (const stream of streams) counts.set(sourceOf(stream), (counts.get(sourceOf(stream)) || 0) + 1);
+  for (const [index, stream] of streams.entries()) {
+    const facts = getStreamFacts(stream);
+    const verdict = classifyEpisode(request, {
+      filename: stream.behaviorHints?.filename || facts.filename || '',
+      folderName: facts.folderName || '',
+      release: facts.release || '',
+      text: [stream.title, stream.description].filter(Boolean).join('\n'),
+      fileIdx: stream.fileIdx,
+      fileMustInclude: stream.fileMustInclude,
+      selected: Boolean(facts.cached),
+    });
+    const episode = episodeScore(verdict);
+    if (episode === null) continue;
+    const parts = {
+      episode,
+      delivery: deliveryScore(stream),
+      audio: audioScore(stream, context),
+      device: deviceScore(stream),
+      quality: smartStreamScore(stream),
+      diversity: 1 - (counts.get(sourceOf(stream)) || 0) / streams.length,
+    };
+    const total = parts.episode + parts.delivery + parts.audio + parts.device
+      + Math.max(0, Math.min(15, parts.quality / 20)) + parts.diversity * 4;
+    setStreamFacts(stream, { episode: { state: verdict.state, line: episodeLine(request, verdict, showTitle) }, rank: { ...parts, total } });
+    kept.push({ stream, index, parts, key: stream.infoHash ? dedupeKey(stream) : `${dedupeKey(stream)}|${sourceOf(stream)}` });
+  }
+  return kept.sort((a, b) => {
+    for (const name of RANK_KEYS) if (a.parts[name] !== b.parts[name]) return b.parts[name] - a.parts[name];
+    return a.key < b.key ? -1 : a.key > b.key ? 1 : a.index - b.index;
+  }).map(({ stream }) => stream);
 }
 
 /** Rank within providers, then interleave groups so one source cannot erase fallbacks. */
@@ -1857,7 +1920,7 @@ async function handleTorboxPlay(request, env, route, headers, fetchImpl, logEven
 function manifest() {
   return {
     id: 'uk.corebuilds.core-streams',
-    version: '0.13.0',
+    version: '0.14.0',
     name: 'Core Streams',
     description: 'Quality-ranked streams with clean file details and fast repeat lookups: torrent add-ons and public indexes (YTS, The Pirate Bay, EZTV, Knaben, Nyaa for anime with dubs first), instant TorBox playback when configured, open media, and configurable sources.',
     resources: ['stream'],
@@ -1913,7 +1976,7 @@ export async function handleCoreStreams(request, env, { headers = {}, rateLimit 
   // Hash every input that can change the answer or the account a play URL
   // belongs to. Raw tokens/keys/source URLs never become cache keys.
   const cacheKey = await responseCacheKey([
-    'core-streams/0.13.0', requestUrl.origin, route.token, route.type, normalizedId,
+    'core-streams/0.14.0', requestUrl.origin, route.token, route.type, normalizedId,
     torbox || '', httpBase || '', maxPerResolution, audio,
   ]);
   const lookupStartedAt = Date.now();
@@ -1972,26 +2035,43 @@ export async function handleCoreStreams(request, env, { headers = {}, rateLimit 
     // This stops an early high-volume source from consuming the result cap and
     // hiding every later provider or the curated open-media matches.
     const seen = new Set();
-    const bareHashes = new Set();
-    const anyHashes = new Set();
+    // A torrent with no file selection folds into a selected copy of itself;
+    // different selections inside one torrent stay distinct.
+    const bareAt = new Map(); // info hash -> index of its selection-less result
+    const selectedHashes = new Set(); // info hashes that already have a selection
     const unique = [];
     for (const stream of interleaveStreamGroups(responses)) {
       const key = dedupeKey(stream);
       if (seen.has(key)) continue;
-      if (stream.infoHash) {
-        if (stream.fileIdx === undefined ? anyHashes.has(stream.infoHash) : bareHashes.has(stream.infoHash)) continue;
-        anyHashes.add(stream.infoHash);
-        if (stream.fileIdx === undefined) bareHashes.add(stream.infoHash);
-      }
       seen.add(key);
+      if (stream.infoHash) {
+        if (stream.fileIdx === undefined && !stream.fileMustInclude) {
+          if (selectedHashes.has(stream.infoHash) || bareAt.has(stream.infoHash)) continue;
+          bareAt.set(stream.infoHash, unique.length);
+        } else {
+          selectedHashes.add(stream.infoHash);
+          if (bareAt.has(stream.infoHash)) {
+            const at = bareAt.get(stream.infoHash);
+            bareAt.delete(stream.infoHash);
+            unique[at] = stream;
+            continue;
+          }
+        }
+      }
       unique.push(stream);
     }
+    const episodeRequest = route.type !== 'movie' && Number.isInteger(context.season) && Number.isInteger(context.episode)
+      ? { season: context.season, episode: context.episode, entryNumbering: Boolean(kitsu) }
+      : null;
+    const showTitle = meta?.title || '';
     // Global quality pass after the fair interleaving/dedupe pass. Scores are
     // memoized per object, so sorting does not re-parse release text.
-    const sorted = dropJunk(unique)
-      .map((stream, index) => ({ stream, index, score: rankScore(stream, context) }))
-      .sort((a, b) => b.score - a.score || a.index - b.index)
-      .map(({ stream }) => stream);
+    const sorted = episodeRequest
+      ? rankEpisodes(dropJunk(unique), episodeRequest, context, showTitle)
+      : dropJunk(unique)
+        .map((stream, index) => ({ stream, index, score: rankScore(stream, context) }))
+        .sort((a, b) => b.score - a.score || a.index - b.index)
+        .map(({ stream }) => stream);
     // Curated open media is the only HTTPS path for some players; reserve its
     // slots before the general quality pool is truncated.
     const open = sorted.filter(isOpenMedia);
@@ -1999,11 +2079,14 @@ export async function handleCoreStreams(request, env, { headers = {}, rateLimit 
       ...sorted.filter((stream) => !isOpenMedia(stream)).slice(0, MAX_STREAMS_TOTAL + 40 - open.length),
       ...open,
     ];
-    const ranked = torbox
+    const promoted = torbox
       ? await track('torbox', applyTorbox(pool, {
         key: torbox, origin: requestUrl.origin, token: route.token, type: route.type, id: normalizedId, fetchImpl: limitedFetch, report, context,
       }))
       : pool;
+    // TorBox picked the episode file in each cached torrent: re-rank so a
+    // cached exact copy and its new delivery score take their place.
+    const ranked = episodeRequest && promoted !== pool ? rankEpisodes(promoted, episodeRequest, context, showTitle) : promoted;
     const capped = limitPerResolution(ranked, maxPerResolution);
     // Quality decides order, but the final 80 still keeps a best-effort seat
     // for every provider that returned something. Without this, a global sort
@@ -2049,6 +2132,9 @@ export async function handleCoreStreams(request, env, { headers = {}, rateLimit 
 }
 
 export const _coreStreamsTest = {
+  rankEpisodes,
+  streamFacts: getStreamFacts,
+  setStreamFacts,
   formatStream: (stream) => formatStream(stream, { inferHeight: inferredHeight, inferSeeders: inferredSeeders }),
   parseRelease: (text) => parseRelease(text, inferredHeight),
   indexerStream,

@@ -29,7 +29,7 @@ test('manifest is a Stremio stream-only manifest behind the install token', asyn
   assert.equal(response.headers.get('Cache-Control'), 'no-store');
   assert.deepEqual(await response.json(), {
     id: 'uk.corebuilds.core-streams',
-    version: '0.13.0',
+    version: '0.14.0',
     name: 'Core Streams',
     description: 'Quality-ranked streams with clean file details and fast repeat lookups: torrent add-ons and public indexes (YTS, The Pirate Bay, EZTV, Knaben, Nyaa for anime with dubs first), instant TorBox playback when configured, open media, and configurable sources.',
     resources: ['stream'],
@@ -1499,14 +1499,16 @@ test('Kitsu anime episodes come from Nyaa and the add-ons, dubs first, with the 
   assert.ok(calls.some((url) => decodeURIComponent(url).includes('q=Sousou no Frieren 05&')), 'romaji search');
   assert.ok(calls.some((url) => decodeURIComponent(url).includes("q=Frieren: Beyond Journey's End 05 (dub|dual|multi)&")), 'English dub search');
   assert.ok(!calls.some((url) => /accel\.li|apibay|eztvx|knaben|cinemeta|archive\.org/.test(url)), 'IMDb-only indexes are not asked');
-  assert.deepEqual(streams.map((stream) => stream.infoHash), [HASH('b'), HASH('e'), HASH('a'), HASH('9')],
-    'the multi-audio episode, then the dual-audio pack (below the episode with dub audio), then the sub; '
+  assert.deepEqual(streams.map((stream) => stream.infoHash), [HASH('b'), HASH('a'), HASH('e')],
+    'single episodes first (the multi-audio one before the sub), then the dual-audio pack; '
     + 'season 2 from Nyaa, remakes and dead torrents are dropped, '
-    + "and the add-on's S02E05 file is kept but sinks to the bottom, so a misread numbering never hides a file");
+    + "and the add-on's S02E05 names another season, so it is excluded");
   assert.match(streams[0].description, /🎙 Multi-audio/);
-  assert.match(streams[1].description, /🏷 .*Season pack/);
-  assert.deepEqual(streams[1].fileMustInclude, ['(?:[Ee][Pp]?|- |\\[)0*5(?:v[0-9])?[^0-9]']);
-  assert.match(streams[2].description, /🔎 Nyaa · Trusted/);
+  assert.match(streams[0].description, /^📺 S01E05 · from the release name$/m, 'a Nyaa hit has no file name to confirm the episode');
+  assert.match(streams[1].description, /🔎 Nyaa · Trusted/);
+  assert.match(streams[2].description, /^📺 Season 1 · Episode 5 selected$/m);
+  assert.doesNotMatch(streams[2].description, /Season pack/, 'the episode line replaces the pack tag');
+  assert.deepEqual(streams[2].fileMustInclude, ['(?:[Ee][Pp]?|- |\\[)0*5(?:v[0-9])?[^0-9]']);
   assert.match(response.headers.get('X-Core-Streams-Sources'), /nyaa=ok 3/);
   _coreStreamsTest.resetSourceHealth();
 });
@@ -1651,4 +1653,109 @@ test('Kitsu titles are cached, so the next episode skips the title lookup; the d
   assert.equal(sub.headers.get('X-Core-Streams-Cache'), 'miss', 'a different audio order is a different answer');
   _coreStreamsTest.resetKitsuCache();
   _coreStreamsTest.resetSourceHealth();
+});
+
+// --- Episode-aware ranking ---------------------------------------------------
+const epStream = (n, fields, source = 'Torrentio') => _coreStreamsTest.normalizeStream({ infoHash: HASH(String(n)), name: '1080p', ...fields }, source);
+const rankEp = (streams, context = {}) => _coreStreamsTest.rankEpisodes(streams, { season: 1, episode: 5 }, { anime: false, audio: 'dub', ...context }, 'Show');
+const hashes = (streams) => streams.map((stream) => stream.infoHash[0]);
+
+test('a result whose file names another episode is excluded', () => {
+  const wrong = epStream(1, { title: 'Show.S01.2160p.BluRay.REMUX', behaviorHints: { filename: 'Show.S01E06.2160p.REMUX.mkv' } });
+  const right = epStream(2, { title: 'Show.S01E05.720p.HDTV', behaviorHints: { filename: 'Show.S01E05.720p.HDTV.mkv' } });
+  assert.deepEqual(hashes(rankEp([wrong, right])), ['2']);
+});
+
+test('the correct 1080p WEB-DL outranks a 4K REMUX of another episode, and an exact single outranks a pack', () => {
+  const mismatch = epStream(1, { name: '2160p', title: 'Show.S01E04.2160p.UHD.BluRay.REMUX.DV.HDR10.TrueHD.Atmos\n👤 900' });
+  const exact = epStream(2, { title: 'Show.S01E05.1080p.WEB-DL.x264\n👤 3', behaviorHints: { filename: 'Show.S01E05.1080p.WEB-DL.x264.mkv' } });
+  const pack = epStream(3, { name: '2160p', title: 'Show.S01.2160p.BluRay.REMUX\n👤 900', fileIdx: 4 });
+  const ranked = rankEp([mismatch, pack, exact]);
+  assert.deepEqual(hashes(ranked), ['2', '3']);
+  const totals = ranked.map((stream) => _coreStreamsTest.streamFacts(stream).rank.total);
+  assert.ok(totals[0] > totals[1], 'the additive totals agree with the order');
+});
+
+test('a pack with a file selection outranks one without, and a range containing the episode is a pack', () => {
+  const unselected = epStream(1, { name: '2160p', title: 'Show.S01.2160p.REMUX\n👤 999' });
+  const selected = epStream(2, { name: '720p', title: 'Show.S01.720p.WEB\n👤 2', fileMustInclude: ['[Ss]0*1[ ._-]?[Ee]0*5[^0-9]'] });
+  const range = epStream(3, { title: 'Show.S01E01-E08.1080p.WEB' });
+  const ranked = rankEp([unselected, range, selected]);
+  assert.equal(hashes(ranked)[0], '2', 'the selected pack first, despite lower quality');
+  const episode = (stream) => _coreStreamsTest.streamFacts(stream).episode;
+  assert.equal(episode(range).state, 'PACK');
+  assert.equal(episode(range).line, 'Episodes 1–8 · episode not selected');
+  assert.equal(episode(selected).line, 'Season 1 · Episode 5 selected');
+  assert.equal(episode(unselected).line, 'Season 1 · episode not selected');
+});
+
+test('the dub preference only reorders results that are equally sure of the episode', () => {
+  const subExact = epStream(1, { title: '[SubsPlease] Show - 05 (1080p)', behaviorHints: { filename: '[SubsPlease] Show - 05 (1080p).mkv' } });
+  const dubPack = epStream(2, { title: '[Judas] Show (Season 1) [Dual-Audio] (Batch)', fileIdx: 4 });
+  const dubExact = epStream(3, { name: '720p', title: '[Group] Show - 05 (720p) [English Dub]', behaviorHints: { filename: '[Group] Show - 05 (720p) [English Dub].mkv' } });
+  assert.deepEqual(hashes(rankEp([subExact, dubPack, dubExact], { anime: true })), ['3', '1', '2'],
+    'the 720p dub before the 1080p sub, both before the dual-audio pack');
+});
+
+test('absolute numbering stays a labelled unverified fallback without a mapping', () => {
+  const absolute = epStream(1, { title: '[X] Show - 33 (1080p)', behaviorHints: { filename: '[X] Show - 33 (1080p).mkv' } });
+  const ranked = _coreStreamsTest.rankEpisodes([absolute], { season: 2, episode: 5 }, {}, 'Show');
+  assert.equal(ranked.length, 1, 'kept, not dropped');
+  assert.deepEqual(_coreStreamsTest.streamFacts(absolute).episode, { state: 'UNKNOWN', line: 'Episode unverified · absolute numbering' });
+  assert.match(_coreStreamsTest.formatStream(absolute).description, /^📺 Episode unverified · absolute numbering$/m);
+  const firstSeason = epStream(2, { behaviorHints: { filename: '[X] Show - 33 (1080p).mkv' } });
+  assert.deepEqual(_coreStreamsTest.rankEpisodes([firstSeason], { season: 1, episode: 5 }, {}, 'Show'), [],
+    'in a first season the number is the episode, so 33 is another episode');
+});
+
+test('the same torrent with different file selections stays separate results', async () => {
+  _coreStreamsTest.resetSourceHealth();
+  const fetchImpl = indexFetch([
+    ['https://torrentio.strem.fun/', () => jsonResponse({ streams: [
+      { infoHash: HASH('a'), fileIdx: 4, name: '1080p', title: 'Show.S01.1080p\nShow.S01E05.mkv', behaviorHints: { filename: 'Show.S01E05.mkv' } },
+      { infoHash: HASH('a'), fileIdx: 5, name: '1080p', title: 'Show.S01.1080p\nShow.S01E05.Extended.mkv', behaviorHints: { filename: 'Show.S01E05.Extended.mkv' } },
+    ] })],
+  ]);
+  const response = await handleCoreStreams(makeRequest(`/core-streams/${TOKEN}/stream/series/tt0903747:1:5.json`), makeEnv(), { fetchImpl });
+  const streams = (await response.json()).streams.filter((stream) => stream.infoHash === HASH('a'));
+  assert.deepEqual(streams.map((stream) => stream.fileIdx).sort(), [4, 5]);
+  _coreStreamsTest.resetSourceHealth();
+});
+
+test('a copy with no file selection folds into a selected copy of the same torrent', async () => {
+  _coreStreamsTest.resetSourceHealth();
+  const fetchImpl = indexFetch([
+    ['https://torrentio.strem.fun/', () => jsonResponse({ streams: [
+      { infoHash: HASH('c'), name: '1080p', title: 'Show.S01E05.1080p.WEB' },
+    ] })],
+    ['https://torrentsdb.com/', () => jsonResponse({ streams: [
+      { infoHash: HASH('c'), fileIdx: 0, name: '1080p', title: 'Show.S01E05.1080p.WEB', behaviorHints: { filename: 'Show.S01E05.1080p.WEB.mkv' } },
+    ] })],
+  ]);
+  const response = await handleCoreStreams(makeRequest(`/core-streams/${TOKEN}/stream/series/tt0903747:1:5.json`), makeEnv(), { fetchImpl });
+  const streams = (await response.json()).streams.filter((stream) => stream.infoHash === HASH('c'));
+  assert.deepEqual(streams.map((stream) => stream.fileIdx), [0]);
+  _coreStreamsTest.resetSourceHealth();
+});
+
+test('a low-seed P2P result does not outrank a TorBox-cached copy of the right episode', () => {
+  const p2p = epStream(1, { name: '2160p', title: 'Show.S01E05.2160p.WEB-DL\n👤 2', behaviorHints: { filename: 'Show.S01E05.2160p.WEB-DL.mkv' } });
+  const cached = _coreStreamsTest.setStreamFacts({ url: 'https://worker.example/play', name: 'TorBox ⚡ · 1080p', title: 'Show.S01E05.1080p.WEB-DL',
+    behaviorHints: { filename: 'Show.S01E05.1080p.WEB-DL.mkv' } }, { source: 'Torrentio', cached: true, release: 'Show.S01E05.1080p.WEB-DL' });
+  assert.equal(rankEp([p2p, cached])[0], cached);
+});
+
+test('episode ordering is deterministic whatever order the providers answered in', () => {
+  const make = () => [
+    epStream(1, { title: 'Show.S01E05.1080p.WEB' }), epStream(2, { title: 'Show.S01E05.1080p.WEB' }),
+    epStream(3, { title: 'Show.S01E05.1080p.WEB' }, 'TorrentsDB'), epStream(4, { title: 'Show.S01.1080p', fileIdx: 1 }),
+  ];
+  const forward = hashes(rankEp(make()));
+  assert.deepEqual(hashes(rankEp(make().reverse())), forward);
+  assert.equal(forward[forward.length - 1], '4', 'the pack is last');
+});
+
+test('film requests keep the quality-first order', async () => {
+  const facts = _coreStreamsTest.rankScore(epStream(1, { name: '2160p', title: 'Film.2024.2160p.REMUX' }), {});
+  assert.ok(facts > _coreStreamsTest.rankScore(epStream(2, { title: 'Film.2024.1080p.WEB' }), {}));
 });
