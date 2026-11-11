@@ -135,7 +135,7 @@ Movie/episode lookups are rate-limited using the existing `RL_PROXY_CUSTOM` lane
   - `EXACT`: the file names the episode (`S01E05`, `1x05`, or an anime ` - 05` with the season named, in a first season, or under a Kitsu id). Card: `📺 S01E05 · Title`.
   - `LIKELY`: only the release title names it, or the file names the episode but not the season. Card: `📺 S01E05 · from the release name`.
   - `PACK`: a season, batch, volume or range that contains it. Card: `📺 Season 1 · Episode 5 selected`, or `📺 Episodes 1–8 · E05 selected`. A pack the add-on picked a file in (`fileIdx`/`fileMustInclude`) ranks above one it did not (`· episode not selected`).
-  - `UNKNOWN`: no reliable evidence. Card: `📺 Episode unverified`. Absolute anime numbering (` - 33` for S2E5) stays here, labelled `· absolute numbering`: it is kept as a fallback, never dropped and never treated as exact.
+  - `UNKNOWN`: no reliable evidence. Card: `📺 Episode unverified`. For a later season with no season named and no Kitsu entry numbering, an anime number that differs from the request (`- 33` for S2E5, which may be absolute numbering) stays here as a fallback, labelled `· absolute numbering`. A matching number in that case is `LIKELY`.
   - `MISMATCH`: the file, or a title with no file selection, names another episode or season. These results are **removed**.
 - Results are ordered by, in turn:
   1. episode state;
@@ -147,7 +147,7 @@ Movie/episode lookups are rate-limited using the existing `RL_PROXY_CUSTOM` lane
   7. a stable key, so the order never depends on which provider answered first.
 
   Each result also carries an additive score in its facts (EXACT 1000, LIKELY 700, PACK 450, +100 for a pack with a selection, UNKNOWN 100; delivery, audio, device, quality and diversity together stay under 100). A 4K REMUX of the wrong episode is gone, and a better pack never passes an exact single. The dub preference only reorders results that are equally sure of the episode. Film requests keep the quality-first order.
-- The same torrent with a different file selection is a different result. A copy with no selection folds into the selected one.
+- The same torrent with a different file selection is a different result. A copy with no selection is dropped once a selected copy has passed episode classification.
 - P2P playback of a pack opens the episode through `fileMustInclude`, which Stremio's torrent engine reads but the stream protocol does not promise. A TorBox-cached pack is different: Core Streams picks the episode file itself.
 - Kitsu titles are cached like Cinemeta's (positive answers, 6 h), so the title lookup is paid once per show. Both Nyaa searches start together once the title is known.
 - Not matched, on purpose: releases numbered absolutely (` - 33` for S2E5), since Kitsu does not give the offset. Kitsu subtitles are optional (`Mushoku Tensei II: …` matches `Mushoku Tensei S2`) and Roman numerals count as the season.

@@ -61,3 +61,12 @@ test('card lines', () => {
   assert.equal(episodeLine(R, { state: 'UNKNOWN', ambiguous: true }), 'Episode unverified · absolute numbering');
   assert.equal(episodeLine(R, { state: 'MISMATCH' }), '');
 });
+
+test('a range that repeats the season is one pack, and three-digit seasons parse', () => {
+  const verdict = classifyEpisode(R, { release: 'Show.S01E01-S01E08.1080p.WEB' });
+  assert.equal(verdict.state, 'PACK');
+  assert.deepEqual(verdict.range, [1, 8]);
+  assert.equal(state({ release: 'Show.S01E06-S01E08.1080p' }), 'MISMATCH');
+  assert.equal(state({ filename: 'Show.S100E05.mkv' }, { season: 100, episode: 5 }), 'EXACT');
+  assert.equal(state({ filename: 'Show.S100E06.mkv' }, { season: 100, episode: 5 }), 'MISMATCH');
+});

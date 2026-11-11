@@ -1759,3 +1759,28 @@ test('film requests keep the quality-first order', async () => {
   const facts = _coreStreamsTest.rankScore(epStream(1, { name: '2160p', title: 'Film.2024.2160p.REMUX' }), {});
   assert.ok(facts > _coreStreamsTest.rankScore(epStream(2, { title: 'Film.2024.1080p.WEB' }), {}));
 });
+
+test('device compatibility reads AV1, 3D and DV-only as whole words', () => {
+  const ranked = rankEp([
+    epStream(1, { title: 'Show.S01E05.1080p.WEB.AV1' }),
+    epStream(2, { title: 'Show.S01E05.1080p.WEB.DV' }),
+    epStream(3, { title: 'Show.S01E05.1080p.WEB.x264' }),
+  ]);
+  assert.deepEqual(ranked.map((stream) => _coreStreamsTest.streamFacts(stream).rank.device), [10, 4, 0]);
+});
+
+test('a bare copy survives when the selected copy of the same torrent names another episode', async () => {
+  _coreStreamsTest.resetSourceHealth();
+  const fetchImpl = indexFetch([
+    ['https://torrentio.strem.fun/', () => jsonResponse({ streams: [
+      { infoHash: HASH('d'), name: '1080p', title: 'Show.S01E05.1080p.WEB' },
+    ] })],
+    ['https://torrentsdb.com/', () => jsonResponse({ streams: [
+      { infoHash: HASH('d'), fileIdx: 1, name: '1080p', title: 'Show.S01E06.1080p.WEB', behaviorHints: { filename: 'Show.S01E06.1080p.WEB.mkv' } },
+    ] })],
+  ]);
+  const response = await handleCoreStreams(makeRequest(`/core-streams/${TOKEN}/stream/series/tt0903747:1:5.json`), makeEnv(), { fetchImpl });
+  const streams = (await response.json()).streams.filter((stream) => stream.infoHash === HASH('d'));
+  assert.deepEqual(streams.map((stream) => stream.fileIdx), [undefined], 'the S01E05 copy stays; the S01E06 file is excluded');
+  _coreStreamsTest.resetSourceHealth();
+});

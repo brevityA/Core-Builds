@@ -599,5 +599,5 @@ The 0.12.0 branch (#825) was merged into #824 unchanged, and the stream cards (#
 - The order is lexicographic: episode state → delivery → anime audio → device → quality → diversity → a stable key. A better-quality copy of the wrong episode can never pass the right one.
 - The dub preference now applies only within one episode state. 0.13.0 lifted a dual-audio batch above a sub single; that no longer happens.
 - Absolute anime numbering stays a labelled `UNKNOWN` unless the season is named, it is a first season, or a Kitsu id numbers episodes per entry.
-- The dedupe key includes `fileMustInclude`. A selection-less copy of a hash folds into the selected one; different selections stay distinct.
+- The dedupe key includes `fileMustInclude`; different selections stay distinct. A selection-less copy of a hash is dropped only once a selected copy has passed episode classification.
 - Results are re-ranked after TorBox promotion, so a cached exact copy takes its place by episode state first.

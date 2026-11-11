@@ -28,8 +28,8 @@ const clean = (value) => String(value || '').replace(/_/g, '.');
 /** "S2", "Season 2", "2nd Season", Roman "II": the season a text names, or null. */
 export function explicitSeason(text) {
   const value = clean(text).toLowerCase();
-  const match = value.match(/\bs0*(\d{1,2})(?=e\d|[^a-z0-9]|$)/) || value.match(/\b(\d{1,2})(?:st|nd|rd|th)[ .-]season\b/)
-    || value.match(/\bseason[ .-]?0*(\d{1,2})\b/);
+  const match = value.match(/\bs0*(\d{1,3})(?=e\d|[^a-z0-9]|$)/) || value.match(/\b(\d{1,3})(?:st|nd|rd|th)[ .-]season\b/)
+    || value.match(/\bseason[ .-]?0*(\d{1,3})\b/);
   if (match) return Number(match[1]);
   const roman = value.match(/[ .](ii|iii|iv|vi)(?=[ .:\-[(]|$)/);
   return roman ? { ii: 2, iii: 3, iv: 4, vi: 6 }[roman[1]] : null;
@@ -43,7 +43,8 @@ export function episodeClaims(text) {
   const value = clean(text);
   const claims = [];
   // S01E05, S01E05-E07, S01E05E06 (but not the "5.1" of S01E05.DDP.5.1 audio).
-  for (const m of value.matchAll(/\bS(\d{1,2})[ .-]?E(\d{1,4})(?:-?E(\d{1,4})|-(\d{1,4})(?![\d.]))?(?!\d)/gi)) {
+  // S01E01-S01E08 repeats the season; it is one range, not two episodes.
+  for (const m of value.matchAll(/\bS(\d{1,3})[ .-]?E(\d{1,4})(?:-?(?:S\1[ .-]?)?E(\d{1,4})|-(\d{1,4})(?![\d.]))?(?!\d)/gi)) {
     const season = Number(m[1]);
     const first = Number(m[2]);
     const last = Number(m[3] || m[4] || first);

@@ -476,9 +476,19 @@ function audioScore(stream, { anime = false, audio = 'dub' } = {}) {
 /** Device compatibility: AV1, 3D and DV without an HDR fallback play on fewer devices. */
 function deviceScore(stream) {
   const text = streamText(stream).toLowerCase();
-  if (/av1|3d/.test(text)) return 0;
-  if (/(?:dv|dovi|dolby[ .-]?vision)/.test(text) && !/hdr(?:10)?/.test(text)) return 4;
+  if (/\bav1\b|\b3d\b/.test(text)) return 0;
+  if (/\b(?:dv|dovi|dolby[ .-]?vision)\b/.test(text) && !/\bhdr(?:10)?\b/.test(text)) return 4;
   return 10;
+}
+
+/**
+ * Drop a torrent's selection-less copy when a copy with a file selection
+ * (fileIdx/fileMustInclude) is in the same list; different selections stay.
+ */
+function foldBareCopies(streams) {
+  const selected = new Set(streams.filter((stream) => stream.infoHash && (stream.fileIdx !== undefined || stream.fileMustInclude))
+    .map((stream) => stream.infoHash));
+  return streams.filter((stream) => !stream.infoHash || stream.fileIdx !== undefined || stream.fileMustInclude || !selected.has(stream.infoHash));
 }
 
 const sourceOf = (stream) => String(stream?.name || '').split(' · ')[0];
@@ -2035,28 +2045,19 @@ export async function handleCoreStreams(request, env, { headers = {}, rateLimit 
     // This stops an early high-volume source from consuming the result cap and
     // hiding every later provider or the curated open-media matches.
     const seen = new Set();
-    // A torrent with no file selection folds into a selected copy of itself;
-    // different selections inside one torrent stay distinct.
-    const bareAt = new Map(); // info hash -> index of its selection-less result
-    const selectedHashes = new Set(); // info hashes that already have a selection
+    // Keep one selection-less copy of each torrent beside every selected copy;
+    // foldBareCopies() drops the bare one only once a selected copy has
+    // survived episode classification, so a selected copy that names another
+    // episode never takes the torrent's only viable result with it.
+    const bareHashes = new Set();
     const unique = [];
     for (const stream of interleaveStreamGroups(responses)) {
       const key = dedupeKey(stream);
       if (seen.has(key)) continue;
       seen.add(key);
-      if (stream.infoHash) {
-        if (stream.fileIdx === undefined && !stream.fileMustInclude) {
-          if (selectedHashes.has(stream.infoHash) || bareAt.has(stream.infoHash)) continue;
-          bareAt.set(stream.infoHash, unique.length);
-        } else {
-          selectedHashes.add(stream.infoHash);
-          if (bareAt.has(stream.infoHash)) {
-            const at = bareAt.get(stream.infoHash);
-            bareAt.delete(stream.infoHash);
-            unique[at] = stream;
-            continue;
-          }
-        }
+      if (stream.infoHash && stream.fileIdx === undefined && !stream.fileMustInclude) {
+        if (bareHashes.has(stream.infoHash)) continue;
+        bareHashes.add(stream.infoHash);
       }
       unique.push(stream);
     }
@@ -2067,8 +2068,8 @@ export async function handleCoreStreams(request, env, { headers = {}, rateLimit 
     // Global quality pass after the fair interleaving/dedupe pass. Scores are
     // memoized per object, so sorting does not re-parse release text.
     const sorted = episodeRequest
-      ? rankEpisodes(dropJunk(unique), episodeRequest, context, showTitle)
-      : dropJunk(unique)
+      ? foldBareCopies(rankEpisodes(dropJunk(unique), episodeRequest, context, showTitle))
+      : dropJunk(foldBareCopies(unique))
         .map((stream, index) => ({ stream, index, score: rankScore(stream, context) }))
         .sort((a, b) => b.score - a.score || a.index - b.index)
         .map(({ stream }) => stream);
@@ -2132,6 +2133,7 @@ export async function handleCoreStreams(request, env, { headers = {}, rateLimit 
 }
 
 export const _coreStreamsTest = {
+  foldBareCopies,
   rankEpisodes,
   streamFacts: getStreamFacts,
   setStreamFacts,
