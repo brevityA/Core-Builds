@@ -114,7 +114,15 @@ for f in files:
         c['requiredResolutions'] = []
         if hd_only and not any(isinstance(e, dict) and e.get('enabled') and 'Hard Resolution Kill' in expr(e) for e in eses):
             # requiredResolutions was this line's only 4K ceiling (Samsung TV 1080p has no hard kill).
+            # Give it the hard-kill ESE every other 1080p line carries, and keep 4K out of its
+            # REPACK/PROPER passthrough so 'excluded' cannot exempt a 4K REPACK from that kill.
             excl = excl + [r for r in ('1440p', '2160p') if r not in excl]
+            eses.insert(at, {'enabled': True, 'expression': "/* Hard Resolution Kill — Stream is 1080p-only */ resolution(streams, '2160p', '1440p')"})
+            rp = "keyword(negate(merge(library(streams),seadex(streams)),streams),'all','repack','proper')"
+            for e in c.get('includedStreamExpressions', []):
+                if isinstance(e, dict) and 'REPACK/PROPER Passthrough' in e.get('expression', '') and rp in e['expression']:
+                    e['expression'] = e['expression'].replace(rp, "keyword(negate(merge(library(streams),seadex(streams),resolution(streams,'2160p','1440p')),streams),'all','repack','proper')")
+            done.append('hard kill added')
         c['excludedResolutions'] = excl
         done.append('sd fallback')
     g = ((c.get('size') or {}).get('global') or {}).get('series')
@@ -149,6 +157,10 @@ for f in files:
     if '/Anime/' in f and bad4k_anime and ANIME_4K in cond:
         cond = cond.replace(ANIME_4K, 'cached(quality(resolution(totalStreams, "2160p"), "Bluray REMUX"))')
         daf['condition'] = cond; done.append('anime 4k remux count')
+    if hard_kill and 'count(cached(totalStreams))' in cond:
+        # Flash's own 'two cached results' exit counted the 4K results its hard kill drops.
+        cond = cond.replace('count(cached(totalStreams))', f'count(cached({kept}))')
+        daf['condition'] = cond; done.append('raw exit filtered')
     if daf.get('enabled') and cond and 'totalTimeTaken' not in cond:
         daf['condition'] = cond + time_exit; done.append('time exit')
 
@@ -190,6 +202,8 @@ for f in files:
     if 'season air years' in done: notes.append('year matching uses each season\'s air years instead of the premiere year')
     if 'flood caps' in done: notes.append('per-add-on caps (Comet 5→10, Meteor 5→3) apply only once 10 cached results exist')
     if 'anime 4k remux count' in done: notes.append('the 2160p fetch threshold counts only REMUX, since Bad 4k Anime drops other cached 4K for Japanese anime')
+    if 'hard kill added' in done: notes.append('hard 1080p resolution kill added (requiredResolutions was its only 4K ceiling), and 4K REPACKs no longer bypass it')
+    if 'raw exit filtered' in done: notes.append('the two-cached-results fetch exit no longer counts 4K results this line drops')
     if 'zilean off' in done: notes.append('Zilean disabled: it needs a debrid service, and AIOStreams refused this EasyNews-only template on save')
     if 'meteor timeout' in done: notes.append('Meteor timeout 6 s→4 s')
     m.setdefault('changelog', []).insert(0, {'date': DATE, 'version': m['version'], 'content': '; '.join(notes) + '.'})

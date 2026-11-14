@@ -20,7 +20,7 @@
       {
         "date": "2026-11-14",
         "version": "0.3.16",
-        "content": "Inline ranked expressions score resolution, source, HDR, audio and release group so the best file leads each tier (Dolby Vision not scored on this device); the final limit now keeps four uncached results instead of dropping all of them when cached ones are plentiful; add-on fetching stops after 4.5 s once five cached results the template keeps are in; SD and untagged releases now fill in when fewer than five cached HD results exist (older shows such as Arthur returned none); episode size floor lowered to 30 MB for short SD episodes; year matching uses each season's air years instead of the premiere year; per-add-on caps (Comet 5→10, Meteor 5→3) apply only once 10 cached results exist."
+        "content": "Inline ranked expressions score resolution, source, HDR, audio and release group so the best file leads each tier (Dolby Vision not scored on this device); the final limit now keeps four uncached results instead of dropping all of them when cached ones are plentiful; add-on fetching stops after 4.5 s once five cached results the template keeps are in; SD and untagged releases now fill in when fewer than five cached HD results exist (older shows such as Arthur returned none); episode size floor lowered to 30 MB for short SD episodes; year matching uses each season's air years instead of the premiere year; per-add-on caps (Comet 5→10, Meteor 5→3) apply only once 10 cached results exist; hard 1080p resolution kill added (requiredResolutions was its only 4K ceiling), and 4K REPACKs no longer bypass it."
       },
       {
         "date": "2026-11-02",
@@ -335,6 +335,10 @@
       },
       {
         "enabled": true,
+        "expression": "/* Hard Resolution Kill — Stream is 1080p-only */ resolution(streams, '2160p', '1440p')"
+      },
+      {
+        "enabled": true,
         "expression": "/* CB | SD Fallback — SD and untagged releases only when fewer than 5 cached 1080p/720p remain */ count(cached(resolution(streams,'1080p','720p'))) >= 5 ? negate(merge(library(streams),seadex(streams)),resolution(streams,'576p','480p','360p','Unknown')) : []"
       },
       {
@@ -398,7 +402,7 @@
         "enabled": true
       },
       {
-        "expression": "/*REPACK/PROPER Passthrough*/ count(keyword(negate(merge(library(streams),seadex(streams)),streams),'all','repack','proper'))>0?passthrough(keyword(negate(merge(library(streams),seadex(streams)),streams),'all','repack','proper'),'excluded','limit'):[]",
+        "expression": "/*REPACK/PROPER Passthrough*/ count(keyword(negate(merge(library(streams),seadex(streams),resolution(streams,'2160p','1440p')),streams),'all','repack','proper'))>0?passthrough(keyword(negate(merge(library(streams),seadex(streams),resolution(streams,'2160p','1440p')),streams),'all','repack','proper'),'excluded','limit'):[]",
         "enabled": true
       }
     ],
@@ -1267,7 +1271,7 @@
     "selOverrides": [],
     "dynamicAddonFetching": {
       "enabled": true,
-      "condition": "count(cached(resolution(totalStreams, \"1080p\"))) >= 20 or (totalTimeTaken >= 4500 and count(cached(merge(negate(resolution(totalStreams,'2160p'),totalStreams),quality(resolution(totalStreams,'2160p'),'Bluray REMUX')))) >= 5)"
+      "condition": "count(cached(resolution(totalStreams, \"1080p\"))) >= 20 or (totalTimeTaken >= 4500 and count(cached(negate(resolution(totalStreams,'2160p','1440p'),totalStreams))) >= 5)"
     },
     "sortCriteria": {
       "global": [
