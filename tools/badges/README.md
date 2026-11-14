@@ -31,7 +31,11 @@ node --test tools/badges/tests/*.test.mjs
 python -m pytest tests/test_badge_builder.py
 ```
 
-The generated badge image URLs intentionally point to the `main` branch so published packs remain stable after the feature merges.
+The generated badge image URLs intentionally point to the `main` branch so published packs remain stable after the feature merges. Asset files are therefore never renamed or deleted once published.
+
+## Licence
+
+The badge artwork in `assets/` is licensed [CC BY 4.0](assets/LICENSE.md): anyone may reuse it with credit ("Badge artwork: Core Builds (brevityA/Core-Builds), CC BY 4.0"), a link to the [licence](https://creativecommons.org/licenses/by/4.0/), and a note of any changes they made. The builder code and generated JSON are MIT, like the rest of the repository. `published/badges.json` indexes every image for reuse.
 
 ## Upstream contract check
 

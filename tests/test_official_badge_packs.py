@@ -73,6 +73,41 @@ def test_stacks_name_the_urls():
     assert "core-nodv-universal.json" in text
 
 
+ASSETS = ROOT / "tools" / "badges" / "assets"
+RAW_ASSETS = "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/"
+
+
+def test_badge_index_lists_every_image_with_the_licence():
+    index = load("badges.json")
+    assert index["license"] == "CC-BY-4.0"
+    assert "Core Builds" in index["attribution"] and "CC BY 4.0" in index["attribution"]
+    ids = [badge["id"] for badge in index["badges"]]
+    assert len(ids) == len(set(ids)) == 111
+    groups = {group["id"] for group in index["groups"]}
+    for badge in index["badges"]:
+        assert badge["group"] in groups
+        assert badge["name"] and badge["label"]
+        for kind in ("png", "svg"):
+            url = badge[kind]
+            assert url == f"{RAW_ASSETS}{badge['id']}.{kind}"
+            # Installed packs load these URLs: a published file is never renamed or deleted.
+            assert (ASSETS / f"{badge['id']}.{kind}").is_file(), url
+
+
+def test_every_pack_image_exists():
+    for name in PACKS:
+        for filt in load(name)["filters"]:
+            file = filt["imageURL"].rsplit("/", 1)[1]
+            assert (ASSETS / file).is_file(), f"{name}: {file}"
+
+
+def test_artwork_licence_is_cc_by():
+    text = (ASSETS / "LICENSE.md").read_text(encoding="utf-8")
+    assert "CC BY 4.0" in text
+    assert "creativecommons.org/licenses/by/4.0" in text
+    assert "Badge artwork: Core Builds (brevityA/Core-Builds), CC BY 4.0" in text
+
+
 def main() -> int:
     tests = [
         test_three_official_packs_exist,
@@ -80,6 +115,9 @@ def main() -> int:
         test_counts_and_no_dv_pack,
         test_universal_patterns_compile,
         test_stacks_name_the_urls,
+        test_badge_index_lists_every_image_with_the_licence,
+        test_every_pack_image_exists,
+        test_artwork_licence_is_cc_by,
     ]
     failed = 0
     for test in tests:
