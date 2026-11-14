@@ -97,6 +97,37 @@ for (const c of cases) {
     (failures.get(key) || failures.set(key, []).get(key)).push(name);
   }
 }
+// Every active static template. The fleet is hand-maintained JSON, so only a real save proves
+// an edit to it is accepted (template suite 3.13 added ranked expressions fleet-wide).
+{
+  const { readdirSync, statSync } = await import('node:fs');
+  const SKIP_DIRS = /^(Deprecated|Nightly|Legacy|Personal)$/;
+  const walk = d => readdirSync(d).flatMap(n => {
+    const p = `${d}/${n}`;
+    if (statSync(p).isDirectory()) return SKIP_DIRS.test(n) ? [] : walk(p);
+    return p.endsWith('.json') ? [p] : [];
+  });
+  const root = new URL('../../Templates/Torbox', import.meta.url).pathname;
+  for (const file of walk(root).sort()) {
+    const name = 'static:' + file.slice(root.length + 1);
+    cases.push({ name });
+    const config = structuredClone(JSON.parse(readFileSync(file, 'utf8')).config);
+    // Top-level `<template_placeholder>` fields (TMDB token and key) are optional prompts on
+    // import; a user who leaves them blank saves without them. A dummy value would be validated
+    // against TMDB and refused, which tests nothing about the template.
+    for (const [k, v] of Object.entries(config)) if (v === '<template_placeholder>') delete config[k];
+    // Without one, AIOStreams refuses the TMDB-backed matchers, so turn them off exactly as the
+    // configurator does when no key is set (hasTmdb); everything else is saved as shipped.
+    if (!config.tmdbAccessToken && !config.tmdbApiKey) {
+      for (const k of ['titleMatching', 'yearMatching', 'digitalReleaseFilter']) if (config[k]) config[k].enabled = false;
+      if (config.bitrate) config.bitrate.useMetadataRuntime = false;
+    }
+    const r = await save(withDummyCredentials(config, required));
+    if (r.ok) { pass++; continue; }
+    const key = r.error.replace(/\b[0-9a-f-]{36}\b/g, '<uuid>').slice(0, 220);
+    (failures.get(key) || failures.set(key, []).get(key)).push(name);
+  }
+}
 // Negative control for the restricted run: a pattern no allowlist carries must be
 // refused, or a green run would only mean the gate was never on.
 if (ONLY_HOST) {

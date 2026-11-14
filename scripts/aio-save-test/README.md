@@ -25,13 +25,18 @@ AIOStreams itself. CI: `.github/workflows/aio-save-test.yml`.
    checked against generator output for every other answer (one language each; the
    compiler itself reads every language), so combined picks are the case only this
    harness covers.
+5. Every active static template under `Templates/Torbox/` (not Deprecated, Nightly,
+   Legacy or Personal) is saved as shipped, except that top-level
+   `<template_placeholder>` fields are dropped and the TMDB-backed matchers are
+   switched off, as the configurator does when no TMDB key is set. Added in suite
+   3.13; its first run found Speed EasyNews refused (Zilean with no debrid).
 
 ## Variants
 
 | Variant | Host rules | Cases |
 |---|---|---|
-| `open` | `REGEX_FILTER_ACCESS=all`, `SEL_SYNC_ACCESS=all` | 489 (27 smart template) |
-| `restricted` | ElfHosted's allowlist from `allowlist.elfhosted.json` (level, synced URLs, literal patterns) | 412 (24 smart template; free lanes skipped: ElfHosted refuses them) |
+| `open` | `REGEX_FILTER_ACCESS=all`, `SEL_SYNC_ACCESS=all` | 530 (27 smart template, 41 static) |
+| `restricted` | ElfHosted's allowlist from `allowlist.elfhosted.json` (level, synced URLs, literal patterns) | 453 (24 smart template, 41 static; free lanes skipped: ElfHosted refuses them) |
 
 The restricted run also saves one config carrying a regex no allowlist has and
 fails unless AIOStreams refuses it, so a green run cannot mean the gate was off.
