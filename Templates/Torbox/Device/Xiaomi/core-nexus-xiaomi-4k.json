@@ -20,7 +20,7 @@
       {
         "date": "2026-11-14",
         "version": "0.1.9",
-        "content": "Inline ranked expressions score resolution, source, HDR, audio and release group so the best file leads each tier; the final limit now keeps four uncached results instead of dropping all of them when cached ones are plentiful; add-on fetching stops after 4.5 s once five cached results are in; SD and untagged releases now fill in when fewer than five HD results exist (older shows such as Arthur returned none); episode size floor lowered to 30 MB for short SD episodes; year matching uses each season's air years instead of the premiere year; per-add-on caps (Comet 5→10, Meteor 5→3) apply only once 10 cached results exist."
+        "content": "Inline ranked expressions score resolution, source, HDR, audio and release group so the best file leads each tier; the final limit now keeps four uncached results instead of dropping all of them when cached ones are plentiful; add-on fetching stops after 4.5 s once five cached results the template keeps are in; SD and untagged releases now fill in when fewer than five HD results exist (older shows such as Arthur returned none); episode size floor lowered to 30 MB for short SD episodes; year matching uses each season's air years instead of the premiere year; per-add-on caps (Comet 5→10, Meteor 5→3) apply only once 10 cached results exist."
       },
       {
         "date": "2026-11-02",

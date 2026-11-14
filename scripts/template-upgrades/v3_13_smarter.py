@@ -12,7 +12,6 @@ import glob, json, re, subprocess, sys
 DATE = '2026-11-14'
 DRY = '--dry-run' in sys.argv
 CACHED_ONLY = ('/Flash/', '/Speed/TorBox/')  # instant-play lines: no uncached reserve by design
-TIME_EXIT = ' or (totalTimeTaken >= 4500 and count(cached(totalStreams)) >= 5)'
 UNCACHED = "type(uncached(streams),'debrid')"
 # slice(x, 4) returns x minus its first four, so the quota now spares four uncached debrid results
 # in every branch instead of none. Same shape as the quota's own last branch (slice(..., 6)); a
@@ -127,8 +126,13 @@ for f in files:
     # 3. Faster — stop waiting once 4.5 s have passed and five cached results are in hand.
     daf = c.get('dynamicAddonFetching') or {}
     cond = daf.get('condition') or ''
+    # Count only results the template keeps: 1080p lines hard-kill 2160p/1440p later, so five
+    # cached 4K results must not end fetching (the later add-ons' 1080p results would be lost).
+    hard_kill = any(isinstance(e, dict) and e.get('enabled') and 'Hard Resolution Kill' in expr(e) for e in eses)
+    kept = "negate(resolution(totalStreams,'2160p','1440p'),totalStreams)" if hard_kill else 'totalStreams'
+    time_exit = f' or (totalTimeTaken >= 4500 and count(cached({kept})) >= 5)'
     if daf.get('enabled') and cond and 'totalTimeTaken' not in cond:
-        daf['condition'] = cond + TIME_EXIT; done.append('time exit')
+        daf['condition'] = cond + time_exit; done.append('time exit')
 
     # 4. Right file first — an additive score inside each PSE tier.
     name = f.lower()
@@ -158,7 +162,7 @@ for f in files:
     notes = ['Inline ranked expressions score resolution, source, HDR, audio and release group so the best file leads each tier'
              + ('' if dv else ' (Dolby Vision not scored on this device)')]
     if 'uncached reserve' in done: notes.append('the final limit now keeps four uncached results instead of dropping all of them when cached ones are plentiful')
-    if 'time exit' in done: notes.append('add-on fetching stops after 4.5 s once five cached results are in')
+    if 'time exit' in done: notes.append('add-on fetching stops after 4.5 s once five cached results the template keeps are in')
     if 'sd fallback' in done: notes.append('SD and untagged releases now fill in when fewer than five HD results exist (older shows such as Arthur returned none)')
     if 'series size floor' in done: notes.append('episode size floor lowered to 30 MB for short SD episodes')
     if 'season air years' in done: notes.append('year matching uses each season\'s air years instead of the premiere year')

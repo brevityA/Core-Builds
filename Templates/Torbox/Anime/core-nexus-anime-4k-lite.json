@@ -13,7 +13,7 @@
       {
         "date": "2026-11-14",
         "version": "2.8.19",
-        "content": "Inline ranked expressions score resolution, source, HDR, audio and release group so the best file leads each tier; add-on fetching stops after 4.5 s once five cached results are in; episode size floor lowered to 30 MB for short SD episodes; year matching uses each season's air years instead of the premiere year; per-add-on caps (Comet 5→10, Meteor 5→3) apply only once 10 cached results exist; Meteor timeout 6 s→4 s."
+        "content": "Inline ranked expressions score resolution, source, HDR, audio and release group so the best file leads each tier; add-on fetching stops after 4.5 s once five cached results the template keeps are in; episode size floor lowered to 30 MB for short SD episodes; year matching uses each season's air years instead of the premiere year; per-add-on caps (Comet 5→10, Meteor 5→3) apply only once 10 cached results exist; Meteor timeout 6 s→4 s."
       },
       {
         "date": "2026-10-22",
