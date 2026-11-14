@@ -1,4 +1,10 @@
 export const CHANGELOG = [
+  { v:'3.34', date:'Nov 18 2026', items:[
+    'Three new stream cards — Core Compact (two short lines: cache, resolution and service, then quality, size, audio and language), Core Detailed (up to six lines with title and episode, bitrate, subtitles, release group, source and file name) and Core Badges (the same facts as [TEXT LABELS]). Missing details are left out instead of shown as Unknown, empty brackets or a stray ·, and a result whose cache state AIOStreams does not know gets no icon rather than a guess.',
+    'Score display — the Core cards can show the stream score as ★ 87, in plain or bold-looking digits (Unicode characters, not font weight; a player without them shows boxes), or hide it. The score only exists with the Advanced and Labs profiles, and the setting says so.',
+    'Previews rendered by AIOStreams — the Core cards are previewed with AIOStreams’ own formatter engine at the pinned release, and tests render every style through it for complete, sparse, P2P, episode, season-pack and long Unicode streams. Other cards are labelled illustrative.',
+    'Generated output unchanged — every config the configurator and the CLI build from existing settings is byte-for-byte what 3.33 produced apart from the version stamp; only choosing one of the new cards changes the formatter.',
+  ]},
   { v:'3.33', date:'Nov 18 2026', items:[
     'A one-screen main page — the Core mark, the Core Builds name and the version, then six equal rows: Core Builds (opens Quick install), Template Inspector, Back Up Addons, Nuvio Stack Genie, Core Badge Builder and All Core Tools. Each row has a hexagon icon and a short tag saying what it is.',
     'Support and shortcuts — a Support Core Builds button sits under the rows, and Custom build, Guided setup, update, import, the tour, template compare, what’s new and Report an issue are one tap away on All Core Tools. Each also has its own link (for example …/configurator/#advanced), and the links now work while the page is open as well as on first load.',
