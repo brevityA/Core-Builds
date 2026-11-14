@@ -1,6 +1,8 @@
 import { ICO } from '../data/icons.js';
 import { CHANGELOG } from '../data/changelog.js';
 import { FORMATTERS, AUDIO_HELP } from '../data/formatters.js';
+import { CORE_SCORE_MODES, DEFAULT_CORE_SCORE_MODE, buildCoreFormatter, isCoreFormatter } from '../data/core-formatters.js';
+import { CORE_FORMATTER_PREVIEWS, CORE_PREVIEW_ENGINE_VERSION } from '../data/core-formatter-previews.js';
 import { OPTIONAL_SCRAPER_DEFS, presetRole, withPenguplay } from '../data/scrapers.js';
 import { HOST_BASE_URLS, HOST_LABEL_MAP, HOST_META, MIN_AIOSTREAMS_VERSION } from '../data/hosts.js';
 import { DEVICE_AUDIO_DEFAULTS, DEVICE_FORCE_LIMITED_AUDIO, DEVICE_AV1_SAFE, DEVICE_DV_SAFE, POPULAR_DEVICE_IDS, DEVICE_PROFILES } from '../data/devices.js';
@@ -48,7 +50,7 @@ const STEPS = 6;
 // workflow) the raw x.y here expands to x.y.0 in package.json / versions.json and
 // the release tag; the built badge drops the trailing .0. At the 2026-09-06
 // audit the release tag was v3.7.0 while this said 3.1 — they must move together.
-const CONFIGURATOR_VERSION = '3.32';
+const CONFIGURATOR_VERSION = '3.33';
 // Set to a collector endpoint to enable the opt-in anonymous usage ping (service+device+resolution only).
 // Leave empty to keep the feature fully disabled and hidden.
 const USAGE_BEACON_URL = '';
@@ -453,7 +455,7 @@ async function selectHealthyHost(timeout=4000) {
 // Cloudflare Worker CORS proxy — see cloudflare-worker/README.md for deployment.
 // Set to '' to disable and fall back to direct-only fetches.
 const CORS_PROXY = 'https://core-builds-cors-proxy.tlorenzato26.workers.dev';
-const S = { service:null, device:null, resolution:null, audio:'limited', bandwidthMbps:0, content:null, name:'', multiServices:[], sizeLimit:'unlimited', formatter:'family-v4', p2pEnabled:false, qualityFirst:false, resolutionFirst:false, foreignLangKill:true, matchMode:'balanced', exclude4K:false, excludeDV:false, tmdbToken:'', tmdbApiKey:'', creds:{torbox:'',realdebrid:'',alldebrid:'',premiumize:'',debridlink:'',offcloud:'',easynews:'',easynewsPass:'',nzbgeek:'',debridio:'',debrider:'',nzbnoob:'',althub:'',usenetcrawler:'',drunkenslug:'',nzbfinder:'',jackett:'',prowlarr:'',subdl:'',penguplay:''}, instanceHost:'elfhosted', instanceUrl:'', instanceUuid:'', instancePassword:'', baseUuid:'', basePassword:'', quickStart:false, langs: ['English'], langsSet: false, langExclusive: false, cacheMode: 'mixed', streamPool: 'normal', pseArch: 'standard', telemetryOk: false, simpleMode: false, outputProfile:'auto', aiostreamsVersion:DEFAULT_AIOSTREAMS_VERSION, installMode: 'direct', stremioEmail: '', stremioPassword: '', subtitleLangs: ['en'], subtitleAddons: ['opensubtitles-v3-plus'], streamProxy: { ...DEFAULT_STREAM_PROXY, proxiedServices: [], proxiedAddons: [] }, streamProxyPassword: '', catalogs: ['tmdb-addon'], dedupMerge: false, optionalScrapers: [], cleanInstall: false, quickProfile: 'balanced', preloadEnabled:true, autoPlayMethod:'matchingFile', addonTimeout:6000, patchCinemeta:false, installAIOMeta:false, libraryBoost:'default', nzbFailover:false, nzbFailoverPosition:'after-torrents', maxFailoverNzbs:3, addonServices:[] };
+const S = { service:null, device:null, resolution:null, audio:'limited', bandwidthMbps:0, content:null, name:'', multiServices:[], sizeLimit:'unlimited', formatter:'family-v4', fmtScore:DEFAULT_CORE_SCORE_MODE, p2pEnabled:false, qualityFirst:false, resolutionFirst:false, foreignLangKill:true, matchMode:'balanced', exclude4K:false, excludeDV:false, tmdbToken:'', tmdbApiKey:'', creds:{torbox:'',realdebrid:'',alldebrid:'',premiumize:'',debridlink:'',offcloud:'',easynews:'',easynewsPass:'',nzbgeek:'',debridio:'',debrider:'',nzbnoob:'',althub:'',usenetcrawler:'',drunkenslug:'',nzbfinder:'',jackett:'',prowlarr:'',subdl:'',penguplay:''}, instanceHost:'elfhosted', instanceUrl:'', instanceUuid:'', instancePassword:'', baseUuid:'', basePassword:'', quickStart:false, langs: ['English'], langsSet: false, langExclusive: false, cacheMode: 'mixed', streamPool: 'normal', pseArch: 'standard', telemetryOk: false, simpleMode: false, outputProfile:'auto', aiostreamsVersion:DEFAULT_AIOSTREAMS_VERSION, installMode: 'direct', stremioEmail: '', stremioPassword: '', subtitleLangs: ['en'], subtitleAddons: ['opensubtitles-v3-plus'], streamProxy: { ...DEFAULT_STREAM_PROXY, proxiedServices: [], proxiedAddons: [] }, streamProxyPassword: '', catalogs: ['tmdb-addon'], dedupMerge: false, optionalScrapers: [], cleanInstall: false, quickProfile: 'balanced', preloadEnabled:true, autoPlayMethod:'matchingFile', addonTimeout:6000, patchCinemeta:false, installAIOMeta:false, libraryBoost:'default', nzbFailover:false, nzbFailoverPosition:'after-torrents', maxFailoverNzbs:3, addonServices:[] };
 // A clean template update must not inherit unrelated wizard/experimental flags.
 const INITIAL_STATE = cloneUpdateValue(S);
 function replaceState(nextState) {
@@ -467,7 +469,7 @@ function releaseMigrationFields(fields) {
 function releaseMigrationForControl(action, element) {
   if (action === 'set-output-profile') { S._migrationKeep = null; S._migrationRemove = []; return; }
   const key = element.dataset.key;
-  if (['set-formatter', 'set-simple-fmt', 'fmt-scroll-pick', 'fmt-dropdown-change', 'clear-custom-formatter'].includes(action)) releaseMigrationFields(['formatter']);
+  if (['set-formatter', 'set-simple-fmt', 'fmt-scroll-pick', 'fmt-dropdown-change', 'clear-custom-formatter', 'set-fmt-score'].includes(action)) releaseMigrationFields(['formatter']);
   if (['set-simple-quality', 'set-simple-resfirst', 'set-library-boost'].includes(action)
     || (action === 'toggle-pref' && ['qualityFirst', 'resolutionFirst'].includes(key))) {
     releaseMigrationFields(CONFIG_UPDATE_SECTIONS.find(section => section.key === 'sort').fields);
@@ -692,7 +694,7 @@ function sanitizeCustomFormatter(value) {
   return { name, d:description, label };
 }
 // Only wizard selections are shareable — never credentials, tokens, UUIDs, or passwords
-const SHARE_KEYS = ['device','resolution','audio','content','name','multiServices','sizeLimit','formatter','p2pEnabled','qualityFirst','resolutionFirst','foreignLangKill','matchMode','exclude4K','excludeDV','quickStart','langs','langsSet','langExclusive','cacheMode','streamPool','instanceHost','simpleMode','outputProfile','aiostreamsVersion','pseArch','subtitleLangs','subtitleAddons','catalogs','dedupMerge','optionalScrapers','preloadEnabled','autoPlayMethod','addonTimeout','bandwidthMbps','patchCinemeta','installAIOMeta','libraryBoost','nzbFailover','nzbFailoverPosition','maxFailoverNzbs'];
+const SHARE_KEYS = ['device','resolution','audio','content','name','multiServices','sizeLimit','formatter','fmtScore','p2pEnabled','qualityFirst','resolutionFirst','foreignLangKill','matchMode','exclude4K','excludeDV','quickStart','langs','langsSet','langExclusive','cacheMode','streamPool','instanceHost','simpleMode','outputProfile','aiostreamsVersion','pseArch','subtitleLangs','subtitleAddons','catalogs','dedupMerge','optionalScrapers','preloadEnabled','autoPlayMethod','addonTimeout','bandwidthMbps','patchCinemeta','installAIOMeta','libraryBoost','nzbFailover','nzbFailoverPosition','maxFailoverNzbs'];
 function shareConfig() {
   try {
     const pub = {};
@@ -714,6 +716,7 @@ function sanitizeSharedConfig(d) {
   pick('content',      v => optVals('content').includes(v));
   pick('audio',        v => ['lossless','standard','limited','dolby'].includes(v));
   pick('formatter',    v => v === 'custom' || FORMATTERS.some(f => f.id === v));
+  pick('fmtScore',     v => CORE_SCORE_MODES.includes(v));
   pick('matchMode',    v => ['relaxed','balanced','strict'].includes(v));
   pick('cacheMode',    v => ['mixed','cached','uncached'].includes(v));
   pick('streamPool',   v => ['normal','large','max'].includes(v));
@@ -1352,13 +1355,56 @@ const FMT_PREVIEWS = {
   }
 };
 
+/**
+ * The name/description templates for the chosen formatter. Core collection
+ * styles are built for the chosen score display; everything else is the
+ * library entry as written, or the user's imported formatter.
+ */
+function selectedFormatterDefinition() {
+  if (S.formatter === 'custom' && S.customFormatter) return S.customFormatter;
+  if (isCoreFormatter(S.formatter)) return buildCoreFormatter(S.formatter, { score: S.fmtScore });
+  return FORMATTERS.find(f => f.id === (S.formatter || 'family-v4')) || FORMATTERS[0];
+}
+
+/** A Core collection preview rendered by AIOStreams' engine, as {n, d[]}. */
+function corePreview(id) {
+  const set = CORE_FORMATTER_PREVIEWS[id];
+  if (!set) return null;
+  const p = set[S.fmtScore] || set[DEFAULT_CORE_SCORE_MODE];
+  const lines = String(p.n).split('\n');
+  return { n: lines.map(escHtml).join('<br>'), d: p.d.map(escHtml), rendered: true };
+}
+
+const SCORE_MODE_LABELS = {
+  plain: ['Plain digits', '★ 87'],
+  bold: ['Bold-looking digits', '★ 𝟴𝟳'],
+  off: ['Hidden', 'no score'],
+};
+
+/**
+ * Score display for the Core collection. Shown only while a Core style is
+ * selected; the choice is kept when switching styles away and back.
+ */
+function fmtScoreControlHtml() {
+  const radios = CORE_SCORE_MODES.map(mode => {
+    const [text, sample] = SCORE_MODE_LABELS[mode];
+    const checked = (S.fmtScore || DEFAULT_CORE_SCORE_MODE) === mode;
+    return `<label class="fmt-score-opt"><input type="radio" name="fmtScore" value="${mode}" data-action="set-fmt-score"${checked ? ' checked' : ''}> <span>${text}</span> <span class="fmt-score-sample" aria-hidden="true">${escHtml(sample)}</span></label>`;
+  }).join('');
+  return `<fieldset class="fmt-score" id="fmtScoreControl"${isCoreFormatter(S.formatter) ? '' : ' hidden'}>
+    <legend>Score display <span class="fmt-score-scope">Core styles only</span></legend>
+    <div class="fmt-score-opts">${radios}</div>
+    <p class="fmt-score-help">The score is <code>stream.nSeScore</code>: 0–100, with the best stream in each list at 100. Only the <strong>Advanced</strong> and <strong>Labs</strong> profiles produce one; with Core Stable or Balanced no score is shown. Bold-looking digits are Unicode characters, not font weight: a player whose font lacks them shows empty boxes, so keep Plain if you see any.</p>
+  </fieldset>`;
+}
+
 function fmtDropdownHtml() {
   const isCustom = S.formatter === 'custom' && S.customFormatter;
   const allFmts = [...FORMATTERS];
   if (S.customFormatter) allFmts.push({ id:'custom', label:S.customFormatter.label||'Custom', badge:'Imported', bc:'#a78bfa', desc:'Your imported formatter' });
   const cards = allFmts.map(f => {
     const active = (isCustom && f.id === 'custom') || (!isCustom && f.id === S.formatter);
-    const p = FMT_PREVIEWS[f.id] || FMT_PREVIEWS['family-v4'];
+    const p = corePreview(f.id) || FMT_PREVIEWS[f.id] || FMT_PREVIEWS['family-v4'];
     return `<div class="fmt-scroll-card" data-active="${active}" data-action="fmt-scroll-pick" data-fmt="${f.id}">
       <div class="fmt-scroll-head">
         <div class="fmt-scroll-dot" style="background:${f.bc}"></div>
@@ -1373,9 +1419,10 @@ function fmtDropdownHtml() {
           ${p.d.map(l=>`<div class="fmt-live-d">${l}</div>`).join('')}
         </div>
       </div>
+      <div class="fmt-preview-note">${p.rendered ? `Rendered by AIOStreams ${CORE_PREVIEW_ENGINE_VERSION}'s formatter for a sample stream` : 'Illustrative preview'}</div>
     </div>`;
   }).join('');
-  return `<div class="scroll-fade-wrap" data-scroll-start="true" data-scroll-end="false"><div class="fmt-scroll" id="fmtScroll">${cards}</div></div>`;
+  return `<div class="scroll-fade-wrap" data-scroll-start="true" data-scroll-end="false"><div class="fmt-scroll" id="fmtScroll">${cards}</div></div>${fmtScoreControlHtml()}`;
 }
 
 function updateFmtFeatured() {
@@ -1384,6 +1431,23 @@ function updateFmtFeatured() {
     card.dataset.active = isSel ? 'true' : 'false';
     if (isSel) card.scrollIntoView({ behavior:'smooth', block:'nearest', inline:'center' });
   });
+  document.querySelectorAll('.fmt-score').forEach(el => { el.hidden = !isCoreFormatter(S.formatter); });
+}
+
+/** Re-render the Core cards' previews after the score display changes. */
+function updateCorePreviews() {
+  document.querySelectorAll('.fmt-scroll-card').forEach(card => {
+    const p = corePreview(card.dataset.fmt);
+    if (!p) return;
+    const n = card.querySelector('.fmt-live-n');
+    const lines = card.querySelector('.fmt-live-lines');
+    if (n) n.innerHTML = p.n;
+    if (lines) {
+      lines.querySelectorAll('.fmt-live-d').forEach(el => el.remove());
+      lines.insertAdjacentHTML('beforeend', p.d.map(l => `<div class="fmt-live-d">${l}</div>`).join(''));
+    }
+  });
+  document.querySelectorAll('input[name="fmtScore"]').forEach(input => { input.checked = input.value === S.fmtScore; });
 }
 
 function updateDeviceScroll() {
@@ -3196,6 +3260,14 @@ document.addEventListener('DOMContentLoaded', () => {
     if(!action) return;
     releaseMigrationForControl(action, el);
 
+    if (action === 'set-fmt-score') {
+      if (!CORE_SCORE_MODES.includes(el.value)) return;
+      S.fmtScore = el.value;
+      saveState();
+      updateCorePreviews();
+      return;
+    }
+
     if (action === 'fmt-scroll-pick') {
       S.formatter = el.dataset.fmt;
       applyChoiceProfile('formatter');
@@ -4636,7 +4708,7 @@ function build() {
     ...(S.tmdbApiKey ? { tmdbApiKey: S.tmdbApiKey } : {}),
     sortCriteria: sortPolicy(S),
     deduplicator: (function(){ const isFree=S.service==='p2p'||S.service==='http'; return { enabled:true, excludeAddons:[], multiGroupBehaviour: S.matchMode === 'relaxed' ? 'conservative' : 'aggressive', keys:isFree?['filename','infoHash','smartDetect']:['filename','infoHash','smartDetect'], cached: isFree ? 'disabled' : (S.matchMode === 'relaxed' ? 'per_service' : 'single_result'), uncached: isFree ? 'disabled' : 'per_service', p2p:'per_addon', smartDetectAttributes:['size','resolution','quality','visualTags','audioTags','audioChannels','languages','encode','edition','network','remastered','bitrate','releaseGroup'], smartDetectRounding: S.matchMode === 'strict' ? 5 : 10, libraryBehaviour: isFree ? 'ignore' : 'prefer', tiebreakers:[{type:'torrent_seeders',position:'before_addon'},{type:'usenet_age',position:'before_addon'}], ...(S.dedupMerge ? { merge: { enabled: true, failoverVariants: true, fields: [] } } : {}) }; })(),
-    formatter: (function(){ const _f = S.formatter === 'custom' && S.customFormatter ? S.customFormatter : FORMATTERS.find(f => f.id === (S.formatter||'family-v4')) || FORMATTERS[0]; return { id:'tamtaro', definitions:{ overrides:{ tamtaro:{ name: _f.name, description: _f.d } } } }; })(),
+    formatter: (function(){ const _f = selectedFormatterDefinition(); return { id:'tamtaro', definitions:{ overrides:{ tamtaro:{ name: _f.name, description: _f.d } } } }; })(),
     proxy: streamProxyConfig(S.streamProxy, S.streamProxyPassword),
     resultLimits: { global: rc.maxResults, resolution: rc.maxResultsPerResolution, mode: 'conjunctive' },
     size: sizePolicy(input),
@@ -5509,8 +5581,11 @@ function parseTemplateToState(tpl) {
   if (c.formatter && c.formatter.definitions && c.formatter.definitions.overrides) {
     const ov = c.formatter.definitions.overrides[Object.keys(c.formatter.definitions.overrides)[0]];
     if (ov) {
-      const match = FORMATTERS.find(f => f.name === ov.name || f.d === ov.description);
-      if (match) st.formatter = match.id;
+      const coreMatch = FORMATTERS.filter(f => isCoreFormatter(f.id)).flatMap(f => CORE_SCORE_MODES.map(score => ({ id: f.id, score, ...buildCoreFormatter(f.id, { score }) })))
+        .find(v => v.name === ov.name && v.d === ov.description);
+      const match = coreMatch || FORMATTERS.find(f => f.name === ov.name || f.d === ov.description);
+      if (coreMatch) { st.formatter = coreMatch.id; st.fmtScore = coreMatch.score; }
+      else if (match) st.formatter = match.id;
       else {
         st.formatter = 'custom';
         st.customFormatter = { name: ov.name || '', d: ov.description || '', label: 'Imported' };
@@ -8815,6 +8890,12 @@ if (new URLSearchParams(location.search).get('cb-e2e') === '1') {
     },
     checkUpdate() {
       return checkForTemplateUpdate(true);
+    },
+    importState(template) {
+      return parseTemplateToState(template);
+    },
+    renderFormatterPicker() {
+      return fmtDropdownHtml();
     },
   };
 }

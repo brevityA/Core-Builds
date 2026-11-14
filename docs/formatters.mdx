@@ -59,6 +59,46 @@ Formatters control how streams are displayed in Stremio — the text shown for e
 
 ---
 
+## Core collection (Configurator)
+
+Three styles built for the Configurator's **Stream Layout** step. They share wording and a score display setting, and every one is rendered through AIOStreams' own formatter engine in the repository's tests, for complete, sparse, P2P, episode, season-pack and long-Unicode streams.
+
+| Style | Lines | Shows | Best for |
+|---|---|---|---|
+| **Core Compact** | name 1–2, description 1–2 | Cache, resolution and service first; then quality · codec · HDR · size, and audio · channels · languages | Scanning a list quickly, small screens |
+| **Core Detailed** | name up to 3, description up to 6 | Adds title and episode, bitrate, subtitles, release group, source add-on, seeders and a shortened file name | Comparing releases |
+| **Core Badges** | name 2, description up to 3 | The same facts as `[TEXT LABELS]`, grouped as video / audio / delivery | People who scan by tag; no images or HTML needed |
+
+How they handle gaps:
+
+- A value that is missing is left out. You never see `Unknown`, empty brackets or a dangling `·`.
+- **Cache**: ⚡ cached, ⏳ not cached, 🧲 P2P. When AIOStreams does not know the cache state, no icon is shown rather than a guess.
+- **Languages**: the first three codes, then `…` when there are more.
+- **Packs**: shown as `Pack`, `Season pack` or `[PACK]`; season packs are never hidden by the formatter (formatters only display).
+- **Size**: a size of 0 is treated as unknown.
+
+### Score display
+
+The Core styles can show `stream.nSeScore` as `★ 87`. Choose under the style cards:
+
+- **Plain digits** (default): `★ 87`.
+- **Bold-looking digits**: `★ 𝟴𝟳`, made with AIOStreams' `translate` modifier into Unicode mathematical bold digits. This is not font weight. A player whose font lacks these characters shows empty boxes; switch back to Plain if you see them.
+- **Hidden**.
+
+The score is relative: the best stream in each list scores 100, and 0 is the lowest, not a missing value. It only exists when the config has ranked stream expressions, which the **Advanced** and **Labs** profiles produce. With **Core Stable** or **Balanced** no score is shown whatever you pick. Core Stable also uses its own built-in stream card regardless of the style chosen; the Configurator tells you when that happens.
+
+### Previews and client rendering
+
+The preview on each Core card is rendered by AIOStreams' formatter engine at the pinned release for a synthetic sample stream, so the text is what AIOStreams produces. How it looks on screen is up to the player: fonts, emoji, line wrapping and how many lines it shows. Previews on the other formatter cards are illustrative.
+
+These styles have not yet been checked on a Nuvio device. To check one yourself:
+
+1. Build with the style and import it into AIOStreams, then reinstall the add-on in Nuvio.
+2. Open a film with cached and uncached results: ⚡ and ⏳ appear on the right results, and no line starts or ends with `·`.
+3. Open an episode: Detailed shows `S01E05`; a season pack shows `Season pack`.
+4. With the Advanced profile and Bold-looking digits, the score shows as digits, not boxes.
+5. Check that long file names stay on one line or wrap cleanly, and that P2P results show 🧲 and seeders.
+
 ## Official Formatters
 
 ### Core Nexus Apex v2 ⭐ Recommended
@@ -230,8 +270,8 @@ https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatter
 | `stream.resolution` | 2160p, 1080p, 720p, etc. |
 | `stream.quality` | BluRay REMUX, WEB-DL, WEBRip, etc. |
 | `stream.encode` | HEVC, AVC, AV1 |
-| `stream.visualTag` | DV, HDR10+, HDR10, HLG, SDR |
-| `stream.audioTag` | Atmos, TrueHD, DTS:X, DD+, AAC |
+| `stream.visualTags` | DV, HDR10+, HDR10, HLG, SDR (a list: join it, e.g. `::join(' ')`) |
+| `stream.audioTags` | Atmos, TrueHD, DTS:X, DD+, AAC (a list) |
 | `stream.size` | File size |
 | `stream.bitrate` | Bitrate in Mbps |
 | `stream.seeders` | P2P seeders (torrent only) |
@@ -240,8 +280,8 @@ https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatter
 | `stream.regraded` | Colour regrade flag |
 | `stream.repack` | REPACK/PROPER flag |
 | `stream.seMatched` | Name of the stream expression that matched |
-| `stream.nSeScore` | Normalised SEL score (0–1) |
-| `stream.nRegexScore` | Normalised regex score (0–1) |
+| `stream.nSeScore` | Stream Expression score scaled 0–100 against the best stream in the same list; empty when the config has no ranked stream expressions |
+| `stream.nRegexScore` | Regex score scaled 0–100 the same way; empty without ranked regexes |
 | `stream.dubbed` | Dubbed audio flag |
 | `stream.subbed` | Subtitles present |
 | `stream.uSubtitleEmojis` | Per-language subtitle flag emojis |
@@ -250,6 +290,6 @@ https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Formatter
 
 - Formatters are display-only — they don't affect which streams appear, filtering, or sorting
 - All formatters use `id: "tamtaro"` — this is the correct formatter type for AIOStreams
-- Score badges (ELITE / QUALITY) only appear when a stream has a ranked regex or stream expression score
+- Score badges (ELITE / QUALITY) only appear when a stream has a ranked regex or stream expression score. Configurator builds on the **Core Stable** and **Balanced** profiles have no ranked stream expressions, so `stream.nSeScore` is always empty there and score badges never show
 - `{tools.newLine}` must be used for line breaks in the description — literal newlines cause the formatter to be silently discarded on import
 - Compatible with AIOStreams v2.4.6+
