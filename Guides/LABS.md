@@ -8,11 +8,11 @@ Nightly / Labs templates test new ideas before they're promoted to stable. They 
 
 | Template | Version | Resolution | Base |
 |---|---|---|---|
-| **4K Apex Labs** | v0.15.7 | 4K + 1080p | 4K Apex |
-| **Stream Labs** | v0.10.7 | 1080p | Stream |
-| **All-Rounder Labs** | v0.4.7 | 1080p | Stream + Anime |
-| **4K Essential Labs** | v0.6.7 | 4K + 1080p | 4K Essential |
-| **Essential Labs** | v0.4.7 | 1080p | Essential |
+| **4K Apex Labs** | v0.15.8 | 4K + 1080p | 4K Apex |
+| **Stream Labs** | v0.10.8 | 1080p | Stream |
+| **All-Rounder Labs** | v0.4.8 | 1080p | Stream + Anime |
+| **4K Essential Labs** | v0.6.8 | 4K + 1080p | 4K Essential |
+| **Essential Labs** | v0.4.8 | 1080p | Essential |
 | **Anime 4K Labs** | v0.3.4 | 4K + 1080p | Anime 4K |
 
 ---
