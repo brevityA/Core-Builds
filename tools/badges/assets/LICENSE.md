@@ -6,7 +6,7 @@ The badge images in this folder (`*.svg` and `*.png`) are © 2026 Branding-Brevi
 
 You may copy, redistribute, recolour, resize and build on them, for any purpose,
 including in other Nuvio formatters, badge packs and apps, as long as you give
-credit. A line like this is enough:
+credit, link the licence, and say if you changed them. For example:
 
 > Badge artwork: Core Builds (brevityA/Core-Builds), CC BY 4.0
 

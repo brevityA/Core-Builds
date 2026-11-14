@@ -29,7 +29,7 @@ Customize: [Core Badge Builder](https://brevitya.github.io/Core-Builds/tools/bad
 ## Reuse the artwork
 
 The badge images are free to use in your own Nuvio formatter, pack or app under
-[CC BY 4.0](../assets/LICENSE.md). Credit them as:
+[CC BY 4.0](../assets/LICENSE.md). Credit them as below, and say if you changed them:
 
 > Badge artwork: Core Builds (brevityA/Core-Builds), CC BY 4.0
 
