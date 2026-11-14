@@ -1,14 +1,33 @@
 ---
-title: "What's New — Configurator v3.32"
+title: "What's New — Configurator v3.33"
 sidebarTitle: "What's New"
-description: "Latest Core Builds Configurator releases (v3.32 and earlier), auto-generated from the in-app changelog."
+description: "Latest Core Builds Configurator releases (v3.33 and earlier), auto-generated from the in-app changelog."
 ---
 
 # What's New in the Configurator
 
-This page is regenerated from `configurator/src/data/changelog.js` by `scripts/sync-docs.py`, so it always reflects the latest shipped configurator version (currently **v3.32**).
+This page is regenerated from `configurator/src/data/changelog.js` by `scripts/sync-docs.py`, so it always reflects the latest shipped configurator version (currently **v3.33**).
 
 For the template-suite release log, see the [Changelog](https://corebuilds-docs.docsalot.dev/changelog).
+
+## Configurator v3.33 (Nov 14 2026)
+
+<CardGroup cols={2}>
+  <Card title="Three new stream cards" icon="sparkles">
+    Core Compact (two short lines: cache, resolution and service, then quality, size, audio and language), Core Detailed (up to six lines with title and episode, bitrate, subtitles, release group, source and file name) and Core Badges (the same facts as [TEXT LABELS]). Missing details are left out instead of shown as Unknown, empty brackets or a stray ·, and a result whose cache state AIOStreams does not know gets no icon rather than a guess.
+  </Card>
+  <Card title="Score display" icon="bolt">
+    the Core cards can show the stream score as ★ 87, in plain or bold-looking digits (Unicode characters, not font weight; a player without them shows boxes), or hide it. The score only exists with the Advanced and Labs profiles, and the setting says so.
+  </Card>
+  <Card title="Previews rendered by AIOStreams" icon="shield-check">
+    the Core cards are previewed with AIOStreams’ own formatter engine at the pinned release, and tests render every style through it for complete, sparse, P2P, episode, season-pack and long Unicode streams. Other cards are labelled illustrative.
+  </Card>
+  <Card title="Generated output unchanged" icon="sliders">
+    every config the configurator and the CLI build from existing settings is byte-for-byte what 3.32 produced apart from the version stamp; only choosing one of the new cards changes the formatter.
+  </Card>
+</CardGroup>
+
+---
 
 ## Configurator v3.32 (Oct 31 2026)
 
@@ -59,21 +78,5 @@ For the template-suite release log, see the [Changelog](https://corebuilds-docs.
   </Card>
   <Card title="Generated output unchanged" icon="shield-check">
     every config the configurator and the CLI build is byte-for-byte what 3.29 produced apart from the version stamp; only the way an existing setup is updated changed.
-  </Card>
-</CardGroup>
-
----
-
-## Configurator v3.29 (Oct 30 2026)
-
-<CardGroup cols={2}>
-  <Card title="Quick install asks your language" icon="sparkles">
-    under Optional, filled in from your browser’s language (a language you already chose in Custom build wins). It goes first in the preferred-language list with English kept behind it, so releases in your language come first when everything else is equal. Nothing is made strict: English and original-audio releases still show.
-  </Card>
-  <Card title="Chinese saves again" icon="bolt">
-    the language list offered “Chinese (Simplified)” and “Chinese (Traditional)”, but AIOStreams only knows “Chinese”, so any config carrying either was refused when saved. Both are now “Chinese”, including in settings saved in your browser and in share links, and a test checks every offered language against AIOStreams’ own list.
-  </Card>
-  <Card title="Generated output unchanged" icon="shield-check">
-    for every setting that saved before, configs are byte-for-byte what 3.28 produced apart from the version stamp; only a build that picked a Chinese option changes, from refused to saved.
   </Card>
 </CardGroup>

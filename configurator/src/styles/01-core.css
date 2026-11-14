@@ -692,6 +692,20 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .fmt-scroll-card .fmt-live-n{font-size:.65rem}
 .fmt-scroll-card .fmt-live-d{font-size:.6rem}
 .fmt-scroll-card .fmt-live-poster{width:28px;height:40px;font-size:1rem}
+/* Preview provenance: engine-rendered (Core collection) vs illustrative */
+.fmt-preview-note{font-size:.58rem;color:var(--th-tx3);margin-top:4px;line-height:1.3}
+/* Core collection score display */
+.fmt-score{border:1px solid var(--th-border-strong);border-radius:10px;padding:10px 12px 8px;margin:10px 0 0;min-width:0}
+.fmt-score[hidden]{display:none}
+.fmt-score legend{font-size:.72rem;font-weight:700;color:var(--th-tx);padding:0 4px}
+.fmt-score-scope{font-weight:500;color:var(--th-tx2);margin-left:4px}
+.fmt-score-opts{display:flex;flex-wrap:wrap;gap:6px 14px;margin:4px 0 6px}
+.fmt-score-opt{display:inline-flex;align-items:center;gap:6px;font-size:.75rem;color:var(--th-tx);cursor:pointer;min-height:32px}
+.fmt-score-opt input{accent-color:var(--th-accent);width:16px;height:16px;margin:0}
+.fmt-score-opt input:focus-visible{outline:2px solid var(--th-accent);outline-offset:2px}
+.fmt-score-sample{color:var(--th-tx2);font-variant-numeric:tabular-nums}
+.fmt-score-help{font-size:.68rem;color:var(--th-tx2);line-height:1.45;margin:0}
+.fmt-score-help code{font-size:.66rem}
 /* Keep dropdown styles for fallback/import custom formatter */
 [data-theme="light"] .scroll-fade-wrap::before{background:linear-gradient(90deg,var(--th-bg,#fff) 0%,transparent 100%)}
 [data-theme="light"] .scroll-fade-wrap::after{background:linear-gradient(270deg,var(--th-bg,#fff) 0%,transparent 100%)}
