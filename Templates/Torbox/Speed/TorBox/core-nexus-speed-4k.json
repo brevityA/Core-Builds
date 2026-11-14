@@ -15,7 +15,7 @@
       {
         "date": "2026-11-14",
         "version": "2.10.15",
-        "content": "Inline ranked expressions score resolution, source, HDR, audio and release group so the best file leads each tier; SD and untagged releases now fill in when fewer than five HD results exist (older shows such as Arthur returned none); episode size floor lowered to 30 MB for short SD episodes; year matching uses each season's air years instead of the premiere year; per-add-on caps (Comet 5→10, Meteor 5→3) apply only once 10 cached results exist."
+        "content": "Inline ranked expressions score resolution, source, HDR, audio and release group so the best file leads each tier; SD and untagged releases now fill in when fewer than five cached HD results exist (older shows such as Arthur returned none); episode size floor lowered to 30 MB for short SD episodes; year matching uses each season's air years instead of the premiere year; per-add-on caps (Comet 5→10, Meteor 5→3) apply only once 10 cached results exist."
       },
       {
         "date": "2026-11-02",
@@ -343,7 +343,7 @@
       },
       {
         "enabled": true,
-        "expression": "/* CB | SD Fallback — SD and untagged releases only when fewer than 5 2160p/1080p remain */ count(resolution(streams,'2160p','1080p')) >= 5 ? negate(merge(library(streams),seadex(streams)),resolution(streams,'1440p','720p','576p','480p','360p','Unknown')) : []"
+        "expression": "/* CB | SD Fallback — SD and untagged releases only when fewer than 5 cached 2160p/1080p remain */ count(cached(resolution(streams,'2160p','1080p'))) >= 5 ? negate(merge(library(streams),seadex(streams)),resolution(streams,'1440p','720p','576p','480p','360p','Unknown')) : []"
       },
       {
         "enabled": true,

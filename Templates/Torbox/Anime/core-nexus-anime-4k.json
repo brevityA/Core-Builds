@@ -13,7 +13,7 @@
       {
         "date": "2026-11-14",
         "version": "2.8.21",
-        "content": "Inline ranked expressions score resolution, source, HDR, audio and release group so the best file leads each tier; the final limit now keeps four uncached results instead of dropping all of them when cached ones are plentiful; add-on fetching stops after 4.5 s once five cached results the template keeps are in; episode size floor lowered to 30 MB for short SD episodes; year matching uses each season's air years instead of the premiere year; per-add-on caps (Comet 5→10, Meteor 5→3) apply only once 10 cached results exist; Meteor timeout 6 s→4 s."
+        "content": "Inline ranked expressions score resolution, source, HDR, audio and release group so the best file leads each tier; the final limit now keeps four uncached results instead of dropping all of them when cached ones are plentiful; add-on fetching stops after 4.5 s once five cached results the template keeps are in; episode size floor lowered to 30 MB for short SD episodes; year matching uses each season's air years instead of the premiere year; per-add-on caps (Comet 5→10, Meteor 5→3) apply only once 10 cached results exist; the 2160p fetch threshold counts only REMUX, since Bad 4k Anime drops other cached 4K for Japanese anime; Meteor timeout 6 s→4 s."
       },
       {
         "date": "2026-10-22",
@@ -1417,7 +1417,7 @@
     },
     "dynamicAddonFetching": {
       "enabled": true,
-      "condition": "count(cached(resolution(totalStreams, \"2160p\"))) >= 10 or (totalTimeTaken >= 4500 and count(cached(merge(negate(resolution(totalStreams,'2160p'),totalStreams),quality(resolution(totalStreams,'2160p'),'Bluray REMUX')))) >= 5)"
+      "condition": "count(cached(quality(resolution(totalStreams, \"2160p\"), \"Bluray REMUX\"))) >= 10 or (totalTimeTaken >= 4500 and count(cached(merge(negate(resolution(totalStreams,'2160p'),totalStreams),quality(resolution(totalStreams,'2160p'),'Bluray REMUX')))) >= 5)"
     },
     "checkOwned": false,
     "digitalReleaseFilter": {

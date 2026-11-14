@@ -107,8 +107,8 @@ for f in files:
         hd_only = '2160p' not in req  # 1080p lines keep their hard 4K kill
         fallback = [r for r in ALL_RES if r not in req and r not in excl and not (hd_only and r in ('2160p', '1440p'))]
         q = lambda rs: ','.join(f"'{r}'" for r in rs)
-        entry = {'enabled': True, 'expression': f"{SD_MARK} — SD and untagged releases only when fewer than 5 {'/'.join(req)} remain */ "
-                 f"count(resolution(streams,{q(req)})) >= 5 ? negate(merge(library(streams),seadex(streams)),resolution(streams,{q(fallback)})) : []"}
+        entry = {'enabled': True, 'expression': f"{SD_MARK} — SD and untagged releases only when fewer than 5 cached {'/'.join(req)} remain */ "
+                 f"count(cached(resolution(streams,{q(req)}))) >= 5 ? negate(merge(library(streams),seadex(streams)),resolution(streams,{q(fallback)})) : []"}
         at = next((i for i, e in enumerate(eses) if 'Late Pack Fallback' in expr(e)), len(eses))
         eses.insert(at, entry)
         c['requiredResolutions'] = []
@@ -142,6 +142,13 @@ for f in files:
     else:
         kept = 'totalStreams'
     time_exit = f' or (totalTimeTaken >= 4500 and count(cached({kept})) >= 5)'
+    # Anime lines serve almost only anime, so Bad 4k Anime applies to nearly every request: their own
+    # 2160p threshold counts only REMUX, or ten cached 4K WEB-DL could end fetching and then be dropped.
+    # (General 4K lines keep the plain count; there Bad 4k Anime only touches Japanese anime.)
+    ANIME_4K = 'cached(resolution(totalStreams, "2160p"))'
+    if '/Anime/' in f and bad4k_anime and ANIME_4K in cond:
+        cond = cond.replace(ANIME_4K, 'cached(quality(resolution(totalStreams, "2160p"), "Bluray REMUX"))')
+        daf['condition'] = cond; done.append('anime 4k remux count')
     if daf.get('enabled') and cond and 'totalTimeTaken' not in cond:
         daf['condition'] = cond + time_exit; done.append('time exit')
 
@@ -178,10 +185,11 @@ for f in files:
              + (' (no HDR bonus: this line prefers SDR)' if (c.get('preferredVisualTags') or [''])[0] == 'SDR' else '')]
     if 'uncached reserve' in done: notes.append('the final limit now keeps four uncached results instead of dropping all of them when cached ones are plentiful')
     if 'time exit' in done: notes.append('add-on fetching stops after 4.5 s once five cached results the template keeps are in')
-    if 'sd fallback' in done: notes.append('SD and untagged releases now fill in when fewer than five HD results exist (older shows such as Arthur returned none)')
+    if 'sd fallback' in done: notes.append('SD and untagged releases now fill in when fewer than five cached HD results exist (older shows such as Arthur returned none)')
     if 'series size floor' in done: notes.append('episode size floor lowered to 30 MB for short SD episodes')
     if 'season air years' in done: notes.append('year matching uses each season\'s air years instead of the premiere year')
     if 'flood caps' in done: notes.append('per-add-on caps (Comet 5→10, Meteor 5→3) apply only once 10 cached results exist')
+    if 'anime 4k remux count' in done: notes.append('the 2160p fetch threshold counts only REMUX, since Bad 4k Anime drops other cached 4K for Japanese anime')
     if 'zilean off' in done: notes.append('Zilean disabled: it needs a debrid service, and AIOStreams refused this EasyNews-only template on save')
     if 'meteor timeout' in done: notes.append('Meteor timeout 6 s→4 s')
     m.setdefault('changelog', []).insert(0, {'date': DATE, 'version': m['version'], 'content': '; '.join(notes) + '.'})
