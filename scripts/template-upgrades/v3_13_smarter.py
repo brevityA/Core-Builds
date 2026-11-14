@@ -112,6 +112,9 @@ for f in files:
         at = next((i for i, e in enumerate(eses) if 'Late Pack Fallback' in expr(e)), len(eses))
         eses.insert(at, entry)
         c['requiredResolutions'] = []
+        if hd_only and not any(isinstance(e, dict) and e.get('enabled') and 'Hard Resolution Kill' in expr(e) for e in eses):
+            # requiredResolutions was this line's only 4K ceiling (Samsung TV 1080p has no hard kill).
+            excl = excl + [r for r in ('1440p', '2160p') if r not in excl]
         c['excludedResolutions'] = excl
         done.append('sd fallback')
     g = ((c.get('size') or {}).get('global') or {}).get('series')
@@ -129,7 +132,15 @@ for f in files:
     # Count only results the template keeps: 1080p lines hard-kill 2160p/1440p later, so five
     # cached 4K results must not end fetching (the later add-ons' 1080p results would be lost).
     hard_kill = any(isinstance(e, dict) and e.get('enabled') and 'Hard Resolution Kill' in expr(e) for e in eses)
-    kept = "negate(resolution(totalStreams,'2160p','1440p'),totalStreams)" if hard_kill else 'totalStreams'
+    # Bad 4k Anime drops cached 2160p non-REMUX for Japanese anime; the exit cannot see isAnime, so
+    # where that rule is on, only 2160p REMUX counts among 4K results (the exit only gets later).
+    bad4k_anime = any(isinstance(e, dict) and e.get('enabled') and 'Bad 4k Anime' in expr(e) for e in eses)
+    if hard_kill:
+        kept = "negate(resolution(totalStreams,'2160p','1440p'),totalStreams)"
+    elif bad4k_anime:
+        kept = "merge(negate(resolution(totalStreams,'2160p'),totalStreams),quality(resolution(totalStreams,'2160p'),'Bluray REMUX'))"
+    else:
+        kept = 'totalStreams'
     time_exit = f' or (totalTimeTaken >= 4500 and count(cached({kept})) >= 5)'
     if daf.get('enabled') and cond and 'totalTimeTaken' not in cond:
         daf['condition'] = cond + time_exit; done.append('time exit')
@@ -144,7 +155,10 @@ for f in files:
     if c.get('rankedStreamExpressions'):
         skipped.append('ranked (already)')
     else:
-        c['rankedStreamExpressions'] = ranked(res, dv, limited, 'HDR' not in vt); done.append(f'ranked x{len(c["rankedStreamExpressions"])}')
+        # SDR-first lines (Mobile, the 1080p streams) rank SDR above HDR on purpose; an HDR bonus
+        # ahead of visualTag in the sort would invert that.
+        sdr_first = (c.get('preferredVisualTags') or [''])[0] == 'SDR'
+        c['rankedStreamExpressions'] = ranked(res, dv, limited, 'HDR' not in vt and not sdr_first); done.append(f'ranked x{len(c["rankedStreamExpressions"])}')
     for scope, keys in (c.get('sortCriteria') or {}).items():
         names = [k['key'] for k in keys]
         # After the PSE tier where there is one; otherwise (4K Apex sorts on resolution and quality
@@ -160,7 +174,8 @@ for f in files:
     m = d['metadata']
     m['version'] = bump(m['version'])
     notes = ['Inline ranked expressions score resolution, source, HDR, audio and release group so the best file leads each tier'
-             + ('' if dv else ' (Dolby Vision not scored on this device)')]
+             + ('' if dv else ' (Dolby Vision not scored on this device)')
+             + (' (no HDR bonus: this line prefers SDR)' if (c.get('preferredVisualTags') or [''])[0] == 'SDR' else '')]
     if 'uncached reserve' in done: notes.append('the final limit now keeps four uncached results instead of dropping all of them when cached ones are plentiful')
     if 'time exit' in done: notes.append('add-on fetching stops after 4.5 s once five cached results the template keeps are in')
     if 'sd fallback' in done: notes.append('SD and untagged releases now fill in when fewer than five HD results exist (older shows such as Arthur returned none)')

@@ -15,7 +15,7 @@
       {
         "date": "2026-11-14",
         "version": "2.10.15",
-        "content": "Inline ranked expressions score resolution, source, HDR, audio and release group so the best file leads each tier; SD and untagged releases now fill in when fewer than five HD results exist (older shows such as Arthur returned none); episode size floor lowered to 30 MB for short SD episodes; year matching uses each season's air years instead of the premiere year; per-add-on caps (Comet 5→10, Meteor 5→3) apply only once 10 cached results exist."
+        "content": "Inline ranked expressions score resolution, source, HDR, audio and release group so the best file leads each tier (no HDR bonus: this line prefers SDR); SD and untagged releases now fill in when fewer than five HD results exist (older shows such as Arthur returned none); episode size floor lowered to 30 MB for short SD episodes; year matching uses each season's air years instead of the premiere year; per-add-on caps (Comet 5→10, Meteor 5→3) apply only once 10 cached results exist."
       },
       {
         "date": "2026-11-02",
@@ -422,11 +422,6 @@
         "enabled": true,
         "expression": "/* RSE Dolby Vision */ visualTag(streams,'DV','Dolby Vision')",
         "score": 120
-      },
-      {
-        "enabled": true,
-        "expression": "/* RSE HDR */ visualTag(streams,'HDR10+','HDR10','HDR')",
-        "score": 80
       },
       {
         "enabled": true,

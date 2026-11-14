@@ -1348,7 +1348,7 @@
     "selOverrides": [],
     "dynamicAddonFetching": {
       "enabled": true,
-      "condition": "count(cached(resolution(totalStreams, \"2160p\"))) >= 15 or count(cached(resolution(totalStreams, \"1080p\"))) >= 20 or (totalTimeTaken >= 4500 and count(cached(totalStreams)) >= 5)"
+      "condition": "count(cached(resolution(totalStreams, \"2160p\"))) >= 15 or count(cached(resolution(totalStreams, \"1080p\"))) >= 20 or (totalTimeTaken >= 4500 and count(cached(merge(negate(resolution(totalStreams,'2160p'),totalStreams),quality(resolution(totalStreams,'2160p'),'Bluray REMUX')))) >= 5)"
     },
     "groups": {
       "enabled": false,
