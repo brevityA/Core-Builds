@@ -1,5 +1,13 @@
 # Changelog
 
+## 3.13.1 (2026-11-15)
+
+### Fixed
+- **SDR-first templates no longer score Dolby Vision (16 templates)** — 3.13 removed the HDR bonus on templates whose visual preference starts with SDR but left Dolby Vision at +120. The score sorts ahead of `visualTag`, so a DV release still outranked the SDR one these templates prefer. The entry is removed; HDR-first templates keep it. One patch bump each.
+
+### Changed
+- **Personal set brought in line with 3.13 (6 templates)** — untagged and SD releases become a fallback instead of being removed, the episode size floor drops to 30 MB for SD while 1080p and above keep their old floor, the low-seeder cull and per-add-on caps wait for cached results, and ranked expressions are added. Applied by `scripts/template-upgrades/v3_13_1_followup.py` (idempotent); each template saves on the pinned AIOStreams.
+
 ## 3.13.0 (2026-11-14)
 
 ### Changed

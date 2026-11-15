@@ -5,13 +5,18 @@
     "description": "1080p AllDebrid Lite. DTS:X / TrueHD / HEVC · Relaxed filtering. Requires AllDebrid account.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "0.2.18",
+    "version": "0.2.19",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
     "sourceUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/AllDebrid/core-nexus-alldebrid-lite.json",
     "changelogUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md",
     "changelog": [
+      {
+        "date": "2026-11-15",
+        "version": "0.2.19",
+        "content": "Dolby Vision no longer earns a score on this SDR-first line (it outranked SDR, like the HDR bonus removed in the last version)."
+      },
       {
         "date": "2026-11-14",
         "version": "0.2.18",
@@ -426,11 +431,6 @@
       {
         "enabled": true,
         "expression": "/* RSE WEB-DL */ quality(streams,'WEB-DL')",
-        "score": 120
-      },
-      {
-        "enabled": true,
-        "expression": "/* RSE Dolby Vision */ visualTag(streams,'DV','Dolby Vision')",
         "score": 120
       },
       {

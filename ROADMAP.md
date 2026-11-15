@@ -11,6 +11,7 @@ Auto-generated from [`CHANGELOG.md`](https://github.com/brevityA/Core-Builds/blo
 
 | Version | Date | Highlights |
 | --- | --- | --- |
+| v3.13.1 | 2026-11-15 | SDR-first templates no longer score Dolby Vision (16 templates) — 3.13 removed the HDR bonus on templates whose visual p… |
 | v3.13.0 | 2026-11-14 | Best file first inside every tier (41 templates) — each active template now carries inline ranked stream expressions fro… |
 | v3.12.1 | 2026-10-23 | Remaining AIOStreams 2.36 save follow-ups (18 templates, one patch bump each) — the four Personal templates no longer ca… |
 | v3.12.0 | 2026-10-22 | 52 templates refused on AIOStreams 2.36 (AIOSubtitle removed) — AIOStreams 2.36.0 marks the aiosubtitle preset removed (… |
@@ -24,7 +25,6 @@ Auto-generated from [`CHANGELOG.md`](https://github.com/brevityA/Core-Builds/blo
 | v3.6.0 | 2026-08-11 | Preflight audit tool (Configurator v2.92 · Tools page) — audits any template or live config offline with rules learned f… |
 | v3.5.3 | 2026-08-04 | Episode-pack availability — multi-episode and season-pack streams were previously removed by an early exclusion filter b… |
 | v3.5.2 | 2026-08-02 | Core Builds CLI published to npm — npm install -g core-builds for generate, validate, diff, and info commands. Same @cor… |
-| v3.5.1 | 2026-07-31 | Capability-based device profiles (Configurator v2.87) — Android Mobile, Android TV / Google TV, Samsung Tizen, LG webOS,… |
 <!-- AUTO:ROOT_COMPLETED:END -->
 
 > **Shipped-then-removed:** Audio Pinnacle PSE and HDR/DV Priority PSE shipped at v2.84 and were **removed in v3.2.8** (REMUX-ranking fix). Do not re-implement.

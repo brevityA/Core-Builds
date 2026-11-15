@@ -514,20 +514,20 @@ Meteor ≤ 5, Comet ≤ 5, MediaFusion ≤ 4, EZTV ≤ 3, HdHub ≤ 3, Torrent G
 
 ---
 
-## Active Template Inventory (as of v3.13.0)
+## Active Template Inventory (as of v3.13.1)
 
 ### Single (TorBox Pro)
 - `Single/core-nexus-4k-apex.json` v0.9.8 — flagship 4K, IQR PSEs, pow() decay, 5s dynamic fetching cap, Score IQR Guard, elite group pins, perGroup() Extra Cached
 - `Single/core-nexus-4k-apex-torbox.json` v2.12.17 — TorBox-cached-only Apex variant, Score IQR Guard, elite group pins, perGroup() Extra Cached
-- `Single/core-nexus-stream.json` v2.10.16 — 1080p streaming quality, 720p fallback
-- `Single/core-nexus-stream-lite.json` v2.10.16 — lite variant
+- `Single/core-nexus-stream.json` v2.10.17 — 1080p streaming quality, 720p fallback
+- `Single/core-nexus-stream-lite.json` v2.10.17 — lite variant
 - `Single/core-nexus-stream-firestick.json` v2.10.16 — Fire Stick optimised
 - `Single/core-nexus-stream-firestick-lite.json` v2.10.5
 
 ### Essential (TorBox Essential)
 - `Essential/core-nexus-4k-essential.json` v2.12.16 — 4K with IQR PSEs, pow() decay, Score IQR Guard, elite group pins, perGroup() Extra Cached
 - `Essential/core-nexus-4k-essential-lite.json` v2.10.16 — CB-style PSEs
-- `Essential/core-nexus-essential.json` v2.10.16 — 1080p
+- `Essential/core-nexus-essential.json` v2.10.17 — 1080p
 - `Essential/core-nexus-essential-lite.json` v2.10.5
 
 ### Flash
@@ -537,7 +537,7 @@ Meteor ≤ 5, Comet ≤ 5, MediaFusion ≤ 4, EZTV ≤ 3, HdHub ≤ 3, Torrent G
 ### Speed (TorBox)
 - `Speed/TorBox/core-nexus-speed-4k.json` v2.10.15 — fast cached 4K
 - `Speed/TorBox/core-nexus-speed-4k-lite.json` v2.10.5
-- `Speed/TorBox/core-nexus-speed.json` v2.10.15 — fast cached 1080p
+- `Speed/TorBox/core-nexus-speed.json` v2.10.16 — fast cached 1080p
 - `Speed/TorBox/core-nexus-speed-lite.json` v2.10.5
 
 ### Speed (EasyNews)
@@ -547,13 +547,13 @@ Meteor ≤ 5, Comet ≤ 5, MediaFusion ≤ 4, EZTV ≤ 3, HdHub ≤ 3, Torrent G
 ### AllDebrid
 - `AllDebrid/core-nexus-4k-alldebrid.json` v0.4.18 — 4K with IQR PSEs, Score IQR Guard, elite group pins, perGroup() Extra Cached
 - `AllDebrid/core-nexus-4k-alldebrid-lite.json` v0.2.18 — 4K CB-style
-- `AllDebrid/core-nexus-alldebrid.json` v0.2.18 — 1080p
-- `AllDebrid/core-nexus-alldebrid-lite.json` v0.2.18 — 1080p lite
+- `AllDebrid/core-nexus-alldebrid.json` v0.2.19 — 1080p
+- `AllDebrid/core-nexus-alldebrid-lite.json` v0.2.19 — 1080p lite
 
 ### Hybrid
 - `Hybrid/core-nexus-4k-hybrid.json` v2.12.17 — TorBox + RD, service() priority PSEs, IQR, Score IQR Guard, elite group pins, perGroup() Extra Cached, dedup tiebreakers (after_addon), NZBGeek preset (disabled by default)
-- `Hybrid/core-nexus-hybrid.json` v2.10.17 — 1080p hybrid, TorBox-priority twins (IQR), dedup tiebreakers (after_addon), NZBGeek preset (disabled by default)
-- `Hybrid/core-nexus-hybrid-lite.json` v2.10.17 — TorBox-priority twins (CB-style), dedup tiebreakers (after_addon), NZBGeek preset (disabled by default)
+- `Hybrid/core-nexus-hybrid.json` v2.10.18 — 1080p hybrid, TorBox-priority twins (IQR), dedup tiebreakers (after_addon), NZBGeek preset (disabled by default)
+- `Hybrid/core-nexus-hybrid-lite.json` v2.10.18 — TorBox-priority twins (CB-style), dedup tiebreakers (after_addon), NZBGeek preset (disabled by default)
 
 ### Device
 - `Device/Samsung/core-nexus-samsung-tv.json` v0.3.16 — 1080p, DV-Only Kill on, AV1/VC-1 excluded, REPACK ISE + booster PSEs
@@ -565,10 +565,10 @@ Meteor ≤ 5, Comet ≤ 5, MediaFusion ≤ 4, EZTV ≤ 3, HdHub ≤ 3, Torrent G
 ### Anime
 - `Anime/core-nexus-anime-4k.json` v2.8.21 — 4K anime, SeaDex + Anime Tosho (`anime-tosho-new`, needs AIOStreams 2.36+), cachedAnime/uncachedAnime sort
 - `Anime/core-nexus-anime-4k-lite.json` v2.8.19 — cachedAnime/uncachedAnime sort
-- `Anime/core-nexus-anime.json` v2.8.21 — 1080p anime, cachedAnime/uncachedAnime sort
-- `Anime/core-nexus-anime-lite.json` v2.8.19 — cachedAnime/uncachedAnime sort
-- `Anime/core-nexus-anime-dub.json` v2.8.21 — dubbed variant, cachedAnime/uncachedAnime sort
-- `Anime/core-nexus-anime-dub-lite.json` v2.8.19 — cachedAnime/uncachedAnime sort
+- `Anime/core-nexus-anime.json` v2.8.22 — 1080p anime, cachedAnime/uncachedAnime sort
+- `Anime/core-nexus-anime-lite.json` v2.8.20 — cachedAnime/uncachedAnime sort
+- `Anime/core-nexus-anime-dub.json` v2.8.22 — dubbed variant, cachedAnime/uncachedAnime sort
+- `Anime/core-nexus-anime-dub-lite.json` v2.8.20 — cachedAnime/uncachedAnime sort
 
 ### Nightly (gitignored — force-add to commit)
 - `Nightly/AppleTV/core-nexus-apple-tv-4k.json` v0.2.14 — DV Profile 5/8, AV1 excluded, SeaDex ISE, REPACK ISE
