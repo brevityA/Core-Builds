@@ -1,0 +1,298 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Core Builds — UI pass example (offline)</title>
+<!--
+  Self-contained before/after example of the 2026-11 configurator UI pass.
+  No network requests, no external assets, no build step: open this file
+  directly (file://) to view. It is a reduced reproduction of the real
+  screens with the real token values from src/styles/01-core.css — the
+  working app itself is the standalone index.html in this directory.
+-->
+<style>
+/* ── Real token values (copied from src/styles/01-core.css) ── */
+:root{--th-bg:#0d1017;--th-card:#151923;--th-card-alt:#111720;--th-border:rgba(255,255,255,.06);--th-border-strong:rgba(255,255,255,.12);--th-tx:#e4e7ed;--th-tx2:#8b949e;--th-tx3:#6b7280;--th-tx4:#4b5563;--th-tx5:#374151;--th-accent:#00d4ff;--th-accent-bg:rgba(0,212,255,.08);--th-accent-border:rgba(0,212,255,.18);--th-green:#34d399;--th-green-border:rgba(52,211,153,.2);--th-purple:#a78bfa;--th-purple-border:rgba(168,85,247,.18);--th-radius-lg:14px;--th-shadow-soft:0 6px 18px rgba(0,0,0,.16)}
+[data-theme="light"]{--th-bg:#f6f8fa;--th-card:#ffffff;--th-card-alt:#f6f8fa;--th-border:rgba(0,0,0,.09);--th-border-strong:rgba(0,0,0,.18);--th-tx:#1c2128;--th-tx2:#57606a;--th-tx3:#6b7280;--th-tx4:#8c959f;--th-tx5:#9ca3af;--th-accent:#0969da;--th-accent-bg:rgba(9,105,218,.06);--th-accent-border:rgba(9,105,218,.25);--th-green:#059669;--th-green-border:rgba(5,150,105,.2);--th-purple:#7c3aed;--th-purple-border:rgba(127,99,235,.18);--th-shadow-soft:0 6px 18px rgba(0,0,0,.06)}
+
+/* ── Page chrome ── */
+*{box-sizing:border-box}
+body{margin:0;background:var(--th-bg);color:var(--th-tx);font:15px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
+.page{max-width:1240px;margin:0 auto;padding:28px 20px 60px}
+.top{display:flex;align-items:center;gap:12px;margin-bottom:6px}
+.top h1{font-size:1.25rem;margin:0;letter-spacing:-.02em}
+.top .tag{font:700 .62rem/1 monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--th-tx3);border:1px solid var(--th-border-strong);border-radius:99px;padding:4px 9px}
+.toggle{margin-left:auto;background:var(--th-card-alt);border:1px solid var(--th-border-strong);color:var(--th-tx2);font:600 .75rem/1 system-ui;border-radius:99px;padding:7px 13px;cursor:pointer}
+.sub{color:var(--th-tx3);font-size:.8rem;margin:4px 0 26px;max-width:720px}
+section{margin-bottom:34px}
+section>h2{font-size:.95rem;margin:0 0 4px;letter-spacing:-.01em}
+section>p{color:var(--th-tx3);font-size:.78rem;margin:0 0 12px;max-width:760px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:900px){.grid{grid-template-columns:1fr}}
+.pane{border:1px solid var(--th-border-strong);border-radius:14px;padding:16px;position:relative;background:var(--th-card)}
+.pane .chip{position:absolute;top:-9px;left:14px;font:800 .6rem/1 monospace;letter-spacing:.1em;text-transform:uppercase;border-radius:99px;padding:4px 9px}
+.pane-b .chip{background:#2a2f3a;color:#9ca3af}
+[data-theme="light"] .pane-b .chip{background:#e6e9ec;color:#57606a}
+.pane-a .chip{background:var(--th-accent-bg);color:var(--th-accent);border:1px solid var(--th-accent-border)}
+.note{margin-top:10px;font-size:.7rem;color:var(--th-tx4)}
+footer{border-top:1px solid var(--th-border);margin-top:40px;padding-top:16px;font-size:.72rem;color:var(--th-tx3);line-height:1.7}
+footer code{font:600 .68rem/1 ui-monospace,monospace;background:var(--th-card-alt);border:1px solid var(--th-border);border-radius:5px;padding:2px 5px}
+
+/* ════════════ BEFORE — original rules (values from git HEAD) ════════════ */
+.b-card{background:rgba(21,25,35,.72);background-image:radial-gradient(circle at 100% 0%,rgba(0,212,255,.12) 0%,transparent 45%),radial-gradient(circle at 0% 100%,rgba(168,85,247,.09) 0%,transparent 45%);border:1px solid rgba(0,212,255,.1);border-radius:14px;padding:20px;position:relative;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+.b-card::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(0,212,255,.2),transparent);pointer-events:none}
+.b-card h3{font-size:1.15rem;font-weight:800;margin:0 0 5px;color:#e6edf3;text-shadow:0 0 18px rgba(0,212,255,.12)}
+.b-card .d{font-size:.78rem;color:#7ea4bd;margin:0 0 12px}
+/* step strip: all six states were the same dot */
+.b-strip{display:flex;align-items:flex-start;padding:10px 0 4px}
+.b-unit{display:flex;flex-direction:column;align-items:center;flex:1;position:relative}
+.b-unit:not(:first-child)::before{content:'';position:absolute;top:5px;transform:translateY(-50%);right:50%;width:100%;height:1px;background:rgba(255,255,255,.06)}
+.b-bub{width:9px;height:9px;border-radius:50%;position:relative;z-index:1;background:#2b3444;border:1px solid rgba(255,255,255,.05)}
+.b-lbl{font-size:.6rem;font-weight:600;color:#4a4f60;margin-top:5px}
+/* start cards: two equal outlines */
+.b-starts{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+@media(max-width:520px){.b-starts{grid-template-columns:1fr}}
+.b-sc{display:flex;flex-direction:column;align-items:flex-start;gap:5px;text-align:left;padding:14px;border-radius:13px;cursor:pointer;font:inherit}
+.b-sc .t{font-size:.84rem;font-weight:800;color:#e6edf3}
+.b-sc .x{font-size:.62rem;color:#6b7280;line-height:1.4}
+.b-sc .ic{width:32px;height:32px;border-radius:9px;display:grid;place-items:center}
+.b-quick{border:1px solid rgba(0,212,255,.32);background:linear-gradient(150deg,rgba(0,212,255,.12),rgba(10,15,23,.85))}
+.b-quick .ic{color:#00d4ff;background:rgba(0,212,255,.12);border:1px solid rgba(0,212,255,.28)}
+.b-custom{border:1px solid rgba(167,139,250,.3);background:linear-gradient(150deg,rgba(167,139,250,.11),rgba(10,15,23,.85))}
+.b-custom .ic{color:#a78bfa;background:rgba(167,139,250,.12);border:1px solid rgba(167,139,250,.28)}
+.b-alt{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.b-alt button{font:700 .58rem/1 system-ui;letter-spacing:.05em;text-transform:uppercase;color:#748194;background:none;border:0;cursor:pointer;padding:5px 2px}
+.b-h2{font-family:Georgia,serif;font-size:1.48rem;letter-spacing:-.04em;color:#edf4f8;margin:0}
+/* option card before: glow on select + lift on hover */
+.b-opt{position:relative;border:1px solid rgba(255,255,255,.1);border-radius:11px;padding:11px 13px;font-size:.8rem;color:#c9d1d9;display:flex;justify-content:space-between;align-items:center;background:rgba(255,255,255,.02)}
+.b-opt.sel{border-color:rgba(0,212,255,.4);background:rgba(0,212,255,.08);box-shadow:0 0 0 1px rgba(0,212,255,.15),0 4px 24px rgba(0,180,220,.12)}
+.b-opt.sel::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:#00d4ff;box-shadow:0 0 12px rgba(0,200,255,.45),0 0 30px rgba(0,200,255,.12)}
+.b-opt .tick{width:18px;height:18px;border-radius:50%;background:#00d4ff;color:#04222b;font-size:11px;display:none;place-items:center;font-weight:900}
+.b-opt.sel .tick{display:grid}
+/* fine-tune before: uppercase glow */
+.b-ft{width:100%;margin-top:12px;padding:12px 16px;background:rgba(0,212,255,.04);border:1px solid rgba(0,212,255,.18);border-radius:11px;color:#67e8f9;font:700 .88rem/1.3 system-ui;letter-spacing:.05em;text-transform:uppercase;cursor:pointer}
+.b-skip{width:100%;margin-top:10px;padding:9px 14px;background:transparent;border:1px dashed rgba(255,255,255,.1);border-radius:10px;color:#6b7280;font:600 .86rem/1.3 system-ui;cursor:pointer}
+/* export block before: three cyan-tinted buttons, no explanation */
+.b-dl{width:100%;padding:15px;font-size:1.1rem;font-weight:800;border-radius:10px;border:none;cursor:pointer;background:linear-gradient(135deg,#059669,#10b981);color:#fff}
+.b-fb{width:100%;margin-top:8px;padding:10px;font-size:.78rem;font-weight:700;border-radius:10px;border:1px solid rgba(0,212,255,.24);background:rgba(0,212,255,.05);color:#00d4ff;cursor:pointer}
+.b-row{display:flex;gap:8px;margin-top:8px}
+.b-share{flex:1;padding:11px;font-size:.82rem;font-weight:700;border-radius:10px;border:1px solid rgba(0,212,255,.18);background:rgba(0,212,255,.04);color:#3d9db5;cursor:pointer}
+.b-aio{flex:1;padding:11px;font-size:.82rem;font-weight:700;border-radius:10px;border:2px solid #0e7490;background:transparent;color:#00d4ff;cursor:pointer}
+
+/* ════════════ AFTER — new rules (2026-11 pass) ════════════ */
+.a-card{background:var(--th-card);border:1px solid var(--th-border-strong);border-radius:var(--th-radius-lg);padding:20px;position:relative}
+.a-card h3{font-size:1.15rem;font-weight:800;margin:0 0 5px;color:var(--th-tx)}
+.a-card .d{font-size:.78rem;color:var(--th-tx2);margin:0 0 12px}
+/* step strip: states carried by shape */
+.a-strip{display:flex;align-items:flex-start;padding:10px 0 4px}
+.a-unit{display:flex;flex-direction:column;align-items:center;flex:1;position:relative;min-width:0;cursor:default}
+.a-unit:not(:first-child)::before{content:'';position:absolute;top:5px;transform:translateY(-50%);right:50%;width:100%;height:1px;background:var(--th-border)}
+.a-unit.done::before{background:var(--th-green-border)}
+.a-bub{width:10px;height:10px;border-radius:50%;position:relative;z-index:1;display:grid;place-items:center;font-size:0;color:transparent;background:var(--th-tx5)}
+.a-unit.active .a-bub{width:16px;height:16px;background:var(--th-card);border:2px solid var(--th-accent);box-shadow:0 0 0 3px var(--th-accent-bg)}
+.a-unit.done .a-bub{width:14px;height:14px;background:var(--th-green);color:#fff}
+.a-unit.done .a-bub svg{width:10px;height:10px}
+.a-unit[data-click]{cursor:pointer}
+.a-unit[data-click]:focus-visible{outline:2px solid var(--th-accent);outline-offset:4px;border-radius:8px}
+.a-lbl{font-size:.62rem;font-weight:600;color:var(--th-tx3);margin-top:4px}
+.a-unit.active .a-lbl{color:var(--th-tx2)}
+/* start cards: one clear primary */
+.a-starts{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+@media(max-width:520px){.a-starts{grid-template-columns:1fr}}
+.a-sc{display:flex;flex-direction:column;align-items:flex-start;gap:5px;text-align:left;padding:14px;border-radius:13px;cursor:pointer;font:inherit}
+.a-sc .t{font-size:.84rem;font-weight:800}
+.a-sc .x{font-size:.62rem;line-height:1.4}
+.a-sc .ic{width:32px;height:32px;border-radius:9px;display:grid;place-items:center}
+.a-quick{border:1px solid var(--th-accent);background:var(--th-accent);color:#04141a}
+.a-quick .t{color:#04141a}
+.a-quick .x{color:rgba(4,20,26,.72)}
+.a-quick .ic{color:#04141a;background:rgba(0,0,0,.18);border:1px solid rgba(0,0,0,.22)}
+[data-theme="light"] .a-quick{color:#fff}
+[data-theme="light"] .a-quick .t{color:#fff}
+[data-theme="light"] .a-quick .x{color:rgba(255,255,255,.82)}
+[data-theme="light"] .a-quick .ic{color:#fff;background:rgba(255,255,255,.18);border-color:rgba(255,255,255,.28)}
+.a-custom{border:1px solid rgba(167,139,250,.3);background:rgba(167,139,250,.06);color:var(--th-tx)}
+.a-custom .x{color:var(--th-tx3)}
+.a-custom .ic{color:var(--th-purple);background:rgba(167,139,250,.12);border:1px solid rgba(167,139,250,.28)}
+.a-alt{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;align-items:center}
+.a-alt .lead{flex-basis:100%;font-size:.62rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--th-tx3);padding-top:2px}
+.a-alt button{font:700 .58rem/1 system-ui;letter-spacing:.05em;text-transform:uppercase;color:var(--th-tx3);background:none;border:0;cursor:pointer;padding:5px 2px}
+.a-alt button:hover{color:var(--th-tx2)}
+.a-h2{font-family:Georgia,serif;font-size:1.18rem;letter-spacing:-.04em;color:var(--th-tx);margin:0}
+/* option card after: quiet ring, no lift */
+.a-opt{position:relative;border:1px solid var(--th-border-strong);border-radius:11px;padding:11px 13px;font-size:.8rem;color:var(--th-tx);display:flex;justify-content:space-between;align-items:center;background:var(--th-card-alt)}
+.a-opt.sel{border-color:var(--th-accent-border);background:var(--th-accent-bg);box-shadow:0 0 0 1px var(--th-accent-border)}
+.a-opt.sel::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--th-accent);opacity:.7}
+.a-opt .tick{width:18px;height:18px;border-radius:50%;background:var(--th-accent);color:#04222b;font-size:11px;display:none;place-items:center;font-weight:900}
+.a-opt.sel .tick{display:grid}
+/* fine-tune after: quiet labelled secondary */
+.fine-tune-btn{appearance:none;font:inherit;width:100%;margin-top:12px;padding:12px 16px;background:var(--th-card-alt);border:1px solid var(--th-border-strong);border-radius:11px;color:var(--th-tx);font-size:.88rem;font-weight:700;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px}
+.fine-tune-btn .sub2{font-size:.7rem;font-weight:500;color:var(--th-tx3)}
+.skip-step-btn{appearance:none;font:inherit;width:100%;margin-top:10px;padding:9px 14px;background:transparent;border:1px dashed var(--th-border-strong);border-radius:10px;color:var(--th-tx3);font-size:.86rem;font-weight:600;cursor:pointer}
+.skip-step-btn:hover{color:var(--th-tx2);border-color:var(--th-tx4);background:var(--th-card-alt)}
+/* export after: labelled, explained */
+.a-dl{width:100%;padding:15px;font-size:1.1rem;font-weight:800;border-radius:10px;border:none;cursor:pointer;background:linear-gradient(135deg,#059669,#10b981);color:#fff}
+.action-help{font-size:.7rem;color:var(--th-tx3);line-height:1.45;margin:6px 0 10px}
+.rv-tool-btn{appearance:none;font:inherit;width:100%;margin-top:4px;padding:10px;font-size:.78rem;font-weight:700;border-radius:10px;border:1px solid var(--th-accent-border);background:var(--th-accent-bg);color:var(--th-accent);cursor:pointer}
+.rv-actions-row{display:flex;gap:8px;margin-top:8px}
+.rv-secondary-btn{appearance:none;font:inherit;flex:1;padding:11px;font-size:.82rem;font-weight:700;border-radius:10px;border:1px solid var(--th-border-strong);background:var(--th-card-alt);color:var(--th-tx2);cursor:pointer}
+.aio{appearance:none;font:inherit;flex:1;padding:11px;font-size:.82rem;font-weight:700;border-radius:10px;border:2px solid #0e7490;background:transparent;color:var(--th-accent);cursor:pointer}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="top">
+    <h1>Core Builds — configurator UI pass</h1>
+    <span class="tag">offline example</span>
+    <button class="toggle" id="themeBtn" type="button">Light theme</button>
+  </div>
+  <p class="sub">Before / after of the 2026-11 pass, rendered with the real token values from <code>src/styles/01-core.css</code>. Reduced reproduction — no scripts of the real app run here. The fully working offline build is <code>configurator/index.html</code> (single file, JS+CSS inlined). Click the steps in the "After" strip to see state carry.</p>
+
+  <!-- 1 ── Where do I start? -->
+  <section>
+    <h2>1 · Where do I start? — the splash</h2>
+    <p>Before: two equal outline cards and four ungrouped links; oversized section headline. After: one filled primary (Quick install), a visibly secondary Custom build, and the returning-user routes grouped under their own label.</p>
+    <div class="grid">
+      <div class="pane pane-b"><span class="chip">Before</span>
+        <div class="b-card">
+          <h3 class="b-h2">New streams, formatted</h3>
+          <p class="d">Pick your service and device. Core Builds writes a checked AIOStreams setup and can install the whole stack straight into your Stremio account. No JSON editing.</p>
+          <div class="b-starts">
+            <button class="b-sc b-quick"><span class="ic">⚡</span><span class="t">Quick install</span><span class="x">Service → device → resolution → key → Deploy. Working streams in about 30 seconds.</span></button>
+            <button class="b-sc b-custom"><span class="ic">⚙</span><span class="t">Custom build</span><span class="x">Every setting: audio, languages, subtitles, filters, ranking and stream cards.</span></button>
+          </div>
+          <div class="b-alt"><button>Update an existing setup</button><button>Import a config</button><button>Setup Genie</button><button>Take the tour</button></div>
+        </div>
+      </div>
+      <div class="pane pane-a"><span class="chip">After</span>
+        <div class="a-card">
+          <h3 class="a-h2">New streams, formatted</h3>
+          <p class="d">Pick your service and device — Core Builds writes a checked <b>AIOStreams setup</b> and can install it <b>straight into your Stremio account</b>. No JSON editing.</p>
+          <div class="a-starts">
+            <button class="a-sc a-quick"><span class="ic">⚡</span><span class="t">Quick install</span><span class="x">Service → device → resolution → key → Deploy. Working streams in about 30 seconds.</span></button>
+            <button class="a-sc a-custom"><span class="ic">⚙</span><span class="t">Custom build</span><span class="x">Every setting: audio, languages, subtitles, filters, ranking and stream cards.</span></button>
+          </div>
+          <div class="a-alt"><span class="lead">Already have a setup?</span><button>Update an existing setup</button><button>Import a config</button><button>Take the tour</button><button>Setup Genie</button></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2 ── Where am I now? -->
+  <section>
+    <h2>2 · Where am I now? — the step strip</h2>
+    <p>Before: all six steps rendered as the same small dot — the current step was not visually marked at all. After: shape carries the state — done = green check, active = accent ring, pending = dim dot.</p>
+    <div class="grid">
+      <div class="pane pane-b"><span class="chip">Before</span>
+        <div class="b-strip">
+          <div class="b-unit"><div class="b-bub"></div><div class="b-lbl">Sources</div></div>
+          <div class="b-unit"><div class="b-bub"></div><div class="b-lbl">Device</div></div>
+          <div class="b-unit"><div class="b-bub"></div><div class="b-lbl">Quality</div></div>
+          <div class="b-unit"><div class="b-bub"></div><div class="b-lbl">Content</div></div>
+          <div class="b-unit"><div class="b-bub"></div><div class="b-lbl">Accounts</div></div>
+          <div class="b-unit"><div class="b-bub"></div><div class="b-lbl">Install</div></div>
+        </div>
+        <div class="note">Current step: 3 of 6 — not distinguishable from the others.</div>
+      </div>
+      <div class="pane pane-a"><span class="chip">After</span>
+        <div class="a-strip" id="aStrip">
+          <div class="a-unit done"><div class="a-bub"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><div class="a-lbl">Sources</div></div>
+          <div class="a-unit done"><div class="a-bub"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><div class="a-lbl">Device</div></div>
+          <div class="a-unit active"><div class="a-bub"></div><div class="a-lbl">Quality</div></div>
+          <div class="a-unit"><div class="a-bub"></div><div class="a-lbl">Content</div></div>
+          <div class="a-unit"><div class="a-bub"></div><div class="a-lbl">Accounts</div></div>
+          <div class="a-unit"><div class="a-bub"></div><div class="a-lbl">Install</div></div>
+        </div>
+        <div class="note">Current step: 3 of 6 — the ringed bubble is unambiguous. Click any step to move it (states re-carry).</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3 ── What do I choose? -->
+  <section>
+    <h2>3 · What do I choose? — options, Fine-Tune, Skip</h2>
+    <p>Before: selected options glow and hover lifts cards; the one advanced entry point was an uppercase glowing button. After: a quiet ring marks the selection, Fine-Tune is a labelled secondary with a plain-language sub-line, and Skip is an explicit dashed opt-out.</p>
+    <div class="grid">
+      <div class="pane pane-b"><span class="chip">Before</span>
+        <div class="b-card">
+          <h3>Video quality</h3>
+          <p class="d">Sets the maximum resolution your streams use.</p>
+          <div class="b-opt sel">1080p (safe for most)<span class="tick">✓</span></div>
+          <div class="b-opt" style="margin-top:8px">4K (fast debrid only)<span class="tick">✓</span></div>
+          <button class="b-ft">⚙ Fine-Tune<br><span style="font-size:.68rem;font-weight:500;color:#4b5563;text-transform:none">Audio · Video · Formatter</span></button>
+          <button class="b-skip">Skip — use standard settings →</button>
+        </div>
+      </div>
+      <div class="pane pane-a"><span class="chip">After</span>
+        <div class="a-card">
+          <h3>Video quality</h3>
+          <p class="d">Sets the maximum resolution your streams use.</p>
+          <div class="a-opt sel">1080p (safe for most)<span class="tick">✓</span></div>
+          <div class="a-opt" style="margin-top:8px">4K (fast debrid only)<span class="tick">✓</span></div>
+          <button class="fine-tune-btn">⚙ Fine-Tune<span class="sub2">Expert settings — audio, video, formatter. Your picks so far are kept.</span></button>
+          <button class="skip-step-btn">Skip — use standard settings →</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4 ── How do I get my configuration? -->
+  <section>
+    <h2>4 · How do I get my configuration? — review &amp; export</h2>
+    <p>Before: four competing cyan-tinted buttons with no explanation of what each does. After: the green Export stays the one primary; Share drops to neutral; the feedback report is quiet; and one short line states what each action actually does.</p>
+    <div class="grid">
+      <div class="pane pane-b"><span class="chip">Before</span>
+        <div style="padding:4px">
+          <button class="b-dl">⬇ Export Template JSON</button>
+          <button class="b-fb">🧾 Need help? Copy a safe feedback report</button>
+          <div class="b-row"><button class="b-share">⤳ Share</button><button class="b-aio">🔗 Import to AIOStreams</button></div>
+        </div>
+        <div class="note">Which of these do I need? (Not stated anywhere.)</div>
+      </div>
+      <div class="pane pane-a"><span class="chip">After</span>
+        <div style="padding:4px">
+          <button class="a-dl">⬇ Export Template JSON</button>
+          <div class="action-help">Writes a JSON file in your browser — nothing is uploaded, and your keys stay in it only if you added them above.</div>
+          <button class="rv-tool-btn">🧾 Need help? Copy a safe feedback report</button>
+          <div class="rv-actions-row"><button class="rv-secondary-btn">⤳ Share</button><button class="aio">🔗 Import to AIOStreams</button></div>
+          <div class="action-help">Creates your config on an AIOStreams host and gives you an import link — no credentials needed.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <b>What changed where</b><br>
+    Surfaces &amp; keyframes — <code>src/styles/01-core.css</code> · step states, headers, receipt — <code>src/styles/02-brand-theme.css</code> · done-step hover — <code>03-enhancements.css</code> · splash hierarchy — <code>04-landing.css</code> · new component classes — <code>06-features.css</code> · copy, button classes, a11y attributes — <code>src/js/app.js</code> · close-button label — <code>src/index.html</code><br>
+    No dependencies, no framework, no behaviour change — every <code>data-action</code>, id and deep link is untouched. Ratchets: inline styles 745→737, brand rgba 218→187, <code>!important</code> flat at 434. 790/790 tests pass.
+  </footer>
+</div>
+<script>
+// Theme toggle (the only JS on this page).
+const btn = document.getElementById('themeBtn');
+btn.addEventListener('click', () => {
+  const h = document.documentElement;
+  const next = h.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+  h.setAttribute('data-theme', next);
+  btn.textContent = next === 'dark' ? 'Light theme' : 'Dark theme';
+});
+// Step-strip demo: clicking a step in the After pane re-carries state.
+const strip = document.getElementById('aStrip');
+const CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+strip.addEventListener('click', (e) => {
+  const unit = e.target.closest('.a-unit');
+  if (!unit) return;
+  const units = [...strip.children];
+  const i = units.indexOf(unit);
+  units.forEach((u, j) => {
+    u.classList.toggle('done', j < i);
+    u.classList.toggle('active', j === i);
+    u.querySelector('.a-bub').innerHTML = j < i ? CHECK : '';
+    if (j < i) { u.setAttribute('data-click', ''); } else { u.removeAttribute('data-click'); }
+  });
+});
+</script>
+</body>
+</html>

@@ -23,7 +23,7 @@
 [data-theme="light"] .device-help b{color:#1f2328}
 [data-theme="light"] .help-btn{border-color:rgba(0,0,0,.15);background:rgba(0,0,0,.03);color:#8c959f}
 .step-unit.done{cursor:pointer}
-.step-unit.done:hover .step-bub{box-shadow:0 0 10px rgba(0,212,255,.8);transform:scale(1.3)}
+.step-unit.done:hover .step-bub{box-shadow:0 0 0 3px var(--th-green-border)}
 .step-unit.done:hover .step-lbl{color:var(--th-accent)}
 .receipt-row[data-action]{cursor:pointer;transition:background .15s}
 .receipt-row[data-action]:hover{background:rgba(0,212,255,.05)}

@@ -2012,7 +2012,7 @@ function renderSidebar() {
     let sub = '—';
     if (isDone && k && S[k]) { sub = label(k, S[k]) || '—'; }
     else if (isActive && DEFS[i]) { const t = document.createElement('div'); t.innerHTML = DEFS[i].desc; sub = (t.textContent || '').slice(0,50); }
-    const clickAttr = isDone ? ` data-action="jump-step" data-step="${n}"` : '';
+    const clickAttr = isDone ? ` data-action="jump-step" data-step="${n}" role="button" tabindex="0" aria-label="Go back to ${SHORT[i]}"` : '';
     return `<li class="${cls}"${clickAttr}><div class="sb-num">${numContent}</div><div><div class="sb-step-title">${escH(SHORT[i])}</div><div class="sb-step-sub">${escH(sub)}</div></div></li>`;
   }).join('');
   if (stepsEl) stepsEl.innerHTML = items;
@@ -2115,7 +2115,7 @@ function splashHtml() {
       <div class="splash-anim splash-anim-d2">
         <div class="hybrid-eyebrow">AIOStreams template configurator</div>
         <h1>Build streams<br>with intent.</h1>
-        <div class="hybrid-lede">Pick your service and device. Core Builds writes a checked <strong>AIOStreams setup</strong> and can install the whole stack <strong>straight into your Stremio account</strong>. No JSON editing.</div>
+        <div class="hybrid-lede">Pick your service and device — Core Builds writes a checked <strong>AIOStreams setup</strong> and can install it <strong>straight into your Stremio account</strong>. No JSON editing.</div>
         <!-- Two equal ways in (v3.20 redesign). Quick install opens the Express lane;
              Custom build opens the full builder. Same data-actions as before, so the
              #express / #advanced deep links, the tour and every spec keep working. -->
@@ -2133,10 +2133,11 @@ function splashHtml() {
           </button>
         </div>
         <div class="splash-start-more" id="splashAltRoutes">
+          <span class="splash-alt-lead">Already have a setup?</span>
           <button data-action="update-template" class="splash-tertiary-btn">Update an existing setup</button>
           <button data-action="paste-manifest-splash" class="splash-tertiary-btn">Import a config</button>
-          <a href="../tools/genies/" class="splash-tertiary-btn">Setup Genie</a>
           <button data-action="open-tutorial" class="splash-tertiary-btn">Take the tour</button>
+          <a href="../tools/genies/" class="splash-tertiary-btn">Setup Genie</a>
         </div>
         <p class="splash-from-note">Coming from QuackStart? <button type="button" data-action="open-quick-install" class="splash-from-link">Quick install</button> does the same one-click setup: AIOStreams with AIOMetadata and the Cinemeta patch, or just a manifest URL for any app.</p>
         <div class="hybrid-trust"><span><i></i> Runs locally</span><span><i></i> Open source · MIT</span><span><i></i> Build without a login — or push it in one click</span></div>
@@ -2282,7 +2283,7 @@ function render() {
             {k:'formatter',  ico:ICO.palette(14,'#8b949e')},
           ].map(({k, ico}) => {
             const JUMP = { service:1, device:2, resolution:3, audio:3, content:4 };
-            const jumpAttr = JUMP[k] ? ` data-action="jump-step" data-step="${JUMP[k]}" title="Click to change"` : (k === 'formatter' ? ` data-action="open-fmt-picker" title="Click to change"` : '');
+            const jumpAttr = JUMP[k] ? ` data-action="jump-step" data-step="${JUMP[k]}" title="Click to change" role="button" tabindex="0" aria-label="Change ${k}"` : (k === 'formatter' ? ` data-action="open-fmt-picker" title="Click to change" role="button" tabindex="0" aria-label="Change formatter"` : '');
             const audioOverride = k==='audio' && ['lossless','dolby'].includes(S.audio) && DEVICE_FORCE_LIMITED_AUDIO.has(S.device);
             const val = label(k, S[k]) || '—';
             const isNonDefault = k==='service' || (k==='audio' && S.audio!=='limited') || (k==='content' && S.content && S.content!=='all') || (k==='resolution' && (S.resolution==='4k'||S.resolution==='mixed')) || (k==='formatter' && S.formatter!=='family-v4');
@@ -2336,15 +2337,17 @@ function render() {
         ${sizeLimitHtml()}
         ${livePayloadHtml()}
         <button class="btn-dl" data-action="generate-dl">${ICO.download(14,'currentColor')} Export Template JSON</button>
+        <div class="action-help">Writes a JSON file in your browser — nothing is uploaded, and your keys stay in it only if you added them above.</div>
         <div id="exportCredNotice"></div>
-        <button data-action="open-feedback-report" style="width:100%;margin-top:8px;padding:10px;font-size:.78rem;font-weight:700;border-radius:10px;border:1px solid rgba(0,212,255,.24);background:rgba(0,212,255,.05);color:#00d4ff;cursor:pointer">🧾 Need help? Copy a safe feedback report</button>
-        <div style="display:flex;gap:8px;margin-top:8px">
-          <button data-action="share-config" style="flex:1;padding:11px;font-size:.82rem;font-weight:700;border-radius:10px;border:1px solid rgba(0,212,255,.18);background:rgba(0,212,255,.04);color:#3d9db5;cursor:pointer;transition:background .15s;display:flex;align-items:center;justify-content:center;gap:6px" onmouseover="this.style.background='rgba(0,212,255,.1)'" onmouseout="this.style.background='rgba(0,212,255,.04)'"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg> Share</button>
-          <button class="btn-aio" data-action="create-import" id="btnImport" style="flex:1;margin-top:0;padding:11px;font-size:.82rem">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+        <button type="button" data-action="open-feedback-report" class="rv-tool-btn">🧾 Need help? Copy a safe feedback report</button>
+        <div class="rv-actions-row">
+          <button type="button" data-action="share-config" class="rv-secondary-btn"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg> Share</button>
+          <button type="button" class="btn-aio" data-action="create-import" id="btnImport">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
             Import to AIOStreams
           </button>
         </div>
+        <div class="action-help">Creates your config on an AIOStreams host and gives you an import link — no credentials needed.</div>
         <div id="importUrlResult"></div>
         <details class="rv-section" open>
           <summary class="rv-section-hdr"><span class="rv-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg> Deploy</span><span class="rv-arr">›</span></summary>
@@ -2725,10 +2728,10 @@ function render() {
         </div>
         ${def.id === 'device' && _detectedDevice ? `<div style="margin-bottom:12px;padding:9px 14px;border-radius:10px;background:rgba(52,211,153,.06);border:1px solid rgba(52,211,153,.2);display:flex;align-items:center;gap:8px;font-size:.8rem;color:#34d399;font-weight:600"><span>${ICO.search(14,'#34d399')}</span> We detected <b style="margin:0 2px">${(def.opts.find(o=>o.v===_detectedDevice)||{}).name||_detectedDevice}</b> — change below if wrong</div>` : ''}
         ${renderOpts(def)}
-        ${def.id === 'device' ? `<button data-action="skip-device" style="width:100%;margin-top:10px;padding:9px 14px;background:transparent;border:1px dashed rgba(255,255,255,.1);border-radius:10px;color:#6b7280;font-size:.86rem;font-weight:600;cursor:pointer;transition:all .15s;letter-spacing:.02em" onmouseover="this.style.color='#6b7280';this.style.borderColor='rgba(255,255,255,.2)'" onmouseout="this.style.color='#4b5563';this.style.borderColor='rgba(255,255,255,.1)'">Skip — use standard settings →</button>` : ''}
+        ${def.id === 'device' ? `<button type="button" data-action="skip-device" class="skip-step-btn">Skip — use standard settings →</button>` : ''}
         ${def.id === 'content' ? renderCacheMode() + renderMatchMode() + renderP2pToggle() : ''}
-        ${def.id === 'content' ? `<button data-action="skip-content" style="width:100%;margin-top:10px;padding:9px 14px;background:transparent;border:1px dashed rgba(255,255,255,.1);border-radius:10px;color:#6b7280;font-size:.86rem;font-weight:600;cursor:pointer;transition:all .15s;letter-spacing:.02em" onmouseover="this.style.color='#6b7280';this.style.borderColor='rgba(255,255,255,.2)'" onmouseout="this.style.color='#4b5563';this.style.borderColor='rgba(255,255,255,.1)'">Skip — use Everything (safe default) →</button>` : ''}
-        ${def.id === 'service' ? `<button data-action="open-advanced" style="width:100%;margin-top:14px;padding:12px 16px;background:rgba(0,212,255,.04);border:1px solid rgba(0,212,255,.18);border-radius:11px;color:#67e8f9;font-size:.88rem;font-weight:700;cursor:pointer;letter-spacing:.05em;text-transform:uppercase;transition:all .18s;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px" onmouseover="this.style.background='rgba(0,212,255,.10)';this.style.borderColor='rgba(0,212,255,.35)'" onmouseout="this.style.background='rgba(0,212,255,.04)';this.style.borderColor='rgba(0,212,255,.18)'"><div class="u-rowc8">${ICO.gear(16,'#67e8f9')} Fine-Tune</div><div style="font-size:.68rem;font-weight:500;color:#4b5563;text-transform:none;letter-spacing:.01em;margin-top:1px">Audio · Video · Formatter</div></button>` : ''}
+        ${def.id === 'content' ? `<button type="button" data-action="skip-content" class="skip-step-btn">Skip — use Everything (safe default) →</button>` : ''}
+        ${def.id === 'service' ? `<button type="button" data-action="open-advanced" class="fine-tune-btn"><span class="u-rowc8">${ICO.gear(16,'currentColor')} Fine-Tune</span><span class="fine-tune-sub">Expert settings — audio, video, formatter. Your picks so far are kept.</span></button>` : ''}
       </div>`;
     nav.style.display = 'flex';
     const btnBack = document.getElementById('btnBack');
