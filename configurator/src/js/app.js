@@ -2033,6 +2033,7 @@ function renderProgress() {
     if (progWrap) progWrap.style.display = 'none';
     if (nav) nav.style.display = 'none';
     if (hdrBadge) hdrBadge.style.display = 'none';
+    document.getElementById('stepAnnounce').textContent = '';
     return;
   }
   if (progWrap) progWrap.style.display = '';
@@ -2049,14 +2050,18 @@ function renderProgress() {
     const SHORT_LABELS = {0:'Sources',1:'Device',2:'Quality',3:'Content',4:'Accounts',5:'Install'};
     const shortName = SHORT_LABELS[i] || tipName;
     const clickable = state === 'done' ? ` data-action="jump-step" data-step="${n}" role="button" tabindex="0" aria-label="Go back to ${tipName}"` : '';
+    const current = state === 'active' ? ' aria-current="step"' : '';
     const k = keys[i];
     const tipVal = k && S[k] ? label(k, S[k]) : null;
     const tipHtml = tipVal ? `<span class="step-tip">${tipName}: ${tipVal}</span>` : '';
-    return `<div class="step-unit ${state}"${clickable}>${tipHtml}<div class="step-bub">${state==='done'?ICO.check(12,'currentColor'):''}</div><div class="step-lbl">${shortName}</div></div>`;
+    return `<div class="step-unit ${state}"${clickable}${current}>${tipHtml}<div class="step-bub">${state==='done'?ICO.check(12,'currentColor'):''}</div><div class="step-lbl">${shortName}</div></div>`;
   }).join('');
 
   const strip = document.getElementById('stepStrip');
   if (strip) strip.innerHTML = `<div class="step-strip">${bubbles}<button class="btn-reset-strip" data-action="reset-state" title="Start over from scratch">${ICO.refresh(14,'currentColor')} Start Over</button></div><div class="auto-saved" id="autoSavedBadge">${ICO.check(10,'currentColor')} Auto-saved</div>`;
+  // Accessible progress text, kept in sync with the strip (same `step` source).
+  const ann = document.getElementById('stepAnnounce');
+  if (ann) ann.textContent = `Step ${Math.min(step, STEPS)} of ${STEPS} — ${DEFS[step - 1] ? DEFS[step - 1].title : 'Review'}`;
 
   // Breadcrumb chips — show completed selections
   const chips = keys.slice(0, step - 1).map((k, i) => {
@@ -2337,7 +2342,7 @@ function render() {
         ${sizeLimitHtml()}
         ${livePayloadHtml()}
         <button class="btn-dl" data-action="generate-dl">${ICO.download(14,'currentColor')} Export Template JSON</button>
-        <div class="action-help">Writes a JSON file in your browser — nothing is uploaded, and your keys stay in it only if you added them above.</div>
+        <div class="action-help">Writes a JSON file in your browser. If you added debrid keys, they're in the file in plain text — keep it private.</div>
         <div id="exportCredNotice"></div>
         <button type="button" data-action="open-feedback-report" class="rv-tool-btn">🧾 Need help? Copy a safe feedback report</button>
         <div class="rv-actions-row">
@@ -2347,7 +2352,7 @@ function render() {
             Import to AIOStreams
           </button>
         </div>
-        <div class="action-help">Creates your config on an AIOStreams host and gives you an import link — no credentials needed.</div>
+        <div class="action-help">Uploads your template (debrid keys stripped) to a paste service, then gives you an import link to open in AIOStreams.</div>
         <div id="importUrlResult"></div>
         <details class="rv-section" open>
           <summary class="rv-section-hdr"><span class="rv-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg> Deploy</span><span class="rv-arr">›</span></summary>
@@ -2731,7 +2736,7 @@ function render() {
         ${def.id === 'device' ? `<button type="button" data-action="skip-device" class="skip-step-btn">Skip — use standard settings →</button>` : ''}
         ${def.id === 'content' ? renderCacheMode() + renderMatchMode() + renderP2pToggle() : ''}
         ${def.id === 'content' ? `<button type="button" data-action="skip-content" class="skip-step-btn">Skip — use Everything (safe default) →</button>` : ''}
-        ${def.id === 'service' ? `<button type="button" data-action="open-advanced" class="fine-tune-btn"><span class="u-rowc8">${ICO.gear(16,'currentColor')} Fine-Tune</span><span class="fine-tune-sub">Expert settings — audio, video, formatter. Your picks so far are kept.</span></button>` : ''}
+        ${def.id === 'service' ? `<button type="button" data-action="open-advanced" class="fine-tune-btn"><span class="u-rowc8">${ICO.gear(16,'currentColor')} Fine-Tune</span><span class="fine-tune-sub">Expert settings — audio, video, formatter. Opens over your step; nothing is reset.</span></button>` : ''}
       </div>`;
     nav.style.display = 'flex';
     const btnBack = document.getElementById('btnBack');
@@ -2765,8 +2770,7 @@ function syncNext() {
   } else if (!def.key) {
     btn.innerHTML = `<span style="flex:1;font-size:.92rem;font-weight:700">Continue</span><span class="cta-arr">→</span>`;
   } else {
-    const _ph = document.documentElement.getAttribute('data-theme')==='light';
-    btn.innerHTML = `<span style="flex:1;font-size:.88rem;font-weight:600;color:${_ph?'#9ca3af':'#4b5563'}">Select one to continue</span><span class="cta-arr" style="color:${_ph?'#9ca3af':'#374151'}">→</span>`;
+    btn.innerHTML = `<span class="cta-disabled-lbl">Select one to continue</span><span class="cta-arr cta-disabled-arr">→</span>`;
   }
 }
 

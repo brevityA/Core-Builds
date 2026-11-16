@@ -327,3 +327,15 @@
 [data-theme="light"] #cb-loader-sub{color:#8c959f}
 @keyframes cbLoad{0%{opacity:0}10%{opacity:1}75%{opacity:1}100%{opacity:0}}
 @keyframes cbIconPop{from{opacity:0;transform:scale(.7)}to{opacity:1;transform:scale(1)}}
+
+/* ── 2026-11 UI pass (2): consistent state styles ── */
+/* Version badge: quiet, on-token, no glow (was inline gradient + 8px shadow). */
+.hdr-ver-badge{position:absolute;top:9px;right:12px;font-size:.62rem;font-weight:800;color:var(--th-accent);background:var(--th-accent-bg);border:1px solid var(--th-accent-border);border-radius:5px;padding:2px 7px;letter-spacing:.07em;cursor:pointer;transition:all .15s}
+.hdr-ver-badge:hover{border-color:var(--th-accent)}
+.hdr-ver-badge:focus-visible{outline:2px solid var(--th-accent);outline-offset:2px}
+[data-theme="light"] .hdr-ver-badge{color:#0969da;background:rgba(9,105,218,.06);border-color:rgba(9,105,218,.25)}
+[data-theme="light"] .hdr-ver-badge:hover{border-color:#0969da}
+/* Disabled Next: the label that explains why, as a class (was theme-checked inline). */
+.cta-disabled-lbl{flex:1;font-size:.88rem;font-weight:600;color:var(--th-tx4)}
+.cta-disabled-arr{color:var(--th-tx5)}
+[data-theme="light"] .cta-disabled-lbl{color:var(--th-tx5)}

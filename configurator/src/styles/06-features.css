@@ -181,3 +181,10 @@ a.core-tool-door:focus-visible{outline:2px solid #67e8f9;outline-offset:3px}
 /* Splash: the returning-user routes get a quiet label, not another button box. */
 .splash-alt-lead{flex-basis:100%;font-size:.62rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--th-tx3);padding-top:2px}
 @media(prefers-reduced-motion:reduce){.fine-tune-btn,.skip-step-btn,.rv-tool-btn,.rv-secondary-btn{transition:none}}
+
+/* 2026-11 UI pass (2): consistent disabled + touch states for action buttons. */
+.btn-aio:disabled,.rv-tool-btn:disabled,.rv-secondary-btn:disabled,.skip-step-btn:disabled,.fine-tune-btn:disabled{opacity:.55;cursor:wait;filter:saturate(.4)}
+.rv-tool-btn:disabled:hover{background:var(--th-accent-bg);border-color:var(--th-accent-border);color:var(--th-accent)}
+.rv-secondary-btn:disabled:hover{color:var(--th-tx2);border-color:var(--th-border-strong);background:var(--th-card-alt)}
+/* Touch: the new controls meet the 44px target on coarse pointers. */
+@media(pointer:coarse){.skip-step-btn,.rv-tool-btn,.rv-secondary-btn{min-height:44px;display:flex;align-items:center;justify-content:center}.fine-tune-btn{min-height:48px}}
