@@ -5,13 +5,18 @@
     "description": "Core Nexus 1080p for AllDebrid. WEB-DL / Remux quality tiers · HDR preferred · TrueHD/Atmos. Requires AllDebrid account.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "0.2.18",
+    "version": "0.2.19",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
     "sourceUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/AllDebrid/core-nexus-alldebrid.json",
     "changelogUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md",
     "changelog": [
+      {
+        "date": "2026-11-16",
+        "version": "0.2.19",
+        "content": "Inline regex sync: patterns re-derived from the current Vidhin05 English ranked list (H.264 10bit). No filter/sort/formatter changes."
+      },
       {
         "date": "2026-11-14",
         "version": "0.2.18",
@@ -756,7 +761,7 @@
         "score": 20
       },
       {
-        "pattern": "/\\bhi10p?\\b|(?=.*10[.-]?bit)(?=.*\\b[xh][-_. ]?264\\b)/i",
+        "pattern": "/\\bhi10(?:p|res)?\\b|(?=.*(?:\\b10[ .\\-_]?bits?\\b|yuv4\\d\\dp10))(?=.*\\b(?:[xh][-_. ]?264|avc)\\b)/i",
         "name": "H.264 10bit",
         "score": 20
       },

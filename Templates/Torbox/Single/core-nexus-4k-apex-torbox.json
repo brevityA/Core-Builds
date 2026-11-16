@@ -5,13 +5,18 @@
     "description": "TorBox-native build of Core Nexus 4K Apex. Uses only TorBox's own search and Usenet — no third-party indexers. Identical adaptive ranked-pool bitrate PSEs and full ESE stack. Simpler, faster to load, fewer moving parts.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "2.12.17",
+    "version": "2.12.18",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
     "sourceUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-4k-apex-torbox.json",
     "changelogUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md",
     "changelog": [
+      {
+        "date": "2026-11-16",
+        "version": "2.12.18",
+        "content": "Inline regex sync: patterns re-derived from the current Vidhin05 English ranked list (H.264 10bit). No filter/sort/formatter changes."
+      },
       {
         "date": "2026-11-14",
         "version": "2.12.17",
@@ -819,7 +824,7 @@
         "score": 20
       },
       {
-        "pattern": "/\\bhi10p?\\b|(?=.*10[.-]?bit)(?=.*\\b[xh][-_. ]?264\\b)/i",
+        "pattern": "/\\bhi10(?:p|res)?\\b|(?=.*(?:\\b10[ .\\-_]?bits?\\b|yuv4\\d\\dp10))(?=.*\\b(?:[xh][-_. ]?264|avc)\\b)/i",
         "name": "H.264 10bit",
         "score": 20
       },

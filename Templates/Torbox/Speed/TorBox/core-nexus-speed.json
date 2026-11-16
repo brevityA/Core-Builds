@@ -5,13 +5,18 @@
     "description": "Speed-optimised 1080p build for TorBox Essential — no EasyNews required. Lean preset stack: TorBox cache + Zilean for fast cached results. Exits as soon as 3 cached 1080p streams found or 4 s elapsed. TorBox Essential required.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "2.10.15",
+    "version": "2.10.16",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
     "sourceUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/TorBox/core-nexus-speed.json",
     "changelogUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md",
     "changelog": [
+      {
+        "date": "2026-11-16",
+        "version": "2.10.16",
+        "content": "Inline regex sync: patterns re-derived from the current Vidhin05 English ranked list (H.264 10bit). No filter/sort/formatter changes."
+      },
       {
         "date": "2026-11-14",
         "version": "2.10.15",
@@ -746,7 +751,7 @@
         "score": 20
       },
       {
-        "pattern": "/\\bhi10p?\\b|(?=.*10[.-]?bit)(?=.*\\b[xh][-_. ]?264\\b)/i",
+        "pattern": "/\\bhi10(?:p|res)?\\b|(?=.*(?:\\b10[ .\\-_]?bits?\\b|yuv4\\d\\dp10))(?=.*\\b(?:[xh][-_. ]?264|avc)\\b)/i",
         "name": "H.264 10bit",
         "score": 20
       },

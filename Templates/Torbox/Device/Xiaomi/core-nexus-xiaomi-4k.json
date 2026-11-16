@@ -5,7 +5,7 @@
     "description": "4K template tuned for Xiaomi Mi Box S (2nd gen) and similar Xiaomi/Android TV devices. Dolby Vision Profile 5 and HDR10+ supported — DV-Only Kill disabled. AV1 and VC-1 excluded (no hardware decode on 2nd gen). Lossless audio (TrueHD, DTS-HD MA, DTS:X, FLAC) excluded — Xiaomi passes bitstream via HDMI but most users use built-in speakers or basic soundbars. Handles REMUX well. 2160p primary with 1080p fallback. Based on Core Nexus 4K Samsung TV (TorBox · Library, Comet, Zilean).",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "0.1.9",
+    "version": "0.1.10",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -17,6 +17,11 @@
       "v232Action": "remove legacy preset; configure the separate Newznab endpoint only after validation"
     },
     "changelog": [
+      {
+        "date": "2026-11-16",
+        "version": "0.1.10",
+        "content": "Inline regex sync: patterns re-derived from the current Vidhin05 English ranked list (H.264 10bit). No filter/sort/formatter changes."
+      },
       {
         "date": "2026-11-14",
         "version": "0.1.9",
@@ -786,7 +791,7 @@
         "score": 20
       },
       {
-        "pattern": "/\\bhi10p?\\b|(?=.*10[.-]?bit)(?=.*\\b[xh][-_. ]?264\\b)/i",
+        "pattern": "/\\bhi10(?:p|res)?\\b|(?=.*(?:\\b10[ .\\-_]?bits?\\b|yuv4\\d\\dp10))(?=.*\\b(?:[xh][-_. ]?264|avc)\\b)/i",
         "name": "H.264 10bit",
         "score": 20
       },
