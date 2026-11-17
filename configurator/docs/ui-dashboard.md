@@ -38,3 +38,24 @@ python3 configurator/scripts/build-ui-demo.py
 ```
 
 `ui-revamp-offline.html` is a reduced design sampler, not the deployment engine. Its JSON output is explicitly non-installable demo data.
+
+## Touch-first controls
+
+The Quick Install dashboard uses responsive pill grids (two columns below 600px,
+four above) for template profile, device, resolution, connection speed, host and
+language. Radio groups expose a single tab stop with arrow/Home/End navigation;
+selected controls have both a check indicator and cyan border. Hidden selects
+preserve existing IDs and change handlers without opening native dropdowns.
+
+Connection-speed presets drive the existing `set-bandwidth` policy; they do not
+introduce a new bitrate algorithm. Auto unsets the manual connection cap. Custom
+opens Advanced Configuration and focuses the numeric field (1–10000 Mbps).
+Boolean controls use full-width label cards so tapping their explanatory text
+also toggles the checkbox. Advanced Configuration is collapsed by default and
+contains host/language, clean reinstall, TMDB, custom bandwidth, cache policy and
+full-builder shortcuts. Device/resolution, provider keys and Full stack stay visible.
+Focus indicators and reduced-motion support retain the brand typography and tokens.
+
+The touch-control browser regression covers keyboard state, tap-target dimensions,
+responsive column count, label-card toggling, disclosure defaults, bandwidth
+persistence/clamping and host value bridging on desktop and mobile.

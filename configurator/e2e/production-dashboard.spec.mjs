@@ -43,6 +43,7 @@ test('provider keys remain persisted, Stremio password is not, and visibility to
   await page.locator('[data-action="toggle-cred-vis"][data-target="expressCred_torbox"]').click();
   await expect(key).toHaveAttribute('type', 'password');
   await page.locator('#stremioPasswordInline').fill('SYNTHETIC-MEMORY-ONLY-PASSWORD');
+  await page.locator('#expressAdvanced > summary').click();
   await page.locator('[data-express-customize="ft-layout"]').click();
   const raw = await page.evaluate(() => localStorage.getItem('coreBuild'));
   expect(JSON.parse(raw).creds.torbox).toBe('SYNTHETIC-LOCAL-KEY');
@@ -94,5 +95,56 @@ test('raw JSON reuses local generation without requiring a Stremio login', async
   const download = await downloadPromise;
   expect(download.suggestedFilename()).toMatch(/\.json$/);
   expect(writes).toBe(0);
+  expect(errors).toEqual([]);
+});
+
+test('touch-first pills expose keyboard selection and responsive tap targets', async ({ page }, testInfo) => {
+  const errors = await boot(page);
+  const advanced = page.locator('#expressAdvanced');
+  await expect(advanced).not.toHaveAttribute('open');
+  await expect(page.locator('#expressHostPills')).toBeHidden();
+  const profiles = page.getByRole('radiogroup', { name: 'Template profile', exact: true });
+  const stable = profiles.locator('[data-pill-value="stable"]');
+  await stable.focus();
+  await stable.press('ArrowRight');
+  await expect(page.locator('#expressOutputProfile')).toHaveValue('balanced');
+  await expect(profiles.locator('[aria-checked="true"]')).toHaveCount(1);
+  await expect(profiles.locator('[tabindex="0"]')).toBeFocused();
+  await page.keyboard.press('Home');
+  await expect(page.locator('#expressOutputProfile')).toHaveValue('stable');
+  const device = page.getByRole('radiogroup', { name: 'Device', exact: true });
+  await device.locator('[data-express-device="shield"]').click();
+  await expect(device.locator('[data-express-device="shield"]')).toHaveAttribute('aria-checked', 'true');
+  await page.keyboard.press('ArrowLeft');
+  await expect(device.locator('[data-express-device="firestick-hd"]')).toHaveAttribute('aria-checked', 'true');
+  const geometry = await device.evaluate(el => ({
+    columns: getComputedStyle(el).gridTemplateColumns.split(' ').length,
+    targets: [...el.children].map(b => ({ width: b.getBoundingClientRect().width, height: b.getBoundingClientRect().height }))
+  }));
+  expect(geometry.columns).toBe(testInfo.project.name === 'mobile' ? 2 : 4);
+  for (const box of geometry.targets) { expect(box.width).toBeGreaterThanOrEqual(44); expect(box.height).toBeGreaterThanOrEqual(48); }
+  const stack = page.locator('#expressFullStack');
+  const checked = await stack.isChecked();
+  await page.locator('.ux-toggle-row').filter({ has: stack }).locator('.ux-toggle-copy').click();
+  await expect(stack).toBeChecked({ checked: !checked });
+  await page.locator('[data-express-bandwidth="100"]').click();
+  await expect(page.locator('#expressBandwidth')).toHaveValue('100');
+  expect(await page.evaluate(() => JSON.parse(localStorage.getItem('coreBuild')).bandwidthMbps)).toBe(100);
+  await page.locator('[data-express-bandwidth="custom"]').click();
+  await expect(advanced).toHaveAttribute('open', '');
+  await expect(page.locator('#expressBandwidth')).toBeFocused();
+  await page.locator('#expressBandwidth').fill('123');
+  await expect(page.locator('[data-express-bandwidth="custom"]')).toHaveAttribute('aria-checked', 'true');
+  await page.locator('#expressBandwidth').fill('20000');
+  await page.locator('#expressBandwidth').press('Tab');
+  await expect(page.locator('#expressBandwidth')).toHaveValue('10000');
+  expect(await page.evaluate(() => JSON.parse(localStorage.getItem('coreBuild')).bandwidthMbps)).toBe(10000);
+  await page.locator('[data-express-bandwidth="0"]').click();
+  await expect(page.locator('[data-express-bandwidth="0"]')).toHaveAttribute('aria-checked', 'true');
+  expect(await page.evaluate(() => JSON.parse(localStorage.getItem('coreBuild')).bandwidthMbps)).toBe(0);
+  await page.locator('#expressHostPills [data-pill-value="auto"]').click();
+  await expect(page.locator('#expressHost')).toHaveValue('auto');
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  await page.screenshot({ path: `dist/touch-dashboard-${testInfo.project.name}.png`, fullPage: true });
   expect(errors).toEqual([]);
 });

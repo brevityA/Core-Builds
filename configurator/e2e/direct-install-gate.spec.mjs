@@ -156,7 +156,8 @@ test.describe('truthful host picker', () => {
     const errors = await fresh(page);
     await page.locator('[data-action="open-express-lane"]').click();
     await page.locator('[data-express-service="p2p"]').click();
-    await page.locator('#expressHost').selectOption('elfhosted');
+    await page.locator('#expressAdvanced > summary').click();
+    await page.locator('#expressHostPills [data-pill-value=\"elfhosted\"]').click();
     await expect(page.locator('#expressHostChip')).toContainText(/does not serve P2P/i);
     expect(errors).toEqual([]);
   });

@@ -228,8 +228,8 @@ test.describe('Express language from a Spanish browser', () => {
     await fresh(page);
     page.on('dialog', dialog => dialog.accept());
     await page.locator('[data-action="open-express-lane"]').click();
-    await expect(page.locator('details.fastlane-optional')).toHaveAttribute('open', '');
-    await page.locator('#expressLang').selectOption('Chinese');
+    await page.locator('#expressAdvanced > summary').click();
+    await page.locator('#expressLangPills [data-pill-value="Chinese"]').click();
     await page.locator('[data-express-cred="torbox"]').fill('test-torbox-key');
     await page.locator('[data-express-mode="manifest"]').click();
     await page.locator('#expressGo').click();

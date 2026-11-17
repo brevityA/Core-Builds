@@ -7662,6 +7662,13 @@ const EXPRESS_SERVICES = [
   ['p2p','Free / P2P','No account required'],
 ];
 
+// Pill controls retain a hidden native value bridge so the existing change
+// handlers and payload readers remain the sole owners of persisted state.
+function pillSelectHtml(id, title, choices, value) {
+  if (!choices.some(([v]) => v === value)) value = choices[0]?.[0] || '';
+  return `<fieldset class="ux-pill-field"><legend>${escHtml(title)}</legend><div class="ux-pill-grid" id="${id}Pills" role="radiogroup" aria-label="${escHtml(title)}" data-pill-select="${id}">${choices.map(([v, n]) => `<button type="button" class="chip-btn${v===value?' active':''}" role="radio" aria-checked="${v===value}" tabindex="${v===value?'0':'-1'}" data-pill-value="${escHtml(v)}">${escHtml(n)}</button>`).join('')}</div><select id="${id}" hidden aria-hidden="true" tabindex="-1">${choices.map(([v,n]) => `<option value="${escHtml(v)}"${v===value?' selected':''}>${escHtml(n)}</option>`).join('')}</select></fieldset>`;
+}
+
 function showExpressLane() {
   document.getElementById('expressLaneModal')?.remove();
   const gh = window.__genieHandoff; window.__genieHandoff = null; // one-shot seed: read both fields, then clear (review P4)
@@ -7723,7 +7730,7 @@ function showExpressLane() {
     if (!overlay.contains(document.activeElement)) return;
     if (e.key === 'Escape') { closeLane(); return; }
     if (e.key !== 'Tab') return;
-    const focusable = [...overlay.querySelectorAll('button:not(:disabled), input:not(:disabled), select, summary, a[href], [tabindex="0"]')].filter(el => el.getClientRects().length && !el.closest('[hidden]'));
+    const focusable = [...overlay.querySelectorAll('button:not(:disabled), input:not(:disabled), select, summary, a[href], [tabindex="0"]')].filter(el => el.tabIndex >= 0 && el.getClientRects().length && !el.closest('[hidden]'));
     const first = focusable[0], last = focusable[focusable.length - 1];
     if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last?.focus(); }
     else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first?.focus(); }
@@ -7742,7 +7749,7 @@ function showExpressLane() {
     <div class="fastlane-section"><div class="fastlane-label">Supported ecosystem</div>
       <div class="fastlane-grid services">${[['app','Stremio','Recommended — direct install'],['nuvio','Nuvio','Manifest URL'],['wuplay','WuPlay','Manifest URL'],['chillio','Chillio','ChillLink URL'],['manifest','Other app','Copy manifest']].filter(([v]) => v === 'app' || v === 'wuplay').map(([v,n,d])=>`<button type="button" class="fastlane-choice${state.target===v?' active':''}" data-express-target="${v}"><b>${n}</b><span>${d}</span></button>`).join('')}</div>
     </div>
-      <label class="fastlane-sublabel" for="expressOutputProfile">Template profile</label><select class="fastlane-field" id="expressOutputProfile">${['stable','balanced','advanced','labs'].map(v => `<option value="${v}"${activeOutputProfile()===v?' selected':''}>${OUTPUT_PROFILE_INFO[v].label}${v==='stable'?' · Recommended':''}</option>`).join('')}</select><p class="fastlane-trust">Core Stable is the default for fresh sessions. Advanced and Labs change fetching behaviour; review before installing.</p>
+      ${pillSelectHtml('expressOutputProfile', 'Template profile', ['stable','balanced','advanced','labs'].map(v => [v, OUTPUT_PROFILE_INFO[v].label + (v==='stable'?' · Recommended':'')]), activeOutputProfile())}<p class="fastlane-trust">Core Stable is the default for fresh sessions. Advanced and Labs change fetching behaviour; review before installing.</p>
     <div class="fastlane-section"><div class="fastlane-label">Search preferences</div>
       <div class="fastlane-grid services cols-3">${EXPRESS_PROFILES.map(([v,n,d])=>`<button type="button" class="fastlane-choice${state.profile===v?' active':''}" data-express-profile="${v}"><b>${n}${v==='balanced'?' <span class="fastlane-reco">Recommended</span>':''}</b><span>${d}</span></button>`).join('')}</div>
     </div>
@@ -7751,41 +7758,26 @@ function showExpressLane() {
     <div class="fastlane-section"><div class="fastlane-label">Debrid &amp; Usenet providers</div>
       <div class="fastlane-grid services">${EXPRESS_SERVICES.map(([v,n,d])=>`<button type="button" class="fastlane-choice${state.service===v?' active':''}" data-express-service="${v}"><b>${n}</b><span>${d}</span></button>`).join('')}</div>
       <div id="expressCreds">${renderCreds()}</div>
-      <div style="display:flex;align-items:center;gap:8px;margin-top:10px" title="An explicitly picked host is honored exactly — no silent failover to another host.">
-        <label for="expressHost" style="font-size:.6rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#566372;white-space:nowrap">AIOStreams host</label>
-        <span id="expressHostChip" style="flex-shrink:0;font-size:.58rem;font-weight:800;padding:3px 9px;border-radius:99px;border:1px solid rgba(255,255,255,.12);color:#6b7280;white-space:nowrap">…</span>
-        <select id="expressHost" class="fastlane-field" style="min-height:40px;font-size:.72rem;padding:8px 10px">
-          <option value="auto"${(S.instanceHost==='auto')?' selected':''}>Auto (fastest healthy)</option>
-          ${Object.entries(HOST_BASE_URLS).map(([k,u])=>`<option value="${escHtml(k)}"${S.instanceHost===k?' selected':''}>${escHtml(hostPickerLabel(k))}</option>`).join('')}
-          <option value="custom"${S.instanceHost==='custom'?' selected':''}>Custom / self-hosted (set its URL in Advanced)</option>
-        </select>
-      </div>
       <button type="button" id="expressExtrasBtn" class="additional-services-btn" style="width:100%;margin-top:8px;display:flex;align-items:center;gap:10px;padding:11px 13px;border-radius:11px;border:1px solid rgba(255,255,255,.09);background:#0e1621;color:#c9d5df;cursor:pointer;text-align:left"><span style="font-size:1rem;color:#a78bfa">＋</span><span class="u-flex1"><b style="display:block;font-size:.72rem">Additional services &amp; scrapers</b><span style="display:block;font-size:.6rem;color:#718093;margin-top:1px">Debridio, Debrider, Usenet, indexers and more</span></span><span id="expressExtrasCount" style="font-size:.6rem;font-weight:900;color:#67e8f9"></span><span>→</span></button>
     </div>
-    <details class="fastlane-optional" open><summary style="cursor:pointer;color:#8b949e;font-weight:700;letter-spacing:.04em;text-transform:uppercase">Hardware &amp; optional settings</summary>
+    <div class="ux-hardware-pills">
       <div class="u-mt8"><div style="font-size:.64rem;font-weight:800;color:#8b949e;letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px">Device</div>
-        <div class="fastlane-grid services devices cols-4">${[['generic','Standard'],['lgtv','LG webOS'],['firestick-hd','Low-RAM Android'],['shield','NVIDIA Shield'],['firestick-4kmax','Fire Stick 4K Max'],['googletv','Google TV'],['samsung','Samsung TV'],['onn','onn 4K'],['appletv-new','Apple TV 4K'],['windows','Windows PC']].map(([v,n])=>`<button type="button" class="fastlane-choice${state.device===v?' active':''}" data-express-device="${v}"><b>${n}</b></button>`).join('')}</div>
+        <div class="fastlane-grid services devices cols-4 ux-pill-grid" role="radiogroup" aria-label="Device">${[['generic','Standard'],['lgtv','LG webOS'],['firestick-hd','Low-RAM Android'],['shield','NVIDIA Shield'],['firestick-4kmax','Fire Stick 4K Max'],['googletv','Google TV'],['samsung','Samsung TV'],['onn','onn 4K'],['appletv-new','Apple TV 4K'],['windows','Windows PC']].map(([v,n])=>`<button type="button" class="fastlane-choice${state.device===v?' active':''}" data-express-device="${v}"><b>${n}</b></button>`).join('')}</div>
       </div>
       <div class="u-mt8"><div style="font-size:.64rem;font-weight:800;color:#8b949e;letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px">Resolution</div>
-        <div class="fastlane-grid services cols-3">${[['4k','4K','2160p primary · 1080p fallback'],['1080p','1080p','Excludes 4K'],['mixed','Mixed','Adaptive · no hard caps']].map(([v,n,d])=>`<button type="button" class="fastlane-choice${state.resolution===v?' active':''}" data-express-res="${v}"><b>${n}</b><span>${d}</span></button>`).join('')}</div>
+        <div class="fastlane-grid services cols-3 ux-pill-grid" role="radiogroup" aria-label="Resolution">${[['4k','4K','2160p primary · 1080p fallback'],['1080p','1080p','Excludes 4K'],['mixed','Mixed','Adaptive · no hard caps']].map(([v,n,d])=>`<button type="button" class="fastlane-choice${state.resolution===v?' active':''}" data-express-res="${v}"><b>${n}</b><span>${d}</span></button>`).join('')}</div>
       </div>
-      <div class="u-mt8"><label for="expressLang" class="fastlane-sublabel">Language you watch in</label>
-        <select class="fastlane-field" id="expressLang">${LANG_OPTS.map(l => `<option value="${l.v}"${state.lang === l.v ? ' selected' : ''}>${l.v}</option>`).join('')}</select>
+    </div>
+    <fieldset class="ux-pill-field"><legend>Connection speed · Mbps</legend><p class="fastlane-trust">Sets the existing bandwidth policy's bitrate cap to 80% of your connection speed. Auto leaves the manual connection cap unset; existing device and profile limits still apply.</p><div class="ux-pill-grid" id="expressBandwidthPills" role="radiogroup" aria-label="Connection speed">${[0,25,50,100,250].map(v => `<button type="button" class="chip-btn" role="radio" data-express-bandwidth="${v}">${v ? v+' Mbps' : 'Auto'}</button>`).join('')}<button type="button" class="chip-btn" role="radio" data-express-bandwidth="custom">Custom</button></div></fieldset>
+      <label class="ux-toggle-row"><input type="checkbox" id="expressFullStack" ${S.installAIOMeta !== false?'checked':''}><span class="ux-toggle-copy"><b class="u-tx">Full stack</b><br><span class="u-tx2">Install AIOMetadata + patch Cinemeta for better posters and catalogs. Cinebye, a separate service, makes the Cinemeta patch using your Stremio sign-in.</span></span><span class="ux-toggle-indicator" aria-hidden="true"></span></label>
+    <details class="fastlane-optional ux-advanced" id="expressAdvanced"><summary>Advanced Configuration <span class="ux-advanced-hint">Host, language, custom bandwidth &amp; optional integrations</span></summary>
+      <div class="ux-host-control">${pillSelectHtml('expressHost', 'AIOStreams host', [['auto','Auto · fastest healthy'], ...Object.keys(HOST_BASE_URLS).map(k => [k, hostPickerLabel(k)]), ['custom','Custom / self-hosted']], S.instanceHost)}<span id="expressHostChip" class="ux-spec" role="status" aria-live="polite">Checking host…</span><p class="fastlane-trust">Your explicit host choice is honoured. Set custom host URLs in the full builder.</p></div>
+      <div class="u-mt8">${pillSelectHtml('expressLang', 'Language you watch in', LANG_OPTS.map(l => [l.v,l.v]), state.lang)}
         <p class="fastlane-trust">Releases in this language come first when everything else is equal. English and original-audio releases still show.</p>
       </div>
-      <label style="display:flex;align-items:flex-start;gap:8px;cursor:pointer;margin-top:8px"><input type="checkbox" id="expressFullStack" ${S.installAIOMeta !== false?'checked':''} style="margin-top:2px"><span style="color:#c9d5df"><b class="u-tx">Full stack</b><br><span class="u-tx2">Install AIOMetadata + patch Cinemeta for better posters and catalogs. Cinebye, a separate service, makes the Cinemeta patch using your Stremio sign-in.</span></span></label>
-      <label style="display:flex;align-items:flex-start;gap:8px;cursor:pointer;margin-top:8px"><input type="checkbox" id="expressClean" ${S.cleanInstall?'checked':''} style="margin-top:2px"><span style="color:#c9d5df"><b class="u-tx">Clean reinstall</b><br><span class="u-tx2">Remove previous Core Builds addons from your Stremio account.</span></span></label>
+      <label class="ux-toggle-row"><input type="checkbox" id="expressClean" ${S.cleanInstall?'checked':''}><span class="ux-toggle-copy"><b class="u-tx">Clean reinstall</b><br><span class="u-tx2">Remove previous Core Builds addons from your Stremio account.</span></span><span class="ux-toggle-indicator" aria-hidden="true"></span></label>
       <div class="u-mt8"><div class="input-action-wrap"><input class="fastlane-field" id="expressTmdb" type="password" autocomplete="off" spellcheck="false" placeholder="TMDB Read Access Token (optional — improves matching)" value="${escH(S.tmdbToken||'')}" style="width:100%"><button type="button" class="input-paste-btn" data-action="paste-input" data-target="expressTmdb">Paste</button></div></div>
-    </details>
-<p class="ux-spec" id="expressDeviceSpec"></p>
-      <div id="expressStremio"${state.target==='app'?'':' style="display:none"'}>
-        <div class="fastlane-pair" style="display:flex;gap:8px;margin-top:10px">
-          <input class="fastlane-field" id="stremioEmailInline" type="email" autocomplete="username" placeholder="Stremio email" value="${escH(S.stremioEmail||'')}" style="flex:1">
-          <input class="fastlane-field" id="stremioPasswordInline" type="password" autocomplete="current-password" placeholder="Stremio password" value="${escH(S.stremioPassword||'')}" style="flex:1">
-        </div>
-        <button type="button" data-action="create-stremio-account" style="margin-top:6px;font-size:.74rem;color:var(--th-accent);background:none;border:none;cursor:pointer;padding:0;font-weight:600">Create random account →</button>
-        <p class="fastlane-trust">Adds Core Builds to your Stremio account. Your other addons stay; only <b>Clean reinstall</b> replaces earlier Core Builds addons.</p>
-      </div>
+      <label class="fastlane-sublabel" for="expressBandwidth">Custom connection speed · Mbps</label><input class="fastlane-field" id="expressBandwidth" type="number" min="1" max="10000" inputmode="numeric" placeholder="Auto" value="${Number(S.bandwidthMbps)||''}" data-action="set-bandwidth">
     <div class="fastlane-section"><div class="fastlane-label">Stream availability ${ftTip('<strong>Cached only</strong> = instant play; nothing that still needs downloading appears at all. <strong>Mixed</strong> also shows torrents your debrid must fetch first — those stall on a “downloading to debrid” screen the first time. Fast profile implies Cached-only until you change it here.')}</div>
       <div class="fastlane-grid services cols-2">
         <button type="button" class="fastlane-choice${S.cacheMode!=='cached' && S.cacheMode!=='uncached'?' active':''}" data-express-cache="mixed"><b>Mixed</b><span>Cached first · uncached can download first</span></button>
@@ -7797,6 +7789,16 @@ function showExpressLane() {
       <div class="fastlane-defaults" id="expressDefaults">${expressDefaultRows().map(([sec, name, val]) => `<button type="button" class="fastlane-default" data-express-customize="${sec}"><span class="fastlane-default-name">${name}</span><span class="fastlane-default-val">${val}</span><span class="fastlane-default-go" aria-hidden="true">›</span></button>`).join('')}</div>
       <button type="button" class="fastlane-customize" data-express-customize="">Customize every setting →</button>
     </div>
+    </details>
+<p class="ux-spec" id="expressDeviceSpec"></p>
+      <div id="expressStremio"${state.target==='app'?'':' style="display:none"'}>
+        <div class="fastlane-pair" style="display:flex;gap:8px;margin-top:10px">
+          <input class="fastlane-field" id="stremioEmailInline" type="email" autocomplete="username" placeholder="Stremio email" value="${escH(S.stremioEmail||'')}" style="flex:1">
+          <input class="fastlane-field" id="stremioPasswordInline" type="password" autocomplete="current-password" placeholder="Stremio password" value="${escH(S.stremioPassword||'')}" style="flex:1">
+        </div>
+        <button type="button" data-action="create-stremio-account" style="margin-top:6px;font-size:.74rem;color:var(--th-accent);background:none;border:none;cursor:pointer;padding:0;font-weight:600">Create random account →</button>
+        <p class="fastlane-trust">Adds Core Builds to your Stremio account. Your other addons stay; only <b>Clean reinstall</b> replaces earlier Core Builds addons.</p>
+      </div>
       <div class="ux-review-summary"><h3>Review your build</h3><div id="expressSummary" class="fastlane-summary"></div>${telemetryHtml()}</div>
     </section>
     <section class="fastlane-foot ux-section" id="ux-deploy" aria-labelledby="ux-deploy-title"><h2 id="ux-deploy-title">04 · Review &amp; deploy</h2>
@@ -7804,6 +7806,48 @@ function showExpressLane() {
   </div>`;
   document.body.appendChild(overlay);
   try { history.pushState({ ...(history.state || {}), expressLane: true }, ''); } catch(e) {}
+  const syncRadioGroup = (selector, value, key) => {
+    overlay.querySelectorAll(selector).forEach(button => {
+      const active = button.dataset[key] === String(value);
+      button.setAttribute('role', 'radio'); button.setAttribute('aria-checked', String(active));
+      button.tabIndex = active ? 0 : -1; button.classList.toggle('active', active);
+    });
+    const buttons = [...overlay.querySelectorAll(selector)];
+    if (buttons.length && !buttons.some(b => b.tabIndex === 0)) buttons[0].tabIndex = 0;
+  };
+  const syncBandwidth = () => {
+    const mbps = Number(document.getElementById('expressBandwidth').value) || 0;
+    syncRadioGroup('[data-express-bandwidth]', [0,25,50,100,250].includes(mbps) ? String(mbps) : 'custom', 'expressBandwidth');
+  };
+  syncRadioGroup('[data-express-device]', state.device, 'expressDevice');
+  syncRadioGroup('[data-express-res]', state.resolution, 'expressRes');
+  syncBandwidth();
+  overlay.addEventListener('keydown', e => {
+    const radio = e.target.closest('[role="radio"]');
+    const group = radio?.closest('[role="radiogroup"]');
+    if (!radio || !group || !['ArrowRight','ArrowDown','ArrowLeft','ArrowUp','Home','End'].includes(e.key)) return;
+    e.preventDefault();
+    const buttons = [...group.querySelectorAll('[role="radio"]')];
+    const index = buttons.indexOf(radio), delta = ['ArrowLeft','ArrowUp'].includes(e.key) ? -1 : 1;
+    const next = buttons[e.key === 'Home' ? 0 : e.key === 'End' ? buttons.length-1 : (index+delta+buttons.length)%buttons.length];
+    next.focus(); next.click();
+  });
+  overlay.addEventListener('click', e => {
+    const button = e.target.closest('[data-pill-value]');
+    if (!button) return;
+    const group = button.closest('[data-pill-select]');
+    const select = document.getElementById(group.dataset.pillSelect);
+    select.value = button.dataset.pillValue;
+    syncRadioGroup(`#${group.id} [data-pill-value]`, select.value, 'pillValue');
+    select.dispatchEvent(new Event('change', { bubbles: true }));
+  });
+  const bandwidthInput = document.getElementById('expressBandwidth');
+  bandwidthInput.addEventListener('input', syncBandwidth);
+  bandwidthInput.addEventListener('change', () => {
+    const mbps = Math.floor(Number(bandwidthInput.value));
+    bandwidthInput.value = Number.isFinite(mbps) && mbps > 0 ? String(Math.min(mbps, 10000)) : '';
+    syncBandwidth();
+  });
   document.getElementById('expressHost')?.addEventListener('change', e => { S.instanceHost = e.target.value; saveState(); probeExpressHost(); refreshExpressSummary(); });
   _expressLaneService = state.service;
   probeExpressHost();
@@ -7861,6 +7905,16 @@ function showExpressLane() {
   document.getElementById('expressLang')?.addEventListener('change', e => { state.lang = e.target.value; refreshExpressSummary(); });
   overlay.addEventListener('click', e => {
     if (e.target === overlay || e.target.closest('#expressClose') || e.target.closest('[data-express-back]')) { closeLane(); return; }
+    const bandwidthBtn = e.target.closest('[data-express-bandwidth]');
+    if (bandwidthBtn) {
+      const input = document.getElementById('expressBandwidth');
+      if (bandwidthBtn.dataset.expressBandwidth === 'custom') {
+        document.getElementById('expressAdvanced').open = true; input.focus(); return;
+      }
+      input.value = bandwidthBtn.dataset.expressBandwidth;
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+      syncBandwidth(); refreshExpressSummary(); return;
+    }
     const modeBtn = e.target.closest('[data-express-mode]');
     if (modeBtn) { state.mode = modeBtn.dataset.expressMode; refreshDeliveryMode(); return; }
     const svcBtn = e.target.closest('[data-express-service]');
@@ -7902,6 +7956,7 @@ function showExpressLane() {
       // The profile's resolution too: Quick install passes its own resolution to
       // applyExpressChoices, which overrides the profile's, so Fast used to build 4K.
       state.resolution = state.profile === 'fast' ? '1080p' : '4k';
+      syncRadioGroup('[data-express-res]', state.resolution, 'expressRes');
       saveState();
       overlay.querySelectorAll('[data-express-cache]').forEach(b => b.classList.toggle('active', b.dataset.expressCache === S.cacheMode));
       overlay.querySelectorAll('[data-express-res]').forEach(b => b.classList.toggle('active', b.dataset.expressRes === state.resolution));
@@ -7911,6 +7966,7 @@ function showExpressLane() {
     const devBtn = e.target.closest('[data-express-device]');
     if (devBtn) {
       state.device = devBtn.dataset.expressDevice;
+      syncRadioGroup('[data-express-device]', state.device, 'expressDevice');
       refreshDeviceSpec();
       overlay.querySelectorAll('[data-express-device]').forEach(b => b.classList.toggle('active', b.dataset.expressDevice === state.device));
       refreshExpressSummary();
@@ -7919,6 +7975,7 @@ function showExpressLane() {
     const resBtn = e.target.closest('[data-express-res]');
     if (resBtn) {
       state.resolution = resBtn.dataset.expressRes;
+      syncRadioGroup('[data-express-res]', state.resolution, 'expressRes');
       overlay.querySelectorAll('[data-express-res]').forEach(b => b.classList.toggle('active', b.dataset.expressRes === state.resolution));
       refreshExpressSummary();
       return;
