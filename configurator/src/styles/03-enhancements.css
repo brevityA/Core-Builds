@@ -3,7 +3,7 @@
 .import-info{border-color:#374151!important;background:#111827!important}
 [data-theme="light"] .import-error{border-color:#f1aeb5!important;background:#fff5f5!important}
 [data-theme="light"] .import-error strong[style]{color:#cf222e!important}
-[data-theme="light"] .import-info{border-color:#d0d7de!important;background:#f5f2ec!important}
+[data-theme="light"] .import-info{border-color:#d0d7de!important;background:#f6f8fa!important}
 [data-theme="light"] .import-info strong[style]{color:#1f2328!important}
 .insights-box{background:#060e15;border:1px solid #162030;border-radius:10px;padding:14px 16px;margin-bottom:16px}
 .insights-hdr{color:#7eeeff;font-size:.72rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;margin-bottom:8px}
@@ -16,7 +16,7 @@
 [data-theme="light"] .cred-remind .cr-hdr{color:#b45309!important}
 .cred-status{font-size:.74rem;margin-top:4px;min-height:16px;display:block}
 .help-btn{width:20px;height:20px;border-radius:50%;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.05);color:#6b7280;font-size:.7rem;font-weight:800;cursor:pointer;flex-shrink:0;line-height:1;margin-right:8px;transition:all .15s;padding:0}
-.help-btn:hover{color:var(--th-accent);border-color:rgba(245,158,11,.4)}
+.help-btn:hover{color:var(--th-accent);border-color:rgba(0,212,255,.4)}
 .device-help{font-size:.8rem;color:#8b949e;line-height:1.55;padding:9px 14px 11px;border-top:1px dashed rgba(255,255,255,.09);display:none}
 .device-help b{color:#c9d1d9}
 [data-theme="light"] .device-help{color:#57606a;border-color:rgba(0,0,0,.12)}
@@ -26,15 +26,15 @@
 .step-unit.done:hover .step-bub{box-shadow:0 0 0 3px var(--th-green-border)}
 .step-unit.done:hover .step-lbl{color:var(--th-accent)}
 .receipt-row[data-action]{cursor:pointer;transition:background .15s}
-.receipt-row[data-action]:hover{background:rgba(245,158,11,.05)}
+.receipt-row[data-action]:hover{background:rgba(0,212,255,.05)}
 @media (prefers-reduced-motion: reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
 /* ===== v2.38 Nexus calm UI — Duck-inspired mix (single accent, no glow) ===== */
 /* Motion: retire pulse/glow loops (keyframes redefined to static states) */
 @keyframes optSelect{0%,100%{box-shadow:none}}
 @keyframes hoverPulse{0%,100%{box-shadow:none}}
 @keyframes bubPulse{0%,100%{box-shadow:none}}
-@keyframes manifestPulse{0%,100%{box-shadow:0 4px 20px rgba(245,158,11,.22)}}
-@keyframes dlPulse{0%,100%{box-shadow:0 4px 20px rgba(245,158,11,.22)}}
+@keyframes manifestPulse{0%,100%{box-shadow:0 4px 20px rgba(0,212,255,.22)}}
+@keyframes dlPulse{0%,100%{box-shadow:0 4px 20px rgba(0,212,255,.22)}}
 @keyframes btnFlash{0%,100%{box-shadow:none}}
 @keyframes btnHoverPulse{0%,100%{box-shadow:none}}
 /* Decorative hairline glows off */
@@ -43,19 +43,19 @@
 .opts.list .opt-icon svg,.opts.pills .opt-icon svg,
 .opts.list .opt input:checked+label .opt-icon svg,.opts.pills .opt input:checked+label .opt-icon svg{filter:none}
 /* Flat selection states */
-.opt input:checked+label{border-color:rgba(245,158,11,.45);background:rgba(245,158,11,.07);box-shadow:none}
+.opt input:checked+label{border-color:rgba(0,212,255,.45);background:rgba(0,212,255,.07);box-shadow:none}
 .opt input:checked+label::after{box-shadow:none}
 .opts.pills .opt input:checked+label{box-shadow:none}
 .svc-list-hero input:checked+label{box-shadow:none!important}
 .bc-chip{box-shadow:none}
 /* One CTA identity — cyan gradient, dark text */
-.btn-next{background:linear-gradient(135deg,#00a8d4,var(--th-accent));color:#04202b;border:none;box-shadow:0 5px 22px rgba(245,158,11,.22)}
-.btn-next:hover:not(:disabled){background:linear-gradient(135deg,#00b8e6,#2adcff);border:none;box-shadow:0 7px 28px rgba(245,158,11,.32)}
-.btn-next:disabled{background:#111111;color:#4a4f60;border:1px solid rgba(255,255,255,.06);box-shadow:none}
+.btn-next{background:linear-gradient(135deg,#00a8d4,var(--th-accent));color:#04202b;border:none;box-shadow:0 5px 22px rgba(0,212,255,.22)}
+.btn-next:hover:not(:disabled){background:linear-gradient(135deg,#00b8e6,#2adcff);border:none;box-shadow:0 7px 28px rgba(0,212,255,.32)}
+.btn-next:disabled{background:#111720;color:#4a4f60;border:1px solid rgba(255,255,255,.06);box-shadow:none}
 .btn-next .cta-step-lbl{opacity:.72}
-.btn-dl{background:linear-gradient(135deg,#00a8d4,var(--th-accent));color:#04202b;box-shadow:0 5px 22px rgba(245,158,11,.22)}
-.btn-dl:hover{box-shadow:0 7px 28px rgba(245,158,11,.32)}
-.btn-manifest{box-shadow:0 4px 20px rgba(245,158,11,.2)}
+.btn-dl{background:linear-gradient(135deg,#00a8d4,var(--th-accent));color:#04202b;box-shadow:0 5px 22px rgba(0,212,255,.22)}
+.btn-dl:hover{box-shadow:0 7px 28px rgba(0,212,255,.32)}
+.btn-manifest{box-shadow:0 4px 20px rgba(0,212,255,.2)}
 /* Multi-select rows read as switches (service picker / optional scrapers) */
 .svc-row-ck{width:36px;height:20px;border-radius:20px;background:#2a3140;border:none;position:relative;transition:background .18s}
 .svc-row-ck svg{display:none}
@@ -74,44 +74,44 @@
 .splash-door .splash-door-tag{position:static;font-size:.56rem;flex-shrink:0}
 [data-theme="light"] .svc-row-ck{background:#d0d7de}
 [data-theme="light"] .svc-row-ck::after{background:#fff}
-[data-theme="light"] .svc-list-row input:checked+label .svc-row-ck{background:#92400e}
+[data-theme="light"] .svc-list-row input:checked+label .svc-row-ck{background:#0969da}
 [data-theme="light"] .btn-next,[data-theme="light"] .btn-dl{color:#04202b}
-[data-theme="light"] .btn-next:disabled{background:#f5f2ec;color:#8c959f;border:1px solid #d0d7de}
+[data-theme="light"] .btn-next:disabled{background:#f6f8fa;color:#8c959f;border:1px solid #d0d7de}
 /* ===== Device picker grid (Advanced Builder > Your Device) =====
    Replaces the old sideways-scrolling carousel with a neat, responsive grid
    of equal-height cards plus a single contextual explanation banner. */
 .device-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(152px,1fr));gap:9px;padding:2px}
-.device-card{position:relative;display:flex;flex-direction:column;gap:6px;padding:12px 12px 13px;border:1px solid rgba(255,255,255,.085);border-radius:14px;background:linear-gradient(145deg,#1c1c1c,#111111);cursor:pointer;transition:border-color .18s,background .18s,transform .18s,box-shadow .18s;outline:none}
-.device-card:hover{border-color:rgba(245,158,11,.26);background:linear-gradient(145deg,#152331,#161616);transform:translateY(-2px)}
-.device-card:focus-visible{outline:2px solid rgba(245,158,11,.5);outline-offset:2px}
-.device-card[data-active="true"]{border-color:rgba(245,158,11,.43);background:radial-gradient(circle at 100% 0,rgba(245,158,11,.13),transparent 42%),linear-gradient(145deg,#102431,#0e1823);box-shadow:inset 3px 0 var(--th-accent)}
+.device-card{position:relative;display:flex;flex-direction:column;gap:6px;padding:12px 12px 13px;border:1px solid rgba(255,255,255,.085);border-radius:14px;background:linear-gradient(145deg,#111b27,#0d151f);cursor:pointer;transition:border-color .18s,background .18s,transform .18s,box-shadow .18s;outline:none}
+.device-card:hover{border-color:rgba(0,212,255,.26);background:linear-gradient(145deg,#152331,#101923);transform:translateY(-1px)}
+.device-card:focus-visible{outline:2px solid rgba(0,212,255,.5);outline-offset:2px}
+.device-card[data-active="true"]{border-color:rgba(0,212,255,.43);background:radial-gradient(circle at 100% 0,rgba(0,212,255,.13),transparent 42%),linear-gradient(145deg,#102431,#0e1823);box-shadow:inset 3px 0 var(--th-accent)}
 .device-card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:6px;min-height:32px}
 .device-card-icon{width:32px;height:32px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .device-card-icon svg{width:32px;height:32px;display:block}
 .device-card-check{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;flex-shrink:0}
 .device-card-name{font-size:.82rem;font-weight:700;color:#dce6ed;line-height:1.25;display:flex;align-items:center;flex-wrap:wrap;gap:5px}
-.device-card[data-active="true"] .device-card-name{color:#fbbf24}
-.device-card-pop{display:inline-block;padding:1px 6px;border-radius:4px;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.18);color:#fbbf24;font-size:.5rem;font-weight:900;letter-spacing:.06em;text-transform:uppercase;line-height:1.4}
+.device-card[data-active="true"] .device-card-name{color:#67e8f9}
+.device-card-pop{display:inline-block;padding:1px 6px;border-radius:4px;background:rgba(0,212,255,.08);border:1px solid rgba(0,212,255,.18);color:#67e8f9;font-size:.5rem;font-weight:900;letter-spacing:.06em;text-transform:uppercase;line-height:1.4}
 .device-card-desc{font-size:.64rem;color:#718093;line-height:1.45}
 /* Contextual explanation banner for the currently selected device */
-.device-help-banner{display:flex;gap:11px;align-items:flex-start;margin-top:12px;padding:12px 14px;border:1px solid rgba(245,158,11,.16);border-radius:12px;background:radial-gradient(circle at 0% 0%,rgba(245,158,11,.06),transparent 55%),rgba(255,255,255,.02)}
+.device-help-banner{display:flex;gap:11px;align-items:flex-start;margin-top:12px;padding:12px 14px;border:1px solid rgba(0,212,255,.16);border-radius:12px;background:radial-gradient(circle at 0% 0%,rgba(0,212,255,.06),transparent 55%),rgba(255,255,255,.02)}
 .device-help-banner-ico{flex-shrink:0;width:24px;height:24px;display:flex;align-items:center;justify-content:center;margin-top:1px}
-.device-help-banner-title{font-size:.78rem;font-weight:800;color:#fbbf24;letter-spacing:.02em;margin-bottom:4px}
+.device-help-banner-title{font-size:.78rem;font-weight:800;color:#67e8f9;letter-spacing:.02em;margin-bottom:4px}
 .device-help-banner-body{font-size:.71rem;color:#9aa6b2;line-height:1.55}
 .device-help-banner-body b{color:#cfe6ef;font-weight:700}
 /* Light theme */
 [data-theme="light"] .device-card{background:#f8fafc;border-color:#d7dee5}
-[data-theme="light"] .device-card:hover{background:#f2f6f9;border-color:rgba(146,64,14,.28)}
-[data-theme="light"] .device-card[data-active="true"]{background:rgba(146,64,14,.06);border-color:rgba(146,64,14,.4);box-shadow:inset 3px 0 #92400e}
+[data-theme="light"] .device-card:hover{background:#f2f6f9;border-color:rgba(9,105,218,.28)}
+[data-theme="light"] .device-card[data-active="true"]{background:rgba(9,105,218,.06);border-color:rgba(9,105,218,.4);box-shadow:inset 3px 0 #0969da}
 [data-theme="light"] .device-card-name{color:#1f2933}
-[data-theme="light"] .device-card[data-active="true"] .device-card-name{color:#92400e}
-[data-theme="light"] .device-card-pop{background:rgba(146,64,14,.08);border-color:rgba(146,64,14,.2);color:#0a6fcd}
+[data-theme="light"] .device-card[data-active="true"] .device-card-name{color:#0969da}
+[data-theme="light"] .device-card-pop{background:rgba(9,105,218,.08);border-color:rgba(9,105,218,.2);color:#0a6fcd}
 [data-theme="light"] .device-card-desc{color:#5f6c78}
-[data-theme="light"] .device-help-banner{background:rgba(146,64,14,.04);border-color:rgba(146,64,14,.2)}
-[data-theme="light"] .device-help-banner-title{color:#92400e}
+[data-theme="light"] .device-help-banner{background:rgba(9,105,218,.04);border-color:rgba(9,105,218,.2)}
+[data-theme="light"] .device-help-banner-title{color:#0969da}
 [data-theme="light"] .device-help-banner-body{color:#4a5663}
 [data-theme="light"] .device-help-banner-body b{color:#27323b}
-[data-theme="light"] .device-help-banner-ico svg{stroke:#92400e}
+[data-theme="light"] .device-help-banner-ico svg{stroke:#0969da}
 /* Mobile: keep two tidy columns on narrow screens */
 @media(max-width:599px){
   .device-grid{grid-template-columns:repeat(2,1fr);gap:9px}
@@ -127,11 +127,11 @@
 /* ── Accessibility floor (UX polish, 2026-08-11) ── */
 /* 1) focus must be VISIBLE on dark ground (was: near-black auto outline) */
 :focus-visible{ outline:2px solid var(--th-accent,var(--th-accent)) !important; outline-offset:2px; border-radius:10px; }
-button:focus-visible, a:focus-visible, [role="button"]:focus-visible, input:focus-visible, select:focus-visible{ box-shadow:0 0 0 3px rgba(245,158,11,.25) !important; }
+button:focus-visible, a:focus-visible, [role="button"]:focus-visible, input:focus-visible, select:focus-visible{ box-shadow:0 0 0 3px rgba(0,212,255,.25) !important; }
 /* 2) modal close/exit affordances meet the 40px touch floor */
 .fastlane-close, .modal-close, .pwd-cancel, .cb-contact-close, .tut-btn, button[aria-label*="Close" i], button[aria-label="✕" i]{ min-width:40px !important; min-height:40px !important; display:inline-flex; align-items:center; justify-content:center; }
 /* 3) skip link — first tab stop jumps straight to the install doors */
-.skip-link{ position:fixed; top:12px; left:-999px; z-index:1000; background:#161616; color:var(--th-accent,var(--th-accent)); padding:10px 16px; border-radius:10px; border:1px solid rgba(245,158,11,.35); font-weight:700; font-size:13px; transition:left .15s; text-decoration:none; }
+.skip-link{ position:fixed; top:12px; left:-999px; z-index:1000; background:#0e1621; color:var(--th-accent,var(--th-accent)); padding:10px 16px; border-radius:10px; border:1px solid rgba(0,212,255,.35); font-weight:700; font-size:13px; transition:left .15s; text-decoration:none; }
 .skip-link:focus{ left:12px; }
 /* 4) reduced motion floor */
 @media (prefers-reduced-motion: reduce){

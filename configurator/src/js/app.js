@@ -1118,14 +1118,14 @@ function renderOpts(def) {
       return `<div class="device-card" data-active="${active}" data-action="device-scroll-pick" data-val="${o.v}" role="radio" aria-checked="${active}" tabindex="0">
         <div class="device-card-head">
           <div class="device-card-icon">${o.icon}</div>
-          <span class="device-card-check">${active ? ICO.check(15,'#f59e0b') : ''}</span>
+          <span class="device-card-check">${active ? ICO.check(15,'#00d4ff') : ''}</span>
         </div>
         <div class="device-card-name">${o.name}${POPULAR_DEVICE_IDS.has(o.v) ? '<span class="device-card-pop">Popular</span>' : ''}</div>
         <div class="device-card-desc">${o.desc}</div>
       </div>`;
     }).join('');
     const banner = activeOpt && activeOpt.help
-      ? `<div class="device-help-banner"><div class="device-help-banner-ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="11" x2="12" y2="16"/><circle cx="12" cy="7.8" r="0.4" fill="#f59e0b"/></svg></div><div class="device-help-banner-text"><div class="device-help-banner-title">${activeOpt.name}</div><div class="device-help-banner-body">${activeOpt.help}</div></div></div>`
+      ? `<div class="device-help-banner"><div class="device-help-banner-ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#00d4ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="11" x2="12" y2="16"/><circle cx="12" cy="7.8" r="0.4" fill="#00d4ff"/></svg></div><div class="device-help-banner-text"><div class="device-help-banner-title">${activeOpt.name}</div><div class="device-help-banner-body">${activeOpt.help}</div></div></div>`
       : '';
     return `<div class="device-grid" role="radiogroup" aria-label="Your device">${cards}</div>${banner}`;
   }
@@ -1158,11 +1158,11 @@ function renderOpts(def) {
         const audioRows = AUDIO_OPTS.map(o => {
           const on = S.audio === o.v;
           const isRec = recAudio === o.v && S.device && S.device !== 'generic';
-          return `<div class="svc-list-row opt adv-audio-row" data-action="set-audio" data-val="${o.v}" data-active="${on}" style="cursor:pointer;border:1px solid ${on?'rgba(245,158,11,.35)':'rgba(255,255,255,.07)'};background:${on?'rgba(245,158,11,.05)':'rgba(13,17,23,.7)'};border-radius:11px;padding:11px 14px;display:flex;align-items:center;gap:12px;transition:border-color .15s,background .15s">
+          return `<div class="svc-list-row opt adv-audio-row" data-action="set-audio" data-val="${o.v}" data-active="${on}" style="cursor:pointer;border:1px solid ${on?'rgba(0,212,255,.35)':'rgba(255,255,255,.07)'};background:${on?'rgba(0,212,255,.05)':'rgba(13,17,23,.7)'};border-radius:11px;padding:11px 14px;display:flex;align-items:center;gap:12px;transition:border-color .15s,background .15s">
             <div class="opt-icon" style="flex-shrink:0;pointer-events:none">${o.icon}</div>
-            <div class="opt-body" style="flex:1;min-width:0;pointer-events:none"><div class="opt-name" style="font-size:.86rem;font-weight:600;color:${on?'#f59e0b':'#e6edf3'}">${o.name}${isRec?' <span style="font-size:.6rem;font-weight:700;padding:1px 6px;border-radius:3px;background:rgba(52,211,153,.12);color:#34d399;border:1px solid rgba(52,211,153,.3);vertical-align:middle">'+devLabel+'</span>':''}</div><div class="opt-desc" style="font-size:.69rem;color:#6b7280;margin-top:1px">${o.desc}</div></div>
+            <div class="opt-body" style="flex:1;min-width:0;pointer-events:none"><div class="opt-name" style="font-size:.86rem;font-weight:600;color:${on?'#00d4ff':'#e6edf3'}">${o.name}${isRec?' <span style="font-size:.6rem;font-weight:700;padding:1px 6px;border-radius:3px;background:rgba(52,211,153,.12);color:#34d399;border:1px solid rgba(52,211,153,.3);vertical-align:middle">'+devLabel+'</span>':''}</div><div class="opt-desc" style="font-size:.69rem;color:#6b7280;margin-top:1px">${o.desc}</div></div>
             <button type="button" class="help-btn" data-action="toggle-help-target" data-target="audiohelp_res_${o.v}" title="What does this mean?" aria-label="Explain ${o.name}">?</button>
-            <span style="color:${on?'#f59e0b':'#374151'};flex-shrink:0;pointer-events:none">${on?ICO.check(14,'#f59e0b'):'<span style="font-size:.9rem">›</span>'}</span>
+            <span style="color:${on?'#00d4ff':'#374151'};flex-shrink:0;pointer-events:none">${on?ICO.check(14,'#00d4ff'):'<span style="font-size:.9rem">›</span>'}</span>
           </div><div class="device-help" id="audiohelp_res_${o.v}" style="border:none;padding:6px 14px 2px">${AUDIO_HELP[o.v] || ''}</div>`;
         }).join('');
         const curAudioLabel = AUDIO_OPTS.find(o => o.v === S.audio)?.name || 'Auto';
@@ -1287,7 +1287,7 @@ function renderOpts(def) {
     }).join('');
     const hasExtras = S.multiServices.some(s => CAROUSEL_SVCS.includes(s)) || S.optionalScrapers.length;
     const extraCount = S.multiServices.filter(s=>CAROUSEL_SVCS.includes(s)).length + S.optionalScrapers.length;
-    const compactOptSection = `<div class="opt-scraper-section"><button type="button" class="additional-services-btn" data-action="open-additional-services" style="width:100%;display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:13px;border:1px solid rgba(255,255,255,.09);background:linear-gradient(145deg,#111b27,#0d151f);color:#c9d5df;cursor:pointer;text-align:left"><span style="width:34px;height:34px;border-radius:9px;display:grid;place-items:center;background:rgba(167,139,250,.09);color:#a78bfa">＋</span><span class="u-flex1"><b style="display:block;font-size:.82rem">Additional services &amp; scrapers</b><span style="display:block;color:#718093;font-size:.68rem;margin-top:2px">P2P, HTTP, Usenet, Debridio and optional indexers</span></span>${extraCount?`<span style="padding:3px 8px;border-radius:99px;background:rgba(245,158,11,.09);border:1px solid rgba(245,158,11,.2);color:#fbbf24;font-size:.62rem;font-weight:900">${extraCount} selected</span>`:''}<span style="color:#637185">→</span></button>${hasExtras?'<div class="opt-scraper-hint">Selected extras are active. Their credentials appear on Accounts &amp; Keys.</div>':''}</div>`;
+    const compactOptSection = `<div class="opt-scraper-section"><button type="button" class="additional-services-btn" data-action="open-additional-services" style="width:100%;display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:13px;border:1px solid rgba(255,255,255,.09);background:linear-gradient(145deg,#111b27,#0d151f);color:#c9d5df;cursor:pointer;text-align:left"><span style="width:34px;height:34px;border-radius:9px;display:grid;place-items:center;background:rgba(167,139,250,.09);color:#a78bfa">＋</span><span class="u-flex1"><b style="display:block;font-size:.82rem">Additional services &amp; scrapers</b><span style="display:block;color:#718093;font-size:.68rem;margin-top:2px">P2P, HTTP, Usenet, Debridio and optional indexers</span></span>${extraCount?`<span style="padding:3px 8px;border-radius:99px;background:rgba(0,212,255,.09);border:1px solid rgba(0,212,255,.2);color:#67e8f9;font-size:.62rem;font-weight:900">${extraCount} selected</span>`:''}<span style="color:#637185">→</span></button>${hasExtras?'<div class="opt-scraper-hint">Selected extras are active. Their credentials appear on Accounts &amp; Keys.</div>':''}</div>`;
     const carouselOptSection = `<div class="opt-scraper-section"><div class="opt-scraper-divider"><span class="opt-scraper-line"></span><span class="opt-scraper-label">Extras &amp; Optional Scrapers</span><span class="opt-scraper-count" id="extrasCarouselCount">${extraCount ? extraCount+' selected' : 'Optional'}</span><span class="opt-scraper-line"></span></div><div class="opt-scraper-desc">Swipe or scroll, then tap any card to toggle it. Multi-select is supported.</div><div class="scroll-fade-wrap" data-scroll-start="true" data-scroll-end="false"><div class="opt-scraper-scroll" aria-label="Additional services and optional scrapers">${svcCarouselCards}${scraperCards}</div></div>${hasExtras ? '<div class="opt-scraper-hint">Selected extras are active. Required credentials appear on Accounts &amp; Keys.</div>' : ''}</div>`;
     const optSection = S.simpleMode ? compactOptSection : carouselOptSection;
     return `<div class="svc-list">${heroHtml}${searchHtml}${segHtml}<div id="svcRows">${rowsHtml}</div>${emptyHtml}${optSection}</div>`;
@@ -2108,7 +2108,7 @@ function splashPresetsHtml(svc) {
   const presets = [];
   if (debrid) {
     presets.push({action:'quick-start',preset:'4k',icon:ICO.crown(22,'#a78bfa'),name:'4K Apex',detail:'Flagship · IQR · Lossless'});
-    presets.push({action:'quick-start',preset:'1080p',icon:ICO.tv(22,'#f59e0b'),name:'1080p Stream',detail:'Balanced · DD+ audio'});
+    presets.push({action:'quick-start',preset:'1080p',icon:ICO.tv(22,'#00d4ff'),name:'1080p Stream',detail:'Balanced · DD+ audio'});
   }
   if (svc === 'easynews') presets.push({action:'quick-start',preset:'1080p',icon:ICO.newspaper(22,'#94a3b8'),name:'Usenet Stream',detail:'EasyNews · Fast'});
   if (!debrid || svc === 'free') {
@@ -2140,8 +2140,8 @@ function splashHtml() {
     <!-- A saved build is resumed from the first screen (v3.20): above the hero, not below the fold. -->
     ${hadSavedState && _savedStep > 0 ? `<div class="hybrid-session continue-banner">
       ${versionBannerHtml()}
-      <div style="flex:1;min-width:180px"><div style="font-size:.76rem;font-weight:800;color:#f59e0b">Continue where you left off</div><div style="font-size:.66rem;color:#6b7280;margin-top:2px">Step ${Number(_savedStep)||1} of 6${S.service ? ' · ' + label('service', S.service) : ''}</div></div>
-      <button data-action="continue-session" class="splash-cta-continue" style="padding:8px 14px;background:rgba(245,158,11,.15);border:1px solid rgba(245,158,11,.35);border-radius:8px;color:#f59e0b;font-size:.76rem;font-weight:800;cursor:pointer">Resume</button>
+      <div style="flex:1;min-width:180px"><div style="font-size:.76rem;font-weight:800;color:#00d4ff">Continue where you left off</div><div style="font-size:.66rem;color:#6b7280;margin-top:2px">Step ${Number(_savedStep)||1} of 6${S.service ? ' · ' + label('service', S.service) : ''}</div></div>
+      <button data-action="continue-session" class="splash-cta-continue" style="padding:8px 14px;background:rgba(0,212,255,.15);border:1px solid rgba(0,212,255,.35);border-radius:8px;color:#00d4ff;font-size:.76rem;font-weight:800;cursor:pointer">Resume</button>
       <button data-action="start-fresh" class="splash-cta-discard" style="padding:6px 9px;background:transparent;border:1px solid rgba(255,255,255,.1);border-radius:7px;color:#6b7280;cursor:pointer" title="Discard saved session">&#10005;</button>
       ${S.service && S.device && S.resolution ? `<button data-action="quick-reinstall" style="padding:8px 13px;background:rgba(52,211,153,.07);border:1px solid rgba(52,211,153,.22);border-radius:8px;color:#34d399;font-size:.72rem;font-weight:800;cursor:pointer">${ICO.bolt(14,'#34d399')} Previous settings → Install</button>` : ''}
     </div>` : ''}
@@ -2182,11 +2182,11 @@ function splashHtml() {
         <button type="button" class="core-support-mark" data-action="open-support" aria-label="Support Core Builds" title="Support Core Builds">
           <svg class="splash-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" aria-hidden="true">
             <defs>
-              <linearGradient id="hsg1" x1="50%" y1="0%" x2="50%" y2="100%"><stop offset="0%" stop-color="#fbbf24"/><stop offset="100%" stop-color="#f59e0b"/></linearGradient>
-              <linearGradient id="hsg2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#f59e0b"/><stop offset="50%" stop-color="#d97706"/><stop offset="100%" stop-color="#b45309"/></linearGradient>
+              <linearGradient id="hsg1" x1="50%" y1="0%" x2="50%" y2="100%"><stop offset="0%" stop-color="#00e5ff"/><stop offset="100%" stop-color="#4facfe"/></linearGradient>
+              <linearGradient id="hsg2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#4facfe"/><stop offset="50%" stop-color="#8a4890"/><stop offset="100%" stop-color="#c03a20"/></linearGradient>
               <filter id="hsf"><feGaussianBlur stdDeviation="12" result="b"/><feComposite in="SourceGraphic" in2="b" operator="over"/></filter>
             </defs>
-            <polygon points="256,41 442,149 442,363 256,471 70,363 70,149" fill="#fbbf24" opacity=".05"/>
+            <polygon points="256,41 442,149 442,363 256,471 70,363 70,149" fill="#00e5ff" opacity=".05"/>
             <polygon class="hex-glow-layer" points="256,41 442,149 442,363 256,471 70,363 70,149" fill="none" stroke="url(#hsg1)" stroke-width="14" stroke-linejoin="round" opacity=".88"/>
             <polygon class="diamond-glow" points="256,166 346,256 256,346 166,256" fill="url(#hsg2)" opacity=".34" filter="url(#hsf)"/>
             <polygon class="diamond-core core-support-gem" points="256,166 346,256 256,346 166,256" fill="url(#hsg2)" opacity=".9"/>
@@ -2209,7 +2209,7 @@ function splashHtml() {
       </div>
     </div>
     ${hadSavedState ? '' : `<div class="hybrid-services hybrid-presets"><div class="hybrid-services-label">Preset</div><div class="splash-chips" role="radiogroup" aria-label="Quick profile — tunes the dials, never trims your services">
-        <span class="splash-chip${S.quickProfile==='fast'?' active':''}" data-qp="fast" role="radio" aria-checked="${S.quickProfile==='fast'}" tabindex="0"><span class="splash-chip-icon">${ICO.bolt(14,'#fbbf24')}</span> Lean · 1080p cached-first</span>
+        <span class="splash-chip${S.quickProfile==='fast'?' active':''}" data-qp="fast" role="radio" aria-checked="${S.quickProfile==='fast'}" tabindex="0"><span class="splash-chip-icon">${ICO.bolt(14,'#67e8f9')}</span> Lean · 1080p cached-first</span>
         <span class="splash-chip${S.quickProfile==='balanced'?' active':''}" data-qp="balanced" role="radio" aria-checked="${S.quickProfile==='balanced'}" tabindex="0"><span class="splash-chip-icon">${ICO.diamond(14,'#10b981')}</span> Standard · recommended</span>
         <span class="splash-chip${S.quickProfile==='maximum'?' active':''}" data-qp="maximum" role="radio" aria-checked="${S.quickProfile==='maximum'}" tabindex="0"><span class="splash-chip-icon">${ICO.circle(14,'#fbbf24')}</span> Maximum · 4K quality-first</span>
       </div></div>`}
@@ -2232,7 +2232,7 @@ function splashHtml() {
     <div class="splash-doors splash-anim splash-anim-d6">
       <a class="splash-door core-tool-door" href="../account-tools/" target="_blank" rel="noopener noreferrer"><div class="splash-door-icon">${ICO.download(22,'#34d399')}</div><div class="splash-door-text"><div class="splash-door-title">Back Up Addons <span class="splash-door-tag" style="background:rgba(52,211,153,.1);color:#34d399;border:1px solid rgba(52,211,153,.2)">Read-only</span></div><div class="splash-door-desc">View and download your current Stremio addon setup. Nothing is changed.</div></div></a>
       <a class="splash-door core-tool-door" href="../tools/genies/nuvio-stacks.html"><div class="splash-door-icon"><span style="font-size:20px;line-height:1" aria-hidden="true">🧞</span></div><div class="splash-door-text"><div class="splash-door-title">Nuvio Stack Genie <span class="splash-door-tag" style="background:rgba(168,85,247,.12);color:#c4b5fd;border:1px solid rgba(168,85,247,.28)">Cross-app</span></div><div class="splash-door-desc">Guided profiles &amp; add-ons for Nuvio — pick a stack, get install links.</div></div></a>
-      <a class="splash-door core-tool-door" href="../tools/speedtest/"><div class="splash-door-icon"><span style="font-size:20px;line-height:1" aria-hidden="true">⚡</span></div><div class="splash-door-text"><div class="splash-door-title">CoreSpeed <span class="splash-door-tag" style="background:rgba(245,158,11,.1);color:#fbbf24;border:1px solid rgba(245,158,11,.22)">Speedtest</span></div><div class="splash-door-desc">Race every TorBox CDN at once — ping, multi-stream speed, live map, and the best node for your setup.</div></div></a>
+      <a class="splash-door core-tool-door" href="../tools/speedtest/"><div class="splash-door-icon"><span style="font-size:20px;line-height:1" aria-hidden="true">⚡</span></div><div class="splash-door-text"><div class="splash-door-title">CoreSpeed <span class="splash-door-tag" style="background:rgba(0,212,255,.1);color:#67e8f9;border:1px solid rgba(0,212,255,.22)">Speedtest</span></div><div class="splash-door-desc">Race every TorBox CDN at once — ping, multi-stream speed, live map, and the best node for your setup.</div></div></a>
       <a class="splash-door core-tool-door" href="../tools/badges/"><div class="splash-door-icon"><span style="font-size:20px;line-height:1" aria-hidden="true">🏷️</span></div><div class="splash-door-text"><div class="splash-door-title">Core Badge Builder <span class="splash-door-tag" style="background:rgba(168,85,247,.12);color:#c4b5fd;border:1px solid rgba(168,85,247,.28)">No regex</span></div><div class="splash-door-desc">Design Nuvio stream badges visually, preview them, and hand the matching formatter back here.</div></div></a>
       <a class="splash-door core-tool-door" href="../tools/banner-studio/"><div class="splash-door-icon"><span style="font-size:20px;line-height:1" aria-hidden="true">🎬</span></div><div class="splash-door-text"><div class="splash-door-title">Banner Studio <span class="splash-door-tag" style="background:rgba(248,113,113,.12);color:#fca5a5;border:1px solid rgba(248,113,113,.3)">17 brands</span></div><div class="splash-door-desc">Netflix-style streaming banners for any major streamer — render &amp; export locally.</div></div></a>
       <a class="splash-door core-tool-door" href="../tools/"><div class="splash-door-icon">${ICO.folder(22,'#a78bfa')}</div><div class="splash-door-text"><div class="splash-door-title">All Core Tools</div><div class="splash-door-desc">Builder, backup, and upcoming inspection utilities.</div></div></a>
@@ -2376,7 +2376,7 @@ function renderCore() {
           <summary class="rv-accord-hdr"><span class="rv-accord-ico"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span> Tools<span class="rv-arr">›</span></summary>
           <div class="rv-accord-body" style="display:flex;flex-direction:column;gap:8px">
             <button data-action="open-troubleshooter" style="width:100%;padding:10px;font-size:.78rem;font-weight:700;border-radius:10px;border:1px solid var(--th-yellow-border);background:var(--th-yellow-bg);color:var(--th-yellow);cursor:pointer;transition:background .15s;display:flex;align-items:center;justify-content:center;gap:6px">🔧 Troubleshooter — Fix Common Issues</button>
-            <button data-action="open-feedback-report" style="width:100%;padding:10px;font-size:.78rem;font-weight:700;border-radius:10px;border:1px solid rgba(245,158,11,.24);background:rgba(245,158,11,.05);color:#f59e0b;cursor:pointer;transition:background .15s;display:flex;align-items:center;justify-content:center;gap:6px">🧾 Copy Safe Feedback Report</button>
+            <button data-action="open-feedback-report" style="width:100%;padding:10px;font-size:.78rem;font-weight:700;border-radius:10px;border:1px solid rgba(0,212,255,.24);background:rgba(0,212,255,.05);color:#00d4ff;cursor:pointer;transition:background .15s;display:flex;align-items:center;justify-content:center;gap:6px">🧾 Copy Safe Feedback Report</button>
             <button class="btn-td" data-action="test-drive">${ICO.eye(15,'currentColor')} Test Drive — Preview Your Streams</button>
             <button data-action="open-recommended-stack" style="width:100%;padding:10px;font-size:.78rem;font-weight:700;border-radius:10px;border:1px solid rgba(168,85,247,.22);background:rgba(168,85,247,.05);color:#a78bfa;cursor:pointer;transition:background .15s;display:flex;align-items:center;justify-content:center;gap:6px">⭐ Recommended Stack — Best Add-ons</button>
           </div>
@@ -2473,7 +2473,7 @@ function renderCore() {
               <div class="name-row" style="margin-bottom:0">
                 <div class="u-between6">
                   <span style="color:#8b949e;font-size:.82rem;text-transform:uppercase;letter-spacing:.05em">Password</span>
-                  <button type="button" data-action="gen-pwd" style="font-size:.82rem;color:#f59e0b;background:none;border:none;cursor:pointer;padding:0;font-weight:700">Generate →</button>
+                  <button type="button" data-action="gen-pwd" style="font-size:.82rem;color:#00d4ff;background:none;border:none;cursor:pointer;padding:0;font-weight:700">Generate →</button>
                 </div>
                 <div style="position:relative">
                   <input class="name-input" id="aioPwd" type="password" placeholder="Create a password to protect your manifest" autocapitalize="none" enterkeyhint="done"
@@ -2574,7 +2574,7 @@ function renderCore() {
             <div style="display:flex;gap:12px;align-items:center">
               <button data-action="open-diagnostics" style="font-size:.74rem;font-weight:700;color:#6b7280;background:none;border:none;cursor:pointer;padding:2px 0;text-decoration:underline;text-underline-offset:2px;transition:color .15s">Report Issue</button>
               <button data-action="show-changelog" style="font-size:.74rem;font-weight:700;color:#6b7280;background:none;border:none;cursor:pointer;padding:2px 0;text-decoration:underline;text-underline-offset:2px;transition:color .15s" onmouseover="this.style.color='#9ca3af'" onmouseout="this.style.color='#4b5563'">Changelog</button>
-              <a href="../tools/" style="font-size:.74rem;font-weight:700;color:#6b7280;padding:2px 0;text-decoration:underline;text-underline-offset:2px;transition:color .15s" onmouseover="this.style.color='#f59e0b'" onmouseout="this.style.color='#6b7280'">Tools</a>
+              <a href="../tools/" style="font-size:.74rem;font-weight:700;color:#6b7280;padding:2px 0;text-decoration:underline;text-underline-offset:2px;transition:color .15s" onmouseover="this.style.color='#00d4ff'" onmouseout="this.style.color='#6b7280'">Tools</a>
               <button data-action="start-setup" style="font-size:.74rem;font-weight:700;color:#6b7280;background:none;border:none;cursor:pointer;padding:2px 0;text-decoration:underline;text-underline-offset:2px;transition:color .15s" onmouseover="this.style.color='#9ca3af'" onmouseout="this.style.color='#4b5563'">Start Over</button>
             </div>
           </div>
@@ -2631,7 +2631,7 @@ function renderCore() {
         <div class="srh">
           <div class="srh-ring">
             <svg viewBox="0 0 52 52" width="52" height="52" style="overflow:visible">
-              <defs><linearGradient id="rg${step}" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#f59e0b"/><stop offset="100%" stop-color="#a855f7"/></linearGradient></defs>
+              <defs><linearGradient id="rg${step}" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#00d4ff"/><stop offset="100%" stop-color="#4facfe"/></linearGradient></defs>
               <circle cx="26" cy="26" r="21" fill="none" stroke="rgba(255,255,255,.07)" stroke-width="2.5"/>
               <circle cx="26" cy="26" r="21" fill="none" stroke="url(#rg${step})" stroke-width="2.5"
                 stroke-dasharray="${ringC}" stroke-dashoffset="${(ringC*(1-ringPct)).toFixed(1)}"
@@ -2656,23 +2656,23 @@ function renderCore() {
           <summary style="list-style:none;display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:11px 14px;background:rgba(255,255,255,.03);user-select:none" onclick="this.parentElement.querySelector('.lang-chevron').style.transform=this.parentElement.open?'rotate(0deg)':'rotate(90deg)'">
             <div style="display:flex;align-items:center;gap:10px">
               <span style="font-size:.74rem;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.06em">Language Preferences</span>
-              <span style="font-size:.7rem;color:#f59e0b;font-weight:600">${(S.langs||['English']).map(escHtml).join(' · ')}</span>
+              <span style="font-size:.7rem;color:#00d4ff;font-weight:600">${(S.langs||['English']).map(escHtml).join(' · ')}</span>
             </div>
             <div class="u-rowc8">
-              ${S.langExclusive ? `<span style="font-size:.62rem;font-weight:700;padding:2px 6px;border-radius:4px;background:var(--th-accent-bg);color:var(--th-accent);border:1px solid rgba(245,158,11,.25)">EXCLUSIVE</span>` : ''}
+              ${S.langExclusive ? `<span style="font-size:.62rem;font-weight:700;padding:2px 6px;border-radius:4px;background:var(--th-accent-bg);color:var(--th-accent);border:1px solid rgba(0,212,255,.25)">EXCLUSIVE</span>` : ''}
               <span class="lang-chevron" style="font-size:.7rem;color:#374151;transition:transform .2s;transform:rotate(0deg)">›</span>
             </div>
           </summary>
           <div style="padding:12px 14px;border-top:1px solid rgba(255,255,255,.05)">
             <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:7px 6px;margin-bottom:12px">
               ${LANG_OPTS.map(l => `
-              <label style="display:flex;align-items:center;gap:7px;cursor:pointer;padding:7px 9px;border-radius:8px;border:1px solid ${S.langs.includes(l.v)?'rgba(245,158,11,.4)':'rgba(255,255,255,.06)'};background:${S.langs.includes(l.v)?'rgba(245,158,11,.07)':'transparent'};transition:all .15s">
-                <input type="checkbox" value="${l.v}" ${S.langs.includes(l.v)?'checked':''} data-action="toggle-lang" style="accent-color:#f59e0b;flex-shrink:0">
+              <label style="display:flex;align-items:center;gap:7px;cursor:pointer;padding:7px 9px;border-radius:8px;border:1px solid ${S.langs.includes(l.v)?'rgba(0,212,255,.4)':'rgba(255,255,255,.06)'};background:${S.langs.includes(l.v)?'rgba(0,212,255,.07)':'transparent'};transition:all .15s">
+                <input type="checkbox" value="${l.v}" ${S.langs.includes(l.v)?'checked':''} data-action="toggle-lang" style="accent-color:#00d4ff;flex-shrink:0">
                 <span style="font-size:.75rem;color:${S.langs.includes(l.v)?'#e6edf3':'#8b949e'};font-weight:${S.langs.includes(l.v)?'600':'400'}">${l.v}</span>
               </label>`).join('')}
             </div>
-            <label style="display:flex;align-items:center;gap:9px;cursor:pointer;padding:9px 11px;border-radius:8px;border:1px solid ${S.langExclusive?'rgba(245,158,11,.35)':'rgba(255,255,255,.06)'};background:${S.langExclusive?'rgba(245,158,11,.06)':'transparent'};transition:all .15s">
-              <input type="checkbox" ${S.langExclusive?'checked':''} data-action="toggle-lang-exclusive" style="accent-color:#f59e0b;flex-shrink:0">
+            <label style="display:flex;align-items:center;gap:9px;cursor:pointer;padding:9px 11px;border-radius:8px;border:1px solid ${S.langExclusive?'rgba(0,212,255,.35)':'rgba(255,255,255,.06)'};background:${S.langExclusive?'rgba(0,212,255,.06)':'transparent'};transition:all .15s">
+              <input type="checkbox" ${S.langExclusive?'checked':''} data-action="toggle-lang-exclusive" style="accent-color:#00d4ff;flex-shrink:0">
               <div>
                 <div style="font-size:.79rem;font-weight:700;color:${S.langExclusive?'#e6edf3':'#8b949e'}">Exclusive mode</div>
                 <div style="font-size:.67rem;color:#4b5563;margin-top:1px">Only include streams in selected languages — Multi, Dubbed &amp; Original always pass</div>
@@ -2693,7 +2693,7 @@ function renderCore() {
         <div class="name-row" style="margin-bottom:14px">
           <div class="u-between6">
             <span style="color:#8b949e;font-size:.82rem;text-transform:uppercase;letter-spacing:.05em">${inp.label}</span>
-            ${inp.url ? `<a href="${inp.url}" target="_blank" rel="noopener noreferrer" style="font-size:.83rem;color:#f59e0b;text-decoration:none;font-weight:700">Get key →</a>` : ''}
+            ${inp.url ? `<a href="${inp.url}" target="_blank" rel="noopener noreferrer" style="font-size:.83rem;color:#00d4ff;text-decoration:none;font-weight:700">Get key →</a>` : ''}
           </div>
           <div class="u-relrow">
             <input class="name-input" id="cred_${inp.id}" data-service="${inp.id}" data-action="update-cred" type="password" autocapitalize="none" spellcheck="false" enterkeyhint="done" placeholder="${inp.placeholder}"
@@ -2721,7 +2721,7 @@ function renderCore() {
             <div class="name-row" style="margin-bottom:14px">
               <div class="u-between6">
                 <span style="color:#8b949e;font-size:.82rem;text-transform:uppercase;letter-spacing:.05em">TMDB Read Access Token</span>
-                <a href="https://www.themoviedb.org/settings/api" target="_blank" rel="noopener noreferrer" style="font-size:.83rem;color:#f59e0b;text-decoration:none;font-weight:700">Get key →</a>
+                <a href="https://www.themoviedb.org/settings/api" target="_blank" rel="noopener noreferrer" style="font-size:.83rem;color:#00d4ff;text-decoration:none;font-weight:700">Get key →</a>
               </div>
               <div class="u-relrow">
                 <input class="name-input" id="tmdbIn" data-action="update-tmdb" type="password" autocapitalize="none" spellcheck="false" enterkeyhint="done" placeholder="eyJhbGciOiJSUzI1NiJ9…"
@@ -2738,7 +2738,7 @@ function renderCore() {
             <div class="name-row">
               <div class="u-between6">
                 <span style="color:#8b949e;font-size:.82rem;text-transform:uppercase;letter-spacing:.05em">TMDB API Key</span>
-                <a href="https://www.themoviedb.org/settings/api" target="_blank" rel="noopener noreferrer" style="font-size:.83rem;color:#f59e0b;text-decoration:none;font-weight:700">Get key →</a>
+                <a href="https://www.themoviedb.org/settings/api" target="_blank" rel="noopener noreferrer" style="font-size:.83rem;color:#00d4ff;text-decoration:none;font-weight:700">Get key →</a>
               </div>
               <div class="u-relrow">
                 <input class="name-input" id="tmdbKeyIn" data-action="update-tmdb-key" type="password" autocapitalize="none" spellcheck="false" enterkeyhint="done" placeholder="abc123def456…"
@@ -2766,7 +2766,7 @@ function renderCore() {
         <div class="srh">
           <div class="srh-ring">
             <svg viewBox="0 0 52 52" width="52" height="52" style="overflow:visible">
-              <defs><linearGradient id="rg${step}" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#f59e0b"/><stop offset="100%" stop-color="#a855f7"/></linearGradient></defs>
+              <defs><linearGradient id="rg${step}" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#00d4ff"/><stop offset="100%" stop-color="#4facfe"/></linearGradient></defs>
               <circle cx="26" cy="26" r="21" fill="none" stroke="rgba(255,255,255,.07)" stroke-width="2.5"/>
               <circle cx="26" cy="26" r="21" fill="none" stroke="url(#rg${step})" stroke-width="2.5"
                 stroke-dasharray="${ringC}" stroke-dashoffset="${(ringC * (1 - ringPct)).toFixed(1)}"
@@ -2775,7 +2775,7 @@ function renderCore() {
             <div class="srh-num">${S.simpleMode ? ({1:1,2:2,3:3}[step]||step) : step}</div>
           </div>
           <div>
-            <div class="srh-title">${def.title}${S.simpleMode ? ` <span style="font-size:.62rem;font-weight:600;color:#4b5563;margin-left:4px">${Math.min({1:1,2:2,3:3}[step]||step, 3)} of 3</span>` : ''}${step===1&&((S.resolution==='4k'&&S.audio==='lossless')||(S.resolution==='1080p'&&S.audio==='standard'))&&S.content==='all'?` <span style="font-size:.65rem;font-weight:700;color:#f59e0b;letter-spacing:.05em;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.2);border-radius:4px;padding:1px 5px">${ICO.bolt(11,'#f59e0b')} QUICK START</span>`:''}${step===1&&S.multiServices.length>=2?` <span style="font-size:.62rem;font-weight:800;color:#a855f7;background:rgba(168,85,247,.1);border:1px solid rgba(168,85,247,.25);border-radius:12px;padding:1px 7px">${S.multiServices.filter(s=>['torbox-pro','torbox-ess','alldebrid','realdebrid','premiumize','debridlink','easynews','offcloud','hybrid','debridio','debrider','easydebrid','pikpak'].includes(s)).length} selected</span>`:''}
+            <div class="srh-title">${def.title}${S.simpleMode ? ` <span style="font-size:.62rem;font-weight:600;color:#4b5563;margin-left:4px">${Math.min({1:1,2:2,3:3}[step]||step, 3)} of 3</span>` : ''}${step===1&&((S.resolution==='4k'&&S.audio==='lossless')||(S.resolution==='1080p'&&S.audio==='standard'))&&S.content==='all'?` <span style="font-size:.65rem;font-weight:700;color:#00d4ff;letter-spacing:.05em;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.2);border-radius:4px;padding:1px 5px">${ICO.bolt(11,'#00d4ff')} QUICK START</span>`:''}${step===1&&S.multiServices.length>=2?` <span style="font-size:.62rem;font-weight:800;color:#a855f7;background:rgba(168,85,247,.1);border:1px solid rgba(168,85,247,.25);border-radius:12px;padding:1px 7px">${S.multiServices.filter(s=>['torbox-pro','torbox-ess','alldebrid','realdebrid','premiumize','debridlink','easynews','offcloud','hybrid','debridio','debrider','easydebrid','pikpak'].includes(s)).length} selected</span>`:''}
             </div>
             <div class="srh-sub">${def.desc}</div>
           </div>
@@ -6676,17 +6676,17 @@ function simpleFinishHtml() {
         <div style="font-size:.86rem;color:#8b949e;margin-top:6px;line-height:1.5">Enter your API key below, then tap create. Everything is handled behind the scenes — no extra steps.</div>
       </div>
       <div style="display:flex;justify-content:center;flex-wrap:wrap;gap:7px;margin:16px 0">
-        ${bits.map(([i2, t]) => `<span style="display:inline-flex;align-items:center;gap:6px;background:rgba(245,158,11,.05);border:1px solid rgba(245,158,11,.16);border-radius:20px;padding:5px 13px;font-size:.8rem;font-weight:600;color:#9ca3af">${i2} ${t}</span>`).join('')}
+        ${bits.map(([i2, t]) => `<span style="display:inline-flex;align-items:center;gap:6px;background:rgba(0,212,255,.05);border:1px solid rgba(0,212,255,.16);border-radius:20px;padding:5px 13px;font-size:.8rem;font-weight:600;color:#9ca3af">${i2} ${t}</span>`).join('')}
       </div>
       ${renderOutputProfilePicker({ compact:true })}
       ${outputProfileAuditHtml()}
-      ${(() => { const hint = DEVICE_BANDWIDTH_HINTS[S.device]; if (!hint) return ''; const bw = calculateBitrateLimit(hint.recommended); return `<div style="background:rgba(245,158,11,.03);border:1px solid rgba(245,158,11,.12);border-radius:8px;padding:10px 14px;margin-bottom:14px;display:flex;align-items:center;gap:10px"><span style="font-size:1.1rem">📶</span><div class="u-flex1"><div style="font-size:.72rem;font-weight:700;color:#9ca3af">Bandwidth hint for your device</div><div style="font-size:.68rem;color:#6b7280;line-height:1.4">Recommended: <strong class="u-accent">${hint.recommended} Mbps+</strong> — ${hint.reason}. Safe bitrate cap: <strong class="u-tx">${bw.label}</strong> (${bw.description})</div></div></div>`; })()}
+      ${(() => { const hint = DEVICE_BANDWIDTH_HINTS[S.device]; if (!hint) return ''; const bw = calculateBitrateLimit(hint.recommended); return `<div style="background:rgba(0,212,255,.03);border:1px solid rgba(0,212,255,.12);border-radius:8px;padding:10px 14px;margin-bottom:14px;display:flex;align-items:center;gap:10px"><span style="font-size:1.1rem">📶</span><div class="u-flex1"><div style="font-size:.72rem;font-weight:700;color:#9ca3af">Bandwidth hint for your device</div><div style="font-size:.68rem;color:#6b7280;line-height:1.4">Recommended: <strong class="u-accent">${hint.recommended} Mbps+</strong> — ${hint.reason}. Safe bitrate cap: <strong class="u-tx">${bw.label}</strong> (${bw.description})</div></div></div>`; })()}
       ${needed.length ? `<div style="margin-bottom:14px">
         ${needed.map(inp => `
         <div class="u-mb10 name-row">
           <div class="u-between4">
             <span style="color:#8b949e;font-size:.78rem;font-weight:700;letter-spacing:.04em">${inp.label}</span>
-            ${inp.url ? `<a href="${inp.url}" target="_blank" rel="noopener noreferrer" style="font-size:.76rem;color:#f59e0b;text-decoration:none;font-weight:700">Get key →</a>` : ''}
+            ${inp.url ? `<a href="${inp.url}" target="_blank" rel="noopener noreferrer" style="font-size:.76rem;color:#00d4ff;text-decoration:none;font-weight:700">Get key →</a>` : ''}
           </div>
           <div class="u-relrow">
             <input class="name-input" id="cred_${inp.id}" data-service="${inp.id}" data-action="update-cred" type="password" autocapitalize="none" spellcheck="false" enterkeyhint="done" placeholder="${inp.placeholder}"
@@ -6716,8 +6716,8 @@ function simpleFinishHtml() {
           </div>
           <div style="font-weight:700;color:#e6edf3;margin-bottom:4px">How to get a free TMDB key (2 min):</div>
           <div style="display:flex;flex-direction:column;gap:2px">
-            <span>1. Sign up at <a href="https://www.themoviedb.org/signup" target="_blank" rel="noopener noreferrer" style="color:#f59e0b;font-weight:700;text-decoration:none">themoviedb.org/signup</a></span>
-            <span>2. Go to <a href="https://www.themoviedb.org/settings/api" target="_blank" rel="noopener noreferrer" style="color:#f59e0b;font-weight:700;text-decoration:none">Settings → API</a> and request an API key</span>
+            <span>1. Sign up at <a href="https://www.themoviedb.org/signup" target="_blank" rel="noopener noreferrer" style="color:#00d4ff;font-weight:700;text-decoration:none">themoviedb.org/signup</a></span>
+            <span>2. Go to <a href="https://www.themoviedb.org/settings/api" target="_blank" rel="noopener noreferrer" style="color:#00d4ff;font-weight:700;text-decoration:none">Settings → API</a> and request an API key</span>
             <span>3. Copy either the <b>Read Access Token</b> or the <b>API Key</b> below</span>
           </div>
         </div>`}
@@ -6725,7 +6725,7 @@ function simpleFinishHtml() {
           <div class="u-mb10 name-row">
             <div class="u-between4">
               <span style="color:#8b949e;font-size:.78rem;font-weight:700;letter-spacing:.04em">Read Access Token</span>
-              <a href="https://www.themoviedb.org/settings/api" target="_blank" rel="noopener noreferrer" style="font-size:.76rem;color:#f59e0b;text-decoration:none;font-weight:700">Get key →</a>
+              <a href="https://www.themoviedb.org/settings/api" target="_blank" rel="noopener noreferrer" style="font-size:.76rem;color:#00d4ff;text-decoration:none;font-weight:700">Get key →</a>
             </div>
             <div class="u-relrow">
               <input class="name-input" id="tmdbIn" data-action="update-tmdb" type="password" autocapitalize="none" spellcheck="false" enterkeyhint="done" placeholder="eyJhbGciOiJSUzI1NiJ9…"
@@ -6742,7 +6742,7 @@ function simpleFinishHtml() {
           <div class="name-row">
             <div class="u-between4">
               <span style="color:#8b949e;font-size:.78rem;font-weight:700;letter-spacing:.04em">API Key</span>
-              <a href="https://www.themoviedb.org/settings/api" target="_blank" rel="noopener noreferrer" style="font-size:.76rem;color:#f59e0b;text-decoration:none;font-weight:700">Get key →</a>
+              <a href="https://www.themoviedb.org/settings/api" target="_blank" rel="noopener noreferrer" style="font-size:.76rem;color:#00d4ff;text-decoration:none;font-weight:700">Get key →</a>
             </div>
             <div class="u-relrow">
               <input class="name-input" id="tmdbKeyIn" data-action="update-tmdb-key" type="password" autocapitalize="none" spellcheck="false" enterkeyhint="done" placeholder="abc123def456…"
@@ -6771,19 +6771,19 @@ function simpleFinishHtml() {
           <div>
             <div style="font-size:.72rem;font-weight:700;color:#8b949e;margin-bottom:6px">Formatter</div>
             <div style="display:flex;flex-wrap:wrap;gap:6px">
-              ${FORMATTERS.slice(0,5).map(f => `<button data-action="set-simple-fmt" data-val="${f.id}" data-active="${S.formatter===f.id}" style="padding:5px 12px;border-radius:7px;font-size:.72rem;font-weight:700;cursor:pointer;transition:all .15s;border:1px solid ${S.formatter===f.id?'rgba(245,158,11,.4)':'rgba(255,255,255,.08)'};background:${S.formatter===f.id?'rgba(245,158,11,.1)':'transparent'};color:${S.formatter===f.id?'#f59e0b':'#6b7280'}">${f.label}</button>`).join('')}
+              ${FORMATTERS.slice(0,5).map(f => `<button data-action="set-simple-fmt" data-val="${f.id}" data-active="${S.formatter===f.id}" style="padding:5px 12px;border-radius:7px;font-size:.72rem;font-weight:700;cursor:pointer;transition:all .15s;border:1px solid ${S.formatter===f.id?'rgba(0,212,255,.4)':'rgba(255,255,255,.08)'};background:${S.formatter===f.id?'rgba(0,212,255,.1)':'transparent'};color:${S.formatter===f.id?'#00d4ff':'#6b7280'}">${f.label}</button>`).join('')}
             </div>
           </div>
           <div>
             <div style="font-size:.72rem;font-weight:700;color:#8b949e;margin-bottom:6px">Dedup matching</div>
             <div class="u-row6">
-              ${[['strict','Strict'],['balanced','Balanced'],['relaxed','Relaxed']].map(([v,l]) => `<button data-action="set-simple-match" data-val="${v}" data-active="${S.matchMode===v}" style="flex:1;padding:5px 10px;border-radius:7px;font-size:.72rem;font-weight:700;cursor:pointer;transition:all .15s;border:1px solid ${S.matchMode===v?'rgba(245,158,11,.4)':'rgba(255,255,255,.08)'};background:${S.matchMode===v?'rgba(245,158,11,.1)':'transparent'};color:${S.matchMode===v?'#f59e0b':'#6b7280'}">${l}</button>`).join('')}
+              ${[['strict','Strict'],['balanced','Balanced'],['relaxed','Relaxed']].map(([v,l]) => `<button data-action="set-simple-match" data-val="${v}" data-active="${S.matchMode===v}" style="flex:1;padding:5px 10px;border-radius:7px;font-size:.72rem;font-weight:700;cursor:pointer;transition:all .15s;border:1px solid ${S.matchMode===v?'rgba(0,212,255,.4)':'rgba(255,255,255,.08)'};background:${S.matchMode===v?'rgba(0,212,255,.1)':'transparent'};color:${S.matchMode===v?'#00d4ff':'#6b7280'}">${l}</button>`).join('')}
             </div>
           </div>
           <div>
             <div style="font-size:.72rem;font-weight:700;color:#8b949e;margin-bottom:6px">Cache mode</div>
             <div class="u-row6">
-              ${[['mixed','Mixed'],['cached','Cached only'],['uncached','Uncached only']].map(([v,l]) => `<button data-action="set-simple-cache" data-val="${v}" data-active="${S.cacheMode===v}" style="flex:1;padding:5px 10px;border-radius:7px;font-size:.72rem;font-weight:700;cursor:pointer;transition:all .15s;border:1px solid ${S.cacheMode===v?'rgba(245,158,11,.4)':'rgba(255,255,255,.08)'};background:${S.cacheMode===v?'rgba(245,158,11,.1)':'transparent'};color:${S.cacheMode===v?'#f59e0b':'#6b7280'}">${l}</button>`).join('')}
+              ${[['mixed','Mixed'],['cached','Cached only'],['uncached','Uncached only']].map(([v,l]) => `<button data-action="set-simple-cache" data-val="${v}" data-active="${S.cacheMode===v}" style="flex:1;padding:5px 10px;border-radius:7px;font-size:.72rem;font-weight:700;cursor:pointer;transition:all .15s;border:1px solid ${S.cacheMode===v?'rgba(0,212,255,.4)':'rgba(255,255,255,.08)'};background:${S.cacheMode===v?'rgba(0,212,255,.1)':'transparent'};color:${S.cacheMode===v?'#00d4ff':'#6b7280'}">${l}</button>`).join('')}
             </div>
           </div>
           ${['advanced', 'labs'].includes(activeOutputProfile()) ? `          <div>
@@ -6792,19 +6792,19 @@ function simpleFinishHtml() {
               <span style="font-size:.6rem;color:#4b5563;font-weight:600">${streamPoolSummary()}</span>
             </div>
             <div class="u-row6">
-              ${streamPoolChoices().map(([v,l,c]) => `<button data-action="set-simple-pool" data-val="${v}" data-active="${(S.streamPool||'normal')===v}" style="flex:1;padding:7px 10px 5px;border-radius:7px;font-size:.72rem;font-weight:700;cursor:pointer;transition:all .15s;border:1px solid ${(S.streamPool||'normal')===v?'rgba(245,158,11,.4)':'rgba(255,255,255,.08)'};background:${(S.streamPool||'normal')===v?'rgba(245,158,11,.1)':'transparent'};color:${(S.streamPool||'normal')===v?'#f59e0b':'#6b7280'};line-height:1.3">${l}<br><span style="font-size:.6rem;font-weight:600;opacity:.7">${c}</span></button>`).join('')}
+              ${streamPoolChoices().map(([v,l,c]) => `<button data-action="set-simple-pool" data-val="${v}" data-active="${(S.streamPool||'normal')===v}" style="flex:1;padding:7px 10px 5px;border-radius:7px;font-size:.72rem;font-weight:700;cursor:pointer;transition:all .15s;border:1px solid ${(S.streamPool||'normal')===v?'rgba(0,212,255,.4)':'rgba(255,255,255,.08)'};background:${(S.streamPool||'normal')===v?'rgba(0,212,255,.1)':'transparent'};color:${(S.streamPool||'normal')===v?'#00d4ff':'#6b7280'};line-height:1.3">${l}<br><span style="font-size:.6rem;font-weight:600;opacity:.7">${c}</span></button>`).join('')}
             </div>
             <div style="font-size:.65rem;color:#4b5563;margin-top:4px;line-height:1.4">More streams = better quality picks but slower load</div>
           </div>` : ''}
           <div>
-            <button data-action="set-simple-quality" data-active="${!!S.qualityFirst}" style="width:100%;padding:8px 12px;border-radius:7px;font-size:.72rem;font-weight:700;cursor:pointer;transition:all .15s;border:1px solid ${S.qualityFirst?'rgba(245,158,11,.4)':'rgba(255,255,255,.08)'};background:${S.qualityFirst?'rgba(245,158,11,.1)':'transparent'};color:${S.qualityFirst?'#f59e0b':'#6b7280'};display:flex;align-items:center;justify-content:space-between">
+            <button data-action="set-simple-quality" data-active="${!!S.qualityFirst}" style="width:100%;padding:8px 12px;border-radius:7px;font-size:.72rem;font-weight:700;cursor:pointer;transition:all .15s;border:1px solid ${S.qualityFirst?'rgba(0,212,255,.4)':'rgba(255,255,255,.08)'};background:${S.qualityFirst?'rgba(0,212,255,.1)':'transparent'};color:${S.qualityFirst?'#00d4ff':'#6b7280'};display:flex;align-items:center;justify-content:space-between">
               <span>Quality over resolution</span>
               <span>${S.qualityFirst?ICO.check(13,'currentColor'):''}</span>
             </button>
             <div style="font-size:.65rem;color:#4b5563;margin-top:4px;line-height:1.4">A 1080p REMUX ranks above a 4K WEB-DL when enabled</div>
           </div>
           <div>
-            <button data-action="set-simple-resfirst" data-active="${!!S.resolutionFirst}" style="width:100%;padding:8px 12px;border-radius:7px;font-size:.72rem;font-weight:700;cursor:pointer;transition:all .15s;border:1px solid ${S.resolutionFirst?'rgba(245,158,11,.4)':'rgba(255,255,255,.08)'};background:${S.resolutionFirst?'rgba(245,158,11,.1)':'transparent'};color:${S.resolutionFirst?'#f59e0b':'#6b7280'};display:flex;align-items:center;justify-content:space-between">
+            <button data-action="set-simple-resfirst" data-active="${!!S.resolutionFirst}" style="width:100%;padding:8px 12px;border-radius:7px;font-size:.72rem;font-weight:700;cursor:pointer;transition:all .15s;border:1px solid ${S.resolutionFirst?'rgba(0,212,255,.4)':'rgba(255,255,255,.08)'};background:${S.resolutionFirst?'rgba(0,212,255,.1)':'transparent'};color:${S.resolutionFirst?'#00d4ff':'#6b7280'};display:flex;align-items:center;justify-content:space-between">
               <span>Resolution first</span>
               <span>${S.resolutionFirst?ICO.check(13,'currentColor'):''}</span>
             </button>
@@ -6838,7 +6838,7 @@ function simpleFinishHtml() {
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
           </button>
         </div>
-        <button type="button" data-action="create-stremio-account" style="align-self:flex-start;font-size:.7rem;color:#f59e0b;background:none;border:none;cursor:pointer;padding:0;font-weight:600;opacity:.8">Create random account →</button>
+        <button type="button" data-action="create-stremio-account" style="align-self:flex-start;font-size:.7rem;color:#00d4ff;background:none;border:none;cursor:pointer;padding:0;font-weight:600;opacity:.8">Create random account →</button>
       </div>
       <button class="u-mb8 btn-manifest" id="btnAio" data-action="simple-install" data-target="app">${ICO.rocket(18,'currentColor')} Install to Stremio</button>
       ` : `
@@ -6851,7 +6851,7 @@ function simpleFinishHtml() {
       `}
       <div id="aioResult"></div>`}
       <div style="display:flex;justify-content:center;gap:18px;margin-top:18px;padding-top:14px;border-top:1px solid rgba(255,255,255,.06)">
-        <button data-action="generate-dl" style="background:none;border:none;color:#fbbf24;font-size:.8rem;font-weight:700;cursor:pointer;padding:0">${ICO.download(13,'#fbbf24')} Export JSON instead</button>
+        <button data-action="generate-dl" style="background:none;border:none;color:#67e8f9;font-size:.8rem;font-weight:700;cursor:pointer;padding:0">${ICO.download(13,'#67e8f9')} Export JSON instead</button>
         <button data-action="show-full-review" style="background:none;border:none;color:#6b7280;font-size:.8rem;font-weight:600;cursor:pointer;padding:0;text-decoration:underline;text-underline-offset:2px">Show all options →</button>
       </div>
     </div>`;
@@ -7740,7 +7740,7 @@ function showExpressLane() {
           <option value="custom"${S.instanceHost==='custom'?' selected':''}>Custom / self-hosted (set its URL in Advanced)</option>
         </select>
       </div>
-      <button type="button" id="expressExtrasBtn" class="additional-services-btn" style="width:100%;margin-top:8px;display:flex;align-items:center;gap:10px;padding:11px 13px;border-radius:11px;border:1px solid rgba(255,255,255,.09);background:#0e1621;color:#c9d5df;cursor:pointer;text-align:left"><span style="font-size:1rem;color:#a78bfa">＋</span><span class="u-flex1"><b style="display:block;font-size:.72rem">Additional services &amp; scrapers</b><span style="display:block;font-size:.6rem;color:#718093;margin-top:1px">Debridio, Debrider, Usenet, indexers and more</span></span><span id="expressExtrasCount" style="font-size:.6rem;font-weight:900;color:#fbbf24"></span><span>→</span></button>
+      <button type="button" id="expressExtrasBtn" class="additional-services-btn" style="width:100%;margin-top:8px;display:flex;align-items:center;gap:10px;padding:11px 13px;border-radius:11px;border:1px solid rgba(255,255,255,.09);background:#0e1621;color:#c9d5df;cursor:pointer;text-align:left"><span style="font-size:1rem;color:#a78bfa">＋</span><span class="u-flex1"><b style="display:block;font-size:.72rem">Additional services &amp; scrapers</b><span style="display:block;font-size:.6rem;color:#718093;margin-top:1px">Debridio, Debrider, Usenet, indexers and more</span></span><span id="expressExtrasCount" style="font-size:.6rem;font-weight:900;color:#67e8f9"></span><span>→</span></button>
     </div>
     <div class="fastlane-section"><div class="fastlane-label">2 · What matters most</div>
       <div class="fastlane-grid services cols-3">${EXPRESS_PROFILES.map(([v,n,d])=>`<button type="button" class="fastlane-choice${state.profile===v?' active':''}" data-express-profile="${v}"><b>${n}${v==='balanced'?' <span class="fastlane-reco">Recommended</span>':''}</b><span>${d}</span></button>`).join('')}</div>
