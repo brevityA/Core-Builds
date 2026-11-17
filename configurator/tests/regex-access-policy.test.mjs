@@ -33,8 +33,8 @@ test('collectRegexPatternSet: a regex-scoring golden carries the synced URL + it
   const golden = JSON.parse(await readFile(new URL('../e2e/golden/torbox-4k-apex-mixed.json', import.meta.url), 'utf8'));
   const set = collectRegexPatternSet(golden.config);
   assert.deepEqual(set.syncedUrls, [VIDHIN_URL]);
-  // 83 unique: the 5 preferred + 3 excluded arrays overlap the 83 ranked entries
-  assert.equal(set.inline.size, 83);
+  // 84 unique: the 5 preferred + 3 excluded arrays overlap the 83 ranked entries (+1 fixed AI excluded regex)
+  assert.equal(set.inline.size, 84);
 });
 
 // Balanced keeps inline regex but no synced URL since v3.14. Before that it shipped
@@ -44,7 +44,7 @@ test('collectRegexPatternSet: a Balanced golden carries inline patterns but no s
   const golden = JSON.parse(await readFile(new URL('../e2e/golden/core-balanced-torbox-1080p.json', import.meta.url), 'utf8'));
   const set = collectRegexPatternSet(golden.config);
   assert.equal(set.syncedUrls.length, 0);
-  assert.equal(set.inline.size, 79);
+  assert.equal(set.inline.size, 80);
 });
 
 test('collectRegexPatternSet: a Stable golden still carries neither', async () => {
