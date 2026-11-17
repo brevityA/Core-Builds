@@ -278,9 +278,17 @@ test('Fix 1 (DV-Only Kill): generic/non-DV 1080p build kills DV-only s14 while k
 });
 
 test('Fix 2 (\\bAI\\b regex): excludes real AI upscales without killing legitimate "(AI)" titles like s28', () => {
-  const patterns = (balancedGolden.config.excludedRegexPatterns || []).map(parseRegexLiteral);
+  const customBalanced = generateTemplate({
+    outputProfile: 'balanced',
+    architecture: 'standard',
+    service: 'torbox-pro',
+    device: 'generic',
+    resolution: '1080p',
+    host: 'custom',
+  }).config;
+  const patterns = (customBalanced.excludedRegexPatterns || []).map(parseRegexLiteral);
   const aiRegex = patterns[0];
-  assert.ok(aiRegex, 'First excluded regex pattern present');
+  assert.ok(aiRegex, 'First excluded regex pattern present on custom/self-hosted build');
 
   const s28 = fixture.streams.find((s) => s.id === 's28-edge-title-contains-ai-false-exclusion');
   assert.ok(s28, 'Fixture includes s28');
@@ -294,15 +302,22 @@ test('Fix 2 (\\bAI\\b regex): excludes real AI upscales without killing legitima
   assert.equal(aiRegex.test('Movie.2024.AI_Remastered.1080p.mkv'), true);
   assert.equal(aiRegex.test('Movie.2024.AIUS.1080p.mkv'), true);
 
+  const customSurvivors = runEseAndRegex(customBalanced, fixture.streams, fixture.context);
+  assert.ok(
+    customSurvivors.some((s) => s.id === 's28-edge-title-contains-ai-false-exclusion'),
+    'Custom Core Balanced TorBox 1080p keeps s28'
+  );
+  assert.equal(
+    customSurvivors.some((s) => s.id === 's29-edge-true-ai-upscale'),
+    false,
+    'Custom Core Balanced TorBox 1080p still excludes true AI upscale s29'
+  );
+
+  // ElfHosted golden keeps s28 as well (non-allowlisted AI pattern stripped by host gate)
   const balancedSurvivors = runEseAndRegex(balancedGolden.config, fixture.streams, fixture.context);
   assert.ok(
     balancedSurvivors.some((s) => s.id === 's28-edge-title-contains-ai-false-exclusion'),
-    'Core Balanced TorBox 1080p keeps s28'
-  );
-  assert.equal(
-    balancedSurvivors.some((s) => s.id === 's29-edge-true-ai-upscale'),
-    false,
-    'Core Balanced TorBox 1080p still excludes true AI upscale s29'
+    'ElfHosted Core Balanced golden keeps s28'
   );
 });
 
