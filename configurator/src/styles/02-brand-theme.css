@@ -10,23 +10,31 @@
 .core-ring-2{animation-delay:1.3s}
 .hex-glow-layer{animation:hexBreath 2.6s ease-in-out infinite}
 @media(prefers-reduced-motion:reduce){.diamond-core,.diamond-glow,.core-ring,.hex-glow-layer{animation:none}}
-.srh{display:flex;align-items:center;gap:14px;padding-bottom:16px;margin-bottom:18px;border-bottom:1px solid rgba(255,255,255,.05)}
+.srh{display:flex;align-items:center;gap:14px;padding-bottom:16px;margin-bottom:18px;border-bottom:1px solid var(--th-border)}
 .srh-ring{position:relative;width:52px;height:52px;flex-shrink:0}
 .srh-num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:1.15rem;font-weight:900;color:var(--th-accent)}
-.srh-title{font-size:1.15rem;font-weight:900;letter-spacing:-.02em;line-height:1.1;color:#e6edf3}
-.srh-sub{font-size:.84rem;color:#7ea4bd;margin-top:4px;line-height:1.4}
+.srh-title{font-size:1.15rem;font-weight:900;letter-spacing:-.02em;line-height:1.1;color:var(--th-tx)}
+.srh-sub{font-size:.84rem;color:var(--th-tx2);margin-top:4px;line-height:1.4}
 .step-strip{display:flex;align-items:center;padding:10px 0 6px;position:relative}
 .step-unit{display:flex;flex-direction:column;align-items:center;flex:1;position:relative;min-width:0}
-.step-unit:not(:first-child)::before{content:'';position:absolute;top:50%;transform:translateY(-50%);right:50%;width:100%;height:1px;background:rgba(255,255,255,.06);z-index:0;transition:background .3s}
+.step-unit:not(:first-child)::before{content:'';position:absolute;top:50%;transform:translateY(-50%);right:50%;width:100%;height:1px;background:var(--th-border);z-index:0;transition:background .3s}
 .step-unit.done::before{background:linear-gradient(90deg,rgba(0,212,255,.55),rgba(0,212,255,.2))}
-.step-bub{width:10px;height:10px;border-radius:50%;position:relative;z-index:1;flex-shrink:0;transition:all .25s;display:grid;place-items:center;font-size:0;color:transparent}
-.step-lbl{font-size:.62rem;font-weight:600;color:#4a4f60;margin-top:4px;text-align:center;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:80px}
+/* Step states are carried by shape as much as colour: done = green check,
+   active = larger ringed bubble, pending = small dim dot (2026-11 UI pass). */
+.step-bub{width:10px;height:10px;border-radius:50%;position:relative;z-index:1;flex-shrink:0;transition:all .25s;display:grid;place-items:center;font-size:0;color:transparent;background:var(--th-tx5)}
+.step-unit.active .step-bub{width:16px;height:16px;background:var(--th-card);border:2px solid var(--th-accent);box-shadow:0 0 0 3px var(--th-accent-bg)}
+.step-unit.done .step-bub{width:14px;height:14px;background:var(--th-green);color:#fff}
+.step-unit.done .step-bub svg{width:10px;height:10px}
+.step-unit[data-action]{cursor:pointer}
+.step-unit[data-action]:focus-visible{outline:2px solid var(--th-accent);outline-offset:4px;border-radius:8px}
+.step-lbl{font-size:.62rem;font-weight:600;color:var(--th-tx3);margin-top:4px;text-align:center;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:80px}
+.step-unit.active .step-lbl{color:var(--th-tx2)}
 @media(max-width:480px){.step-lbl{max-width:48px;font-size:.56rem}}
 .btn-reset-strip{background:transparent;border:1px solid rgba(255,255,255,.06)!important;color:#4a4f60;font-size:.68rem;font-weight:700;cursor:pointer;padding:4px 10px;border-radius:20px;transition:all .15s;flex-shrink:0;align-self:center;letter-spacing:.05em;text-transform:uppercase;line-height:1.4}
 .btn-reset-strip:hover{background:rgba(220,38,38,.08);border-color:rgba(220,38,38,.25)!important;color:#f87171}
 .bc-row{display:flex;flex-wrap:nowrap;gap:5px;padding:1px 0 7px;overflow-x:auto;scrollbar-width:none}
 .bc-row::-webkit-scrollbar{display:none}
-.bc-chip{font-size:.6rem;font-weight:700;padding:2px 8px;border-radius:20px;background:rgba(0,212,255,.06);border:1px solid rgba(0,212,255,.28);color:#00b8d9;white-space:nowrap;flex-shrink:0;box-shadow:0 0 6px rgba(0,212,255,.1)}
+.bc-chip{font-size:.6rem;font-weight:700;padding:2px 8px;border-radius:20px;background:rgba(0,212,255,.06);border:1px solid rgba(0,212,255,.28);color:#00b8d9;white-space:nowrap;flex-shrink:0}
 .receipt-card{border:1px solid rgba(255,255,255,.06);border-radius:12px;overflow:hidden;margin-bottom:16px}
 .receipt-hdr{display:flex;align-items:center;gap:12px;padding:13px 16px;background:#111720;border-bottom:1px solid rgba(255,255,255,.06)}
 .receipt-hdr-icon{width:36px;height:36px;border-radius:9px;background:linear-gradient(135deg,#0096b4,#005c7a);display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0}
@@ -36,7 +44,11 @@
 .receipt-row:last-child{border-bottom:none}
 .receipt-row-left{display:flex;align-items:center;gap:8px;flex-shrink:0}
 .receipt-row-ico{font-size:.8rem;width:16px;text-align:center}
-.receipt-row-lbl{font-size:.74rem;color:#4b5563;font-weight:600;text-transform:capitalize}
+.receipt-row-lbl{font-size:.74rem;color:var(--th-tx3);font-weight:600;text-transform:capitalize}
+.receipt-row[data-action]{cursor:pointer;transition:background .15s}
+.receipt-row[data-action]:hover{background:rgba(255,255,255,.025)}
+.receipt-row[data-action]:focus-visible{outline:2px solid var(--th-accent);outline-offset:-2px;border-radius:8px}
+[data-theme="light"] .receipt-row[data-action]:hover{background:rgba(0,0,0,.03)}
 .receipt-row-val{font-size:.84rem;font-weight:700;color:#c9d1d9;text-align:right;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:54%}
 .receipt-row-val.hl{color:var(--th-accent)}
 .card.splash{background:rgba(10,15,22,0.72);background-image:radial-gradient(ellipse at 50% 18%,rgba(0,180,210,0.18) 0%,transparent 55%),radial-gradient(ellipse at 50% 92%,rgba(120,30,180,0.12) 0%,transparent 50%);position:relative;overflow:hidden;backdrop-filter:blur(12px) saturate(180%);-webkit-backdrop-filter:blur(12px) saturate(180%)}
@@ -108,7 +120,6 @@
 [data-theme="light"]{color-scheme:light}
 [data-theme="light"] body{background:#f6f8fa;color:#1c2128}
 [data-theme="light"] .card{background:#ffffff;border-color:#d0d7de}
-[data-theme="light"] .card::after{background:linear-gradient(90deg,transparent,rgba(9,105,218,.15),transparent)}
 [data-theme="light"] .card.splash{background:#f0f4f8}
 [data-theme="light"] .card h2{color:#1c2128}
 [data-theme="light"] .card .desc{color:#57606a}
@@ -316,3 +327,15 @@
 [data-theme="light"] #cb-loader-sub{color:#8c959f}
 @keyframes cbLoad{0%{opacity:0}10%{opacity:1}75%{opacity:1}100%{opacity:0}}
 @keyframes cbIconPop{from{opacity:0;transform:scale(.7)}to{opacity:1;transform:scale(1)}}
+
+/* ── 2026-11 UI pass (2): consistent state styles ── */
+/* Version badge: quiet, on-token, no glow (was inline gradient + 8px shadow). */
+.hdr-ver-badge{position:absolute;top:9px;right:12px;font-size:.62rem;font-weight:800;color:var(--th-accent);background:var(--th-accent-bg);border:1px solid var(--th-accent-border);border-radius:5px;padding:2px 7px;letter-spacing:.07em;cursor:pointer;transition:all .15s}
+.hdr-ver-badge:hover{border-color:var(--th-accent)}
+.hdr-ver-badge:focus-visible{outline:2px solid var(--th-accent);outline-offset:2px}
+[data-theme="light"] .hdr-ver-badge{color:#0969da;background:rgba(9,105,218,.06);border-color:rgba(9,105,218,.25)}
+[data-theme="light"] .hdr-ver-badge:hover{border-color:#0969da}
+/* Disabled Next: the label that explains why, as a class (was theme-checked inline). */
+.cta-disabled-lbl{flex:1;font-size:.88rem;font-weight:600;color:var(--th-tx4)}
+.cta-disabled-arr{color:var(--th-tx5)}
+[data-theme="light"] .cta-disabled-lbl{color:var(--th-tx5)}

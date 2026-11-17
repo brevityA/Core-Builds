@@ -5,7 +5,7 @@
     "description": "Windows PC / Ultra-Wide. 1080p primary · 1440p when available · 4K fallback. Full audio (Atmos, TrueHD, DTS-HD MA, DTS:X) · all encodes including AV1 · HDR-first visual priority. No codec restrictions.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "0.2.16",
+    "version": "0.2.17",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -17,6 +17,11 @@
       "v232Action": "remove legacy preset; configure the separate Newznab endpoint only after validation"
     },
     "changelog": [
+      {
+        "date": "2026-11-16",
+        "version": "0.2.17",
+        "content": "Inline regex sync: patterns re-derived from the current Vidhin05 English ranked list (H.264 10bit). No filter/sort/formatter changes."
+      },
       {
         "date": "2026-11-14",
         "version": "0.2.16",
@@ -782,7 +787,7 @@
         "score": 20
       },
       {
-        "pattern": "/\\bhi10p?\\b|(?=.*10[.-]?bit)(?=.*\\b[xh][-_. ]?264\\b)/i",
+        "pattern": "/\\bhi10(?:p|res)?\\b|(?=.*(?:\\b10[ .\\-_]?bits?\\b|yuv4\\d\\dp10))(?=.*\\b(?:[xh][-_. ]?264|avc)\\b)/i",
         "name": "H.264 10bit",
         "score": 20
       },
