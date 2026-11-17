@@ -150,3 +150,76 @@ test('buildFeedbackReport redacts Authorization: Basic base64 credentials from s
   assert.match(report, /Fire Stick/);
   assert.match(report, /Series S01E01/);
 });
+
+test('buildFeedbackReport redacts full comma-separated Authorization: Digest parameter lists', () => {
+  const digestHeader = 'Authorization: Digest username="user1", realm="realm@host.com", '
+    + 'nonce="dcd98b7102dd2f0e8b11d0f600bfb0c093", uri="/api", qop=auth, nc=00000001, '
+    + 'cnonce="0a4f113b", response="6629fae49393a05397450978507c4ef1", '
+    + 'opaque="5ccc069c403ebaf9f0171e9517f40e41"';
+  const report = buildFeedbackReport({ device: 'TV' }, {
+    contentType: 'Movie',
+    titleAndEpisode: 'Example Title',
+    visibleError: digestHeader,
+  });
+
+  const leaked = [
+    'username',
+    'realm@host.com',
+    'dcd98b7102dd2f0e8b11d0f600bfb0c093',
+    '0a4f113b',
+    '6629fae49393a05397450978507c4ef1',
+    '5ccc069c403ebaf9f0171e9517f40e41',
+  ];
+  for (const value of leaked) {
+    assert.equal(report.includes(value), false, `leaked digest parameter: ${value}`);
+  }
+  assert.match(report, /Authorization \[redacted\]/);
+});
+
+test('sanitizeFeedbackText redacts a Digest list and keeps following prose after a semicolon', () => {
+  const safe = sanitizeFeedbackText(
+    'Authorization: Digest username="user1", nonce="dcd98b7102dd2f0e8b11d0f600bfb0c093", response="6629fae49393a05397450978507c4ef1"; No streams returned',
+  );
+  assert.equal(safe, 'Authorization [redacted]; No streams returned');
+});
+
+test('sanitizeFeedbackText redacts a Digest header with nested quotes and a URL-valued uri', () => {
+  const safe = sanitizeFeedbackText(
+    'Authorization: Digest username="user1", uri="https://example.invalid/private/manifest.json", response="6629fae49393a05397450978507c4ef1"',
+  );
+  assert.equal(safe, 'Authorization [redacted]');
+});
+
+test('sanitizeFeedbackText redacts the Token scheme and a lowercase header name', () => {
+  const safe = sanitizeFeedbackText('authorization=Token 0123456789abcdef');
+  assert.equal(safe, 'authorization [redacted]');
+});
+
+test('sanitizeFeedbackText leaves plain prose about authorization untouched', () => {
+  assert.equal(
+    sanitizeFeedbackText('Check the authorization settings for this addon'),
+    'Check the authorization settings for this addon',
+  );
+});
+
+test('sanitizeFeedbackText leaves an authorization header with no value untouched', () => {
+  assert.equal(sanitizeFeedbackText('Authorization:'), 'Authorization:');
+});
+
+test('sanitizeFeedbackText stays linear on long adversarial Authorization input', () => {
+  const hostile = `Authorization: Digest ${'a="'.repeat(20000)}`;
+  const started = performance.now();
+  const safe = sanitizeFeedbackText(hostile, 5000);
+  const elapsed = performance.now() - started;
+  assert.equal(safe, 'Authorization [redacted]');
+  assert.equal(elapsed < 2000, true, `sanitization took ${elapsed.toFixed(1)}ms`);
+});
+
+test('sanitizeFeedbackText stays linear on long adversarial Bearer spacing', () => {
+  const hostile = `Bearer${' '.repeat(50000)}short`;
+  const started = performance.now();
+  const safe = sanitizeFeedbackText(hostile, 5000);
+  const elapsed = performance.now() - started;
+  assert.equal(safe, 'Bearer short');
+  assert.equal(elapsed < 2000, true, `sanitization took ${elapsed.toFixed(1)}ms`);
+});
