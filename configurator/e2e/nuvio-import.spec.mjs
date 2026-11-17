@@ -40,8 +40,9 @@ for (const service of ['p2p', 'torbox-pro']) {
 
     await page.locator('[data-action="open-express-lane"]').click();
     await page.locator('#expressHost').selectOption('midnight'); // explicit compatible host — Express honors the pick post-#684 (#682)
-    await page.locator('[data-express-target="nuvio"]').click();
-    await page.locator('#expressGo').click();
+    await expect(page.locator('[data-express-target="nuvio"]')).toHaveCount(0);
+    // Legacy engine regression only: this route is intentionally absent from the UI.
+    await page.evaluate(service => window.__coreBuilds.legacyExpressInstall({ service, target:'nuvio', profile:'balanced', device:'generic', resolution:'1080p', creds:{} }), service);
 
     await expect(page.locator('#aioResult')).toContainText('Nuvio template ready');
     await expect(page.locator('#aioResult')).toContainText('https://dpaste.com/nuvio-fallback.txt');
@@ -79,8 +80,8 @@ test('Nuvio paste failure offers the actual Nuvio JSON instead of the previous w
   await page.evaluate(() => window.__coreBuilds.generate({ service: 'torbox-pro', multiServices: ['torbox-pro'], device: 'googletv', resolution: '4k', content: 'all', creds: { torbox: 'LOCAL-TORBOX-KEY' } }));
   await page.locator('[data-action="open-express-lane"]').click();
   await page.locator('#expressHost').selectOption('midnight');
-  await page.locator('[data-express-target="nuvio"]').click();
-  await page.locator('#expressGo').click();
+  await expect(page.locator('[data-express-target="nuvio"]')).toHaveCount(0);
+  await page.evaluate(() => window.__coreBuilds.legacyExpressInstall({ service:'torbox-pro', target:'nuvio', profile:'balanced', device:'googletv', resolution:'4k', creds:{} }));
   const downloadPromise = page.waitForEvent('download');
   await page.getByRole('button', { name: 'Export Nuvio JSON' }).click();
   const download = await downloadPromise;

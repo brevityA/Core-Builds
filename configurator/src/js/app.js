@@ -2176,7 +2176,7 @@ function splashHtml() {
         <p class="splash-from-note">Coming from QuackStart? <button type="button" data-action="open-quick-install" class="splash-from-link">Quick install</button> does the same one-click setup: AIOStreams with AIOMetadata and the Cinemeta patch, or just a manifest URL for any app.</p>
         <div class="hybrid-trust"><span><i></i> Runs locally</span><span><i></i> Open source · MIT</span><span><i></i> Build without a login — or push it in one click</span></div>
         <div class="splash-stats" id="splashStats"></div>
-        <div class="hybrid-subnote">Core Stable by default · 6s addon timeout · Core Builds keeps no copy of your keys</div>
+        <div class="hybrid-subnote">Core Stable by default · 6s addon timeout · Provider keys stay in this browser and are sent to your chosen host on deploy</div>
       </div>
       <div class="hybrid-core-stage splash-anim splash-anim-d2">
         <button type="button" class="core-support-mark" data-action="open-support" aria-label="Support Core Builds" title="Support Core Builds">
@@ -2231,9 +2231,8 @@ function splashHtml() {
     <div class="hybrid-section-head splash-anim splash-anim-d6"><div><h2>Utilities</h2><p>Back up or explore the Core tool suite.</p></div><p class="hybrid-section-index">03 / Tools</p></div>
     <div class="splash-doors splash-anim splash-anim-d6">
       <a class="splash-door core-tool-door" href="../account-tools/" target="_blank" rel="noopener noreferrer"><div class="splash-door-icon">${ICO.download(22,'#34d399')}</div><div class="splash-door-text"><div class="splash-door-title">Back Up Addons <span class="splash-door-tag" style="background:rgba(52,211,153,.1);color:#34d399;border:1px solid rgba(52,211,153,.2)">Read-only</span></div><div class="splash-door-desc">View and download your current Stremio addon setup. Nothing is changed.</div></div></a>
-      <a class="splash-door core-tool-door" href="../tools/genies/nuvio-stacks.html"><div class="splash-door-icon"><span style="font-size:20px;line-height:1" aria-hidden="true">🧞</span></div><div class="splash-door-text"><div class="splash-door-title">Nuvio Stack Genie <span class="splash-door-tag" style="background:rgba(168,85,247,.12);color:#c4b5fd;border:1px solid rgba(168,85,247,.28)">Cross-app</span></div><div class="splash-door-desc">Guided profiles &amp; add-ons for Nuvio — pick a stack, get install links.</div></div></a>
       <a class="splash-door core-tool-door" href="../tools/speedtest/"><div class="splash-door-icon"><span style="font-size:20px;line-height:1" aria-hidden="true">⚡</span></div><div class="splash-door-text"><div class="splash-door-title">CoreSpeed <span class="splash-door-tag" style="background:rgba(0,212,255,.1);color:#67e8f9;border:1px solid rgba(0,212,255,.22)">Speedtest</span></div><div class="splash-door-desc">Race every TorBox CDN at once — ping, multi-stream speed, live map, and the best node for your setup.</div></div></a>
-      <a class="splash-door core-tool-door" href="../tools/badges/"><div class="splash-door-icon"><span style="font-size:20px;line-height:1" aria-hidden="true">🏷️</span></div><div class="splash-door-text"><div class="splash-door-title">Core Badge Builder <span class="splash-door-tag" style="background:rgba(168,85,247,.12);color:#c4b5fd;border:1px solid rgba(168,85,247,.28)">No regex</span></div><div class="splash-door-desc">Design Nuvio stream badges visually, preview them, and hand the matching formatter back here.</div></div></a>
+      <a class="splash-door core-tool-door" href="../tools/badges/"><div class="splash-door-icon"><span style="font-size:20px;line-height:1" aria-hidden="true">🏷️</span></div><div class="splash-door-text"><div class="splash-door-title">Core Badge Builder <span class="splash-door-tag" style="background:rgba(168,85,247,.12);color:#c4b5fd;border:1px solid rgba(168,85,247,.28)">No regex</span></div><div class="splash-door-desc">Design stream badges visually, preview them, and hand the matching formatter back here.</div></div></a>
       <a class="splash-door core-tool-door" href="../tools/banner-studio/"><div class="splash-door-icon"><span style="font-size:20px;line-height:1" aria-hidden="true">🎬</span></div><div class="splash-door-text"><div class="splash-door-title">Banner Studio <span class="splash-door-tag" style="background:rgba(248,113,113,.12);color:#fca5a5;border:1px solid rgba(248,113,113,.3)">17 brands</span></div><div class="splash-door-desc">Netflix-style streaming banners for any major streamer — render &amp; export locally.</div></div></a>
       <a class="splash-door core-tool-door" href="../tools/"><div class="splash-door-icon">${ICO.folder(22,'#a78bfa')}</div><div class="splash-door-text"><div class="splash-door-title">All Core Tools</div><div class="splash-door-desc">Builder, backup, and upcoming inspection utilities.</div></div></a>
     </div>
@@ -2445,8 +2444,6 @@ function renderCore() {
             <button class="u-mb8 btn-manifest" id="btnAutoCreate" data-action="simple-install" data-target="app">${ICO.rocket(18,'currentColor')} Deploy to Stremio</button>
             <div class="u-row8">
               <button class="btn-manifest" data-action="simple-install" data-target="wuplay" style="flex:1;font-size:.82rem;padding:11px 10px;background:rgba(167,139,250,.10);border-color:rgba(167,139,250,.3);color:#a78bfa">${ICO.wuplay(16,'#a78bfa')} WuPlay</button>
-              <button class="btn-manifest" data-action="simple-install" data-target="nuvio" style="flex:1;font-size:.82rem;padding:11px 10px;background:rgba(168,85,247,.08);border-color:rgba(168,85,247,.25);color:#c084fc">${ICO.nuvio(16)} Nuvio</button>
-              <button class="btn-manifest btn-chillio" data-action="simple-install" data-target="chillio" title="ChillLink URL for the Chillio app">${ICO.chillio(16,'#fb923c')} Chillio</button>
             </div>
             <div id="aioResult"></div>
             `}`}
@@ -2845,7 +2842,7 @@ const TUT_STEPS = [
   },
   {
     id:'quick', badge:'Step 4 of 7', title:'Quick Install',
-    desc:'Quick Install asks only what is required. Choose Stremio, Nuvio, WuPlay, or another app; select multiple providers; then pick <strong>Fast & Light</strong>, <strong>Balanced</strong>, or <strong>Maximum Quality</strong>.<br><br>Credential fields appear only for selected providers.',
+    desc:'Quick Install asks only what is required. Choose Stremio or WuPlay; select multiple providers; then pick <strong>Fast & Light</strong>, <strong>Balanced</strong>, or <strong>Maximum Quality</strong>.<br><br>Credential fields appear only for selected providers.',
     target:'#splashStart [data-action="open-express-lane"]', arrow:'top', nextLabel:'Next'
   },
   {
@@ -6239,6 +6236,9 @@ function showManifestModal(manifestUrl, password, hostLabel, initialTab) {
   ];
   if (chillUrl) FMTS.push({ key:'chillio', label:'Chillio', getUrl: () => chillUrl, action:'copy', copyToast:'Copied! Paste into Chillio → Manage Account → Add Account → ChillLink Protocol' });
   FMTS.push({ key:'manifest',label:'Manifest URL', getUrl: u => u, action:'copy' });
+  for (let i = FMTS.length - 1; i >= 0; i--) {
+    if (!['app', 'web', 'wuplay', 'manifest'].includes(FMTS[i].key)) FMTS.splice(i, 1);
+  }
   const qrSrc = u => {
     try {
       const qr = qrcode(0, 'M'); qr.addData(u); qr.make();
@@ -6845,8 +6845,6 @@ function simpleFinishHtml() {
       <button class="u-mb8 btn-manifest" id="btnAio" data-action="simple-install" data-target="app">${ICO.rocket(18,'currentColor')} Deploy to Stremio</button>
       <div class="u-row8">
         <button class="btn-manifest" data-action="simple-install" data-target="wuplay" style="flex:1;font-size:.82rem;padding:11px 10px;background:rgba(167,139,250,.10);border-color:rgba(167,139,250,.3);color:#a78bfa">${ICO.wuplay(16,'#a78bfa')} WuPlay</button>
-        <button class="btn-manifest" data-action="simple-install" data-target="nuvio" style="flex:1;font-size:.82rem;padding:11px 10px;background:rgba(168,85,247,.08);border-color:rgba(168,85,247,.25);color:#c084fc">${ICO.nuvio(16)} Nuvio</button>
-        <button class="btn-manifest btn-chillio" data-action="simple-install" data-target="chillio" title="ChillLink URL for the Chillio app">${ICO.chillio(16,'#fb923c')} Chillio</button>
       </div>
       `}
       <div id="aioResult"></div>`}
@@ -7668,14 +7666,14 @@ function showExpressLane() {
   document.getElementById('expressLaneModal')?.remove();
   const gh = window.__genieHandoff; window.__genieHandoff = null; // one-shot seed: read both fields, then clear (review P4)
   const svc = gh?.service || ((S.service && EXPRESS_SERVICES.some(([v]) => v === S.service)) ? S.service : 'torbox-pro');
-  const state = { service: svc, target: gh?.app || 'app', profile:S.quickProfile || 'balanced', device:S.device || 'generic', resolution:S.resolution || '4k', extras:(S.multiServices||[]).filter(v=>CAROUSEL_SVCS.includes(v) && v!==svc), scrapers:[...(S.optionalScrapers||[])],
+  const state = { service: svc, target: gh?.app === 'wuplay' ? 'wuplay' : 'app', mode:S.installMode === 'manifest' ? 'manifest' : 'direct', profile:S.quickProfile || 'balanced', device:S.device || 'generic', resolution:S.resolution || '4k', extras:(S.multiServices||[]).filter(v=>CAROUSEL_SVCS.includes(v) && v!==svc), scrapers:[...(S.optionalScrapers||[])],
     // A language already chosen (Custom build or an earlier Quick install) wins, English
     // included; only a never-chosen list falls back to the browser's language.
     lang: (S.langsSet && S.langs?.[0]) || ((S.langs?.[0] && S.langs[0] !== 'English') ? S.langs[0] : browserLang()) };
   const credInput = (key) => {
     const d = PROVIDER_CREDENTIALS[key] || { label: key, placeholder:'Paste your key', url:'#', linkLabel:'Get key' };
     const link = (d.url && d.url !== '#') ? `<a class="fastlane-get-key" href="${d.url}" target="_blank" rel="noopener noreferrer">${d.linkLabel||'Get key'} &nearr;</a>` : '';
-    return `<div class="fastlane-credential"><div class="fastlane-credential-head"><label>${d.label}</label>${link}</div><div class="input-action-wrap"><input id="expressCred_${key}" class="fastlane-field" data-express-cred="${key}" type="password" autocomplete="off" spellcheck="false" autocapitalize="none" enterkeyhint="done" placeholder="${d.placeholder||'Paste your API key'}" value="${escH(S.creds[key]||'')}"><button type="button" class="input-paste-btn" data-action="paste-input" data-target="expressCred_${key}">Paste Key</button></div></div>`;
+    return `<div class="fastlane-credential"><div class="fastlane-credential-head"><label>${d.label}</label>${link}</div><div class="u-relrow"><input id="expressCred_${key}" class="fastlane-field" data-express-cred="${key}" type="password" autocomplete="off" spellcheck="false" autocapitalize="none" enterkeyhint="done" placeholder="${d.placeholder||'Paste your API key'}" value="${escH(S.creds[key]||'')}"><button type="button" class="input-paste-btn" data-action="paste-input" data-target="expressCred_${key}">Paste Key</button><button type="button" class="input-eye-btn" data-action="toggle-cred-vis" data-target="expressCred_${key}" aria-label="Show or hide credential">${ICO.eye(16,'currentColor')}</button></div></div>`;
   };
   const credArea = (service) => {
     if (service === 'p2p') return `<div style="margin:10px 2px 4px;font-size:.78rem;color:#8b949e;line-height:1.5">No key needed — Core Builds uses free P2P scrapers. Results depend on public torrent availability.</div>`;
@@ -7720,15 +7718,37 @@ function showExpressLane() {
     if (!fromHistory && history.state?.expressLane) { _expressLanePop = true; try { history.back(); } catch(e) { _expressLanePop = false; } }
   };
   overlay._closeLane = closeLane;
-  const expressLaneEscKey = (e) => { if (e.key === 'Escape') closeLane(); };
+  const expressLaneEscKey = (e) => {
+    // Password, preflight and native diagnostics dialogs own their own focus.
+    if (!overlay.contains(document.activeElement)) return;
+    if (e.key === 'Escape') { closeLane(); return; }
+    if (e.key !== 'Tab') return;
+    const focusable = [...overlay.querySelectorAll('button:not(:disabled), input:not(:disabled), select, summary, a[href], [tabindex="0"]')].filter(el => el.getClientRects().length && !el.closest('[hidden]'));
+    const first = focusable[0], last = focusable[focusable.length - 1];
+    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last?.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first?.focus(); }
+  };
   document.addEventListener('keydown', expressLaneEscKey);
   overlay.addEventListener('click', (e) => { if (e.target === overlay || e.target.closest('#expressClose')) closeLane(); }, { once:false });
   overlay.dataset.bound = '1';
   overlay.id = 'expressLaneModal';
   overlay.className = 'fastlane-overlay';
   overlay.innerHTML = `<div class="fastlane-panel fastlane-express" role="dialog" aria-modal="true" aria-labelledby="expressTitle">
-    <div class="fastlane-head"><button class="fastlane-back" type="button" data-express-back aria-label="Back">&larr; Back</button><div class="fastlane-head-copy"><div class="fastlane-kicker">Express install</div><div class="fastlane-title" id="expressTitle">Working streams in about 30 seconds.</div><div class="fastlane-sub">Pick your debrid, connect Stremio, done. Everything else has a sensible default — change any of them under Defaults we’ll use.</div></div><button class="fastlane-close" id="expressClose" aria-label="Close">✕</button></div>
-    <div class="fastlane-section"><div class="fastlane-label">1 · Debrid service</div>
+    <div class="fastlane-head"><button class="fastlane-back" type="button" data-express-back aria-label="Back">&larr; Back</button><div class="fastlane-head-copy"><div class="fastlane-kicker"><svg class="ux-core-mark" viewBox="0 0 44 44" aria-hidden="true"><defs><linearGradient id="uxCoreGradient" x2="1" y2="1"><stop stop-color="#4facfe"/><stop offset=".5" stop-color="#8a4890"/><stop offset="1" stop-color="#c03a20"/></linearGradient></defs><path d="M22 3 39 13v18L22 41 5 31V13Z" fill="none" stroke="currentColor" stroke-width="2"/><path d="m22 12 10 10-10 10-10-10Z" fill="url(#uxCoreGradient)"/></svg>Core Builds <span class="ux-release">● v${CONFIGURATOR_VERSION}</span></div><div class="fastlane-title" id="expressTitle">Build streams with intent.</div><div class="fastlane-sub">Choose a target, tune your hardware, then review and deploy. Your existing settings stay yours.</div></div><button class="fastlane-close" id="expressClose" aria-label="Close">✕</button></div>
+    <section class="ux-section" id="ux-mode" aria-labelledby="ux-mode-title"><div class="ux-section-heading"><h2 id="ux-mode-title">01 · Delivery mode</h2><nav aria-label="Resources"><a href="https://corebuilds-docs.docsalot.dev/" target="_blank" rel="noopener noreferrer">Documentation ↗</a><a href="https://github.com/brevityA/Core-Builds" target="_blank" rel="noopener noreferrer">GitHub ↗</a></nav></div>
+      <div class="ux-mode-switch" role="group" aria-label="Delivery mode">${[['direct','Direct Install'],['manifest','Manifest URL'],['json','Raw JSON']].map(([v,n]) => `<button type="button" data-express-mode="${v}" aria-pressed="${state.mode===v}">${n}</button>`).join('')}</div><p class="fastlane-trust" id="expressModeHelp"></p>
+    </section>
+    <section class="ux-section" id="ux-engine" aria-labelledby="ux-engine-title"><h2 id="ux-engine-title">02 · Service &amp; engine targets</h2>
+    <div class="fastlane-section"><div class="fastlane-label">Supported ecosystem</div>
+      <div class="fastlane-grid services">${[['app','Stremio','Recommended — direct install'],['nuvio','Nuvio','Manifest URL'],['wuplay','WuPlay','Manifest URL'],['chillio','Chillio','ChillLink URL'],['manifest','Other app','Copy manifest']].filter(([v]) => v === 'app' || v === 'wuplay').map(([v,n,d])=>`<button type="button" class="fastlane-choice${state.target===v?' active':''}" data-express-target="${v}"><b>${n}</b><span>${d}</span></button>`).join('')}</div>
+    </div>
+      <label class="fastlane-sublabel" for="expressOutputProfile">Template profile</label><select class="fastlane-field" id="expressOutputProfile">${['stable','balanced','advanced','labs'].map(v => `<option value="${v}"${activeOutputProfile()===v?' selected':''}>${OUTPUT_PROFILE_INFO[v].label}${v==='stable'?' · Recommended':''}</option>`).join('')}</select><p class="fastlane-trust">Core Stable is the default for fresh sessions. Advanced and Labs change fetching behaviour; review before installing.</p>
+    <div class="fastlane-section"><div class="fastlane-label">Search preferences</div>
+      <div class="fastlane-grid services cols-3">${EXPRESS_PROFILES.map(([v,n,d])=>`<button type="button" class="fastlane-choice${state.profile===v?' active':''}" data-express-profile="${v}"><b>${n}${v==='balanced'?' <span class="fastlane-reco">Recommended</span>':''}</b><span>${d}</span></button>`).join('')}</div>
+    </div>
+    </section>
+    <section class="ux-section" id="ux-hardware" aria-labelledby="ux-hardware-title"><h2 id="ux-hardware-title">03 · Hardware &amp; providers</h2>
+    <div class="fastlane-section"><div class="fastlane-label">Debrid &amp; Usenet providers</div>
       <div class="fastlane-grid services">${EXPRESS_SERVICES.map(([v,n,d])=>`<button type="button" class="fastlane-choice${state.service===v?' active':''}" data-express-service="${v}"><b>${n}</b><span>${d}</span></button>`).join('')}</div>
       <div id="expressCreds">${renderCreds()}</div>
       <div style="display:flex;align-items:center;gap:8px;margin-top:10px" title="An explicitly picked host is honored exactly — no silent failover to another host.">
@@ -7742,34 +7762,9 @@ function showExpressLane() {
       </div>
       <button type="button" id="expressExtrasBtn" class="additional-services-btn" style="width:100%;margin-top:8px;display:flex;align-items:center;gap:10px;padding:11px 13px;border-radius:11px;border:1px solid rgba(255,255,255,.09);background:#0e1621;color:#c9d5df;cursor:pointer;text-align:left"><span style="font-size:1rem;color:#a78bfa">＋</span><span class="u-flex1"><b style="display:block;font-size:.72rem">Additional services &amp; scrapers</b><span style="display:block;font-size:.6rem;color:#718093;margin-top:1px">Debridio, Debrider, Usenet, indexers and more</span></span><span id="expressExtrasCount" style="font-size:.6rem;font-weight:900;color:#67e8f9"></span><span>→</span></button>
     </div>
-    <div class="fastlane-section"><div class="fastlane-label">2 · What matters most</div>
-      <div class="fastlane-grid services cols-3">${EXPRESS_PROFILES.map(([v,n,d])=>`<button type="button" class="fastlane-choice${state.profile===v?' active':''}" data-express-profile="${v}"><b>${n}${v==='balanced'?' <span class="fastlane-reco">Recommended</span>':''}</b><span>${d}</span></button>`).join('')}</div>
-    </div>
-    <div class="fastlane-section"><div class="fastlane-label">3 · Streams shown ${ftTip('<strong>Cached only</strong> = instant play; nothing that still needs downloading appears at all. <strong>Mixed</strong> also shows torrents your debrid must fetch first — those stall on a “downloading to debrid” screen the first time. Fast profile implies Cached-only until you change it here.')}</div>
-      <div class="fastlane-grid services cols-2">
-        <button type="button" class="fastlane-choice${S.cacheMode!=='cached' && S.cacheMode!=='uncached'?' active':''}" data-express-cache="mixed"><b>Mixed</b><span>Cached first · uncached can download first</span></button>
-        <button type="button" class="fastlane-choice${S.cacheMode==='cached'?' active':''}" data-express-cache="cached"><b>⚡ Cached only</b><span>Instant play guaranteed — uncached hidden</span></button>
-        ${S.cacheMode==='uncached' ? '<div style="font-size:.6rem;color:#fbbf24;margin-top:6px">Advanced is set to “Uncached only” — Express will honor it unless you pick here.</div>' : ''}
-      </div>
-    </div>
-    <div class="fastlane-section"><div class="fastlane-label">4 · Install to</div>
-      <div class="fastlane-grid services">${[['app','Stremio','Recommended — direct install'],['nuvio','Nuvio','Manifest URL'],['wuplay','WuPlay','Manifest URL'],['chillio','Chillio','ChillLink URL'],['manifest','Other app','Copy manifest']].map(([v,n,d])=>`<button type="button" class="fastlane-choice${state.target===v?' active':''}" data-express-target="${v}"><b>${n}</b><span>${d}</span></button>`).join('')}</div>
-      <div id="expressStremio"${state.target==='app'?'':' style="display:none"'}>
-        <div class="fastlane-pair" style="display:flex;gap:8px;margin-top:10px">
-          <input class="fastlane-field" id="stremioEmailInline" type="email" autocomplete="username" placeholder="Stremio email" value="${escH(S.stremioEmail||'')}" style="flex:1">
-          <input class="fastlane-field" id="stremioPasswordInline" type="password" autocomplete="current-password" placeholder="Stremio password" value="${escH(S.stremioPassword||'')}" style="flex:1">
-        </div>
-        <button type="button" data-action="create-stremio-account" style="margin-top:6px;font-size:.74rem;color:var(--th-accent);background:none;border:none;cursor:pointer;padding:0;font-weight:600">Create random account →</button>
-        <p class="fastlane-trust">Adds Core Builds to your Stremio account. Your other addons stay; only <b>Clean reinstall</b> replaces earlier Core Builds addons.</p>
-      </div>
-    </div>
-    <div class="fastlane-section"><div class="fastlane-label">Defaults we’ll use</div>
-      <div class="fastlane-defaults" id="expressDefaults">${expressDefaultRows().map(([sec, name, val]) => `<button type="button" class="fastlane-default" data-express-customize="${sec}"><span class="fastlane-default-name">${name}</span><span class="fastlane-default-val">${val}</span><span class="fastlane-default-go" aria-hidden="true">›</span></button>`).join('')}</div>
-      <button type="button" class="fastlane-customize" data-express-customize="">Customize every setting →</button>
-    </div>
-    <details class="fastlane-optional"><summary style="cursor:pointer;color:#8b949e;font-weight:700;letter-spacing:.04em;text-transform:uppercase">Optional</summary>
+    <details class="fastlane-optional" open><summary style="cursor:pointer;color:#8b949e;font-weight:700;letter-spacing:.04em;text-transform:uppercase">Hardware &amp; optional settings</summary>
       <div class="u-mt8"><div style="font-size:.64rem;font-weight:800;color:#8b949e;letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px">Device</div>
-        <div class="fastlane-grid services devices cols-4">${[['generic','Standard'],['shield','NVIDIA Shield'],['firestick-4kmax','Fire Stick 4K Max'],['googletv','Google TV'],['samsung','Samsung TV'],['onn','onn 4K'],['appletv-new','Apple TV 4K'],['windows','Windows PC']].map(([v,n])=>`<button type="button" class="fastlane-choice${state.device===v?' active':''}" data-express-device="${v}"><b>${n}</b></button>`).join('')}</div>
+        <div class="fastlane-grid services devices cols-4">${[['generic','Standard'],['lgtv','LG webOS'],['firestick-hd','Low-RAM Android'],['shield','NVIDIA Shield'],['firestick-4kmax','Fire Stick 4K Max'],['googletv','Google TV'],['samsung','Samsung TV'],['onn','onn 4K'],['appletv-new','Apple TV 4K'],['windows','Windows PC']].map(([v,n])=>`<button type="button" class="fastlane-choice${state.device===v?' active':''}" data-express-device="${v}"><b>${n}</b></button>`).join('')}</div>
       </div>
       <div class="u-mt8"><div style="font-size:.64rem;font-weight:800;color:#8b949e;letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px">Resolution</div>
         <div class="fastlane-grid services cols-3">${[['4k','4K','2160p primary · 1080p fallback'],['1080p','1080p','Excludes 4K'],['mixed','Mixed','Adaptive · no hard caps']].map(([v,n,d])=>`<button type="button" class="fastlane-choice${state.resolution===v?' active':''}" data-express-res="${v}"><b>${n}</b><span>${d}</span></button>`).join('')}</div>
@@ -7782,9 +7777,30 @@ function showExpressLane() {
       <label style="display:flex;align-items:flex-start;gap:8px;cursor:pointer;margin-top:8px"><input type="checkbox" id="expressClean" ${S.cleanInstall?'checked':''} style="margin-top:2px"><span style="color:#c9d5df"><b class="u-tx">Clean reinstall</b><br><span class="u-tx2">Remove previous Core Builds addons from your Stremio account.</span></span></label>
       <div class="u-mt8"><div class="input-action-wrap"><input class="fastlane-field" id="expressTmdb" type="password" autocomplete="off" spellcheck="false" placeholder="TMDB Read Access Token (optional — improves matching)" value="${escH(S.tmdbToken||'')}" style="width:100%"><button type="button" class="input-paste-btn" data-action="paste-input" data-target="expressTmdb">Paste</button></div></div>
     </details>
-    <div class="fastlane-foot">
-      <div id="expressSummary" class="fastlane-summary"></div>
-      <button class="fastlane-go" id="expressGo" style="width:100%">Install in ~30 seconds</button><div class="u-mt10" id="aioResult"></div><button id="btnAutoCreate" style="display:none" aria-hidden="true"></button></div>
+<p class="ux-spec" id="expressDeviceSpec"></p>
+      <div id="expressStremio"${state.target==='app'?'':' style="display:none"'}>
+        <div class="fastlane-pair" style="display:flex;gap:8px;margin-top:10px">
+          <input class="fastlane-field" id="stremioEmailInline" type="email" autocomplete="username" placeholder="Stremio email" value="${escH(S.stremioEmail||'')}" style="flex:1">
+          <input class="fastlane-field" id="stremioPasswordInline" type="password" autocomplete="current-password" placeholder="Stremio password" value="${escH(S.stremioPassword||'')}" style="flex:1">
+        </div>
+        <button type="button" data-action="create-stremio-account" style="margin-top:6px;font-size:.74rem;color:var(--th-accent);background:none;border:none;cursor:pointer;padding:0;font-weight:600">Create random account →</button>
+        <p class="fastlane-trust">Adds Core Builds to your Stremio account. Your other addons stay; only <b>Clean reinstall</b> replaces earlier Core Builds addons.</p>
+      </div>
+    <div class="fastlane-section"><div class="fastlane-label">Stream availability ${ftTip('<strong>Cached only</strong> = instant play; nothing that still needs downloading appears at all. <strong>Mixed</strong> also shows torrents your debrid must fetch first — those stall on a “downloading to debrid” screen the first time. Fast profile implies Cached-only until you change it here.')}</div>
+      <div class="fastlane-grid services cols-2">
+        <button type="button" class="fastlane-choice${S.cacheMode!=='cached' && S.cacheMode!=='uncached'?' active':''}" data-express-cache="mixed"><b>Mixed</b><span>Cached first · uncached can download first</span></button>
+        <button type="button" class="fastlane-choice${S.cacheMode==='cached'?' active':''}" data-express-cache="cached"><b>⚡ Cached only</b><span>Instant play guaranteed — uncached hidden</span></button>
+        ${S.cacheMode==='uncached' ? '<div style="font-size:.6rem;color:#fbbf24;margin-top:6px">Advanced is set to “Uncached only” — Express will honor it unless you pick here.</div>' : ''}
+      </div>
+    </div>
+    <div class="fastlane-section"><div class="fastlane-label">Defaults we’ll use</div>
+      <div class="fastlane-defaults" id="expressDefaults">${expressDefaultRows().map(([sec, name, val]) => `<button type="button" class="fastlane-default" data-express-customize="${sec}"><span class="fastlane-default-name">${name}</span><span class="fastlane-default-val">${val}</span><span class="fastlane-default-go" aria-hidden="true">›</span></button>`).join('')}</div>
+      <button type="button" class="fastlane-customize" data-express-customize="">Customize every setting →</button>
+    </div>
+      <div class="ux-review-summary"><h3>Review your build</h3><div id="expressSummary" class="fastlane-summary"></div>${telemetryHtml()}</div>
+    </section>
+    <section class="fastlane-foot ux-section" id="ux-deploy" aria-labelledby="ux-deploy-title"><h2 id="ux-deploy-title">04 · Review &amp; deploy</h2>
+      <button class="fastlane-go" id="expressGo" style="width:100%">Generate &amp; Deploy Build</button><div class="u-mt10" id="aioResult"></div><button id="btnAutoCreate" style="display:none" aria-hidden="true"></button></section>
   </div>`;
   document.body.appendChild(overlay);
   try { history.pushState({ ...(history.state || {}), expressLane: true }, ''); } catch(e) {}
@@ -7795,6 +7811,7 @@ function showExpressLane() {
   const expressPayload = () => ({
     service: state.service,
     target: state.target,
+    mode: state.mode,
     creds: Object.fromEntries([...overlay.querySelectorAll('[data-express-cred]')].map(i => [i.dataset.expressCred, i.value.trim()])),
     stremioEmail: document.getElementById('stremioEmailInline')?.value.trim() || '',
     stremioPassword: document.getElementById('stremioPasswordInline')?.value || '',
@@ -7816,13 +7833,36 @@ function showExpressLane() {
     const tgtName = { app:'Stremio', nuvio:'Nuvio', wuplay:'WuPlay', chillio:'Chillio', manifest:'Manifest URL' }[state.target] || 'Stremio';
     const cacheName = S.cacheMode === 'cached' ? '⚡ Cached only' : S.cacheMode === 'uncached' ? 'Uncached only' : 'Mixed cache (uncached may download first)';
     const fsOn = document.getElementById('expressFullStack')?.checked;
-    elSum.innerHTML = `${escHtml(svcName)} → ${escHtml(tgtName)} · ${profName} · ${escHtml(resName)} · ${escHtml(state.lang)} · <b style="color:${S.cacheMode==='cached'?'#34d399':'#fbbf24'}">${cacheName}</b> · host ${escHtml(HOST_LABEL_MAP[S.instanceHost] || S.instanceHost || 'auto')}${fsOn ? ' · <span class="u-purple">+ full stack (AIOMetadata + Cinemeta patch)</span>' : ''}`;
+    elSum.innerHTML = `${escHtml(svcName)} → ${escHtml(tgtName)} · ${OUTPUT_PROFILE_INFO[activeOutputProfile()].label} · search ${profName} · ${escHtml(resName)} · ${escHtml(state.lang)} · <b style="color:${S.cacheMode==='cached'?'#34d399':'#fbbf24'}">${cacheName}</b> · host ${escHtml(HOST_LABEL_MAP[S.instanceHost] || S.instanceHost || 'auto')}${fsOn ? ' · <span class="u-purple">+ full stack (AIOMetadata + Cinemeta patch)</span>' : ''}`;
   };
+  const refreshDeliveryMode = () => {
+    if (!overlay.isConnected) return;
+    const direct = state.mode === 'direct' && state.target === 'app';
+    document.getElementById('expressStremio').hidden = !direct;
+    document.getElementById('expressStremio').style.display = direct ? '' : 'none';
+    overlay.querySelectorAll('[data-express-mode]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.expressMode === state.mode)));
+    document.getElementById('expressModeHelp').textContent = state.mode === 'json'
+      ? 'Export a local JSON file. Provider keys, if entered, are included — keep the file private. No host is contacted for export.'
+      : direct ? 'Authenticate with Stremio and install into your account. Your account password stays in memory only.'
+      : 'Create a config on your selected AIOStreams host, then copy its manifest URL. No Stremio sign-in required.';
+    document.getElementById('expressGo').textContent = state.mode === 'json' ? 'Export Template JSON' : 'Generate & Deploy Build';
+  };
+  document.getElementById('expressOutputProfile').addEventListener('change', e => {
+    S.outputProfile = e.target.value; saveState(); refreshExpressSummary();
+  });
+  const refreshDeviceSpec = () => {
+    const hint = DEVICE_BANDWIDTH_HINTS[state.device];
+    document.getElementById('expressDeviceSpec').textContent = `${label('device', state.device) || 'Standard'} · ${hint ? 'Recommended connection: ' + hint.recommended + ' Mbps+' : 'Device defaults applied'} · Audio follows your search preference`;
+  };
+  refreshDeviceSpec();
+  refreshDeliveryMode();
   refreshExpressSummary();
   document.getElementById('expressFullStack')?.addEventListener('change', refreshExpressSummary);
   document.getElementById('expressLang')?.addEventListener('change', e => { state.lang = e.target.value; refreshExpressSummary(); });
   overlay.addEventListener('click', e => {
     if (e.target === overlay || e.target.closest('#expressClose') || e.target.closest('[data-express-back]')) { closeLane(); return; }
+    const modeBtn = e.target.closest('[data-express-mode]');
+    if (modeBtn) { state.mode = modeBtn.dataset.expressMode; refreshDeliveryMode(); return; }
     const svcBtn = e.target.closest('[data-express-service]');
     if (svcBtn) {
       state.service = svcBtn.dataset.expressService;
@@ -7848,6 +7888,7 @@ function showExpressLane() {
       overlay.querySelectorAll('[data-express-target]').forEach(b => b.classList.toggle('active', b.dataset.expressTarget === state.target));
       const box = document.getElementById('expressStremio');
       if (box) box.style.display = state.target === 'app' ? '' : 'none';
+      refreshDeliveryMode();
       refreshExpressSummary();
       return;
     }
@@ -7870,6 +7911,7 @@ function showExpressLane() {
     const devBtn = e.target.closest('[data-express-device]');
     if (devBtn) {
       state.device = devBtn.dataset.expressDevice;
+      refreshDeviceSpec();
       overlay.querySelectorAll('[data-express-device]').forEach(b => b.classList.toggle('active', b.dataset.expressDevice === state.device));
       refreshExpressSummary();
       return;
@@ -7922,7 +7964,7 @@ function showExpressLane() {
       }
       const goBtn = document.getElementById('expressGo');
       if (goBtn) { goBtn.disabled = true; goBtn.textContent = 'Installing…'; }
-      runExpressInstall(payload).finally(() => { if (goBtn) { goBtn.disabled = false; goBtn.textContent = 'Install in ~30 seconds'; } });
+      runExpressInstall(payload).finally(() => { if (goBtn) { goBtn.disabled = false; refreshDeliveryMode(); } });
     }
   });
   document.getElementById('expressClose').focus();
@@ -7978,7 +8020,8 @@ function expressDefaultRows() {
 
 async function runExpressInstall(p) {
   const isFree = p.service === 'p2p';
-  if (p.target === 'app' && !isFree) {
+  if (p.mode === 'json') { applyExpressChoices(p); S.quickStart = true; saveState(); await generate(); return; }
+  if (p.target === 'app' && p.mode !== 'manifest' && !isFree) {
     if (!p.stremioEmail || !p.stremioPassword) { showToast('Add your Stremio login or create a random account', true); return; }
     S.stremioEmail = p.stremioEmail; S.stremioPassword = p.stremioPassword;
   }
@@ -8033,13 +8076,13 @@ async function runExpressInstall(p) {
       return;
     }
   }
-  S.installMode = p.target === 'app' ? 'direct' : 'manifest';
+  S.installMode = p.target === 'app' && p.mode !== 'manifest' ? 'direct' : 'manifest';
   saveState();
   try {
     // Renders progress + result into the modal's #aioResult.
     // Chillio keeps its own tab in the manifest modal; every other non-Stremio
     // target (WuPlay, Nuvio, Other app) collapses to the generic manifest tab.
-    await simpleInstall(p.target === 'app' ? 'app' : (p.target === 'chillio' ? 'chillio' : 'manifest'), { profile: p.profile });
+    await simpleInstall(p.target === 'app' && p.mode !== 'manifest' ? 'app' : (p.target === 'wuplay' ? 'wuplay' : (p.target === 'chillio' ? 'chillio' : 'manifest')), { profile: p.profile });
   } catch (err) {
     showToast('Install failed: ' + (err?.message || err), true);
   }
@@ -8130,6 +8173,45 @@ function showDiagnosticsModal() {
   document.getElementById('diagClose').focus();
 }
 
+// Presentation-only observer: progress advances only after the corresponding
+// real compile / host / compatibility / relay / account operation has returned.
+// It neither performs requests nor controls the install pipeline.
+function showDeploymentProgress(labels) {
+  const previous = document.activeElement;
+  document.getElementById('deploymentProgress')?.remove();
+  const dialog = document.createElement('dialog');
+  dialog.id = 'deploymentProgress';
+  dialog.className = 'deployment-progress';
+  dialog.setAttribute('aria-labelledby', 'deploymentTitle');
+  dialog.innerHTML = '<h2 id="deploymentTitle">Build diagnostics</h2><p id="deploymentStatus" role="status" aria-live="polite">Working…</p><progress id="deploymentBar" max="1" value="0" aria-label="Completed deployment stages"></progress><ol id="deploymentSteps"></ol><p class="ux-diagnostics-note">Closing diagnostics does not cancel the deployment.</p><button type="button" id="deploymentClose">View result / close diagnostics</button>';
+  const list = dialog.querySelector('ol');
+  labels.forEach(label => { const li = document.createElement('li'); li.textContent = label; li.dataset.state = 'pending'; list.appendChild(li); });
+  const bar = dialog.querySelector('progress');
+  bar.max = labels.length;
+  const close = () => { dialog.close(); dialog.remove(); if (previous?.isConnected) previous.focus(); };
+  dialog.querySelector('button').addEventListener('click', close);
+  dialog.addEventListener('cancel', e => { e.preventDefault(); close(); });
+  document.body.appendChild(dialog);
+  dialog.showModal();
+  return {
+    advance(count, text) {
+      bar.value = count;
+      [...list.children].forEach((li, i) => { if (li.dataset.state !== 'skipped') li.dataset.state = i < count ? 'done' : i === count ? 'running' : 'pending'; });
+      dialog.querySelector('p').textContent = text;
+    },
+    skip(index, text) {
+      if (list.children[index]) { list.children[index].dataset.state = 'skipped'; list.children[index].textContent = text; }
+    },
+    settle(ok, text) {
+      dialog.dataset.outcome = ok ? 'success' : 'attention';
+      if (ok) { bar.value = labels.length; [...list.children].forEach(li => { if (li.dataset.state !== 'skipped') li.dataset.state = 'done'; }); }
+      else { [...list.children].filter(li => li.dataset.state === 'running').forEach(li => { li.dataset.state = 'failed'; }); }
+      dialog.querySelector('p').textContent = text;
+    },
+    close,
+  };
+}
+
 async function simpleInstall(target, { profile = '' } = {}) {
   if (!S.service) { showToast('Pick a service first — go back to step 1', true); return; }
   // ChillLink carries direct URLs only — AIOStreams' ChillLink transformer drops
@@ -8179,7 +8261,9 @@ async function simpleInstall(target, { profile = '' } = {}) {
   if (isFree) {
     btn.disabled = true; btn.innerHTML = `<span class="dot-spin"><span></span><span></span><span></span></span> Creating import link…`;
     result.innerHTML = '';
+    const freeProgress = showDeploymentProgress(['Creating a credential-stripped import link']);
     const importUrl = await uploadTemplateForImport();
+    freeProgress.settle(Boolean(importUrl), importUrl ? 'Import link ready — manual setup still required' : 'Import link unavailable');
     btn.disabled = false; btn.innerHTML = origHtml;
     if (importUrl) {
       saveLastGen();
@@ -8211,8 +8295,11 @@ async function simpleInstall(target, { profile = '' } = {}) {
   const hostLabels = {};
   _allHosts.forEach(([n, u]) => { hostLabels[u] = n; });
 
+  const deployment = showDeploymentProgress(['Compile manifest configuration', 'Check AIOStreams host & latency', 'Check host regex compatibility', 'Save configuration through relay', 'Install & verify Stremio addons']);
+  deployment.advance(1, 'Configuration compiled locally. Checking your selected host…');
   try {
     const fastest = await resolveInstallHost(4000);
+    deployment.advance(2, 'Host selected. Checking regex compatibility…');
     // Regex-allowlist preflight (2026-09-06 race diagnosis): the same union
     // the host validates (synced URLs resolved live + inline patterns),
     // checked against the host's own allowlist before the POST that would
@@ -8220,10 +8307,13 @@ async function simpleInstall(target, { profile = '' } = {}) {
     // it must never create one.
     const rgx = await regexGateForHost(fastest, cfg);
     if (rgx.status === 'blocked') {
+      deployment.settle(false, 'Host compatibility blocked this build. Review the result below.');
       btn.disabled = false; btn.innerHTML = 'Install';
       result.innerHTML = hostRoutingNoticeHtml({ status: 'blocked', reasons: [rgx.reason] });
       return;
     }
+    if (rgx.status === 'skip') deployment.skip(2, 'Host regex compatibility — not independently verified');
+    deployment.advance(3, rgx.status === 'skip' ? 'Regex check unavailable; proceeding under existing host policy.' : 'Compatibility check returned. Saving configuration…');
     const res = await writeHostFetch(fastest, '/api/v1/user', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ config:cfg, password:pwd }) }, 8000);
     const data = await res.json().catch(() => ({}));
     if (!res.ok || data?.success === false) {
@@ -8231,6 +8321,7 @@ async function simpleInstall(target, { profile = '' } = {}) {
       throw new Error(`API_ERROR:${apiMsg}`);
     }
     {
+      deployment.advance(4, 'AIOStreams acknowledged the save.');
       const uuid = data?.data?.uuid || data?.uuid || data?.user?.uuid || data?.id;
       const epwd = data?.data?.encryptedPassword || encodeURIComponent(pwd);
       if (uuid) { S.instanceUuid = uuid; S.instancePassword = pwd; saveState(); recordSavedConfig(fastest, uuid, cfg); }
@@ -8259,9 +8350,11 @@ async function simpleInstall(target, { profile = '' } = {}) {
             const stackColour = stackResult.ok ? '#3fb950' : '#fbbf24';
             result.innerHTML = `<div style="margin-top:10px;padding:12px 14px;border-radius:10px;background:rgba(63,185,80,.06);border:1px solid rgba(63,185,80,.2)"><div style="font-size:.82rem;font-weight:700;color:${stackColour};margin-bottom:4px">${ICO.check(14,stackColour)} ${stackTitle}</div><div style="font-size:.78rem;color:#8b949e">${stackResult.ok?'The requested addons were read back from your account successfully. Reopen Stremio to see your new setup.':'AIOStreams was verified, but one or more optional full-stack operations did not verify. Review the details below.'}</div>${stackHtml}<div style="margin-top:8px;font-size:.74rem;color:#6b7280">Config password: <code style="background:rgba(255,255,255,.05);padding:2px 6px;border-radius:4px;font-size:.72rem;color:#e6edf3">${pwd.replace(/&/g,'&amp;').replace(/</g,'&lt;')}</code> — save it for later edits</div></div>`;
           }
+          deployment.settle(stackResult.ok, stackResult.ok ? 'Install verified in your Stremio library.' : 'AIOStreams installed; optional stack needs attention.');
           showToast(stackResult.ok ? 'Install verified in your Stremio library' : 'AIOStreams verified; optional stack needs attention', !stackResult.ok);
           return;
         } catch(err) {
+          deployment.settle(false, 'Stremio verification stopped. A manual manifest link is available below.');
           btn.disabled = false; btn.innerHTML = origHtml;
           result.innerHTML = `<div style="margin-top:10px;padding:12px 14px;border-radius:10px;background:rgba(248,113,113,.06);border:1px solid rgba(248,113,113,.2)"><div style="font-size:.82rem;font-weight:700;color:#f87171;margin-bottom:4px">Stremio install stopped safely</div><div style="font-size:.78rem;color:#8b949e">${esc(err.message || 'Something went wrong')}</div><div style="margin-top:8px;font-size:.76rem;color:#6b7280">Your config was created successfully — use the manifest URL below to install manually.</div><div style="margin-top:6px;display:flex;gap:6px;align-items:stretch"><div class="manifest-url" style="flex:1;min-width:0;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.72rem;padding:8px 10px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:6px;color:#8b949e;cursor:pointer" data-action="copy-manifest" data-url="${manifestUrl.replace(/"/g,'&quot;')}">${escHtml(manifestUrl)}</div><button data-action="copy-manifest" data-url="${manifestUrl.replace(/"/g,'&quot;')}" style="flex-shrink:0;padding:0 12px;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.28);border-radius:6px;color:#00d4ff;font-size:.8rem;font-weight:700;cursor:pointer">Copy</button></div></div>`;
           return;
@@ -8270,11 +8363,13 @@ async function simpleInstall(target, { profile = '' } = {}) {
       btn.disabled = false; btn.innerHTML = origHtml;
       // The manifest modal is a z-index 200 layer; Express sits at 10020. Close
       // Express first or the URL the user came for opens hidden behind it.
+      deployment.close();
       document.getElementById('expressLaneModal')?.remove();
       showManifestModal(manifestUrl, pwd, hostLbl, target);
       return;
     }
   } catch(e) {
+    deployment.settle(false, 'Deployment did not complete. Review the error or recovery link below.');
     if (e.message && e.message.startsWith('HOST_')) {
       btn.disabled = false; btn.innerHTML = origHtml;
       result.innerHTML = hostErrorHtml(e.message);
@@ -8882,6 +8977,9 @@ if (new URLSearchParams(location.search).get('cb-e2e') === '1') {
     },
     checkUpdate() {
       return checkForTemplateUpdate(true);
+    },
+    legacyExpressInstall(payload) {
+      return runExpressInstall(payload);
     },
     webVitalsReady() {
       return typeof _cbWebVitalsSend === 'function';

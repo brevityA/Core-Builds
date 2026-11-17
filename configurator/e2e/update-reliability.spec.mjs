@@ -195,10 +195,10 @@ test('first-time Google TV Express install submits a valid, bounded Stable paylo
     return route.fulfill({ contentType: 'application/json', body: JSON.stringify({ success: true, data: { uuid: '11111111-2222-4333-8444-555555555555', encryptedPassword: 'synthetic-password' } }) });
   });
   await page.locator('[data-action="open-express-lane"]').click();
-  await page.locator('#expressLaneModal details > summary').click();
+  await expect(page.locator('#expressLaneModal details.fastlane-optional')).toHaveAttribute('open', '');
   await page.locator('[data-express-device="googletv"]').click();
   await page.locator('[data-express-cred="torbox"]').fill('SYNTHETIC-TORBOX-KEY');
-  await page.locator('[data-express-target="manifest"]').click();
+  await page.locator('[data-express-mode="manifest"]').click();
   await page.locator('#expressGo').click();
   await page.locator('#pwdPrompt .pwd-go').click();
   await expect(page.locator('#manifestModal')).toBeVisible();

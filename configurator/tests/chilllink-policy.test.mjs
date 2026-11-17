@@ -151,8 +151,10 @@ test('app.js only imports policy functions it calls (no dead imports)', () => {
   assert.ok(!importLine[1].includes('buildChillLinkUrl'), 'buildChillLinkUrl is module-internal API, not an app.js import');
 });
 
-test('app.js offers Chillio in both deploy rows, the Express lane and the manifest modal', () => {
-  assert.equal((app.match(/data-target="chillio"/g) || []).length, 2, 'desktop + mobile deploy buttons');
+test('legacy Chillio engine route remains but the dashboard exposes only verified ecosystems', () => {
+  assert.equal((app.match(/data-target="chillio"/g) || []).length, 0, 'unverified deployment buttons are not rendered');
+  assert.ok(app.includes(".filter(([v]) => v === 'app' || v === 'wuplay')"), 'Express UI target allowlist');
+  assert.ok(app.includes("!['app', 'web', 'wuplay', 'manifest'].includes(FMTS[i].key)"), 'result UI target allowlist');
   assert.ok(app.includes("['chillio','Chillio','ChillLink URL']"), 'Express lane tile');
   assert.ok(app.includes("key:'chillio'"), 'manifest modal formatter tab');
   assert.ok(app.includes("chillio:'Chillio'"), 'Express target name map');

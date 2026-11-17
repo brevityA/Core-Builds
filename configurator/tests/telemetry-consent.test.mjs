@@ -179,10 +179,10 @@ test('8. telemetryHtml() always renders approved wording and wires toggle-teleme
 
 test('9. the full-Review consent control is always rendered with the approved wording, visible above Export', () => {
   const allCalls = appClean.match(/\$\{telemetryHtml\(\)\}/g) || [];
-  assert.equal(allCalls.length, 2, `expected exactly two \${telemetryHtml()} render sites (full Review + Quick Start), found ${allCalls.length}`);
+  assert.equal(allCalls.length, 3, `expected three \${telemetryHtml()} render sites (Review + Quick Start + dashboard), found ${allCalls.length}`);
 
   const renderBody = functionBody(appClean, 'renderCore');
-  const exportBtnMarker = '<button class="btn-dl" data-action="generate-dl">';
+  const exportBtnMarker = '<button type="button" id="btn-dl" class="btn-dl" data-action="generate-dl">';
   const customizeMarker = '<span class="rv-ico">';
   const telemetryPos = renderBody.indexOf('${telemetryHtml()}');
   const exportBtnPos = renderBody.indexOf(exportBtnMarker);

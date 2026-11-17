@@ -51,7 +51,7 @@ async function installOnce(page, calls, opts) {
   await expect(page.locator('[data-action="update-my-setup"]'), 'nothing saved yet, no card').toHaveCount(0);
   await page.locator('[data-action="open-express-lane"]').click();
   await page.locator('[data-express-cred="torbox"]').fill('test-torbox-key');
-  await page.locator('[data-express-target="manifest"]').click();
+  await page.locator('[data-express-mode="manifest"]').click();
   await page.locator('#expressGo').click();
   await page.locator('#pwdPrompt .pwd-go').click();
   await expect(page.locator('#manifestModal')).toBeVisible({ timeout: 45000 });
