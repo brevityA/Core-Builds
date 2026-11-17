@@ -214,16 +214,19 @@ function refreshLivePayloadCounter() {
   } catch(e) {}
 }
 
-// Web Vitals minimal (CLS/LCP/FID) — beacon only if USAGE_BEACON_URL set or cb-flags webVitals=1
+// Web Vitals minimal (CLS/LCP/FID) — beacon only if USAGE_BEACON_URL set or cb-flags webVitals=1 (and S.telemetryOk)
+let _cbWebVitalsSend = null;
 function initWebVitals() {
   if (!USAGE_BEACON_URL && !flagEnabled('webVitals', false)) return;
   try {
     const send = (name, value) => {
+      if (!S.telemetryOk) return;
       const url = USAGE_BEACON_URL || COUNTER_URL;
       if (!url) return;
       const body = JSON.stringify({ t:'web-vital', name, value, v:CONFIGURATOR_VERSION, ts:Date.now() });
       try { beaconPost(url, JSON.parse(body)); } catch(e) { try { beaconPost(url, { t:'web-vital', name, value, v:CONFIGURATOR_VERSION, ts:Date.now() }); } catch(e2) {} }
     };
+    _cbWebVitalsSend = send;
     let lcp = 0;
     try {
       const po = new PerformanceObserver((list) => {
@@ -977,6 +980,7 @@ function loadState() {
       try {
         const parsed = migrateState(JSON.parse(savedS));
         Object.assign(S, sanitizeSharedConfig(parsed));
+        if (typeof parsed.telemetryOk === 'boolean') S.telemetryOk = parsed.telemetryOk;
         if (parsed.creds && typeof parsed.creds === 'object' && !Array.isArray(parsed.creds)) {
           const safeCreds = Object.create(null);
           for (const k of Object.keys(parsed.creds)) {
@@ -2384,6 +2388,7 @@ function renderCore() {
         </div>
         ${sizeLimitHtml()}
         ${livePayloadHtml()}
+        ${telemetryHtml()}
         <button class="btn-dl" data-action="generate-dl">${ICO.download(14,'currentColor')} Export Template JSON</button>
         <div class="action-help">Writes a JSON file in your browser. If you added debrid keys, they're in the file in plain text — keep it private.</div>
         <div id="exportCredNotice"></div>
@@ -2547,7 +2552,6 @@ function renderCore() {
           <summary class="rv-section-hdr"><span class="rv-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg> Customize</span><span class="rv-arr">›</span></summary>
           <div class="rv-section-body">
             ${insightsHtml()}
-            ${telemetryHtml()}
             <details id="fmtPickerDetails" data-persist-open class="rv-accord" style="margin-top:0;margin-bottom:12px">
               <summary class="rv-accord-hdr">
                 <span class="u-rowc8"><span>${ICO.palette(14,'currentColor')}</span> Stream Formatter <span style="font-weight:600;color:var(--th-tx5);text-transform:none;letter-spacing:0;font-size:.72rem">— ${label('formatter', S.formatter)}</span></span><span class="rv-arr">›</span>
@@ -3072,7 +3076,7 @@ document.addEventListener('DOMContentLoaded', () => {
       el.innerHTML = `<span class="stat"><span class="stat-val">${fmt(d.visits)}</span> visits</span><span class="stat-dot"></span><span class="stat"><span class="stat-val">${fmt(d.generates)}</span> templates built</span>`;
       el.classList.add('loaded');
     }).catch(() => {});
-    beaconPost(COUNTER_URL + '/api/visit');
+    if (S.telemetryOk) beaconPost(COUNTER_URL + '/api/visit');
   }
   try { history.replaceState({ step: step }, ''); } catch(e) {}
   window.addEventListener('popstate', (e) => {
@@ -4122,9 +4126,12 @@ function insightsHtml() {
   return '<div class="insights-box"><div class="insights-hdr">Template Highlights</div><ul style="list-style:none;display:flex;flex-direction:column;gap:5px">' + pts.map(p => '<li><span style="color:#3fb950;flex-shrink:0">' + ICO.check(12,'#3fb950') + '</span><span>' + p + '</span></li>').join('') + '</ul></div>';
 }
 
+// Shared opt-in usage consent control rendered in BOTH full Review (immediately
+// above Export Template JSON) and Quick Start (`simpleFinishHtml()`, immediately
+// before its install/export action block), outside every collapsed <details>.
+// Both flows share this single control, `S.telemetryOk`, `toggle-telemetry`, and default-off.
 function telemetryHtml() {
-  if (!USAGE_BEACON_URL) return '';
-  return `<label style="display:flex;align-items:center;gap:9px;margin-bottom:14px;cursor:pointer;font-size:.78rem;color:#8b949e"><input type="checkbox" data-action="toggle-telemetry" ${S.telemetryOk ? 'checked' : ''} style="accent-color:#00d4ff;flex-shrink:0">Share an anonymous usage ping on download (service + device only — never keys or names)</label>`;
+  return `<label style="display:flex;align-items:center;gap:9px;margin-bottom:14px;cursor:pointer;font-size:.78rem;color:#8b949e"><input type="checkbox" data-action="toggle-telemetry" ${S.telemetryOk ? 'checked' : ''} style="accent-color:#00d4ff;flex-shrink:0">Share basic usage statistics with the project: page visits and downloads, including service, device and resolution. No API keys, account names, or full configuration are sent.</label>`;
 }
 
 function sizeLimitHtml() {
@@ -5186,7 +5193,7 @@ async function generate() {
   if (USAGE_BEACON_URL && S.telemetryOk) {
     beaconPost(USAGE_BEACON_URL, { v: CONFIGURATOR_VERSION, service: S.service, device: S.device, resolution: S.resolution });
   }
-  if (COUNTER_URL) {
+  if (COUNTER_URL && S.telemetryOk) {
     beaconPost(COUNTER_URL + '/api/generate', { v: CONFIGURATOR_VERSION, service: S.service, device: S.device, resolution: S.resolution });
   }
   const dlBtn = document.querySelector('.btn-dl');
@@ -6794,6 +6801,7 @@ function simpleFinishHtml() {
         <label>Template name (optional)</label>
         <input class="name-input" id="nameIn" type="text" placeholder="${escH(S.name)}" value="${escH(S.name)}" data-action="update-name" maxlength="60">
       </div>
+      ${telemetryHtml()}
       ${isFree ? `
       <button class="u-mb8 btn-manifest" id="btnAio" data-action="simple-install" data-target="app">${ICO.link(18,'currentColor')} Import to AIOStreams</button>
       <div style="font-size:.74rem;color:#6b7280;text-align:center;margin-top:8px;line-height:1.5">Free templates need manual import — we'll create a link and open AIOStreams for you.</div>
@@ -8859,6 +8867,14 @@ if (new URLSearchParams(location.search).get('cb-e2e') === '1') {
     },
     checkUpdate() {
       return checkForTemplateUpdate(true);
+    },
+    webVitalsReady() {
+      return typeof _cbWebVitalsSend === 'function';
+    },
+    webVitalsSend(name, value) {
+      if (typeof _cbWebVitalsSend !== 'function') return false;
+      _cbWebVitalsSend(name, value);
+      return true;
     },
   };
 }
