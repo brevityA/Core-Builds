@@ -45,13 +45,30 @@ test('feedback text redacts "Bearer <value>" header syntax (value, not just keyw
   assert.equal(bare.includes('sk-standalone-999'), false);
 });
 
+test('feedback text redacts Basic, Token, and general Authorization schemes as well as colon values', () => {
+  const basic = sanitizeFeedbackText('request failed: Authorization: Basic dXNlcjpwYXNz==, code 401');
+  assert.equal(basic.includes('dXNlcjpwYXNz'), false);
+  assert.equal(basic.includes('Basic'), false);
+  assert.match(basic, /Authorization \[redacted\], code 401/i);
+
+  const tokenScheme = sanitizeFeedbackText('Authorization: Token tok-secret-456; retry');
+  assert.equal(tokenScheme.includes('tok-secret-456'), false);
+  assert.match(tokenScheme, /Authorization \[redacted\]; retry/i);
+
+  const customScheme = sanitizeFeedbackText('Authorization: CustomScheme custom-secret-789, ok');
+  assert.equal(customScheme.includes('custom-secret-789'), false);
+  assert.match(customScheme, /Authorization \[redacted\], ok/i);
+
+  const colonCred = sanitizeFeedbackText('Authorization: user:colon-secret-000');
+  assert.equal(colonCred.includes('colon-secret-000'), false);
+  assert.equal(colonCred, 'Authorization [redacted]');
+});
+
 test('feedback text redacts credential-bearing URLs (userinfo + query tokens)', () => {
   const userinfo = sanitizeFeedbackText('see https://user:hunter2@api.example.com/v1 for the config');
-  assert.equal(userinfo.includes('hunter2'), false);
-  assert.equal(userinfo.includes('api.example.com'), false);
+  assert.equal(userinfo, 'see [redacted URL] for the config');
   const query = sanitizeFeedbackText('see https://api.example.com/v1?key=abc123secret for the config');
-  assert.equal(query.includes('abc123secret'), false);
-  assert.match(query, /\[redacted URL\]/);
+  assert.equal(query, 'see [redacted URL] for the config');
 });
 
 test('feedback text survives nested objects and arrays without leaking values', () => {
@@ -115,4 +132,21 @@ test('feedback report does not serialize undeclared credential-bearing state', (
   });
   assert.equal(report.includes('must-not-appear'), false);
   assert.equal(report.includes('creds'), false);
+});
+
+test('buildFeedbackReport redacts Authorization: Basic base64 credentials from serialized output', () => {
+  const report = buildFeedbackReport({
+    device: 'Fire Stick',
+    service: 'TorBox',
+    host: 'Example host',
+  }, {
+    titleAndEpisode: 'Series S01E01',
+    visibleError: 'HTTP 401 Authorization: Basic dXNlcjpwYXNz; token=inline-tok-2',
+  });
+  assert.equal(report.includes('dXNlcjpwYXNz'), false);
+  assert.equal(report.includes('Basic'), false);
+  assert.equal(report.includes('inline-tok-2'), false);
+  assert.match(report, /Authorization \[redacted\]/i);
+  assert.match(report, /Fire Stick/);
+  assert.match(report, /Series S01E01/);
 });
