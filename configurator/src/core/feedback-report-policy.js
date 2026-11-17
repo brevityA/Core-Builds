@@ -9,6 +9,21 @@
 
 const PLACEHOLDER = 'Not supplied';
 const URL_PATTERN = /https?:\/\/[^\s"'<>]+/gi;
+
+/**
+ * Authorization headers are redacted as a single unit.
+ *
+ * HTTP Digest credentials are a comma-separated parameter list, so a pattern
+ * that stops at the first comma only hides `username` and leaks `nonce`,
+ * `cnonce`, `response`, and `opaque`. The Digest branch therefore consumes the
+ * rest of the line (or up to a `;`) with a flat negated class, which keeps the
+ * match linear and backtracks nowhere. Single-token schemes (`Basic`,
+ * `Bearer`, `Token`, custom schemes) and bare tokens stay covered by the
+ * remaining branches.
+ */
+const AUTH_HEADER_PATTERN = /\b(authorization)\b\s*[:=]\s*(?:digest\b[^\n;]*|[A-Za-z][A-Za-z0-9._~+-]*\s+[^\s,;]+|[^\s,;]+)/gi;
+/** Standalone `Bearer <token>` values that never appear behind a header name. */
+const BEARER_TOKEN_PATTERN = /\b(bearer)\b\s*[:=]?\s*[A-Za-z0-9._~+/=-]{8,}/gi;
 const CREDENTIAL_PATTERN = /\b(api[ _-]?key|token|password|authorization|bearer|secret)\s*[:=]\s*[^\s,;]+/gi;
 const UUID_MANIFEST_PATTERN = /\b(?:stremio\/)?[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\b/gi;
 
@@ -16,6 +31,8 @@ export function sanitizeFeedbackText(value, maxLength = 240) {
   const raw = String(value ?? '')
     .replace(/[\u0000-\u001f\u007f]/g, ' ')
     .replace(URL_PATTERN, '[redacted URL]')
+    .replace(AUTH_HEADER_PATTERN, '$1 [redacted]')
+    .replace(BEARER_TOKEN_PATTERN, '$1 [redacted]')
     .replace(CREDENTIAL_PATTERN, '$1=[redacted]')
     .replace(UUID_MANIFEST_PATTERN, '[redacted ID]')
     .replace(/\s+/g, ' ')
