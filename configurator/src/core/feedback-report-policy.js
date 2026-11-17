@@ -9,13 +9,29 @@
 
 const PLACEHOLDER = 'Not supplied';
 const URL_PATTERN = /https?:\/\/[^\s"'<>]+/gi;
+// Auth headers are redacted as a unit, BEFORE the generic keyword rule:
+// "Authorization: Bearer <token>" — the generic rule would swallow "Bearer"
+// as the value of "authorization=" and leave the actual token behind.
+const AUTH_HEADER_PATTERN = /\b(authorization|bearer)\s*[:=]?\s*(?:bearer\s+)?[A-Za-z0-9._~+\/=-]+/gi;
 const CREDENTIAL_PATTERN = /\b(api[ _-]?key|token|password|authorization|bearer|secret)\s*[:=]\s*[^\s,;]+/gi;
 const UUID_MANIFEST_PATTERN = /\b(?:stremio\/)?[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\b/gi;
 
+/**
+ * Reduce an arbitrary value to a displayable, credential-free string.
+ * Nested objects are rendered via String(value) as '[object Object]'
+ * (nothing leaks). Arrays are joined with ' | ' (spaced) rather than
+ * String()'s comma-only join: without separators the URL pattern swallows
+ * adjacent diagnostic content into its match, e.g.
+ * String(['https://x?a=1', 'status 502']) -> 'https://x?a=1,status 502'.
+ */
 export function sanitizeFeedbackText(value, maxLength = 240) {
-  const raw = String(value ?? '')
+  const asText = Array.isArray(value)
+    ? value.map(v => (v == null ? '' : String(v))).join(' | ')
+    : String(value ?? '');
+  const raw = asText
     .replace(/[\u0000-\u001f\u007f]/g, ' ')
     .replace(URL_PATTERN, '[redacted URL]')
+    .replace(AUTH_HEADER_PATTERN, '$1 [redacted]')
     .replace(CREDENTIAL_PATTERN, '$1=[redacted]')
     .replace(UUID_MANIFEST_PATTERN, '[redacted ID]')
     .replace(/\s+/g, ' ')

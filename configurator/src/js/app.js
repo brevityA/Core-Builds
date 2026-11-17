@@ -41,7 +41,7 @@ import { preflightFindings, hasBlockers, summarise, findingsAsMessages } from '.
 import { verifyAddonInstall } from '../core/install-transaction-policy.js';
 import { unknownConfigKeys } from '../config/generated/aiostreams-config-schema.js';
 
-function toggleTheme(){const html=document.documentElement;const t=html.getAttribute('data-theme')==='dark'?'light':'dark';html.setAttribute('data-theme',t);localStorage.setItem('cbTheme',t);}
+function toggleTheme(){const html=document.documentElement;const t=html.getAttribute('data-theme')==='dark'?'light':'dark';html.setAttribute('data-theme',t);try{localStorage.setItem('cbTheme',t)}catch(e){/* storage unavailable — the theme still applies for this visit */}}
 
 const STEPS = 6;
 // Single source of truth for the app version. Per repo convention (version-sync
@@ -259,7 +259,32 @@ function initSentry() {
     s.onload = () => {
       try {
         if (window.Sentry) {
-          window.Sentry.init({ dsn, tracesSampleRate: 0.1, release: 'core-builds@' + CONFIGURATOR_VERSION });
+          // Share links carry #cfg=<selections> in the URL fragment. Fragments
+          // are local-only and never meant for a third party. The SDK can put
+          // the page URL in several event fields, so strip the fragment from
+          // each one it owns:
+          //   event.request.url, breadcrumbs[].data.url,
+          //   breadcrumbs[category=history].message, spans[].description,
+          //   spans[].data.url
+          // NOT covered: arbitrary free text inside console/DOM breadcrumbs
+          // (no app code path logs share URLs, but this is not a guarantee).
+          const stripHash = u => (typeof u === 'string' ? u.split('#')[0] : u);
+          window.Sentry.init({
+            dsn, tracesSampleRate: 0.1, release: 'core-builds@' + CONFIGURATOR_VERSION,
+            beforeSend(event) {
+              if (!event) return event;
+              if (event.request) event.request.url = stripHash(event.request.url);
+              for (const crumb of event.breadcrumbs || []) {
+                if (crumb.data) crumb.data.url = stripHash(crumb.data.url);
+                if (crumb.category === 'history') crumb.message = stripHash(crumb.message);
+              }
+              for (const span of event.spans || []) {
+                span.description = stripHash(span.description);
+                if (span.data) span.data.url = stripHash(span.data.url);
+              }
+              return event;
+            },
+          });
           window.Sentry.setTag('cb-flags', Object.keys(CB_FLAGS).join(','));
         }
       } catch(e) {}
@@ -2238,7 +2263,25 @@ function initScrollFades() {
   });
 }
 
+// Re-rendering rewrites main.innerHTML, which natively drops [open] from
+// <details> elements. Their VALUES are safe (they live in S), but collapsing a
+// panel the user just opened — e.g. "Manual setup" while its host probe
+// re-renders — reads as lost work. Remember the open state of opt-in panels
+// and restore it after every render.
+let _persistOpenDetails = [];
 function render() {
+  const _main = document.getElementById('main');
+  _persistOpenDetails = _main
+    ? [..._main.querySelectorAll('details[data-persist-open][open]')].map(d => d.id).filter(Boolean)
+    : [];
+  renderCore();
+  if (!_persistOpenDetails.length) return;
+  for (const id of _persistOpenDetails) {
+    const d = document.getElementById(id);
+    if (d) d.open = true;
+  }
+}
+function renderCore() {
   renderProgress();
   const main = document.getElementById('main');
   const nav  = document.getElementById('nav');
@@ -2400,7 +2443,7 @@ function render() {
             </div>
             <div id="aioResult"></div>
             `}`}
-            <details style="margin-top:16px;border-top:1px solid rgba(255,255,255,.06);padding-top:14px">
+            <details id="manualSetupDetails" data-persist-open style="margin-top:16px;border-top:1px solid rgba(255,255,255,.06);padding-top:14px">
               <summary style="list-style:none;display:flex;align-items:center;justify-content:space-between;cursor:pointer;color:#4b5563;font-size:.79rem;font-weight:600;letter-spacing:.02em;user-select:none">
                 <span>Manual setup (existing config / self-hosted)</span>
                 <span style="font-size:.75rem;color:#374151">›</span>
@@ -2446,10 +2489,10 @@ function render() {
                 <label>UUID</label>
                 <input class="name-input" id="aioUuid" type="text" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx or paste manifest URL"
                   value="${escHtml(S.instanceUuid || '')}" data-action="update-uuid" maxlength="500" style="font-family:monospace;font-size:.88rem;transition:border-color .15s">
-                <div id="uuidStatus" style="font-size:.73rem;margin-top:4px;min-height:18px"></div>
+                <div id="uuidStatus" role="status" aria-live="polite" style="font-size:.73rem;margin-top:4px;min-height:18px"></div>
               </div>
             </div>
-            <details id="baseConfigDetails" style="margin-top:12px;border:1px solid var(--th-purple-border);border-radius:10px;padding:10px 13px;background:var(--th-purple-bg)">
+            <details id="baseConfigDetails" data-persist-open style="margin-top:12px;border:1px solid var(--th-purple-border);border-radius:10px;padding:10px 13px;background:var(--th-purple-bg)">
               <summary style="list-style:none;display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none;outline:none">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--th-purple)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
                 <span style="font-size:.74rem;font-weight:700;color:var(--th-purple);letter-spacing:.03em">Base Config</span>
@@ -2485,7 +2528,7 @@ function render() {
             <div id="manualAioResult"></div>
               </div>
             </details>
-            <details id="pasteManifestDetails" style="margin-top:16px;border-top:1px solid rgba(255,255,255,.06);padding-top:14px" ${pasteMode ? 'open' : ''}>
+            <details id="pasteManifestDetails" data-persist-open style="margin-top:16px;border-top:1px solid rgba(255,255,255,.06);padding-top:14px" ${pasteMode ? 'open' : ''}>
               <summary style="list-style:none;display:flex;align-items:center;justify-content:space-between;cursor:pointer;color:#4b5563;font-size:.79rem;font-weight:600;letter-spacing:.02em;user-select:none">
                 <span>Already have a manifest URL?</span>
                 <span style="font-size:.75rem;color:#374151">›</span>
@@ -2505,13 +2548,13 @@ function render() {
           <div class="rv-section-body">
             ${insightsHtml()}
             ${telemetryHtml()}
-            <details id="fmtPickerDetails" class="rv-accord" style="margin-top:0;margin-bottom:12px">
+            <details id="fmtPickerDetails" data-persist-open class="rv-accord" style="margin-top:0;margin-bottom:12px">
               <summary class="rv-accord-hdr">
                 <span class="u-rowc8"><span>${ICO.palette(14,'currentColor')}</span> Stream Formatter <span style="font-weight:600;color:var(--th-tx5);text-transform:none;letter-spacing:0;font-size:.72rem">— ${label('formatter', S.formatter)}</span></span><span class="rv-arr">›</span>
               </summary>
               <div class="rv-accord-body">${formatterPickerHtml()}</div>
             </details>
-            <details id="jsonPreviewDetails" class="rv-accord" style="margin-top:0;margin-bottom:12px">
+            <details id="jsonPreviewDetails" data-persist-open class="rv-accord" style="margin-top:0;margin-bottom:12px">
               <summary class="rv-accord-hdr">
                 <span>Preview JSON</span><span style="display:flex;align-items:center;gap:10px"><button type="button" data-action="copy-json" style="font-size:.74rem;font-weight:700;color:var(--th-accent);background:var(--th-accent-bg);border:1px solid var(--th-accent-border);border-radius:6px;padding:3px 11px;cursor:pointer;text-transform:none;letter-spacing:0">Copy JSON</button><span class="rv-arr">›</span></span>
               </summary>
@@ -2603,7 +2646,7 @@ function render() {
             <div style="font-size:.7rem;color:#8b949e;line-height:1.45">Core Builds does not log your credentials. <b>Export JSON</b> creates the file locally in your browser. If you choose <b>Direct Install</b>, the generated configuration is transmitted to the AIOStreams host you selected so it can create your manifest.</div>
           </div>
         </div>
-        <details id="langDetails" style="margin-bottom:16px;border:1px solid rgba(255,255,255,.06);border-radius:10px;overflow:hidden">
+        <details id="langDetails" data-persist-open style="margin-bottom:16px;border:1px solid rgba(255,255,255,.06);border-radius:10px;overflow:hidden">
           <summary style="list-style:none;display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:11px 14px;background:rgba(255,255,255,.03);user-select:none" onclick="this.parentElement.querySelector('.lang-chevron').style.transform=this.parentElement.open?'rotate(0deg)':'rotate(90deg)'">
             <div style="display:flex;align-items:center;gap:10px">
               <span style="font-size:.74rem;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.06em">Language Preferences</span>
@@ -2658,7 +2701,7 @@ function render() {
         </div>`).join('')}
         <div style="border-top:1px solid rgba(255,255,255,.06);margin:18px 0 14px"></div>
         ` : ''}
-        <details id="tmdbDetails" style="border:1px solid rgba(255,255,255,.06);border-radius:10px;overflow:hidden;margin-top:${debridInputs.length?'0':'4'}px" ${S.tmdbToken||S.tmdbApiKey?'open':''}>
+        <details id="tmdbDetails" data-persist-open style="border:1px solid rgba(255,255,255,.06);border-radius:10px;overflow:hidden;margin-top:${debridInputs.length?'0':'4'}px" ${S.tmdbToken||S.tmdbApiKey?'open':''}>
           <summary style="list-style:none;display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:11px 14px;background:rgba(255,255,255,.02);user-select:none">
             <span class="u-rowc8">
               <span style="font-size:.75rem;font-weight:700;color:#8b949e;text-transform:uppercase;letter-spacing:.06em">TMDB Keys</span>
@@ -3865,24 +3908,18 @@ document.addEventListener('DOMContentLoaded', () => {
       else S.langs.push(v);
       S.langsSet = true;
       saveState();
-      const wasOpen = document.getElementById('langDetails')?.open;
-      render();
-      if (wasOpen) { const d = document.getElementById('langDetails'); if (d) d.open = true; }
+      render(); // langDetails open-state is restored by the render() wrapper
     }
     if (e.target.dataset.action === 'toggle-lang-exclusive') {
       S.langExclusive = e.target.checked;
       saveState();
-      const wasOpen = document.getElementById('langDetails')?.open;
-      render();
-      if (wasOpen) { const d = document.getElementById('langDetails'); if (d) d.open = true; }
+      render(); // langDetails open-state is restored by the render() wrapper
     }
     if (e.target.dataset.action === 'toggle-foreign-kill') {
       S.foreignLangKill = e.target.checked;
       if (S.foreignLangKill) applyChoiceProfile('foreignLangKill');
       saveState();
-      const wasOpen = document.getElementById('langDetails')?.open;
-      render();
-      if (wasOpen) { const d = document.getElementById('langDetails'); if (d) d.open = true; }
+      render(); // langDetails open-state is restored by the render() wrapper
     }
     if (e.target.dataset.action === 'update-host') {
       S.instanceHost = e.target.value;
