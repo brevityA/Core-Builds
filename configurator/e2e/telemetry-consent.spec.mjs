@@ -127,15 +127,16 @@ async function reloadAndSettle(page, rec, { expectVisit = false } = {}) {
   }
 }
 
-async function fresh(page, rec, state, { query = '?cb-e2e=1', savedStep = '6', expectVisit = false } = {}) {
+async function fresh(page, rec, state, { query = '?cb-e2e=1', savedStep = '6', expectVisit = false, cbFlags = '' } = {}) {
   await page.goto(`/${query}`);
-  await page.evaluate(([s, step]) => {
+  await page.evaluate(([s, step, flags]) => {
     localStorage.clear();
     sessionStorage.clear();
     localStorage.setItem('cb_tut_seen', '1');
+    if (flags) localStorage.setItem('cb-flags', flags);
     if (s) localStorage.setItem('coreBuild', JSON.stringify(s));
     if (step !== null && step !== undefined) localStorage.setItem('coreBuildStep', String(step));
-  }, [state, savedStep]);
+  }, [state, savedStep, cbFlags]);
   await reloadAndSettle(page, rec, { expectVisit });
 }
 
@@ -311,7 +312,7 @@ test('unrelated Review actions send zero counter requests when consent is off', 
   await goReview(page);
 
   const customizeDetails = page.locator('details.rv-section:has(summary:has-text("Customize"))');
-  await customizeDetails.locator('summary').click();
+  await customizeDetails.locator('summary.rv-section-hdr').click();
   await expect(customizeDetails).toHaveAttribute('open', '');
 
   await page.locator('.size-btn', { hasText: '20GB' }).click();
@@ -322,7 +323,7 @@ test('unrelated Review actions send zero counter requests when consent is off', 
 
 test('Web Vitals negative: armed webVitals=1 flag with consent off sends zero beacons', async ({ page }) => {
   const rec = await attachCounterSpy(page);
-  await fresh(page, rec, CLEAN_STATE, { query: '?cb-e2e=1&cb-flags=webVitals=1' });
+  await fresh(page, rec, CLEAN_STATE, { cbFlags: 'webVitals=1' });
   await goReview(page);
 
   await expect.poll(() => page.evaluate(() => window.__coreBuilds.webVitalsReady())).toBe(true);
@@ -335,7 +336,7 @@ test('Web Vitals negative: armed webVitals=1 flag with consent off sends zero be
 
 test('Web Vitals positive: checking consent + deterministic webVitalsSend hook sends exact web-vital payload to COUNTER_URL root', async ({ page }) => {
   const rec = await attachCounterSpy(page);
-  await fresh(page, rec, CLEAN_STATE, { query: '?cb-e2e=1&cb-flags=webVitals=1' });
+  await fresh(page, rec, CLEAN_STATE, { cbFlags: 'webVitals=1' });
   await goReview(page);
 
   await expect.poll(() => page.evaluate(() => window.__coreBuilds.webVitalsReady())).toBe(true);
