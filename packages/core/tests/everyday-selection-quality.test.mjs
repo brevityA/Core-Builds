@@ -4,8 +4,9 @@ import { readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { generateTemplate } from '../src/generate-template.js';
+import { generateTemplate, gateTemplateForHost, resolveHostCapabilities } from '../src/index.js';
 import { PIN_4K_ELITE, PIN_1080_ELITE } from '../src/apex-policy.js';
+import { isAllowed } from '../src/regex-whitelist.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..', '..', '..');
@@ -278,14 +279,15 @@ test('Fix 1 (DV-Only Kill): generic/non-DV 1080p build kills DV-only s14 while k
 });
 
 test('Fix 2 (\\bAI\\b regex): excludes real AI upscales without killing legitimate "(AI)" titles like s28', () => {
-  const customBalanced = generateTemplate({
+  const customBalancedTpl = generateTemplate({
     outputProfile: 'balanced',
     architecture: 'standard',
     service: 'torbox-pro',
     device: 'generic',
     resolution: '1080p',
     host: 'custom',
-  }).config;
+  });
+  const customBalanced = customBalancedTpl.config;
   const patterns = (customBalanced.excludedRegexPatterns || []).map(parseRegexLiteral);
   const aiRegex = patterns[0];
   assert.ok(aiRegex, 'First excluded regex pattern present on custom/self-hosted build');
@@ -298,6 +300,9 @@ test('Fix 2 (\\bAI\\b regex): excludes real AI upscales without killing legitima
   const s29 = fixture.streams.find((s) => s.id === 's29-edge-true-ai-upscale');
   assert.ok(s29, 'Fixture includes s29');
   assert.equal(aiRegex.test(s29.filename), true, 'True AI upscale s29 must match');
+  assert.equal(aiRegex.test('Movie.2024.AIUpscaled.1080p.WEB-DL.mkv'), true, 'Concatenated AIUpscaled must match');
+  assert.equal(aiRegex.test('Movie.2024.1080p.WEB-DL.AI.Upscaling.mkv'), true, 'AI.Upscaling must match');
+  assert.equal(aiRegex.test('Movie.AI.Upscaled_1080p.mkv'), true, 'Underscore-delimited AI.Upscaled_1080p must match');
   assert.equal(aiRegex.test('Movie.2024.AI-Enhanced.1080p.mkv'), true);
   assert.equal(aiRegex.test('Movie.2024.AI_Remastered.1080p.mkv'), true);
   assert.equal(aiRegex.test('Movie.2024.AIUS.1080p.mkv'), true);
@@ -311,6 +316,34 @@ test('Fix 2 (\\bAI\\b regex): excludes real AI upscales without killing legitima
     customSurvivors.some((s) => s.id === 's29-edge-true-ai-upscale'),
     false,
     'Custom Core Balanced TorBox 1080p still excludes true AI upscale s29'
+  );
+
+  // Exercise the ElfHosted host-policy producer directly (not just committed golden)
+  const elfhostedGated = gateTemplateForHost(
+    customBalancedTpl,
+    resolveHostCapabilities('elfhosted', null)
+  );
+  assert.ok(
+    elfhostedGated.removals.some(
+      (r) => r.kind === 'regex' && r.target.startsWith('excludedRegexPatterns:')
+    ),
+    'ElfHosted host gate must strip the non-allowlisted AI excludedRegexPatterns entry'
+  );
+  for (const pat of elfhostedGated.template.config.excludedRegexPatterns || []) {
+    assert.equal(
+      isAllowed(pat),
+      true,
+      `ElfHosted-gated excludedRegexPatterns entry must obey allowlist: ${pat}`
+    );
+  }
+  const elfhostedSurvivors = runEseAndRegex(
+    elfhostedGated.template.config,
+    fixture.streams,
+    fixture.context
+  );
+  assert.ok(
+    elfhostedSurvivors.some((s) => s.id === 's28-edge-title-contains-ai-false-exclusion'),
+    'Generated ElfHosted Core Balanced keeps s28'
   );
 
   // ElfHosted golden keeps s28 as well (non-allowlisted AI pattern stripped by host gate)
