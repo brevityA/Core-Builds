@@ -58,7 +58,7 @@
       {
         "date": "2026-11-18",
         "version": "0.10.10",
-        "content": "DV-Only Kill now removes only Dolby-Vision-only releases; it was removing every HDR10, HDR10+, HLG and SDR-tagged stream instead."
+        "content": "DV-Only Kill now removes only Dolby-Vision-only releases; it was removing the HDR10, HDR10+, HLG and SDR-tagged streams that lacked DV instead."
       },
       {
         "date": "2026-11-16",

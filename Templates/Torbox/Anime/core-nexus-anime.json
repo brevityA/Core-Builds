@@ -13,7 +13,7 @@
       {
         "date": "2026-11-18",
         "version": "2.8.23",
-        "content": "Bad 1080P Bluray applies only in the first 90 days after release, so catalog titles with no REMUX keep their 1080p Bluray encodes."
+        "content": "Bad 1080P Bluray now applies only to movies in their first 90 days after release, so older movies keep the 1080p Bluray encodes this rule used to remove; other quality filters are unchanged."
       },
       {
         "date": "2026-11-15",

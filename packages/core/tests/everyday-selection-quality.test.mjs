@@ -417,3 +417,17 @@ test('Fix 4 (Bad 1080P Bluray): preserves older/indie 1080p BluRay encodes when 
     );
   }
 });
+
+test('Host gate writes back an AI-pattern swap even when nothing else is removed', async () => {
+  const { REGEX_HOST_FALLBACKS } = await import('../src/host-capability-policy.js');
+  const [[narrow, allowlisted]] = [...REGEX_HOST_FALLBACKS];
+  const template = { metadata: {}, config: { excludedRegexPatterns: [narrow] } };
+  const gated = gateTemplateForHost(template, resolveHostCapabilities('elfhosted', null));
+  assert.deepEqual(gated.template.config.excludedRegexPatterns, [allowlisted]);
+  assert.equal(gated.removals.filter((r) => r.kind === 'regex').length, 0);
+
+  const re = parseRegexLiteral(narrow);
+  assert.equal(re.test('Movie_2024_AI_Upscaled_1080p.mkv'), true, 'underscore before AI is a delimiter');
+  assert.equal(re.test('Movie_2024_AIUpscaling_1080p_WEB-DL.mkv'), true);
+  assert.equal(re.test('AI.2001.1080p.mkv'), false, 'a bare AI title still passes');
+});

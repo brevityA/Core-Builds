@@ -31,7 +31,7 @@ import { isAllowed, hasLookbehind, REGEX_FIELDS } from './regex-whitelist.js';
 // hosts accept only the allowlisted text. Rather than drop the filter there, the
 // gate swaps in the allowlisted original, which those hosts do accept.
 export const REGEX_HOST_FALLBACKS = Object.freeze(new Map([
-  ["/(\\bAI[ ._-]*(Upscal(?:ed?|ing)|Enhanced|Remaster(?:ed)?)(?:\\b|_))|(\\b(AIUS|RW|GuyZo|BR-GuyZo)\\b)|(\\b((Upscale)?Re-?graded?)\\b)|(\\b(The[ ._-]?Upscaler)\\b)|(\\b(AI[ ._-]?(Enhanced?|Remaster(ed)?)|UPS(UHD)?|Upscaled?([ ._-]?UHD)?|UpRez)\\b)/i",
+  ["/((?:\\b|_)AI[ ._-]*(Upscal(?:ed?|ing)|Enhanced|Remaster(?:ed)?)(?:\\b|_))|(\\b(AIUS|RW|GuyZo|BR-GuyZo)\\b)|(\\b((Upscale)?Re-?graded?)\\b)|(\\b(The[ ._-]?Upscaler)\\b)|(\\b(AI[ ._-]?(Enhanced?|Remaster(ed)?)|UPS(UHD)?|Upscaled?([ ._-]?UHD)?|UpRez)\\b)/i",
    "/(\\bAI[ ._-]?(Upscaled?|Enhanced|Remaster(ed)?)?\\b)|(\\b(AIUS|RW|GuyZo|BR-GuyZo)\\b)|(\\b((Upscale)?Re-?graded?)\\b)|(\\b(The[ ._-]?Upscaler)\\b)|(\\b(AI[ ._-]?(Enhanced?|Remaster(ed)?)|UPS(UHD)?|Upscaled?([ ._-]?UHD)?|UpRez)\\b)/i"],
 ]));
 
@@ -342,6 +342,7 @@ export function gateConfigForHost(rawConfig, capabilities, options = {}) {
     for (const field of REGEX_FIELDS) {
       if (!Array.isArray(config[field])) continue;
       const kept = [];
+      let substituted = false;
       for (const entry of config[field]) {
         const pattern = patternOf(entry);
         if (!pattern) { kept.push(entry); continue; }
@@ -349,6 +350,7 @@ export function gateConfigForHost(rawConfig, capabilities, options = {}) {
         const fallback = REGEX_HOST_FALLBACKS.get(pattern);
         if (fallback && (hostAllowed.has(fallback) || isAllowed(fallback))) {
           kept.push(typeof entry === 'string' ? fallback : { ...entry, pattern: fallback });
+          substituted = true;
           warnings.push({ kind: 'regex', target: `${field}: ${entry?.name || pattern.slice(0, 48)}`, reason: `${label} only accepts whitelisted regex; using the allowlisted equivalent` });
           continue;
         }
@@ -362,7 +364,7 @@ export function gateConfigForHost(rawConfig, capabilities, options = {}) {
         }
         kept.push(entry);
       }
-      if (kept.length !== config[field].length) config[field] = kept;
+      if (substituted || kept.length !== config[field].length) config[field] = kept;
     }
     // Synced regex URLs are a SEPARATE allowlist from inline patterns, checked
     // by validateSyncedRegexUrls() against RegexAccess.getAllowedUrls(). A

@@ -2,7 +2,7 @@
   "metadata": {
     "id": "brevity.core-nexus-anime-dub-4k",
     "name": "Core Nexus Anime Dub 4K",
-    "description": "English-dub priority for anime up to 4K. SeaDex + AnimeTosho scrapers, SDR preferred (HDR/DV still allowed, ranked after SDR), lossless audio support. Optimised for dubbed and dual-audio releases.",
+    "description": "English-dub priority for anime up to 4K. SeaDex + AnimeTosho scrapers, SDR preferred (HDR/DV still allowed), lossless audio support. Optimised for dubbed and dual-audio releases.",
     "source": "external",
     "author": "Branding-Brevity",
     "version": "0.1.6",
@@ -13,7 +13,7 @@
       {
         "date": "2026-11-18",
         "version": "0.1.6",
-        "content": "Bad 1080P Bluray applies only in the first 90 days after release, so catalog titles with no REMUX keep their 1080p Bluray encodes."
+        "content": "Bad 1080P Bluray now applies only to movies in their first 90 days after release, so older movies keep the 1080p Bluray encodes this rule used to remove; other quality filters are unchanged."
       },
       {
         "date": "2026-11-15",
