@@ -164,3 +164,17 @@ html{background:var(--th-bg)}body{font-feature-settings:'cv02','cv03','cv04','cv
 #expressLaneModal .ux-review-summary .fastlane-summary{text-align:left}
 #expressLaneModal .ux-advanced>.ux-toggle-row{width:auto}
 @media(max-width:640px){#expressLaneModal .fastlane-title{font-size:1.3rem}#expressLaneModal .fastlane-head .fastlane-sub{display:none}}
+
+/* Phone layout: each step is a card with its label above it; choices are full-width rows with a logo. */
+#expressLaneModal .fl-ico{display:none}
+@media(max-width:640px){
+#expressLaneModal .ux-section{position:relative;margin:34px 0 0;padding:16px;border:1px solid var(--th-border);border-radius:16px;background:var(--th-card-alt)}
+#expressLaneModal .ux-section h2{position:absolute;top:-24px;left:2px;margin:0;font-family:var(--font-mono);font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--th-signal-bright)}
+#expressLaneModal .ux-section-heading nav{display:none}
+#expressLaneModal .fastlane-grid.services:not(.ux-pill-grid){grid-template-columns:1fr;gap:10px}
+#expressLaneModal .fastlane-choice:has(.fl-ico){display:grid;grid-template-columns:32px 1fr;column-gap:14px;align-items:center;min-height:64px;padding:12px 14px}
+#expressLaneModal .fastlane-choice .fl-ico{display:flex;grid-row:1/3;width:32px;height:32px;align-items:center;justify-content:center}#expressLaneModal .fl-ico svg{width:32px;height:32px}
+#expressLaneModal .fastlane-choice:has(.fl-ico)>b{align-self:end}#expressLaneModal .fastlane-choice:has(.fl-ico)>span:not(.fl-ico){align-self:start}
+#expressLaneModal .ux-advanced{margin-top:24px}#expressLaneModal .ux-review-summary{margin-top:24px;padding:16px;border:1px solid var(--th-border);border-radius:16px;background:var(--th-card-alt)}
+}
+@media(max-width:640px){#expressLaneModal .fastlane-head{margin-inline:0;padding:12px 2px}}

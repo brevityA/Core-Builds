@@ -7654,6 +7654,16 @@ const EXPRESS_PROFILES = [
   ['balanced', 'Balanced', '4K when available · starts quickly'],
   ['maximum', 'Maximum', 'Best picture · widest search · any file size'],
 ];
+// Logos for the phone layout's list rows (hidden on wider screens).
+function expressIcon(kind, v) {
+  if (kind === 'target') {
+    const t = { app: ICO.tv(28, '#8b5cf6'), nuvio: ICO.nuvio(28), wuplay: ICO.wuplay(28, '#a78bfa'), chillio: ICO.chillio(28, '#fb923c'), manifest: ICO.link(28, 'currentColor') }[v];
+    return t ? `<span class="fl-ico" aria-hidden="true">${t}</span>` : '';
+  }
+  const opt = DEFS.find(d => d.key === 'service')?.opts.find(o => o.v === v);
+  return opt?.icon ? `<span class="fl-ico" aria-hidden="true">${opt.icon}</span>` : '';
+}
+
 const EXPRESS_SERVICES = [
   ['torbox-pro','TorBox','Debrid · fast cache'],
   ['realdebrid','Real-Debrid','Debrid · large library'],
@@ -7745,7 +7755,7 @@ function showExpressLane() {
   overlay.innerHTML = `<div class="fastlane-panel fastlane-express" role="dialog" aria-modal="true" aria-labelledby="expressTitle">
     <div class="fastlane-head"><button class="fastlane-back" type="button" data-express-back aria-label="Back">&larr; Back</button><div class="fastlane-head-copy"><div class="fastlane-kicker"><svg class="ux-core-mark" viewBox="0 0 44 44" aria-hidden="true"><defs><linearGradient id="uxCoreGradient" x2="1" y2="1"><stop stop-color="#4facfe"/><stop offset=".5" stop-color="#8a4890"/><stop offset="1" stop-color="#c03a20"/></linearGradient></defs><path d="M22 3 39 13v18L22 41 5 31V13Z" fill="none" stroke="currentColor" stroke-width="2"/><path d="m22 12 10 10-10 10-10-10Z" fill="url(#uxCoreGradient)"/></svg>Quick install <span class="ux-release">● v${CONFIGURATOR_VERSION}</span></div><div class="fastlane-title" id="expressTitle">Working streams in about 30 seconds.</div><div class="fastlane-sub">Pick your service, choose where to install, done. Everything else has a sensible default — change any of it under Options &amp; defaults.</div></div><button class="fastlane-close" id="expressClose" aria-label="Close">✕</button></div>
     <section class="ux-section" id="ux-service" aria-labelledby="ux-service-title"><div class="ux-section-heading"><h2 id="ux-service-title">1 · Service</h2><nav aria-label="Resources"><a href="https://core-builds.mintlify.app/" target="_blank" rel="noopener noreferrer">Documentation ↗</a><a href="https://github.com/brevityA/Core-Builds" target="_blank" rel="noopener noreferrer">GitHub ↗</a></nav></div>
-      <div class="fastlane-grid services">${EXPRESS_SERVICES.map(([v,n,d])=>`<button type="button" class="fastlane-choice${state.service===v?' active':''}" data-express-service="${v}"><b>${n}</b><span>${d}</span></button>`).join('')}</div>
+      <div class="fastlane-grid services">${EXPRESS_SERVICES.map(([v,n,d])=>`<button type="button" class="fastlane-choice${state.service===v?' active':''}" data-express-service="${v}">${expressIcon('service', v)}<b>${n}</b><span>${d}</span></button>`).join('')}</div>
       <div id="expressCreds">${renderCreds()}</div>
       <div class="ux-host-row" title="An explicitly picked host is honored exactly — no silent failover to another host.">
         <label for="expressHost" class="ux-host-label">AIOStreams host</label>
@@ -7769,7 +7779,7 @@ ${S.cacheMode==='uncached' ? '<div style="font-size:.6rem;color:#fbbf24;margin-t
       </div>
     </section>
     <section class="ux-section" id="ux-target" aria-labelledby="ux-target-title"><h2 id="ux-target-title">4 · Install to</h2>
-      <div class="fastlane-grid services">${[['app','Stremio','Recommended — direct install'],['nuvio','Nuvio','Manifest URL'],['wuplay','WuPlay','Manifest URL'],['chillio','Chillio','ChillLink URL'],['manifest','Other app','Copy manifest']].map(([v,n,d])=>`<button type="button" class="fastlane-choice${state.target===v?' active':''}" data-express-target="${v}"><b>${n}</b><span>${d}</span></button>`).join('')}</div>
+      <div class="fastlane-grid services">${[['app','Stremio','Recommended — direct install'],['nuvio','Nuvio','Manifest URL'],['wuplay','WuPlay','Manifest URL'],['chillio','Chillio','ChillLink URL'],['manifest','Other app','Copy manifest']].map(([v,n,d])=>`<button type="button" class="fastlane-choice${state.target===v?' active':''}" data-express-target="${v}">${expressIcon('target', v)}<b>${n}</b><span>${d}</span></button>`).join('')}</div>
       <div id="expressStremio"${state.target==='app'?'':' style="display:none"'}>
         <div class="fastlane-pair" style="display:flex;gap:8px;margin-top:10px">
           <input class="fastlane-field" id="stremioEmailInline" type="email" autocomplete="username" placeholder="Stremio email" value="${escH(S.stremioEmail||'')}" style="flex:1">
@@ -7882,7 +7892,7 @@ ${S.cacheMode==='uncached' ? '<div style="font-size:.6rem;color:#fbbf24;margin-t
     const tgtName = { app:'Stremio', nuvio:'Nuvio', wuplay:'WuPlay', chillio:'Chillio', manifest:'Manifest URL' }[state.target] || 'Stremio';
     const cacheName = S.cacheMode === 'cached' ? '⚡ Cached only' : S.cacheMode === 'uncached' ? 'Uncached only' : 'Mixed cache (uncached may download first)';
     const fsOn = document.getElementById('expressFullStack')?.checked;
-    elSum.innerHTML = `${escHtml(svcName)} → ${escHtml(tgtName)} · ${OUTPUT_PROFILE_INFO[activeOutputProfile()].label} · search ${profName} · ${escHtml(resName)} · ${escHtml(state.lang)} · <b style="color:${S.cacheMode==='cached'?'#34d399':'#fbbf24'}">${cacheName}</b> · host ${escHtml(HOST_LABEL_MAP[S.instanceHost] || S.instanceHost || 'auto')}${fsOn ? ' · <span class="u-purple">+ full stack (AIOMetadata + Cinemeta patch)</span>' : ''}`;
+    elSum.innerHTML = `${escHtml(svcName)} → ${escHtml(tgtName)} · ${OUTPUT_PROFILE_INFO[activeOutputProfile()].label} · search ${profName} · ${escHtml(resName)} · ${escHtml(state.lang)} · <b style="color:${S.cacheMode==='cached'?'var(--th-green)':'#d97706'}">${cacheName}</b> · host ${escHtml(HOST_LABEL_MAP[S.instanceHost] || S.instanceHost || 'auto')}${fsOn ? ' · <span class="u-purple">+ full stack (AIOMetadata + Cinemeta patch)</span>' : ''}`;
   };
   const refreshDeliveryMode = () => {
     if (!overlay.isConnected) return;
