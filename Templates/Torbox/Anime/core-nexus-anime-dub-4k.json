@@ -2,14 +2,19 @@
   "metadata": {
     "id": "brevity.core-nexus-anime-dub-4k",
     "name": "Core Nexus Anime Dub 4K",
-    "description": "English-dub priority for anime up to 4K. SeaDex + AnimeTosho scrapers, SDR preferred (HDR/DV still allowed, ranked after SDR), lossless audio support. Optimised for dubbed and dual-audio releases.",
+    "description": "English-dub priority for anime up to 4K. SeaDex + AnimeTosho scrapers, SDR preferred (HDR/DV still allowed), lossless audio support. Optimised for dubbed and dual-audio releases.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "0.1.5",
+    "version": "0.1.6",
     "category": "Anime",
     "sourceUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime-dub-4k.json",
     "changelogUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md",
     "changelog": [
+      {
+        "date": "2026-11-18",
+        "version": "0.1.6",
+        "content": "Bad 1080P Bluray now applies only to movies in their first 90 days after release, so older movies keep the 1080p Bluray encodes this rule used to remove; other quality filters are unchanged."
+      },
       {
         "date": "2026-11-15",
         "version": "0.1.5",
@@ -493,7 +498,7 @@
         "enabled": true
       },
       {
-        "expression": "/*Bad 1080P Bluray*/(queryType=='movie') and count(quality(resolution(streams,'2160p'),'Bluray REMUX'))==0 and (count(quality(resolution(streams,'1080p'),'Bluray REMUX'))==0) and count(seadex(resolution(streams,'1080p')))==0? negate(merge(seadex(streams),library(streams)),quality(resolution(streams,'1080p'),'Bluray')):[]",
+        "expression": "/*Bad 1080P Bluray*/(queryType=='movie') and (daysSinceRelease >= 0 and daysSinceRelease < 90) and count(quality(resolution(streams,'2160p'),'Bluray REMUX'))==0 and (count(quality(resolution(streams,'1080p'),'Bluray REMUX'))==0) and count(seadex(resolution(streams,'1080p')))==0? negate(merge(seadex(streams),library(streams)),quality(resolution(streams,'1080p'),'Bluray')):[]",
         "enabled": true
       },
       {

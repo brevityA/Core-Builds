@@ -5,7 +5,7 @@
     "description": "Bandwidth-optimised 1080p template for mobile and data-capped connections. 25 Mbps bitrate ceiling, 10 GB movie / 3 GB series size cap, SDR-preferred, no REMUX, no lossless audio. WEB-DL and WEBRip only.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "0.2.9",
+    "version": "0.2.10",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -17,6 +17,11 @@
       "v232Action": "remove legacy preset; configure the separate Newznab endpoint only after validation"
     },
     "changelog": [
+      {
+        "date": "2026-11-18",
+        "version": "0.2.10",
+        "content": "Bad 1080P Bluray now applies only to movies in their first 90 days after release, so older movies keep the 1080p Bluray encodes this rule used to remove; other quality filters are unchanged."
+      },
       {
         "date": "2026-11-16",
         "version": "0.2.9",
@@ -306,7 +311,7 @@
         "enabled": true
       },
       {
-        "expression": "/*Bad 1080P Bluray*/(queryType=='movie') and count(quality(resolution(streams,'2160p'),'Bluray REMUX'))==0 and (count(quality(resolution(streams,'1080p'),'Bluray REMUX'))==0) and count(seadex(resolution(streams,'1080p')))==0? negate(merge(seadex(streams),library(streams)),quality(resolution(streams,'1080p'),'Bluray')):[]",
+        "expression": "/*Bad 1080P Bluray*/(queryType=='movie') and (daysSinceRelease >= 0 and daysSinceRelease < 90) and count(quality(resolution(streams,'2160p'),'Bluray REMUX'))==0 and (count(quality(resolution(streams,'1080p'),'Bluray REMUX'))==0) and count(seadex(resolution(streams,'1080p')))==0? negate(merge(seadex(streams),library(streams)),quality(resolution(streams,'1080p'),'Bluray')):[]",
         "enabled": true
       },
       {

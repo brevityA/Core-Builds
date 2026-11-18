@@ -134,14 +134,14 @@
     ]
   },
   {
-    "expression": "/* LABS v0.9.0 | 1080p Remux elite pin — releaseGroup() */ pin(releaseGroup(quality(resolution(streams, 'BluRay REMUX'), '1080p'), 'NTb', 'FLUX', 'KiNGS', 'NTG', 'BHDStudio', 'FraMeSToR', 'SiC', '126811'), 'top')",
+    "expression": "/* LABS v0.9.0 | 1080p Remux elite pin — releaseGroup() */ pin(releaseGroup(resolution(quality(streams, 'BluRay REMUX'), '1080p'), 'NTb', 'FLUX', 'KiNGS', 'NTG', 'BHDStudio', 'FraMeSToR', 'SiC', '126811'), 'top')",
     "enabled": true,
     "templates": [
       "4K Apex Labs"
     ]
   },
   {
-    "expression": "/* LABS v0.9.0 | 4K Remux elite pin — releaseGroup() */ pin(releaseGroup(quality(resolution(streams, 'BluRay REMUX'), '2160p'), 'FraMeSToR', 'DON', 'FLUX', 'HIFI', 'playBD', 'BMF', 'QxR', 'EPSiLON', 'BLURANiUM', 'PmP'), 'top')",
+    "expression": "/* LABS v0.9.0 | 4K Remux elite pin — releaseGroup() */ pin(releaseGroup(resolution(quality(streams, 'BluRay REMUX'), '2160p'), 'FraMeSToR', 'DON', 'FLUX', 'HIFI', 'playBD', 'BMF', 'QxR', 'EPSiLON', 'BLURANiUM', 'PmP'), 'top')",
     "enabled": true,
     "templates": [
       "4K Apex Labs"

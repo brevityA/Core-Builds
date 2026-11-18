@@ -9,8 +9,8 @@ import { iqrExpression } from './iqr-expression.js';
 
 // ── Pins ──
 
-export const PIN_4K_ELITE = Object.freeze({ enabled:true, expression:"/* Elite 4K REMUX Pin */ pin(releaseGroup(quality(resolution(streams,'BluRay REMUX'),'2160p'),'FraMeSToR','DON','FLUX','HIFI','playBD','BMF','QxR','EPSiLON','BLURANiUM','PmP'),'top')" });
-export const PIN_1080_ELITE = Object.freeze({ enabled:true, expression:"/* Elite 1080p REMUX Pin */ pin(releaseGroup(quality(resolution(streams,'BluRay REMUX'),'1080p'),'NTb','FLUX','KiNGS','NTG','BHDStudio','FraMeSToR','SiC','126811'),'top')" });
+export const PIN_4K_ELITE = Object.freeze({ enabled:true, expression:"/* Elite 4K REMUX Pin */ pin(releaseGroup(resolution(quality(streams,'BluRay REMUX'),'2160p'),'FraMeSToR','DON','FLUX','HIFI','playBD','BMF','QxR','EPSiLON','BLURANiUM','PmP'),'top')" });
+export const PIN_1080_ELITE = Object.freeze({ enabled:true, expression:"/* Elite 1080p REMUX Pin */ pin(releaseGroup(resolution(quality(streams,'BluRay REMUX'),'1080p'),'NTb','FLUX','KiNGS','NTG','BHDStudio','FraMeSToR','SiC','126811'),'top')" });
 export const PIN_LQ = Object.freeze({ enabled:true, expression:"/* LQ Pin Bottom */ pin(releaseGroup(streams,'YIFY','RARBG','EVO','YTS','PSA','MeGusta','Tigole'),'bottom')" });
 
 // ── Audio priority ──

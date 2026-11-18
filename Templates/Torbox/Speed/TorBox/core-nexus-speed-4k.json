@@ -5,13 +5,18 @@
     "description": "Speed-optimised 4K build for TorBox Essential — no EasyNews required. Lean preset stack: TorBox cache + Zilean for fast cached results. Exits as soon as 3 cached 4K streams found or 4 s elapsed. TorBox Essential required.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "2.10.16",
+    "version": "2.10.17",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
     "sourceUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/TorBox/core-nexus-speed-4k.json",
     "changelogUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md",
     "changelog": [
+      {
+        "date": "2026-11-18",
+        "version": "2.10.17",
+        "content": "DV-Only Kill now removes only Dolby-Vision-only releases; it was removing the HDR10, HDR10+, HLG and SDR-tagged streams that lacked DV instead; Bad 1080P Bluray now applies only to movies in their first 90 days after release, so older movies keep the 1080p Bluray encodes this rule used to remove; other quality filters are unchanged."
+      },
       {
         "date": "2026-11-16",
         "version": "2.10.16",
@@ -251,6 +256,10 @@
     "excludeUncachedMode": "or",
     "excludedStreamExpressions": [
       {
+        "enabled": false,
+        "expression": "/* DV-Only Kill — enable for devices without Dolby Vision support (e.g. Samsung TV) */ negate(merge(visualTag(streams, 'HDR10+'), visualTag(streams, 'HDR10'), visualTag(streams, 'HDR'), visualTag(streams, 'HLG'), visualTag(streams, 'SDR')), visualTag(streams, 'DV'))"
+      },
+      {
         "expression": "/*Per-Addon Flood Guard*/ count(cached(streams)) >= 10 ? merge(slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Meteor'),3),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Comet'),10),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'MediaFusion'),4),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Torrent Galaxy'),1),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'EZTV'),3),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Knaben'),1),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'HdHub'),3)) : []",
         "enabled": true
       },
@@ -291,7 +300,7 @@
         "enabled": true
       },
       {
-        "expression": "/*Bad 1080P Bluray*/(queryType=='movie') and count(quality(resolution(streams,'2160p'),'Bluray REMUX'))==0 and (count(quality(resolution(streams,'1080p'),'Bluray REMUX'))==0) and count(seadex(resolution(streams,'1080p')))==0? negate(merge(seadex(streams),library(streams)),quality(resolution(streams,'1080p'),'Bluray')):[]",
+        "expression": "/*Bad 1080P Bluray*/(queryType=='movie') and (daysSinceRelease >= 0 and daysSinceRelease < 90) and count(quality(resolution(streams,'2160p'),'Bluray REMUX'))==0 and (count(quality(resolution(streams,'1080p'),'Bluray REMUX'))==0) and count(seadex(resolution(streams,'1080p')))==0? negate(merge(seadex(streams),library(streams)),quality(resolution(streams,'1080p'),'Bluray')):[]",
         "enabled": true
       },
       {
@@ -341,10 +350,6 @@
       {
         "expression": "/* CB | Hard External Kill */ type(streams, 'external')",
         "enabled": true
-      },
-      {
-        "enabled": false,
-        "expression": "/* DV-Only Kill — enable for devices without Dolby Vision support (e.g. Samsung TV) */ negate(visualTag(streams, 'DV'), merge(visualTag(streams, 'HDR10+'), visualTag(streams, 'HDR10'), visualTag(streams, 'HDR'), visualTag(streams, 'HLG'), visualTag(streams, 'SDR')))"
       },
       {
         "enabled": true,

@@ -5,7 +5,7 @@
     "description": "4K template tuned for Samsung RU7100 (UA65RU7100W) and compatible TVs. Native video containers: MKV, MP4, AVI, MOV, FLV, ASF, 3GP, VOB. Native audio: FLAC, AAC, MP3, M4A, WMA, WAV. No AV1 or Dolby Vision — DV streams excluded. HDR10+, HDR10, HLG priority. HEVC/AVC encodes only. Audio prioritises FLAC and AAC for native playback; Atmos/TrueHD/DTS ranked lower (passthrough/transcode). Full Core Builds expression layer: IQR Apex PSEs · REPACK/PROPER Passthrough · Per-Addon Flood Guard · Usenet Propagation Guard · AI Upscale Exclusion · Codec Efficiency Booster · Audio Pinnacle (native-first) · HDR Priority (no DV) · Ranked regex pool · Full CB ESE stack.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "0.3.17",
+    "version": "0.3.18",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -17,6 +17,11 @@
       "v232Action": "remove legacy preset; configure the separate Newznab endpoint only after validation"
     },
     "changelog": [
+      {
+        "date": "2026-11-18",
+        "version": "0.3.18",
+        "content": "DV-Only Kill now removes only Dolby-Vision-only releases; it was removing the HDR10, HDR10+, HLG and SDR-tagged streams that lacked DV instead."
+      },
       {
         "date": "2026-11-16",
         "version": "0.3.17",
@@ -257,6 +262,10 @@
     "excludeUncachedFromStreamTypes": [],
     "excludedStreamExpressions": [
       {
+        "enabled": true,
+        "expression": "/* DV-Only Kill — enable for devices without Dolby Vision support (e.g. Samsung TV) */ negate(merge(visualTag(streams, 'HDR10+'), visualTag(streams, 'HDR10'), visualTag(streams, 'HDR'), visualTag(streams, 'HLG'), visualTag(streams, 'SDR')), visualTag(streams, 'DV'))"
+      },
+      {
         "expression": "/*Per-Addon Flood Guard*/ count(cached(streams)) >= 10 ? merge(slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Meteor'),3),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Comet'),10),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'MediaFusion'),4),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Torrent Galaxy'),1),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'EZTV'),3),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Knaben'),1),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'HdHub'),3),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'TorrentsDB'),1)) : []",
         "enabled": true
       },
@@ -323,10 +332,6 @@
       {
         "expression": "/* CB | Hard External Kill */ type(streams, 'external')",
         "enabled": true
-      },
-      {
-        "enabled": true,
-        "expression": "/* DV-Only Kill — enable for devices without Dolby Vision support (e.g. Samsung TV) */ negate(visualTag(streams, 'DV'), merge(visualTag(streams, 'HDR10+'), visualTag(streams, 'HDR10'), visualTag(streams, 'HDR'), visualTag(streams, 'HLG'), visualTag(streams, 'SDR')))"
       },
       {
         "enabled": true,
