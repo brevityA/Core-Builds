@@ -5,7 +5,7 @@
     "description": "4K template tuned for the Google TV Streamer (2024). DV, HDR10+, HDR10, HLG all supported. AV1 hardware decode enabled. Lossless audio excluded (TrueHD, DTS-HD MA, DTS:X, FLAC) — DD+ Atmos is the audio ceiling. Audio channels capped at 5.1. Based on Core Nexus 4K Apex with full IQR Tukey fence PSE stack, Score IQR Guard, elite group pins, and perGroup() Extra Cached.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "0.1.11",
+    "version": "0.1.12",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -17,6 +17,11 @@
       "v232Action": "remove legacy preset; configure the separate Newznab endpoint only after validation"
     },
     "changelog": [
+      {
+        "date": "2026-11-18",
+        "version": "0.1.12",
+        "content": "Bad 1080P Bluray applies only in the first 90 days after release, so catalog titles with no REMUX keep their 1080p Bluray encodes."
+      },
       {
         "date": "2026-11-16",
         "version": "0.1.11",
@@ -187,6 +192,7 @@
       "Unknown"
     ],
     "excludedRegexPatterns": [
+      "/(\\bAI[ ._-]?(Upscaled?|Enhanced|Remaster(ed)?)?\\b)|(\\b(AIUS|RW|GuyZo|BR-GuyZo)\\b)|(\\b((Upscale)?Re-?graded?)\\b)|(\\b(The[ ._-]?Upscaler)\\b)|(\\b(AI[ ._-]?(Enhanced?|Remaster(ed)?)|UPS(UHD)?|Upscaled?([ ._-]?UHD)?|UpRez)\\b)/i",
       "/(?<=\\b[12]\\d{3}\\b).*\\b(Extras|Bonus|Extended[ ._-]Clip)\\b/i",
       "/(?<=\\bS\\d+\\b).*\\b(Extras|Bonus|Extended[ ._-]Clip)\\b/i",
       "/(?<=\\b[12]\\d{3}\\b).*\\b(Sing[-_. ]Along)\\b/i",

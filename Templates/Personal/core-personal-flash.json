@@ -5,13 +5,18 @@
     "description": "Instant cached-only play for Hotack L007CM. TorBox Pro + TorBox Pro. Zero uncached results. Stops fetching at 3 cached streams. Pre-resolves top stream for single-click play. SDR · WEB-DL · DD+/AAC · HEVC/AVC.",
     "source": "external",
     "author": "Personal",
-    "version": "1.2.3",
+    "version": "1.2.4",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
     "sourceUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Personal/core-personal-flash.json",
     "changelogUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md",
     "changelog": [
+      {
+        "date": "2026-11-18",
+        "version": "1.2.4",
+        "content": "Bad 1080P Bluray applies only in the first 90 days after release, so catalog titles with no REMUX keep their 1080p Bluray encodes."
+      },
       {
         "date": "2026-11-15",
         "version": "1.2.3",

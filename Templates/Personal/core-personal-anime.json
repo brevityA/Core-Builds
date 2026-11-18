@@ -5,13 +5,18 @@
     "description": "Anime-optimised build for Hotack L007CM. TorBox Pro · SeaDex · NZBGeek · EZTV · Meteor. Non-Anime Query Guard. SeaDex best releases · Dual audio · Sub + Dub aware. SDR · 1080p · DD+/AAC/FLAC.",
     "source": "external",
     "author": "Personal",
-    "version": "1.2.4",
+    "version": "1.2.5",
     "category": "Anime",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
     "sourceUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Personal/core-personal-anime.json",
     "changelogUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md",
     "changelog": [
+      {
+        "date": "2026-11-18",
+        "version": "1.2.5",
+        "content": "Bad 1080P Bluray applies only in the first 90 days after release, so catalog titles with no REMUX keep their 1080p Bluray encodes."
+      },
       {
         "date": "2026-11-15",
         "version": "1.2.4",

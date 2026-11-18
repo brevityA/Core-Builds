@@ -5,13 +5,18 @@
     "description": "Speed-optimised 1080p cached build for Hotack L007CM. TorBox Pro. Slim source stack. Stops fetching when 8+ cached 1080p streams found or after 12 s. SDR · WEB-DL · DD+/AAC · HEVC/AVC.",
     "source": "external",
     "author": "Personal",
-    "version": "1.2.3",
+    "version": "1.2.4",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
     "sourceUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Personal/core-personal-speed.json",
     "changelogUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md",
     "changelog": [
+      {
+        "date": "2026-11-18",
+        "version": "1.2.4",
+        "content": "Bad 1080P Bluray applies only in the first 90 days after release, so catalog titles with no REMUX keep their 1080p Bluray encodes."
+      },
       {
         "date": "2026-11-15",
         "version": "1.2.3",

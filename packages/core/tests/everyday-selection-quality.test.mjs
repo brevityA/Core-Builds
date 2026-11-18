@@ -318,39 +318,37 @@ test('Fix 2 (\\bAI\\b regex): excludes real AI upscales without killing legitima
     'Custom Core Balanced TorBox 1080p still excludes true AI upscale s29'
   );
 
-  // Exercise the ElfHosted host-policy producer directly (not just committed golden)
+  // Restricted hosts accept only the allowlisted Vidhin05 text, so the host gate swaps the
+  // narrower pattern for its allowlisted original instead of dropping AI-upscale filtering.
+  // The trade-off is deliberate: there, a title literally named "AI" is still excluded.
   const elfhostedGated = gateTemplateForHost(
     customBalancedTpl,
     resolveHostCapabilities('elfhosted', null)
   );
+  assert.equal(
+    elfhostedGated.removals.some((r) => r.kind === 'regex' && r.target.startsWith('excludedRegexPatterns: /(\\bAI')),
+    false,
+    'ElfHosted host gate must not drop the AI-upscale exclusion'
+  );
   assert.ok(
-    elfhostedGated.removals.some(
-      (r) => r.kind === 'regex' && r.target.startsWith('excludedRegexPatterns:')
-    ),
-    'ElfHosted host gate must strip the non-allowlisted AI excludedRegexPatterns entry'
+    elfhostedGated.warnings.some((w) => w.kind === 'regex' && /allowlisted equivalent/.test(w.reason)),
+    'ElfHosted host gate reports the swap to the allowlisted pattern'
   );
   for (const pat of elfhostedGated.template.config.excludedRegexPatterns || []) {
-    assert.equal(
-      isAllowed(pat),
-      true,
-      `ElfHosted-gated excludedRegexPatterns entry must obey allowlist: ${pat}`
-    );
+    assert.equal(isAllowed(pat), true, `ElfHosted-gated excludedRegexPatterns entry must obey allowlist: ${pat}`);
   }
-  const elfhostedSurvivors = runEseAndRegex(
-    elfhostedGated.template.config,
-    fixture.streams,
-    fixture.context
-  );
-  assert.ok(
-    elfhostedSurvivors.some((s) => s.id === 's28-edge-title-contains-ai-false-exclusion'),
-    'Generated ElfHosted Core Balanced keeps s28'
+  const elfhostedSurvivors = runEseAndRegex(elfhostedGated.template.config, fixture.streams, fixture.context);
+  assert.equal(
+    elfhostedSurvivors.some((s) => s.id === 's29-edge-true-ai-upscale'),
+    false,
+    'Generated ElfHosted Core Balanced still excludes true AI upscale s29'
   );
 
-  // ElfHosted golden keeps s28 as well (non-allowlisted AI pattern stripped by host gate)
   const balancedSurvivors = runEseAndRegex(balancedGolden.config, fixture.streams, fixture.context);
-  assert.ok(
-    balancedSurvivors.some((s) => s.id === 's28-edge-title-contains-ai-false-exclusion'),
-    'ElfHosted Core Balanced golden keeps s28'
+  assert.equal(
+    balancedSurvivors.some((s) => s.id === 's29-edge-true-ai-upscale'),
+    false,
+    'ElfHosted Core Balanced golden still excludes true AI upscale s29'
   );
 });
 
