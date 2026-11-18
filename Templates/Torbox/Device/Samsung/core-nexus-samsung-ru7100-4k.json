@@ -5,7 +5,7 @@
     "description": "4K template tuned for Samsung RU7100 (UA65RU7100W) and compatible TVs. Native video containers: MKV, MP4, AVI, MOV, FLV, ASF, 3GP, VOB. Native audio: FLAC, AAC, MP3, M4A, WMA, WAV. No AV1 or Dolby Vision — DV streams excluded. HDR10+, HDR10, HLG priority. HEVC/AVC encodes only. Audio prioritises FLAC and AAC for native playback; Atmos/TrueHD/DTS ranked lower (passthrough/transcode). Full Core Builds expression layer: IQR Apex PSEs · REPACK/PROPER Passthrough · Per-Addon Flood Guard · Usenet Propagation Guard · AI Upscale Exclusion · Codec Efficiency Booster · Audio Pinnacle (native-first) · HDR Priority (no DV) · Ranked regex pool · Full CB ESE stack.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "0.3.16",
+    "version": "0.3.17",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -17,6 +17,11 @@
       "v232Action": "remove legacy preset; configure the separate Newznab endpoint only after validation"
     },
     "changelog": [
+      {
+        "date": "2026-11-16",
+        "version": "0.3.17",
+        "content": "Inline regex sync: patterns re-derived from the current Vidhin05 English ranked list (H.264 10bit). No filter/sort/formatter changes."
+      },
       {
         "date": "2026-11-14",
         "version": "0.3.16",
@@ -790,7 +795,7 @@
         "score": 20
       },
       {
-        "pattern": "/\\bhi10p?\\b|(?=.*10[.-]?bit)(?=.*\\b[xh][-_. ]?264\\b)/i",
+        "pattern": "/\\bhi10(?:p|res)?\\b|(?=.*(?:\\b10[ .\\-_]?bits?\\b|yuv4\\d\\dp10))(?=.*\\b(?:[xh][-_. ]?264|avc)\\b)/i",
         "name": "H.264 10bit",
         "score": 20
       },

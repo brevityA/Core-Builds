@@ -56,7 +56,7 @@
         <svg width="22" height="22" viewBox="0 0 44 44" fill="none" aria-hidden="true"><path d="M22 4 39 14v16L22 40 5 30V14Z" stroke="#00d4ff" stroke-width="2"/><path d="m22 13 9 9-9 9-9-9Z" fill="#a78bfa"/></svg>
         <span class="sup-title">Support Core Builds</span>
       </div>
-      <button class="sup-close" data-action="close-support">✕</button>
+      <button class="sup-close" data-action="close-support" aria-label="Close support dialog">✕</button>
     </div>
     
     <div style="font-size:.76rem;color:#8b949e;line-height:1.5;margin-bottom:14px;text-align:left">
@@ -135,8 +135,9 @@
     <div class="prog-wrap">
       <div id="stepStrip"></div>
       <div id="breadcrumbs"></div>
+      <div id="stepAnnounce" class="sr-only" role="status" aria-live="polite"></div>
     </div>
-    <span id="hdrVersionBadge" data-action="show-changelog" style="position:absolute;top:9px;right:12px;font-size:.62rem;font-weight:800;color:#00d4ff;background:linear-gradient(135deg,rgba(0,212,255,.15),rgba(168,85,247,.12));border:1px solid rgba(0,212,255,.55);border-radius:5px;padding:2px 7px;letter-spacing:.07em;cursor:pointer;box-shadow:0 0 8px rgba(0,212,255,.25),inset 0 1px 0 rgba(255,255,255,.07);transition:all .15s" title="View changelog">v__CB_VERSION__</span>
+    <span id="hdrVersionBadge" data-action="show-changelog" class="hdr-ver-badge" title="View changelog">v__CB_VERSION__</span>
   </header>
 
   <div id="main"></div>

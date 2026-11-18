@@ -20,7 +20,7 @@
       {
         "date": "2026-11-15",
         "version": "0.1.3",
-        "content": "SD and untagged releases now fill in when fewer than five cached HD results exist, instead of being removed outright (older shows such as Arthur returned nothing); episode size floor is 30 MB for SD and untagged files and 150 MB at 720p; 1080p and above keep the old 1024 MB floor; per-add-on caps (Comet 5→10, Meteor 5→3) apply only once 10 cached results exist; ranked expressions score resolution, source, audio and release group, and the favourite-groups entry is rewritten so it matches."
+        "content": "SD and untagged releases now fill in when fewer than five cached HD results exist, instead of being removed outright (older shows such as Arthur returned nothing); episode size floor is 30 MB for SD and untagged files and 150 MB at 720p; 1080p and above keep the old 1024 MB floor; per-add-on caps (Comet 5→10, Meteor 5→3) apply only once 10 cached results exist; ranked expressions score resolution, source, audio and release group, and the favourite-groups entry is rewritten so it matches; 720p episode floor lowered to 150 MB, as the size-floor change intended; the Comet cap now applies to the Comet RD and Comet TB instances too."
       },
       {
         "date": "2026-10-23",
@@ -228,7 +228,7 @@
     "excludeUncachedFromStreamTypes": [],
     "excludedStreamExpressions": [
       {
-        "expression": "/*Per-Addon Flood Guard*/ count(cached(streams)) >= 10 ? merge(slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Meteor'),3),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Comet RD'),5),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'MediaFusion'),4),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Torrent Galaxy'),1),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'EZTV'),3),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Knaben'),1),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'HdHub'),3),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'TorrentsDB'),1)) : []",
+        "expression": "/*Per-Addon Flood Guard*/ count(cached(streams)) >= 10 ? merge(slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Meteor'),3),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Comet RD'),10),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'MediaFusion'),4),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Torrent Galaxy'),1),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'EZTV'),3),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Knaben'),1),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'HdHub'),3),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'TorrentsDB'),1)) : []",
         "enabled": true
       },
       {
@@ -1322,7 +1322,7 @@
             12000000000
           ],
           "series": [
-            268435456,
+            157286400,
             8000000000
           ]
         },

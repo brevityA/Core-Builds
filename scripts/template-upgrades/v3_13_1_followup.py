@@ -85,9 +85,16 @@ for f in sorted(glob.glob('Templates/Personal/*.json')):
         old = g[0]; per = size.setdefault('resolution', {})
         for r in ('2160p', '1440p', '1080p'):
             per.setdefault(r, {}).setdefault('series', [old, g[1]])
-        per.setdefault('720p', {}).setdefault('series', [157286400, g[1]])
         g[0] = SERIES_MIN
-        done.append('size floor'); notes.append(f'episode size floor is 30 MB for SD and untagged files and 150 MB at 720p; 1080p and above keep the old {old // 1048576} MB floor')
+        done.append('size floor'); notes.append(f'episode size floor is 30 MB for SD and untagged files and at most 150 MB at 720p; 1080p and above keep the old {old // 1048576} MB floor')
+    # 720p: lower an existing override that sits above 150 MB, never raise one (the 4K Apex
+    # self-hosted line carried its own 256 MB 720p floor, which setdefault left in place).
+    per = (c.get('size') or {}).get('resolution') or {}
+    s720 = (per.get('720p') or {}).get('series')
+    if g is not None and (not isinstance(s720, list) or (s720[0] or 0) > 157286400):
+        per.setdefault('720p', {})['series'] = [157286400, (s720[1] if isinstance(s720, list) else g[1])]
+        if 'size floor' not in done:
+            done.append('720p floor'); notes.append('720p episode floor lowered to 150 MB, as the size-floor change intended')
 
     for e in eses:
         if not isinstance(e, dict): continue
@@ -95,10 +102,17 @@ for f in sorted(glob.glob('Templates/Personal/*.json')):
         if x.startswith('/*Low Seeders Uncached*/') and SEED_GATE not in x:
             e['expression'] = '/*Low Seeders Uncached*/ ' + SEED_GATE + x[len('/*Low Seeders Uncached*/'):].strip() + ' : []'
             done.append('seeder gate'); notes.append('the low-seeder cull on uncached results waits for five cached results (it removed every uncached copy of niche titles, including ones with no seeder count)')
-        if x.startswith('/*Per-Addon Flood Guard*/') and FLOOD_GATE not in x:
-            y = x.replace("cached(streams)),'Comet'),5)", "cached(streams)),'Comet'),10)").replace("cached(streams)),'Meteor'),5)", "cached(streams)),'Meteor'),3)")
-            e['expression'] = y.replace('/*Per-Addon Flood Guard*/ merge(', '/*Per-Addon Flood Guard*/ ' + FLOOD_GATE + 'merge(', 1) + ' : []'
-            done.append('flood gate'); notes.append('per-add-on caps (Comet 5→10, Meteor 5→3) apply only once 10 cached results exist')
+        if x.startswith('/*Per-Addon Flood Guard*/'):
+            # The Personal set names its Comet instances 'Comet RD' and 'Comet TB'.
+            y = x
+            for n in ('Comet', 'Comet RD', 'Comet TB'):
+                y = y.replace(f"cached(streams)),'{n}'),5)", f"cached(streams)),'{n}'),10)")
+            y = y.replace("cached(streams)),'Meteor'),5)", "cached(streams)),'Meteor'),3)")
+            if FLOOD_GATE not in y:
+                y = y.replace('/*Per-Addon Flood Guard*/ merge(', '/*Per-Addon Flood Guard*/ ' + FLOOD_GATE + 'merge(', 1) + ' : []'
+            if y != x:
+                e['expression'] = y
+                done.append('flood gate'); notes.append('per-add-on caps (Comet 5→10, Meteor 5→3) apply only once 10 cached results exist')
 
     # Scores: the one existing entry compared a bare variable and matched nothing.
     rse = c.get('rankedStreamExpressions') or []

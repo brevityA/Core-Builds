@@ -15,7 +15,7 @@
       {
         "date": "2026-11-15",
         "version": "1.3.4",
-        "content": "SD and untagged releases now fill in when fewer than five cached HD results exist, instead of being removed outright (older shows such as Arthur returned nothing); episode size floor is 30 MB for SD and untagged files and 150 MB at 720p; 1080p and above keep the old 512 MB floor; per-add-on caps (Comet 5→10, Meteor 5→3) apply only once 10 cached results exist; the low-seeder cull on uncached results waits for five cached results (it removed every uncached copy of niche titles, including ones with no seeder count); ranked expressions score resolution, source, audio and release group, and the favourite-groups entry is rewritten so it matches."
+        "content": "SD and untagged releases now fill in when fewer than five cached HD results exist, instead of being removed outright (older shows such as Arthur returned nothing); episode size floor is 30 MB for SD and untagged files and 150 MB at 720p; 1080p and above keep the old 512 MB floor; per-add-on caps (Comet 5→10, Meteor 5→3) apply only once 10 cached results exist; the low-seeder cull on uncached results waits for five cached results (it removed every uncached copy of niche titles, including ones with no seeder count); ranked expressions score resolution, source, audio and release group, and the favourite-groups entry is rewritten so it matches; the Comet cap now applies to the Comet RD and Comet TB instances too."
       },
       {
         "date": "2026-10-23",
@@ -218,7 +218,7 @@
     "excludeUncachedMode": "or",
     "excludedStreamExpressions": [
       {
-        "expression": "/*Per-Addon Flood Guard*/ count(cached(streams)) >= 10 ? merge(slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Meteor'),3),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Comet RD'),5),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Comet TB'),5),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'MediaFusion'),4),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Debridio'),4),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'EZTV'),3),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Knaben'),3)) : []",
+        "expression": "/*Per-Addon Flood Guard*/ count(cached(streams)) >= 10 ? merge(slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Meteor'),3),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Comet RD'),10),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Comet TB'),10),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'MediaFusion'),4),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Debridio'),4),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'EZTV'),3),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Knaben'),3)) : []",
         "enabled": true
       },
       {

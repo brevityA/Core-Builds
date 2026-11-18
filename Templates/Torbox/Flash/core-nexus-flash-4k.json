@@ -5,7 +5,7 @@
     "description": "Single-click instant play — 4K. Only cached streams appear — zero uncached results. Derived from Speed 4K but with excludeUncached:true, a 2-stream dynamic stop condition, and pre-resolved top stream. Resolution order: 2160p → 1080p fallback. DV → HDR10+ → HDR priority. If content has no cached streams, the 0Cached ISE shows a title passthrough rather than a blank screen. 4K · TorBox Essential · Library, Comet, Zilean.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "2.10.15",
+    "version": "2.10.16",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -17,6 +17,11 @@
       "v232Action": "remove legacy preset; configure the separate Newznab endpoint only after validation"
     },
     "changelog": [
+      {
+        "date": "2026-11-16",
+        "version": "2.10.16",
+        "content": "Inline regex sync: patterns re-derived from the current Vidhin05 English ranked list (H.264 10bit). No filter/sort/formatter changes."
+      },
       {
         "date": "2026-11-14",
         "version": "2.10.15",
@@ -2064,7 +2069,7 @@
         "score": 20
       },
       {
-        "pattern": "/\\bhi10p?\\b|(?=.*10[.-]?bit)(?=.*\\b[xh][-_. ]?264\\b)/i",
+        "pattern": "/\\bhi10(?:p|res)?\\b|(?=.*(?:\\b10[ .\\-_]?bits?\\b|yuv4\\d\\dp10))(?=.*\\b(?:[xh][-_. ]?264|avc)\\b)/i",
         "name": "H.264 10bit",
         "score": 20
       },

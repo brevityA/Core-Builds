@@ -5,7 +5,7 @@
     "description": "Firestick and budget Android TV optimised build. Hard SDR-only enforcement — excludes Dolby Vision, HDR10+, HDR10, HLG, and 10-bit content that causes playback failures or tone-mapping artifacts on Fire TV hardware. AV1 excluded. TrueHD/Atmos/lossless audio excluded. 1080p + 720p · WEB-DL/WEBRip · TorBox Essential. Single TorBox subscription required.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "2.10.16",
+    "version": "2.10.17",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -17,6 +17,11 @@
       "v232Action": "remove legacy preset; configure the separate Newznab endpoint only after validation"
     },
     "changelog": [
+      {
+        "date": "2026-11-16",
+        "version": "2.10.17",
+        "content": "Inline regex sync: patterns re-derived from the current Vidhin05 English ranked list (H.264 10bit). No filter/sort/formatter changes."
+      },
       {
         "date": "2026-11-14",
         "version": "2.10.16",
@@ -757,7 +762,7 @@
         "score": 20
       },
       {
-        "pattern": "/\\bhi10p?\\b|(?=.*10[.-]?bit)(?=.*\\b[xh][-_. ]?264\\b)/i",
+        "pattern": "/\\bhi10(?:p|res)?\\b|(?=.*(?:\\b10[ .\\-_]?bits?\\b|yuv4\\d\\dp10))(?=.*\\b(?:[xh][-_. ]?264|avc)\\b)/i",
         "name": "H.264 10bit",
         "score": 20
       },
