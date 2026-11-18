@@ -1,4 +1,5 @@
 import { ICO } from '../data/icons.js';
+import { BRAND_GLYPHS } from '../data/brand-glyphs.js';
 import { CHANGELOG } from '../data/changelog.js';
 import { FORMATTERS, AUDIO_HELP } from '../data/formatters.js';
 import { OPTIONAL_SCRAPER_DEFS, presetRole, withPenguplay } from '../data/scrapers.js';
@@ -48,12 +49,12 @@ const STEPS = 6;
 // workflow) the raw x.y here expands to x.y.0 in package.json / versions.json and
 // the release tag; the built badge drops the trailing .0. At the 2026-09-06
 // audit the release tag was v3.7.0 while this said 3.1 — they must move together.
-const CONFIGURATOR_VERSION = '3.32';
+const CONFIGURATOR_VERSION = '3.33';
 // Set to a collector endpoint to enable the opt-in anonymous usage ping (service+device+resolution only).
 // Leave empty to keep the feature fully disabled and hidden.
 const USAGE_BEACON_URL = '';
 const COUNTER_URL = 'https://core-builds-cors-proxy.tlorenzato26.workers.dev';
-const EXCLUDED_REGEX = ["/(\\bAI[ ._-]?(Upscaled?|Enhanced|Remaster(ed)?)?\\b)|(\\b(AIUS|RW|GuyZo|BR-GuyZo)\\b)|(\\b((Upscale)?Re-?graded?)\\b)|(\\b(The[ ._-]?Upscaler)\\b)|(\\b(AI[ ._-]?(Enhanced?|Remaster(ed)?)|UPS(UHD)?|Upscaled?([ ._-]?UHD)?|UpRez)\\b)/i","/(?<=\\b[12]\\d{3}\\b).*\\b(Extras|Bonus|Extended[ ._-]Clip)\\b/i","/(?<=\\bS\\d+\\b).*\\b(Extras|Bonus|Extended[ ._-]Clip)\\b/i","/(?<=\\b[12]\\d{3}\\b).*\\b(Sing[-_. ]Along)\\b/i","/^(?!.*\\b((?<!HD[._ -]|HD)DVD|BDRip|MKV|XviD|WMV|d3g|(BD)?REMUX|^(?=.*1080p)(?=.*HEVC)|[xh][-_. ]?26[45]|German.*[DM]L|((?<=\\d{4}).*German.*([DM]L)?)(?=.*\\b(AVC|HEVC|VC[-_. ]?1|MVC|MPEG[-_. ]?2)\\b))\\b)(((?=.*\\b(Blu[-_. ]?ray|BD|HD[-_. ]?DVD)\\b)(?=.*\\b(AVC|HEVC|VC[-_. ]?1|MVC|MPEG[-_. ]?2|BDMV|ISO)\\b))|^((?=.*\\b(((?=.*\\b((.*_)?COMPLETE.*|Dis[ck])\\b)(?=.*(Blu[-_. ]?ray|HD[-_. ]?DVD)))|3D[-_. ]?BD|BR[-_. ]?DISK|Full[-_. ]?Blu[-_. ]?ray|^((?=.*((BD|UHD)[-_. ]?(25|50|66|100|ISO)))))))).*$/i","/[.]heb\\b|\\[eztvx?[ ._-]?(io|re|to)?\\]|\\[(rarbg|rartv|TGx)\\]|[.]VAV\\b|\\b(ORARBG)\\b/i","/[.]heb\\b|\\[eztvx?[ ._-]?(io|re|to)?\\]|\\[(rarbg|rartv|TGx)\\]/i"];
+const EXCLUDED_REGEX = ["/((?:\\b|_)AI[ ._-]*(Upscal(?:ed?|ing)|Enhanced|Remaster(?:ed)?)(?:\\b|_))|(\\b(AIUS|RW|GuyZo|BR-GuyZo)\\b)|(\\b((Upscale)?Re-?graded?)\\b)|(\\b(The[ ._-]?Upscaler)\\b)|(\\b(AI[ ._-]?(Enhanced?|Remaster(ed)?)|UPS(UHD)?|Upscaled?([ ._-]?UHD)?|UpRez)\\b)/i","/(?<=\\b[12]\\d{3}\\b).*\\b(Extras|Bonus|Extended[ ._-]Clip)\\b/i","/(?<=\\bS\\d+\\b).*\\b(Extras|Bonus|Extended[ ._-]Clip)\\b/i","/(?<=\\b[12]\\d{3}\\b).*\\b(Sing[-_. ]Along)\\b/i","/^(?!.*\\b((?<!HD[._ -]|HD)DVD|BDRip|MKV|XviD|WMV|d3g|(BD)?REMUX|^(?=.*1080p)(?=.*HEVC)|[xh][-_. ]?26[45]|German.*[DM]L|((?<=\\d{4}).*German.*([DM]L)?)(?=.*\\b(AVC|HEVC|VC[-_. ]?1|MVC|MPEG[-_. ]?2)\\b))\\b)(((?=.*\\b(Blu[-_. ]?ray|BD|HD[-_. ]?DVD)\\b)(?=.*\\b(AVC|HEVC|VC[-_. ]?1|MVC|MPEG[-_. ]?2|BDMV|ISO)\\b))|^((?=.*\\b(((?=.*\\b((.*_)?COMPLETE.*|Dis[ck])\\b)(?=.*(Blu[-_. ]?ray|HD[-_. ]?DVD)))|3D[-_. ]?BD|BR[-_. ]?DISK|Full[-_. ]?Blu[-_. ]?ray|^((?=.*((BD|UHD)[-_. ]?(25|50|66|100|ISO)))))))).*$/i","/[.]heb\\b|\\[eztvx?[ ._-]?(io|re|to)?\\]|\\[(rarbg|rartv|TGx)\\]|[.]VAV\\b|\\b(ORARBG)\\b/i","/[.]heb\\b|\\[eztvx?[ ._-]?(io|re|to)?\\]|\\[(rarbg|rartv|TGx)\\]/i"];
 const PREFERRED_REGEX_4K = [{"name":"Radarr Remux T1","pattern":"/^(?=.*(?:[_. ]|\\d{4}p-|\\bHybrid-)(?:(?:BD|UHD)[-_. ]?)?Remux\\b|(?:(?:BD|UHD)[-_. ]?)?Remux[_. ]\\d{4}p)(?=.*\\b(3L|ATELiER|BiZKiT|BLURANiUM|BMF|CiNEPHiLES|FraMeSToR|PiRAMiDHEAD|PmP|WiLDCAT|ZQ)\\b).*/i"},{"name":"Sonarr Remux T1","pattern":"/^(?=.*(?:[_. ]|\\d{4}p-|\\bHybrid-)(?:(?:BD|UHD)[-_. ]?)?Remux\\b|(?:(?:BD|UHD)[-_. ]?)?Remux[_. ]\\d{4}p)(?=.*\\b(BLURANiUM|BMF|FraMeSToR|PmP)\\b).*/i"},{"name":"Radarr UHD Bluray T1","pattern":"/^(?=.*(BluRay|Blu-Ray|HD-?DVD|BDMux|BD(?!$)|UHD|4K))(?!.*(?:(?:[_. ]|\\d{4}p-|\\bHybrid-)(?:(?:BD|UHD)[-_. ]?)?Remux\\b|(?:(?:BD|UHD)[-_. ]?)?Remux[_. ]\\d{4}p))(?!.*(WEB[-_. ]DL(?:mux)?|WEBDL|AmazonHD|AmazonSD|iTunesHD|MaxdomeHD|NetflixU?HD|WebHD|HBOMaxHD|DisneyHD|[. ]WEB[. ](?:[xh][ .]?26[45]|AVC|HEVC|DDP?[ .]?5[. ]1)|(?:720|1080|2160)p[-. ]WEB[-. ]|[-. ]WEB[-. ](?:720|1080|2160)p|(?:AMZN|NF|DP)[. -]WEB[. -](?!Rip)))(?!.*(WebRip|Web-Rip|WEBMux))(?=.*\\b(?:CtrlHD|MainFrame|W4NK3R)\\b).*/i"},{"name":"Radarr UHD Bluray T1 — DON","pattern":"/^(?=.*(BluRay|Blu-Ray|HD-?DVD|BDMux|BD(?!$)|UHD|4K))(?!.*(?:(?:[_. ]|\\d{4}p-|\\bHybrid-)(?:(?:BD|UHD)[-_. ]?)?Remux\\b|(?:(?:BD|UHD)[-_. ]?)?Remux[_. ]\\d{4}p))(?!.*(WEB[-_. ]DL(?:mux)?|WEBDL|AmazonHD|AmazonSD|iTunesHD|MaxdomeHD|NetflixU?HD|WebHD|HBOMaxHD|DisneyHD|[. ]WEB[. ](?:[xh][ .]?26[45]|AVC|HEVC|DDP?[ .]?5[. ]1)|(?:720|1080|2160)p[-. ]WEB[-. ]|[-. ]WEB[-. ](?:720|1080|2160)p|(?:AMZN|NF|DP)[. -]WEB[. -](?!Rip)))(?!.*(WebRip|Web-Rip|WEBMux))(?=.*(?:\\b(?:DON)\\b)).*/"},{"name":"Anime BD T1","pattern":"/^(?=.*(BluRay|Blu-Ray|HD-?DVD|BDMux|BD(?!$)|bd(?:720|1080|2160)|(?<=[-_. (\\[])bd(?=[-_. )\\]])|DVD|DVDRip|NTSC|PAL|xvidvd))(?=.*(\\[(Moxie|smol|SoM)\\]|-(Moxie|smol|SoM)\\b|\\b(DemiHuman|FLE|Flugel|LYS1TH3A)\\b)).*/i"},{"name":"Anime BD T1 [sam]","pattern":"/^(?=.*(BluRay|Blu-Ray|HD-?DVD|BDMux|BD(?!$)|bd(?:720|1080|2160)|(?<=[-_. (\\[])bd(?=[-_. )\\]])|DVD|DVDRip|NTSC|PAL|xvidvd))(?=.*(\\[sam\\]|-sam\\b)).*/"},{"name":"FraMeSToR","pattern":"/\\b(FraMeSToR)\\b/"}];
 const PREFERRED_REGEX_1080P = [{"name":"Web T1","pattern":"/^(?=.*(WEB[-_. ]DL(?:mux)?|WEBDL|AmazonHD|AmazonSD|iTunesHD|MaxdomeHD|NetflixU?HD|WebHD|HBOMaxHD|DisneyHD|[. ]WEB[. ](?:[xh][ .]?26[45]|AVC|HEVC|DDP?[ .]?5[. ]1)|(?:720|1080|2160)p[-. ]WEB[-. ]|[-. ]WEB[-. ](?:720|1080|2160)p|(?:AMZN|NF|DP)[. -]WEB[. -](?!Rip)|WebRip|Web-Rip|WEBMux))(?=.*\\b(?:APEX|FLUX|KiNGS|TOMMY)\\b).*/"},{"name":"126811","pattern":"/\\b(126811)\\b/i"},{"name":"FLUX","pattern":"/\\b(FLUX)\\b/"},{"name":"SiC","pattern":"/\\b(SiC)\\b/"},{"name":"BHDStudio","pattern":"/\\b(BHDStudio)\\b/i"}];
 const RANKED_REGEX_COMMON = [{"name": "Anime BD T1", "pattern": "/^(?=.*(BluRay|Blu-Ray|HD-?DVD|BDMux|BD(?!$)|bd(?:720|1080|2160)|(?<=[-_. (\\[])bd(?=[-_. )\\]])|DVD|DVDRip|NTSC|PAL|xvidvd))(?=.*(\\[(Moxie|smol|SoM)\\]|-(Moxie|smol|SoM)\\b|\\b(DemiHuman|FLE|Flugel|LYS1TH3A)\\b)).*/i", "score": 100}, {"pattern": "/^(?=.*(BluRay|Blu-Ray|HD-?DVD|BDMux|BD(?!$)|bd(?:720|1080|2160)|(?<=[-_. (\\[])bd(?=[-_. )\\]])|DVD|DVDRip|NTSC|PAL|xvidvd))(?=.*(\\[sam\\]|-sam\\b)).*/", "name": "Anime BD T1 [B]", "score": 100}, {"pattern": "/\\b(FraMeSToR)\\b/", "name": "FraMeSToR", "score": 100}, {"pattern": "/^(?=.*(?:[_. ]|\\d{4}p-|\\bHybrid-)(?:(?:BD|UHD)[-_. ]?)?Remux\\b|(?:(?:BD|UHD)[-_. ]?)?Remux[_. ]\\d{4}p)(?=.*\\b(3L|ATELiER|BiZKiT|BLURANiUM|BMF|CiNEPHiLES|FraMeSToR|PiRAMiDHEAD|PmP|WiLDCAT|ZQ)\\b).*/i", "name": "Radarr Remux T1", "score": 100}, {"pattern": "/^(?=.*(?:[_. ]|\\d{4}p-|\\bHybrid-)(?:(?:BD|UHD)[-_. ]?)?Remux\\b|(?:(?:BD|UHD)[-_. ]?)?Remux[_. ]\\d{4}p)(?=.*\\b(BLURANiUM|BMF|FraMeSToR|PmP)\\b).*/i", "name": "Sonarr Remux T1", "score": 100}, {"pattern": "/\\b(126811)\\b/i", "name": "126811", "score": 80}, {"pattern": "/\\b(FLUX)\\b/", "name": "FLUX", "score": 80}, {"pattern": "/^(?=.*(BluRay|Blu-Ray|HD-?DVD|BDMux|BD(?!$)))(?!.*(?:(?:[_. ]|\\d{4}p-|\\bHybrid-)(?:(?:BD|UHD)[-_. ]?)?Remux\\b|(?:(?:BD|UHD)[-_. ]?)?Remux[_. ]\\d{4}p))(?!.*(WEB[-_. ]DL(?:mux)?|WEBDL|AmazonHD|AmazonSD|iTunesHD|MaxdomeHD|NetflixU?HD|WebHD|HBOMaxHD|DisneyHD|[. ]WEB[. ](?:[xh][ .]?26[45]|AVC|HEVC|DDP?[ .]?5[. ]1)|(?:720|1080|2160)p[-. ]WEB[-. ]|[-. ]WEB[-. ](?:720|1080|2160)p|(?:AMZN|NF|DP)[. -]WEB[. -](?!Rip)))(?!.*(WebRip|Web-Rip|WEBMux))(?=.*\\b(?:ATELiER|BBQ|BMF|c0kE|Chotab|CRiSC|CtrlHD|D-Z0N3|Dariush|decibeL|EbP|EDPH|LolHD|NCmt|PTer|TayTO|TDD|TnP|VietHD|ZQ|ZoroSenpai)\\b).*/i", "name": "Radarr HD Bluray T1", "score": 80}, {"pattern": "/^(?=.*(BluRay|Blu-Ray|HD-?DVD|BDMux|BD(?!$)))(?!.*(?:(?:[_. ]|\\d{4}p-|\\bHybrid-)(?:(?:BD|UHD)[-_. ]?)?Remux\\b|(?:(?:BD|UHD)[-_. ]?)?Remux[_. ]\\d{4}p))(?!.*(WEB[-_. ]DL(?:mux)?|WEBDL|AmazonHD|AmazonSD|iTunesHD|MaxdomeHD|NetflixU?HD|WebHD|HBOMaxHD|DisneyHD|[. ]WEB[. ](?:[xh][ .]?26[45]|AVC|HEVC|DDP?[ .]?5[. ]1)|(?:720|1080|2160)p[-. ]WEB[-. ]|[-. ]WEB[-. ](?:720|1080|2160)p|(?:AMZN|NF|DP)[. -]WEB[. -](?!Rip)))(?!.*(WebRip|Web-Rip|WEBMux))(?=.*(?:\\b(?:DON|Geek)\\b)).*/", "name": "Radarr HD Bluray T1 [B]", "score": 80}, {"pattern": "/\\b(SiC)\\b/", "name": "SiC", "score": 80}, {"pattern": "/^(?=.*(BluRay|Blu-Ray|HD-?DVD|BDMux|BD(?!$)))(?!.*(?:(?:[_. ]|\\d{4}p-|\\bHybrid-)(?:(?:BD|UHD)[-_. ]?)?Remux\\b|(?:(?:BD|UHD)[-_. ]?)?Remux[_. ]\\d{4}p))(?!.*(WEB[-_. ]DL(?:mux)?|WEBDL|AmazonHD|AmazonSD|iTunesHD|MaxdomeHD|NetflixU?HD|WebHD|HBOMaxHD|DisneyHD|[. ]WEB[. ](?:[xh][ .]?26[45]|AVC|HEVC|DDP?[ .]?5[. ]1)|(?:720|1080|2160)p[-. ]WEB[-. ]|[-. ]WEB[-. ](?:720|1080|2160)p|(?:AMZN|NF|DP)[. -]WEB[. -](?!Rip)))(?!.*(WebRip|Web-Rip|WEBMux))(?=.*\\b(?:Chotab|CtrlHD|EbP|NTb|PTer)\\b).*/i", "name": "Sonarr HD Bluray T1", "score": 80}, {"pattern": "/^(?=.*(BluRay|Blu-Ray|HD-?DVD|BDMux|BD(?!$)))(?!.*(?:(?:[_. ]|\\d{4}p-|\\bHybrid-)(?:(?:BD|UHD)[-_. ]?)?Remux\\b|(?:(?:BD|UHD)[-_. ]?)?Remux[_. ]\\d{4}p))(?!.*(WEB[-_. ]DL(?:mux)?|WEBDL|AmazonHD|AmazonSD|iTunesHD|MaxdomeHD|NetflixU?HD|WebHD|HBOMaxHD|DisneyHD|[. ]WEB[. ](?:[xh][ .]?26[45]|AVC|HEVC|DDP?[ .]?5[. ]1)|(?:720|1080|2160)p[-. ]WEB[-. ]|[-. ]WEB[-. ](?:720|1080|2160)p|(?:AMZN|NF|DP)[. -]WEB[. -](?!Rip)))(?!.*(WebRip|Web-Rip|WEBMux))(?=.*(?:\\b(?:DON)\\b)).*/", "name": "Sonarr HD Bluray T1 [B]", "score": 80}, {"pattern": "/\\b(TheFarm)\\b/i", "name": "TheFarm", "score": 80}, {"name": "Anime BD T2", "pattern": "/^(?=.*(BluRay|Blu-Ray|HD-?DVD|BDMux|BD(?!$)|bd(?:720|1080|2160)|(?<=[-_. (\\[])bd(?=[-_. )\\]])|DVD|DVDRip|NTSC|PAL|xvidvd))(?=.*(\\[(Aergia|Arid|koala|Lulu|Vodes|YURI)\\]|-(Aergia(?!-raws)|Arid|koala|Lulu|YURI)\\b|\\b(Arg0|BlackRose|FateSucks|hchcsen|hydes|JOHNTiTOR|JySzE|Kulot|LostYears|Meakes|WAP|ZeroBuild)\\b|-Orphan\\b|(?<!Not)-Vodes\\b)).*/i", "score": 60}, {"pattern": "/^(?=.*(BluRay|Blu-Ray|HD-?DVD|BDMux|BD(?!$)|bd(?:720|1080|2160)|(?<=[-_. (\\[])bd(?=[-_. )\\]])|DVD|DVDRip|NTSC|PAL|xvidvd))(?=.*(\\[Orphan\\])).*/", "name": "Anime BD T2 [B]", "score": 60}, {"pattern": "/^(?=.*(WEB[-_. ]DL(?:mux)?|WEBDL|AmazonHD|AmazonSD|iTunesHD|MaxdomeHD|NetflixU?HD|WebHD|HBOMaxHD|DisneyHD|[. ]WEB[. ](?:[xh][ .]?26[45]|AVC|HEVC|DDP?[ .]?5[. ]1)|(?:720|1080|2160)p[-. ]WEB[-. ]|[-. ]WEB[-. ](?:720|1080|2160)p|(?:AMZN|NF|DP)[. -]WEB[. -](?!Rip)|WebRip|Web-Rip|WEBMux|\\[WEB\\]|[\\[\\(]WEB[ .]))(?=.*(\\[(Arid|smol|SoM|Vodes)\\]|-(Arid|smol|SoM)\\b|\\b(Arg0|Baws|FLE|LostYears|LYS1TH3A|McBalls|SCY|Setsugen|Z4ST1N|ZeroBuild)\\b|(?<!Not)-Vodes\\b)).*/i", "name": "Anime Web T1", "score": 60}, {"pattern": "/^(?=.*(WEB[-_. ]DL(?:mux)?|WEBDL|AmazonHD|AmazonSD|iTunesHD|MaxdomeHD|NetflixU?HD|WebHD|HBOMaxHD|DisneyHD|[. ]WEB[. ](?:[xh][ .]?26[45]|AVC|HEVC|DDP?[ .]?5[. ]1)|(?:720|1080|2160)p[-. ]WEB[-. ]|[-. ]WEB[-. ](?:720|1080|2160)p|(?:AMZN|NF|DP)[. -]WEB[. -](?!Rip)|WebRip|Web-Rip|WEBMux|\\[WEB\\]|[\\[\\(]WEB[ .]))(?=.*(\\[sam\\]|-sam\\b)).*/", "name": "Anime Web T1 [B]", "score": 60}, {"pattern": "/\\b(BHDStudio)\\b/i", "name": "BHDStudio", "score": 60}, {"pattern": "/^(?=.*(BluRay|Blu-Ray|HD-?DVD|BDMux|BD(?!$)))(?!.*(?:(?:[_. ]|\\d{4}p-|\\bHybrid-)(?:(?:BD|UHD)[-_. ]?)?Remux\\b|(?:(?:BD|UHD)[-_. ]?)?Remux[_. ]\\d{4}p))(?!.*(WEB[-_. ]DL(?:mux)?|WEBDL|AmazonHD|AmazonSD|iTunesHD|MaxdomeHD|NetflixU?HD|WebHD|HBOMaxHD|DisneyHD|[. ]WEB[. ](?:[xh][ .]?26[45]|AVC|HEVC|DDP?[ .]?5[. ]1)|(?:720|1080|2160)p[-. ]WEB[-. ]|[-. ]WEB[-. ](?:720|1080|2160)p|(?:AMZN|NF|DP)[. -]WEB[. -](?!Rip)))(?!.*(WebRip|Web-Rip|WEBMux))(?=.*\\b(?:EA|HiDt|HiSD|iFT|NTb|QOQ|SA89|sbR)\\b).*/i", "name": "Radarr HD Bluray T2", "score": 60}, {"pattern": "/^(?=.*(?:[_. ]|\\d{4}p-|\\bHybrid-)(?:(?:BD|UHD)[-_. ]?)?Remux\\b|(?:(?:BD|UHD)[-_. ]?)?Remux[_. ]\\d{4}p)(?=.*\\b(NCmt|playBD|SiCFoI|SURFINBIRD|TEPES)\\b).*/i", "name": "Radarr Remux T2", "score": 60}, {"pattern": "/^(?=.*(BluRay|Blu-Ray|HD-?DVD|BDMux|BD(?!$)))(?!.*(?:(?:[_. ]|\\d{4}p-|\\bHybrid-)(?:(?:BD|UHD)[-_. ]?)?Remux\\b|(?:(?:BD|UHD)[-_. ]?)?Remux[_. ]\\d{4}p))(?!.*(WEB[-_. ]DL(?:mux)?|WEBDL|AmazonHD|AmazonSD|iTunesHD|MaxdomeHD|NetflixU?HD|WebHD|HBOMaxHD|DisneyHD|[. ]WEB[. ](?:[xh][ .]?26[45]|AVC|HEVC|DDP?[ .]?5[. ]1)|(?:720|1080|2160)p[-. ]WEB[-. ]|[-. ]WEB[-. ](?:720|1080|2160)p|(?:AMZN|NF|DP)[. -]WEB[. -](?!Rip)))(?!.*(WebRip|Web-Rip|WEBMux))(?=.*\\b(?:SA89|sbR)\\b).*/i", "name": "Sonarr HD Bluray T2", "score": 60}, {"pattern": "/^(?=.*(?:[_. ]|\\d{4}p-|\\bHybrid-)(?:(?:BD|UHD)[-_. ]?)?Remux\\b|(?:(?:BD|UHD)[-_. ]?)?Remux[_. ]\\d{4}p)(?=.*\\b(12GaugeShotgun|decibeL|EPSiLON|HiFi|KRaLiMaRKo|playBD|PTer|SiCFoI|TRiToN)\\b).*/i", "name": "Sonarr Remux T2", "score": 60}, {"pattern": "/^(?=.*(WEB[-_. ]DL(?:mux)?|WEBDL|AmazonHD|AmazonSD|iTunesHD|MaxdomeHD|NetflixU?HD|WebHD|HBOMaxHD|DisneyHD|[. ]WEB[. ](?:[xh][ .]?26[45]|AVC|HEVC|DDP?[ .]?5[. ]1)|(?:720|1080|2160)p[-. ]WEB[-. ]|[-. ]WEB[-. ](?:720|1080|2160)p|(?:AMZN|NF|DP)[. -]WEB[. -](?!Rip)|WebRip|Web-Rip|WEBMux))(?=.*\\b(?:APEX|FLUX|KiNGS|TOMMY)\\b).*/", "name": "Web T1", "score": 60}, {"name": "Anime BD T3", "pattern": "/^(?=.*(BluRay|Blu-Ray|HD-?DVD|BDMux|BD(?!$)|bd(?:720|1080|2160)|(?<=[-_. (\\[])bd(?=[-_. )\\]])|DVD|DVDRip|NTSC|PAL|xvidvd))(?=.*(\\[(ARC|cappybara|CRUCiBLE|Doc|fig|Headpatter|Legion|Mehul|Mysteria|RaiN|RUDY|Serendipity|sgt|uba)\\]|-(ARC|cappybara|CRUCiBLE|Doc|fig|Headpatter|Legion|Mehul|Mysteria|RaiN|RUDY|Serendipity|sgt|uba)\\b|\\b(BBT-RMX|ChucksMux|CUNNY|Cunnysseur|Inka-Subs|LaCroiX|MTBB|nekotan|Netaro|Noiy|npz|NTRX|Okay-Subs|P9|RMX|Sekkon|SubsMix|Sylvar|ZR)\\b|(?<=remux).*\\b(NAN0)\\b|^(?=.*\\b(PMR)\\b)(?=.*\\b(Remux)\\b)|-ZR-)).*/i", "score": 40}, {"pattern": "/^(?=.*(BluRay|Blu-Ray|HD-?DVD|BDMux|BD(?!$)|bd(?:720|1080|2160)|(?<=[-_. (\\[])bd(?=[-_. )\\]])|DVD|DVDRip|NTSC|PAL|xvidvd))(?=.*(\\[(Afro|Chimera|derp|DIY|EXP|Foxtrot|Kawatare|Metal|Pizza|Smoke|Vanilla|VULCAN)\\]|-(Afro|Chimera|derp|DIY|EXP|Foxtrot|Kawatare|Metal|Pizza|Smoke|Vanilla|VULCAN)\\b|\\b(ABdex|aRMX|BiRJU|BKC|CBT|grimf|IK|Iznjie[ .-]Biznjie|Kaleido-subs|Kametsu|KH|LazyRemux|MK|neko-kBaraka|OZR|pog42|Quetzal|Reza|SCY|Shimatta|Spirale|UDF|UQW|Virtuality)\\b)).*/i", "name": "Anime BD T4", "score": 40}, {"pattern": "/^(?=.*(WEB[-_. ]DL(?:mux)?|WEBDL|AmazonHD|AmazonSD|iTunesHD|MaxdomeHD|NetflixU?HD|WebHD|HBOMaxHD|DisneyHD|[. ]WEB[. ](?:[xh][ .]?26[45]|AVC|HEVC|DDP?[ .]?5[. ]1)|(?:720|1080|2160)p[-. ]WEB[-. ]|[-. ]WEB[-. ](?:720|1080|2160)p|(?:AMZN|NF|DP)[. -]WEB[. -](?!Rip)|WebRip|Web-Rip|WEBMux|\\[WEB\\]|[\\[\\(]WEB[ .]))(?=.*(\\[(Asakura|Cyan|Dae|Foxtrot|Gao|Not-Vodes|Pizza|tenshi)\\]|-(Asakura|Cyan|Dae|Foxtrot|Gao|Not-Vodes|Pizza)\\b|-tenshi$|\\b(0x539|BlackRose|Cytox|GSK[._-]kun|Half-Baked|HatSubs|MALD|MTBB|Okay-Subs|Reza|Slyfox|SoLCE)\\b)).*/i", "name": "Anime Web T2", "score": 40}, {"pattern": "/^(?=.*(WEB[-_. ]DL(?:mux)?|WEBDL|AmazonHD|AmazonSD|iTunesHD|MaxdomeHD|NetflixU?HD|WebHD|HBOMaxHD|DisneyHD|[. ]WEB[. ](?:[xh][ .]?26[45]|AVC|HEVC|DDP?[ .]?5[. ]1)|(?:720|1080|2160)p[-. ]WEB[-. ]|[-. ]WEB[-. ](?:720|1080|2160)p|(?:AMZN|NF|DP)[. -]WEB[. -](?!Rip)|WebRip|Web-Rip|WEBMux|\\[WEB\\]|[\\[\\(]WEB[ .]))(?=.*(\\[Kitsune\\]|-Kitsune\\b|\\b(AnoZu|Dooky|SubsPlus\\+?|ZR)\\b)).*/i", "name": "Anime Web T3", "score": 40}, {"name": "DV (Disk)", "pattern": "/^(?=.*\\b(FraMeSToR)\\b)(?=.*\\b(dv|dovi|dolby[ .]?v(ision)?)\\b)(?!.*\\b(FANRES)\\b)(?!.*\\bhybrid(\\b|\\d)).*/i", "score": 40}, {"pattern": "/^(?=.*(BluRay|Blu-Ray|HD-?DVD|BDMux|BD(?!$)))(?!.*(?:(?:[_. ]|\\d{4}p-|\\bHybrid-)(?:(?:BD|UHD)[-_. ]?)?Remux\\b|(?:(?:BD|UHD)[-_. ]?)?Remux[_. ]\\d{4}p))(?!.*(WEB[-_. ]DL(?:mux)?|WEBDL|AmazonHD|AmazonSD|iTunesHD|MaxdomeHD|NetflixU?HD|WebHD|HBOMaxHD|DisneyHD|[. ]WEB[. ](?:[xh][ .]?26[45]|AVC|HEVC|DDP?[ .]?5[. ]1)|(?:720|1080|2160)p[-. ]WEB[-. ]|[-. ]WEB[-. ](?:720|1080|2160)p|(?:AMZN|NF|DP)[. -]WEB[. -](?!Rip)))(?!.*(WebRip|Web-Rip|WEBMux))(?=.*\\b(?:BHDStudio|hallowed|HiFi|HONE|playHD|SPHD|W4NK3R)\\b).*/i", "name": "Radarr HD Bluray T3", "score": 40}, {"pattern": "/^(?=.*(?:[_. ]|\\d{4}p-|\\bHybrid-)(?:(?:BD|UHD)[-_. ]?)?Remux\\b|(?:(?:BD|UHD)[-_. ]?)?Remux[_. ]\\d{4}p)(?=.*\\b(12GaugeShotgun|decibeL|EPSiLON|HiFi|iFT|KRaLiMaRKo|NTb|PTP|SumVision|TOA|TRiToN)\\b).*/i", "name": "Radarr Remux T3", "score": 40}, {"pattern": "/^(?=.*(WEB[-_. ]DL(?:mux)?|WEBDL|AmazonHD|AmazonSD|iTunesHD|MaxdomeHD|NetflixU?HD|WebHD|HBOMaxHD|DisneyHD|[. ]WEB[. ](?:[xh][ .]?26[45]|AVC|HEVC|DDP?[ .]?5[. ]1)|(?:720|1080|2160)p[-. ]WEB[-. ]|[-. ]WEB[-. ](?:720|1080|2160)p|(?:AMZN|NF|DP)[. -]WEB[. -](?!Rip)|WebRip|Web-Rip|WEBMux))(?=.*\\b(?:dB|MiU|monkee|MZABI|playWEB|SbR|SMURF|XEBEC|4KBEC|CEBEX)\\b).*/i", "name": "Radarr Web T2", "score": 40}, {"pattern": "/^(?=.*(WEB[-_. ]DL(?:mux)?|WEBDL|AmazonHD|AmazonSD|iTunesHD|MaxdomeHD|NetflixU?HD|WebHD|HBOMaxHD|DisneyHD|[. ]WEB[. ](?:[xh][ .]?26[45]|AVC|HEVC|DDP?[ .]?5[. ]1)|(?:720|1080|2160)p[-. ]WEB[-. ]|[-. ]WEB[-. ](?:720|1080|2160)p|(?:AMZN|NF|DP)[. -]WEB[. -](?!Rip)|WebRip|Web-Rip|WEBMux))(?=.*\\b(?:TOMMY)\\b).*/", "name": "Radarr Web T2 [B]", "score": 40}, {"pattern": "/^(?=.*(WEB[-_. ]DL(?:mux)?|WEBDL|AmazonHD|AmazonSD|iTunesHD|MaxdomeHD|NetflixU?HD|WebHD|HBOMaxHD|DisneyHD|[. ]WEB[. ](?:[xh][ .]?26[45]|AVC|HEVC|DDP?[ .]?5[. ]1)|(?:720|1080|2160)p[-. ]WEB[-. ]|[-. ]WEB[-. ](?:720|1080|2160)p|(?:AMZN|NF|DP)[. -]WEB[. -](?!Rip)|WebRip|Web-Rip|WEBMux))(?=.*\\b(?:Flights|PHOENiX)\\b).*/", "name": "Radarr Web T2 [C]", "score": 40}, {"pattern": "/^(?=.*(WEB[-_. ]DL(?:mux)?|WEBDL|AmazonHD|AmazonSD|iTunesHD|MaxdomeHD|NetflixU?HD|WebHD|HBOMaxHD|DisneyHD|[. ]WEB[. ](?:[xh][ .]?26[45]|AVC|HEVC|DDP?[ .]?5[. ]1)|(?:720|1080|2160)p[-. ]WEB[-. ]|[-. ]WEB[-. ](?:720|1080|2160)p|(?:AMZN|NF|DP)[. -]WEB[. -](?!Rip)|WebRip|Web-Rip|WEBMux))(?=.*\\b(?:BLOOM|Dooky|GNOMiSSiON|NINJACENTRAL|NPMS|ROCCaT|SLiGNOME|SwAgLaNdEr)\\b).*/i", "name": "Radarr Web T3", "score": 40}, {"pattern": "/^(?=.*(WEB[-_. ]DL(?:mux)?|WEBDL|AmazonHD|AmazonSD|iTunesHD|MaxdomeHD|NetflixU?HD|WebHD|HBOMaxHD|DisneyHD|[. ]WEB[. ](?:[xh][ .]?26[45]|AVC|HEVC|DDP?[ .]?5[. ]1)|(?:720|1080|2160)p[-. ]WEB[-. ]|[-. ]WEB[-. ](?:720|1080|2160)p|(?:AMZN|NF|DP)[. -]WEB[. -](?!Rip)|WebRip|Web-Rip|WEBMux))(?=.*\\b(?:3cTWeB|4KBEC|BTW|BLUTONiUM|BYNDR|CEBEX|Chotab|Cinefeel|CiT|CMRG|Coo7|dB|FC|iJP|iKA|iT00NZ|JETIX|KHN|MiU|MZABI|NPMS|NYH|orbitron|playWEB|PSiG|ROCCaT|RTFM|SA89|SbR|SDCC|TEPES|TVSmash|WELP|XEBEC)\\b).*/i", "name": "Sonarr Web T2", "score": 40}, {"pattern": "/^(?=.*(WEB[-_. ]DL(?:mux)?|WEBDL|AmazonHD|AmazonSD|iTunesHD|MaxdomeHD|NetflixU?HD|WebHD|HBOMaxHD|DisneyHD|[. ]WEB[. ](?:[xh][ .]?26[45]|AVC|HEVC|DDP?[ .]?5[. ]1)|(?:720|1080|2160)p[-. ]WEB[-. ]|[-. ]WEB[-. ](?:720|1080|2160)p|(?:AMZN|NF|DP)[. -]WEB[. -](?!Rip)|WebRip|Web-Rip|WEBMux))(?=.*\\b(?:DEEP|END|ETHiCS|Flights|GNOME|KiMCHI|LAZY|PHOENiX|SIGMA|SiGMA|SMURF|SPiRiT)\\b).*/", "name": "Sonarr Web T2 [B]", "score": 40}, {"pattern": "/^(?=.*(WEB[-_. ]DL(?:mux)?|WEBDL|AmazonHD|AmazonSD|iTunesHD|MaxdomeHD|NetflixU?HD|WebHD|HBOMaxHD|DisneyHD|[. ]WEB[. ](?:[xh][ .]?26[45]|AVC|HEVC|DDP?[ .]?5[. ]1)|(?:720|1080|2160)p[-. ]WEB[-. ]|[-. ]WEB[-. ](?:720|1080|2160)p|(?:AMZN|NF|DP)[. -]WEB[. -](?!Rip)|WebRip|Web-Rip|WEBMux))(?=.*\\b(?:BLOOM|Dooky|NINJACENTRAL|SLiGNOME|SwAgLaNdEr|T4H)\\b).*/i", "name": "Sonarr Web T3", "score": 40}, {"pattern": "/^(?=.*(WEB[-_. ]DL(?:mux)?|WEBDL|AmazonHD|AmazonSD|iTunesHD|MaxdomeHD|NetflixU?HD|WebHD|HBOMaxHD|DisneyHD|[. ]WEB[. ](?:[xh][ .]?26[45]|AVC|HEVC|DDP?[ .]?5[. ]1)|(?:720|1080|2160)p[-. ]WEB[-. ]|[-. ]WEB[-. ](?:720|1080|2160)p|(?:AMZN|NF|DP)[. -]WEB[. -](?!Rip)|WebRip|Web-Rip|WEBMux))(?=.*\\b(?:DRACULA|ViSiON)\\b).*/", "name": "Sonarr Web T3 [B]", "score": 40}, {"pattern": "/10[.-]?bit|hi10p?/i", "name": "10bit", "score": 20}, {"pattern": "/^(?=.*(BluRay|Blu-Ray|HD-?DVD|BDMux|BD(?!$)|bd(?:720|1080|2160)|(?<=[-_. (\\[])bd(?=[-_. )\\]])|DVD|DVDRip|NTSC|PAL|xvidvd))(?=.*(\\[(Beatrice|Drag|Judgment|Thighs|Yuki)\\]|-(Beatrice(?!-raws)|Drag|Judgment|Thighs|Yuki)\\b|\\b(Animorphs|AOmundson|ASC|Baws|McBalls|B00BA|Cait-Sidhe|CsS|CTR|D4C|deanzel|eldon|Freehold|GHS|Hark0N|Holomux|MC|mottoj|NH|NTRM|o7|QM|TTGA|UltraRemux|WBDP|WSE)\\b)).*/i", "name": "Anime BD T5", "score": 20}, {"pattern": "/^(?=.*(BluRay|Blu-Ray|HD-?DVD|BDMux|BD(?!$)|bd(?:720|1080|2160)|(?<=[-_. (\\[])bd(?=[-_. )\\]])|DVD|DVDRip|NTSC|PAL|xvidvd))(?=.*(\\[(ANE|Tsundere|YURASUKA)\\]|-ANE$|-(Tsundere(?!-)|YURASUKA)\\b|\\b(Bunny-Apocalypse|CyC|Datte13|EJF|GetItTwisted|GSK[._-]kun|iKaos|karios|Pookie|RASETSU|Starbez|Yoghurt)\\b)).*/i", "name": "Anime BD T6", "score": 20}, {"pattern": "/^(?=.*(BluRay|Blu-Ray|HD-?DVD|BDMux|BD(?!$)|bd(?:720|1080|2160)|(?<=[-_. (\\[])bd(?=[-_. )\\]])|DVD|DVDRip|NTSC|PAL|xvidvd))(?=.*(\\[(Almighty|Asakura|Bolshevik|Chihiro|Crow|Dekinai|Senjou|Vivid|AC)\\]|-(Almighty|Asakura|Bolshevik|Chihiro|Crow|Dekinai|Senjou|Vivid)\\b|-AC$|\\b(9volt|Asenshi|BlurayDesuYo|Brrrrrrr|Commie|Dae|Dragon-Releases|DragsterPS|Exiled-Destiny|E-D|FFF|Final8|Geonope|GJM|iAHD|inid4c|Koten[ ._-]Gars|kuchikirukia|LCE|NTW|orz|RAI|REVO|SCP-2223|SEV|THORA)\\b)).*/i", "name": "Anime BD T7", "score": 20}, {"pattern": "/^(?=.*(BluRay|Blu-Ray|HD-?DVD|BDMux|BD(?!$)|bd(?:720|1080|2160)|(?<=[-_. (\\[])bd(?=[-_. )\\]])|DVD|DVDRip|NTSC|PAL|xvidvd))(?=.*(\\[(EDGE|EMBER|GHOST|naiyas|Prof|Judas)\\]|-(EDGE|EMBER|GHOST|naiyas|Prof|Judas)\\b|\\b(AkihitoSubs|Arukoru|Nep[ ._-]Blanc|Shirσ)\\b)).*/i", "name": "Anime BD T8", "score": 20}, {"pattern": "/^(?=.*(WEB[-_. ]DL(?:mux)?|WEBDL|AmazonHD|AmazonSD|iTunesHD|MaxdomeHD|NetflixU?HD|WebHD|HBOMaxHD|DisneyHD|[. ]WEB[. ](?:[xh][ .]?26[45]|AVC|HEVC|DDP?[ .]?5[. ]1)|(?:720|1080|2160)p[-. ]WEB[-. ]|[-. ]WEB[-. ](?:720|1080|2160)p|(?:AMZN|NF|DP)[. -]WEB[. -](?!Rip)|WebRip|Web-Rip|WEBMux|\\[WEB\\]|[\\[\\(]WEB[ .]))(?=.*\\b(Erai-raws|ToonsHub|VARYG)\\b).*/i", "name": "Anime Web T4", "score": 20}, {"pattern": "/^(?=.*(WEB[-_. ]DL(?:mux)?|WEBDL|AmazonHD|AmazonSD|iTunesHD|MaxdomeHD|NetflixU?HD|WebHD|HBOMaxHD|DisneyHD|[. ]WEB[. ](?:[xh][ .]?26[45]|AVC|HEVC|DDP?[ .]?5[. ]1)|(?:720|1080|2160)p[-. ]WEB[-. ]|[-. ]WEB[-. ](?:720|1080|2160)p|(?:AMZN|NF|DP)[. -]WEB[. -](?!Rip)|WebRip|Web-Rip|WEBMux|\\[WEB\\]|[\\[\\(]WEB[ .]))(?=.*(\\[(Lia|ZigZag)\\]|-(Lia|ZigZab)\\b|\\b(BlueLobster|GST|HorribleRips|HorribleSubs|KAN3D2M|KS|KiyoshiStar|NanDesuKa|PlayWeb|SobsPlease|Some-Stuffs|SubsPlease|URANIME)\\b)).*/i", "name": "Anime Web T5", "score": 20}, {"pattern": "/^(?=.*(WEB[-_. ]DL(?:mux)?|WEBDL|AmazonHD|AmazonSD|iTunesHD|MaxdomeHD|NetflixU?HD|WebHD|HBOMaxHD|DisneyHD|[. ]WEB[. ](?:[xh][ .]?26[45]|AVC|HEVC|DDP?[ .]?5[. ]1)|(?:720|1080|2160)p[-. ]WEB[-. ]|[-. ]WEB[-. ](?:720|1080|2160)p|(?:AMZN|NF|DP)[. -]WEB[. -](?!Rip)|WebRip|Web-Rip|WEBMux|\\[WEB\\]|[\\[\\(]WEB[ .]))(?=.*(\\[(Chihiro|Doki|Kantai|Tsundere)\\]|-(Chihiro|Doki|Kantai|Tsundere(?!-))\\b|\\b(9volt|Asenshi|Commie|DameDesuYo|GJM|Kaleido|KawaSubs)\\b)).*/i", "name": "Anime Web T6", "score": 20}, {"pattern": "/\\b\\d{2,3}(?:th)?[.\\s\\-\\+_\\/(),]Anniversary[.\\s\\-\\+_\\/(),](?:Edition|Ed)?\\b/i", "name": "Anniversary Edition", "score": 20}, {"pattern": "/\\bCollector'?s\\b/i", "name": "Collector's Edition", "score": 20}, {"pattern": "/\\bCC\\b/", "name": "Color Corrected", "score": 20}, {"pattern": "/\\b(Criterion|CC)\\b/i", "name": "Criterion Collection", "score": 20}, {"pattern": "/\\b\\.Diamond\\.\\b/i", "name": "Diamond Edition", "score": 20}, {"pattern": "/\\bDirector'?s.?Cut\\b/i", "name": "Director's Cut", "score": 20}, {"pattern": "/\\bDBOX\\b/i", "name": "Dragon Box", "score": 20}, {"pattern": "/\\b(Extended[ ._-]Clip)\\b/i", "name": "Extended Clip", "score": 20}, {"pattern": "/\\b(?:custom.?)?Extended\\b/i", "name": "Extended Edition", "score": 20}, {"pattern": "/\\bhi10(?:p|res)?\\b|(?=.*(?:\\b10[ .\\-_]?bits?\\b|yuv4\\d\\dp10))(?=.*\\b(?:[xh][-_. ]?264|avc)\\b)/i", "name": "H.264 10bit", "score": 20}, {"pattern": "/(?=.*(BluRay|Blu-Ray|HD-?DVD|BDMux|BD(?!$)|bd(?:720|1080|2160)))(?=.*(hybrid(\\b|\\d)))/i", "name": "Hybrid", "score": 20}, {"pattern": "/\\b((?<!NON[ ._-])IMAX)\\b/i", "name": "IMAX", "score": 20}, {"pattern": "/\\b(IMAX[ ._-]Edition)\\b/i", "name": "IMAX Edition", "score": 20}, {"pattern": "/^(?=.*\\b((DSNP|BC|B?CORE)\\b|Disney\\+)(?=.*\\bWEB[ ._-]?(DL|Rip)\\b))(?=.*\\b((?<!NON[ ._-])IMAX)\\b)|^(?=.*\\b(IMAX[ ._-]Enhanced)\\b)/i", "name": "IMAX Enhanced", "score": 20}, {"pattern": "/\\b(Masters[ .-]?Of[ .-]?Cinema|MoC)(\\b|\\d)/i", "name": "Masters of Cinema", "score": 20}, {"pattern": "/\\b(Open[ ._-]?Matte)\\b/i", "name": "Open Matte", "score": 20}, {"pattern": "/\\b(Remaster)\\b/i", "name": "Remaster", "score": 20}, {"pattern": "/\\b(Repack|Proper|Rerip)\\b/i", "name": "Repack/Proper", "score": 20}, {"pattern": "/\\b((repack|proper)2)\\b|\\b(REAL\\.(PROPER|REPACK))\\b/i", "name": "Repack2", "score": 20}, {"pattern": "/\\b((repack|proper)3)\\b|\\b(REAL\\.REAL\\.(PROPER|REPACK))\\b/i", "name": "Repack3", "score": 20}, {"pattern": "/(?<!^)\\b(extended|uncut|directors|special|unrated|uncensored|cut|version|(?<!{)edition)(\\b|\\d)/i", "name": "Special Edition", "score": 20}, {"pattern": "/\\b(Theatrical)\\b/i", "name": "Theatrical Cut", "score": 20}, {"pattern": "/\\bUltimate[.\\s\\-\\+_\\/(),]Edition\\b/i", "name": "Ultimate Edition", "score": 20}, {"name": "Uncensored", "pattern": "/\\b(Uncut|Unrated|Uncensored|AT[-_. ]?X)\\b/i", "score": 20}, {"pattern": "/\\b(Vinegar[ ._-]Syndrome|V-S|VinSyn)\\b/i", "name": "Vinegar Syndrome", "score": 20}, {"pattern": "/^(?=.*(WEB[-_. ]DL(?:mux)?|WEBDL|AmazonHD|AmazonSD|iTunesHD|MaxdomeHD|NetflixU?HD|WebHD|HBOMaxHD|DisneyHD|[. ]WEB[. ](?:[xh][ .]?26[45]|AVC|HEVC|DDP?[ .]?5[. ]1)|(?:720|1080|2160)p[-. ]WEB[-. ]|[-. ]WEB[-. ](?:720|1080|2160)p|(?:AMZN|NF|DP)[. -]WEB[. -](?!Rip)|WebRip|Web-Rip|WEBMux))(?=.*\\b(?:DEFLATE|INFLATE)\\b).*/i", "name": "Web Scene", "score": 20}, {"pattern": "/(\\b|\\d)(v1)\\b/i", "name": "v1", "score": 20}, {"pattern": "/(\\b|\\d)(v2)\\b/i", "name": "v2", "score": 20}, {"pattern": "/(\\b|\\d)(v3)\\b/i", "name": "v3", "score": 20}, {"pattern": "/(\\b|\\d)(v4)\\b/i", "name": "v4", "score": 20}, {"name": "x266", "pattern": "/[xh][ ._-]?266|\\bVVC(\\b|\\d)/i", "score": 20}, {"pattern": "/\\b(Asuka|Beatrice|Daddy|Fumi|Iriza|Kawaiika|Koi|Lilith|LowPower|Nanako|NC|neko|New|Ohys|Pandoratv|Scryous|Seicher|Shiniori)[ ._-]?(Raws)\\b|\\b(Moozzi2|Raws-Maji|ReinForce)\\b|\\[km\\]|-km\\b/i", "name": "Anime Raws", "score": -25}, {"pattern": "/\\b(Golumpa|KamiFS|torenter69)\\b|\\[Yameii\\]|-Yameii\\b|^(?!.*(Dual|Multi)[-_. ]?Audio).*((?<!multi-)\\b(dub(bed)?)\\b|(funi|eng(lish)?)_?dub)|^(?!.*(dual[ ._-]?audio|(JA|ZH|KO)\\+EN|EN\\+(JA|ZH|KO))).*\\b(KaiDubs|KS)\\b/i", "name": "Dubs Only", "score": -25}, {"pattern": "/\\b(INTERNAL)\\b/i", "name": "INTERNAL", "score": -25}, {"pattern": "/\\bSDR\\b/i", "name": "SDR", "score": -25}, {"pattern": "/\\b((FRENCH|MULTi|WiTH|((BA?|A)SL[ ._-]and))[ ._-](AD|Audio[ ._-]Description))\\b/i", "name": "WiTH AD", "score": -25}, {"pattern": "/\\b((WiTH)[ ._-](ASL))\\b/i", "name": "WiTH ASL", "score": -25}, {"pattern": "/\\b(BASL)\\b/i", "name": "WiTH BASL", "score": -25}, {"pattern": "/\\b((WiTH)[ ._-](BSL))\\b/i", "name": "WiTH BSL", "score": -25}, {"name": "v0", "pattern": "/(\\b|\\d)(v0)\\b/i", "score": -25}, {"pattern": "/[xh][ ._-]?264|\\bAVC(\\b|\\d)/i", "name": "x264", "score": -25}, {"pattern": "/(?<=\\b[12]\\d{3}\\b).*((\\b|_)(3d|[fh]?sbs|half[ ._-]ou)(\\b|_)|\\b(BluRay3D|BD3D)\\b)/i", "name": "3D", "score": -50}, {"pattern": "/\\b(W4NK3R|HQMUX)\\b/i", "name": "Atmos Exclude Groups", "score": -50}, {"pattern": "/^(?=.*\\b(BiTOR|DepraveD|SasukeducK|SumVision|tarunk9c|VD0N|VECTOR|VisionXpert)\\b)(?=.*(?:\\bHDR10(\\+|P(lus)?)\\b|\\b(dv|dovi|dolby[ .]?v(ision)?)\\b)).*/i", "name": "Generated Dynamic HDR", "score": -50}, {"pattern": "/^(?=.*\\b(Flights|GuyZo|BR-GuyZo)\\b)(?=.*(?:\\bHDR10(\\+|P(lus)?)\\b|\\b(dv|dovi|dolby[ .]?v(ision)?)\\b)).*/", "name": "Generated Dynamic HDR [B]", "score": -50}, {"pattern": "/-4P\\b|-4Planet\\b|-AsRequested\\b|-BUYMORE\\b|-Chamele0n\\b|-GEROV\\b|-iNC0GNiTO\\b|-NZBGeek\\b|-Obfuscated\\b|-postbot\\b|-Rakuv\\b|(?<=\\b[12]\\d{3}\\b).*(Scrambled)\\b|-WhiteRev\\b|-xpost\\b|-WRTEAM\\b|-CAPTCHA\\b|_nzb\\b/i", "name": "Obfuscated (Radarr)", "score": -50}, {"pattern": "/-4P\\b|-4Planet\\b|-AsRequested\\b|-BUYMORE\\b|-Chamele0n\\b|-GEROV\\b|-iNC0GNiTO\\b|-NZBGeek\\b|-Obfuscated\\b|-postbot\\b|-Rakuv\\b|(?<=\\bS\\d+\\b).*(Scrambled)\\b|-WhiteRev\\b|-xpost\\b|-WRTEAM\\b|-CAPTCHA\\b|_nzb\\b/i", "name": "Obfuscated (Sonarr)", "score": -50}, {"pattern": "/\\b(3L|CtrlHD|HQMUX|W4NK3R)\\b/i", "name": "TrueHD Exclude Groups", "score": -50}, {"pattern": "/^(?!.*\\b((?<!HD[._ -]|HD)DVD|BDRip|MKV|XviD|WMV|d3g|(BD)?REMUX|^(?=.*1080p)(?=.*HEVC)|[xh][-_. ]?26[45]|German.*[DM]L|((?<=\\d{4}).*German.*([DM]L)?)(?=.*\\b(AVC|HEVC|VC[-_. ]?1|MVC|MPEG[-_. ]?2)\\b))\\b)(((?=.*\\b(Blu[-_. ]?ray|BD|HD[-_. ]?DVD)\\b)(?=.*\\b(AVC|HEVC|VC[-_. ]?1|MVC|MPEG[-_. ]?2|BDMV|ISO)\\b))|^((?=.*\\b(((?=.*\\b((.*_)?COMPLETE.*|Dis[ck])\\b)(?=.*(Blu[-_. ]?ray|HD[-_. ]?DVD)))|3D[-_. ]?BD|BR[-_. ]?DISK|Full[-_. ]?Blu[-_. ]?ray|^((?=.*((BD|UHD)[-_. ]?(25|50|66|100|ISO)))))))).*$/i", "name": "BR-DISK", "score": -75}, {"pattern": "/[.]heb\\b|\\[eztvx?[ ._-]?(io|re|to)?\\]|\\[(rarbg|rartv|TGx)\\]|[.]VAV\\b|\\b(ORARBG)\\b/i", "name": "Retags (Radarr)", "score": -75}, {"pattern": "/[.]heb\\b|\\[eztvx?[ ._-]?(io|re|to)?\\]|\\[(rarbg|rartv|TGx)\\]/i", "name": "Retags (Sonarr)", "score": -75}, {"pattern": "/(?<=\\b[12]\\d{3}\\b).*\\b(Sing[-_. ]Along)\\b/i", "name": "Sing-Along Versions", "score": -75}, {"pattern": "/(\\bAI[ ._-]?(Upscaled?|Enhanced|Remaster(ed)?)?\\b)|(\\b(AIUS|RW|GuyZo|BR-GuyZo)\\b)|(\\b((Upscale)?Re-?graded?)\\b)|(\\b(The[ ._-]?Upscaler)\\b)|(\\b(AI[ ._-]?(Enhanced?|Remaster(ed)?)|UPS(UHD)?|Upscaled?([ ._-]?UHD)?|UpRez)\\b)/i", "name": "Upscaled", "score": -75}, {"pattern": "/(?<=\\b[12]\\d{3}\\b).*\\b(Extras|Bonus|Extended[ ._-]Clip)\\b/i", "name": "Extras (Radarr)", "score": -200}, {"pattern": "/(?<=\\bS\\d+\\b).*\\b(Extras|Bonus|Extended[ ._-]Clip)\\b/i", "name": "Extras (Sonarr)", "score": -200}];
@@ -214,16 +215,19 @@ function refreshLivePayloadCounter() {
   } catch(e) {}
 }
 
-// Web Vitals minimal (CLS/LCP/FID) — beacon only if USAGE_BEACON_URL set or cb-flags webVitals=1
+// Web Vitals minimal (CLS/LCP/FID) — beacon only if USAGE_BEACON_URL set or cb-flags webVitals=1 (and S.telemetryOk)
+let _cbWebVitalsSend = null;
 function initWebVitals() {
   if (!USAGE_BEACON_URL && !flagEnabled('webVitals', false)) return;
   try {
     const send = (name, value) => {
+      if (!S.telemetryOk) return;
       const url = USAGE_BEACON_URL || COUNTER_URL;
       if (!url) return;
       const body = JSON.stringify({ t:'web-vital', name, value, v:CONFIGURATOR_VERSION, ts:Date.now() });
       try { beaconPost(url, JSON.parse(body)); } catch(e) { try { beaconPost(url, { t:'web-vital', name, value, v:CONFIGURATOR_VERSION, ts:Date.now() }); } catch(e2) {} }
     };
+    _cbWebVitalsSend = send;
     let lcp = 0;
     try {
       const po = new PerformanceObserver((list) => {
@@ -977,6 +981,7 @@ function loadState() {
       try {
         const parsed = migrateState(JSON.parse(savedS));
         Object.assign(S, sanitizeSharedConfig(parsed));
+        if (typeof parsed.telemetryOk === 'boolean') S.telemetryOk = parsed.telemetryOk;
         if (parsed.creds && typeof parsed.creds === 'object' && !Array.isArray(parsed.creds)) {
           const safeCreds = Object.create(null);
           for (const k of Object.keys(parsed.creds)) {
@@ -1102,7 +1107,7 @@ function renderOpts(def) {
   const blockedReason = (o) => (def._hostBlocked && def._hostBlocked[o.v]) || '';
   const inp = (o) => `<input type="radio" name="${id}" id="o_${o.v}" value="${o.v}" ${S[key]===o.v?'checked':''} ${blockedReason(o)?'disabled':''} data-action="update-radio" data-key="${key}">`;
   const body = (o) => `<div class="opt-body"><div class="opt-name">${o.name}</div><div class="opt-desc">${o.desc}${blockedReason(o)?`<br><span class="opt-host-note">Unavailable — ${escHtml(blockedReason(o))}</span>`:''}</div></div>`;
-  const std = (o, cls='') => `<div class="opt${cls}${blockedReason(o)?' opt-host-blocked':''}"${blockedReason(o)?` title="${escHtml(blockedReason(o))}" aria-disabled="true"`:''}>${inp(o)}<label for="o_${o.v}" tabindex="0"><div class="opt-icon">${o.icon}</div>${body(o)}</label></div>`;
+  const std = (o, cls='') => `<div class="opt${cls}${blockedReason(o)?' opt-host-blocked':''}"${blockedReason(o)?` title="${escHtml(blockedReason(o))}" aria-disabled="true"`:''}>${inp(o)}<label class="choice-card" for="o_${o.v}" tabindex="0"><div class="opt-icon">${o.icon}</div>${body(o)}</label></div>`;
 
   if (def.layout === 'device-hybrid') {
     // Responsive grid of equal-height device cards + a single contextual
@@ -1132,7 +1137,7 @@ function renderOpts(def) {
   if (def.layout === 'pills') return `<div class="opts pills">${def.opts.map(o => std(o)).join('')}</div>`;
   if (def.layout === 'svc-list') {
     if (def.noHero) {
-      const rows = def.opts.map(o => `<div class="svc-list-row opt${blockedReason(o) ? ' opt-host-blocked' : ''}"${blockedReason(o) ? ` title="${escHtml(blockedReason(o))}" aria-disabled="true"` : ''}>${inp(o)}<label for="o_${o.v}" tabindex="0">
+      const rows = def.opts.map(o => `<div class="svc-list-row opt${blockedReason(o) ? ' opt-host-blocked' : ''}"${blockedReason(o) ? ` title="${escHtml(blockedReason(o))}" aria-disabled="true"` : ''}>${inp(o)}<label class="choice-card" for="o_${o.v}" tabindex="0">
         <div class="opt-icon">${o.icon}</div>
         ${body(o)}
         ${o.help ? `<button type="button" class="help-btn" data-action="toggle-device-help" data-v="${o.v}" title="What does this mean?" aria-label="Explain ${o.name}">?</button>` : ''}
@@ -1220,7 +1225,7 @@ function renderOpts(def) {
     const ckSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
     const hero = def.opts[0];
     const heroTags = (SVC_TAGS[hero.v] || []).map(t => `<span class="svc-hero-tag">${t}</span>`).join('');
-    const heroHtml = `<div class="svc-list-hero opt">${chk(hero)}<label for="o_${hero.v}" tabindex="0">
+    const heroHtml = `<div class="svc-list-hero opt">${chk(hero)}<label class="choice-card" for="o_${hero.v}" tabindex="0">
       <div class="opt-icon">${hero.icon}</div>
       <div class="opt-body">
         <div class="opt-name">${hero.name} <span class="svc-hero-badge">${ICO.star(12,'currentColor')} POPULAR</span></div>
@@ -1240,7 +1245,7 @@ function renderOpts(def) {
       const cat = SVC_CAT[o.v] || 'debrid';
       const isFree = auth === 'Free';
       const hostNote = blockedReason(o);
-      return `<div class="svc-list-row opt${hostNote ? ' opt-host-blocked' : ''}" data-svc-cat="${cat}" data-svc-name="${o.name.toLowerCase()}"${hostNote ? ` title="${escHtml(hostNote)}" aria-disabled="true"` : ''}>${chk(o)}<label for="o_${o.v}" tabindex="0">
+      return `<div class="svc-list-row opt${hostNote ? ' opt-host-blocked' : ''}" data-svc-cat="${cat}" data-svc-name="${o.name.toLowerCase()}"${hostNote ? ` title="${escHtml(hostNote)}" aria-disabled="true"` : ''}>${chk(o)}<label class="choice-card" for="o_${o.v}" tabindex="0">
         <div class="opt-icon">${o.icon}</div>
         <div class="opt-body"><div class="opt-name">${o.name}</div><div class="opt-desc">${SVC_DESC[o.v] || ''}${hostNote ? `<br><span class="opt-host-note">Unavailable — ${escHtml(hostNote)}</span>` : ''}</div></div>
         <span class="svc-row-auth${isFree?' free':''}">${auth}</span>
@@ -1291,7 +1296,7 @@ function renderOpts(def) {
   if (def.layout === 'hero') {
     const hero = def.opts[0], rest = def.opts.slice(1);
     return `<div class="hero-wrap">
-      <div class="hero-hero opt">${inp(hero)}<label for="o_${hero.v}" tabindex="0"><div class="opt-icon">${hero.icon}</div><div class="opt-body"><div class="hero-badge">${ICO.star(11,'currentColor')} Most popular</div><div class="opt-name">${hero.name}</div><div class="opt-desc">${hero.desc}</div></div></label></div>
+      <div class="hero-hero opt">${inp(hero)}<label class="choice-card" for="o_${hero.v}" tabindex="0"><div class="opt-icon">${hero.icon}</div><div class="opt-body"><div class="hero-badge">${ICO.star(11,'currentColor')} Most popular</div><div class="opt-name">${hero.name}</div><div class="opt-desc">${hero.desc}</div></div></label></div>
       <div class="hero-sub">${rest.map(o => std(o)).join('')}</div>
     </div>`;
   }
@@ -1891,7 +1896,7 @@ function renderAdvancedPanel() {
             <div class="u-relrow">
               <input class="name-input" id="cred_subdl" data-service="subdl" data-action="update-cred" type="password" autocapitalize="none" spellcheck="false" enterkeyhint="done" placeholder="Your SubDL API key"
                 value="${escH(S.creds.subdl || '')}" maxlength="120" style="padding-right:38px;font-size:.78rem">
-              <button type="button" data-action="toggle-cred-vis" data-target="cred_subdl" title="Show / hide"
+              <button type="button" class="input-paste-btn" data-action="paste-input" data-target="cred_subdl">Paste Key</button><button type="button" class="input-eye-btn" aria-label="Show or hide credential" data-action="toggle-cred-vis" data-target="cred_subdl" title="Show / hide"
                 style="position:absolute;right:10px;background:none;border:none;cursor:pointer;color:#4b5563;padding:0;line-height:1;font-size:.72rem;transition:color .15s"
                 onmouseover="this.style.color='#9ca3af'" onmouseout="this.style.color='#4b5563'">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
@@ -2083,7 +2088,7 @@ function renderProgress() {
   }).join('');
 
   const strip = document.getElementById('stepStrip');
-  if (strip) strip.innerHTML = `<div class="step-strip">${bubbles}<button class="btn-reset-strip" data-action="reset-state" title="Start over from scratch">${ICO.refresh(14,'currentColor')} Start Over</button></div><div class="auto-saved" id="autoSavedBadge">${ICO.check(10,'currentColor')} Auto-saved</div>`;
+  if (strip) strip.innerHTML = `<div class="step-strip" id="step-strip">${bubbles}<button class="btn-reset-strip" data-action="reset-state" title="Start over from scratch">${ICO.refresh(14,'currentColor')} Start Over</button></div><div class="auto-saved" id="autoSavedBadge">${ICO.check(10,'currentColor')} Auto-saved</div>`;
   // Accessible progress text, kept in sync with the strip (same `step` source).
   const ann = document.getElementById('stepAnnounce');
   if (ann) ann.textContent = `Step ${Math.min(step, STEPS)} of ${STEPS} — ${DEFS[step - 1] ? DEFS[step - 1].title : 'Review'}`;
@@ -2122,17 +2127,6 @@ function splashPresetsHtml(svc) {
 function splashHtml() {
   const _splashSvc = S.service || (hadSavedState ? 'torbox' : (localStorage.getItem('coreBuildLastSvc') || 'torbox'));
   return `<div class="card splash hybrid-splash">
-    <div class="hybrid-topbar splash-anim splash-anim-d1">
-      <div class="hybrid-mini-brand">CORE <b>BUILDS</b></div>
-      <div class="hybrid-toplinks">
-        <a href="https://corebuilds-docs.docsalot.dev/templates/directory" target="_blank" rel="noopener noreferrer">Templates</a>
-        <a href="https://github.com/brevityA/Core-Builds" target="_blank" rel="noopener noreferrer">GitHub</a>
-        <a href="https://www.reddit.com/r/CoreBuilds/" target="_blank" rel="noopener noreferrer">Core Crew</a>
-        <a href="https://discord.gg/AwJ49yzbqT" target="_blank" rel="noopener noreferrer">Discord</a>
-        <button data-action="show-changelog" class="hybrid-version">v${CONFIGURATOR_VERSION}</button>
-      </div>
-    </div>
-
     <!-- A saved build is resumed from the first screen (v3.20): above the hero, not below the fold. -->
     ${hadSavedState && _savedStep > 0 ? `<div class="hybrid-session continue-banner">
       ${versionBannerHtml()}
@@ -2143,43 +2137,29 @@ function splashHtml() {
     </div>` : ''}
     <div class="hybrid-hero">
       <div class="splash-anim splash-anim-d2">
-        <div class="hybrid-eyebrow">AIOStreams template configurator</div>
-        <h1>Build streams<br>with intent.</h1>
-        <div class="hybrid-lede">Pick your service and device — Core Builds writes a checked <strong>AIOStreams setup</strong> and can install it <strong>straight into your Stremio account</strong>. No JSON editing.</div>
-        <!-- Two equal ways in (v3.20 redesign). Quick install opens the Express lane;
-             Custom build opens the full builder. Same data-actions as before, so the
-             #express / #advanced deep links, the tour and every spec keep working. -->
+        <p class="lp-kicker">AIOStreams toolkit</p>
+        <h1 class="lp-wordmark">Core <span>Builds</span></h1>
+        <button type="button" data-action="show-changelog" class="lp-ver">v${CONFIGURATOR_VERSION}</button>
         ${splashUpdateCard()}
-        <div class="splash-start" id="splashStart" role="group" aria-label="Start a build">
-          <button type="button" class="start-card start-quick" data-action="open-express-lane">
-            <span class="start-card-icon">${ICO.bolt(20,'currentColor')}</span>
-            <span class="start-card-title">Quick install</span>
-            <span class="start-card-desc">Service &rarr; device &rarr; resolution &rarr; key &rarr; Deploy. Working streams in about 30 seconds.</span>
-          </button>
-          <button type="button" class="start-card start-custom" data-action="custom-start">
-            <span class="start-card-icon">${ICO.gear(20,'currentColor')}</span>
-            <span class="start-card-title">Custom build</span>
-            <span class="start-card-desc">Every setting: audio, languages, subtitles, filters, ranking and stream cards.</span>
-          </button>
-        </div>
-        <div class="splash-start-more" id="splashAltRoutes">
-          <span class="splash-alt-lead">Already have a setup?</span>
-          <button data-action="update-template" class="splash-tertiary-btn">Update an existing setup</button>
-          <button data-action="paste-manifest-splash" class="splash-tertiary-btn">Import a config</button>
-          <button data-action="open-tutorial" class="splash-tertiary-btn">Take the tour</button>
-          <a href="../tools/genies/" class="splash-tertiary-btn">Setup Genie</a>
-        </div>
-        <p class="splash-from-note">Coming from QuackStart? <button type="button" data-action="open-quick-install" class="splash-from-link">Quick install</button> does the same one-click setup: AIOStreams with AIOMetadata and the Cinemeta patch, or just a manifest URL for any app.</p>
-        <div class="hybrid-trust"><span><i></i> Runs locally</span><span><i></i> Open source · MIT</span><span><i></i> Build without a login — or push it in one click</span></div>
-        <div class="splash-stats" id="splashStats"></div>
-        <div class="hybrid-subnote">Core Stable by default · 6s addon timeout · Core Builds keeps no copy of your keys</div>
+        <!-- One list of equal rows (v3.33). Core Builds is the first tool and opens Quick install.
+             Other routes are deep links (#advanced, #update, #import, #tour…) listed on All Core Tools. -->
+        <nav class="lp-rows" id="splashStart" aria-label="Core Builds tools">
+        <button type="button" class="lp-row lp-row-main" data-action="open-express-lane"><span class="lp-row-ico">${BRAND_GLYPHS.corebuilds}</span><b>Core Builds</b><span class="lp-tag">Setup</span></button>
+        <a class="lp-row" href="../tools/inspector/"><span class="lp-row-ico">${ICO.search(22,'currentColor')}</span><b>Template Inspector</b><span class="lp-tag">JSON</span></a>
+        <a class="lp-row" href="../account-tools/" target="_blank" rel="noopener noreferrer"><span class="lp-row-ico">${ICO.download(22,'currentColor')}</span><b>Back Up Addons</b><span class="lp-tag">Backup</span></a>
+        <a class="lp-row" href="../tools/genies/nuvio-stacks.html"><span class="lp-row-ico">${BRAND_GLYPHS.nuvio}</span><b>Nuvio Stack Genie</b><span class="lp-tag">Nuvio</span></a>
+        <a class="lp-row" href="../tools/badges/"><span class="lp-row-ico">${ICO.palette(22,'currentColor')}</span><b>Core Badge Builder</b><span class="lp-tag">Badges</span></a>
+        <a class="lp-row" href="../tools/"><span class="lp-row-ico">${ICO.folder(22,'currentColor')}</span><b>All Core Tools</b><span class="lp-tag">All</span></a>
+        </nav>
+        <button type="button" class="lp-support" data-action="open-support"><span aria-hidden="true">${ICO.coffee(16,'currentColor')}</span>Support Core Builds</button>
+        <div class="splash-stats lp-stats" id="splashStats"></div>
       </div>
       <div class="hybrid-core-stage splash-anim splash-anim-d2">
         <button type="button" class="core-support-mark" data-action="open-support" aria-label="Support Core Builds" title="Support Core Builds">
           <svg class="splash-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" aria-hidden="true">
             <defs>
               <linearGradient id="hsg1" x1="50%" y1="0%" x2="50%" y2="100%"><stop offset="0%" stop-color="#00e5ff"/><stop offset="100%" stop-color="#4facfe"/></linearGradient>
-              <linearGradient id="hsg2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#4facfe"/><stop offset="50%" stop-color="#c060c0"/><stop offset="100%" stop-color="#ff4b2b"/></linearGradient>
+              <linearGradient id="hsg2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#4facfe"/><stop offset="50%" stop-color="#8a4890"/><stop offset="100%" stop-color="#c03a20"/></linearGradient>
               <filter id="hsf"><feGaussianBlur stdDeviation="12" result="b"/><feComposite in="SourceGraphic" in2="b" operator="over"/></filter>
             </defs>
             <polygon points="256,41 442,149 442,363 256,471 70,363 70,149" fill="#00e5ff" opacity=".05"/>
@@ -2189,62 +2169,9 @@ function splashHtml() {
             <circle class="core-click-ring" cx="256" cy="256" r="86"/>
           </svg>
         </button>
-        <div class="hybrid-core-caption">One install writes: AIOStreams · AIOMetadata 74-of-91 catalogs · Cinemeta patch · subtitles<br><span class="u-dim">tap the core to support the project</span></div>
       </div>
     </div>
-
-
-    <div class="hybrid-services splash-anim splash-anim-d3">
-      <div class="hybrid-services-label">Your service</div>
-      <div class="splash-chips" role="radiogroup" aria-label="Select your service">
-        <span class="splash-chip${_splashSvc==='torbox'?' active':''}" data-svc="torbox" role="radio" aria-checked="${_splashSvc==='torbox'}" tabindex="0"><span class="splash-chip-icon">${ICO.bolt(14,'#fbbf24')}</span> TorBox</span>
-        <span class="splash-chip${_splashSvc==='alldebrid'?' active':''}" data-svc="alldebrid" role="radio" aria-checked="${_splashSvc==='alldebrid'}" tabindex="0"><span class="splash-chip-icon">${ICO.diamond(14,'#60a5fa')}</span> AllDebrid</span>
-        <span class="splash-chip${_splashSvc==='realdebrid'?' active':''}" data-svc="realdebrid" role="radio" aria-checked="${_splashSvc==='realdebrid'}" tabindex="0"><span class="splash-chip-icon">${ICO.circle(14,'#4ade80')}</span> Real-Debrid</span>
-        <span class="splash-chip${_splashSvc==='easynews'?' active':''}" data-svc="easynews" role="radio" aria-checked="${_splashSvc==='easynews'}" tabindex="0"><span class="splash-chip-icon">${ICO.newspaper(14,'#94a3b8')}</span> EasyNews</span>
-        <span class="splash-chip${_splashSvc==='free'?' active':''}" data-svc="free" role="radio" aria-checked="${_splashSvc==='free'}" tabindex="0"><span class="splash-chip-icon">${ICO.free(14,'#34d399')}</span> Free</span>
-      </div>
-    </div>
-    ${hadSavedState ? '' : `<div class="hybrid-services hybrid-presets"><div class="hybrid-services-label">Preset</div><div class="splash-chips" role="radiogroup" aria-label="Quick profile — tunes the dials, never trims your services">
-        <span class="splash-chip${S.quickProfile==='fast'?' active':''}" data-qp="fast" role="radio" aria-checked="${S.quickProfile==='fast'}" tabindex="0"><span class="splash-chip-icon">${ICO.bolt(14,'#67e8f9')}</span> Lean · 1080p cached-first</span>
-        <span class="splash-chip${S.quickProfile==='balanced'?' active':''}" data-qp="balanced" role="radio" aria-checked="${S.quickProfile==='balanced'}" tabindex="0"><span class="splash-chip-icon">${ICO.diamond(14,'#10b981')}</span> Standard · recommended</span>
-        <span class="splash-chip${S.quickProfile==='maximum'?' active':''}" data-qp="maximum" role="radio" aria-checked="${S.quickProfile==='maximum'}" tabindex="0"><span class="splash-chip-icon">${ICO.circle(14,'#fbbf24')}</span> Maximum · 4K quality-first</span>
-      </div></div>`}
-
     ${hadSavedState ? '' : remoteUpdateBannerHtml()}
-    <div class="hybrid-section-head splash-anim splash-anim-d5"><div><h2>Ready-Made Setups</h2><p>Opinionated presets for common setups.</p></div><p class="hybrid-section-index">01 / Presets</p></div>
-    <div class="splash-presets splash-anim splash-anim-d5" id="splashPresets">${splashPresetsHtml(_splashSvc)}</div>
-
-    <div class="hybrid-section-head splash-anim splash-anim-d6"><div><h2>What the streams will look like</h2><p>Not adjectives — these are the real cards AIOStreams draws with each formatter, generated from the same templates this configurator writes.</p></div><p class="hybrid-section-index">02 / Preview</p></div>
-    <div class="hybrid-wall splash-anim splash-anim-d6" aria-label="Formatter previews">
-      <figure><img src="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/family-v4-preview.svg" width="800" height="334" loading="lazy" alt="Real stream card preview — Family v4 — the default"><figcaption><b>Family v4</b><span>the default</span></figcaption></figure>
-      <figure><img src="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/apex-v2-preview.svg" width="800" height="334" loading="lazy" alt="Real stream card preview — Apex v2 — detail-rich"><figcaption><b>Apex v2</b><span>detail-rich</span></figcaption></figure>
-      <figure><img src="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/ultra-preview.svg" width="800" height="334" loading="lazy" alt="Real stream card preview — Ultra — flagship 3-line"><figcaption><b>Ultra</b><span>flagship 3-line</span></figcaption></figure>
-      <figure><img src="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/minimal-preview.svg" width="800" height="334" loading="lazy" alt="Real stream card preview — Minimal — title only"><figcaption><b>Minimal</b><span>title only</span></figcaption></figure>
-      <figure><img src="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/tv-preview.svg" width="800" height="334" loading="lazy" alt="Real stream card preview — TV — episode-first"><figcaption><b>TV</b><span>episode-first</span></figcaption></figure>
-      <figure><img src="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/core-syntax-v3-preview.svg" width="800" height="334" loading="lazy" alt="Real stream card preview — Core Syntax V3"><figcaption><b>Core Syntax V3</b><span></span></figcaption></figure>
-    </div>
-
-    <div class="hybrid-section-head splash-anim splash-anim-d6"><div><h2>Utilities</h2><p>Back up or explore the Core tool suite.</p></div><p class="hybrid-section-index">03 / Tools</p></div>
-    <div class="splash-doors splash-anim splash-anim-d6">
-      <a class="splash-door core-tool-door" href="../account-tools/" target="_blank" rel="noopener noreferrer"><div class="splash-door-icon">${ICO.download(22,'#34d399')}</div><div class="splash-door-text"><div class="splash-door-title">Back Up Addons <span class="splash-door-tag" style="background:rgba(52,211,153,.1);color:#34d399;border:1px solid rgba(52,211,153,.2)">Read-only</span></div><div class="splash-door-desc">View and download your current Stremio addon setup. Nothing is changed.</div></div></a>
-      <a class="splash-door core-tool-door" href="../tools/genies/nuvio-stacks.html"><div class="splash-door-icon"><span style="font-size:20px;line-height:1" aria-hidden="true">🧞</span></div><div class="splash-door-text"><div class="splash-door-title">Nuvio Stack Genie <span class="splash-door-tag" style="background:rgba(168,85,247,.12);color:#c4b5fd;border:1px solid rgba(168,85,247,.28)">Cross-app</span></div><div class="splash-door-desc">Guided profiles &amp; add-ons for Nuvio — pick a stack, get install links.</div></div></a>
-      <a class="splash-door core-tool-door" href="../tools/speedtest/"><div class="splash-door-icon"><span style="font-size:20px;line-height:1" aria-hidden="true">⚡</span></div><div class="splash-door-text"><div class="splash-door-title">CoreSpeed <span class="splash-door-tag" style="background:rgba(0,212,255,.1);color:#67e8f9;border:1px solid rgba(0,212,255,.22)">Speedtest</span></div><div class="splash-door-desc">Race every TorBox CDN at once — ping, multi-stream speed, live map, and the best node for your setup.</div></div></a>
-      <a class="splash-door core-tool-door" href="../tools/badges/"><div class="splash-door-icon"><span style="font-size:20px;line-height:1" aria-hidden="true">🏷️</span></div><div class="splash-door-text"><div class="splash-door-title">Core Badge Builder <span class="splash-door-tag" style="background:rgba(168,85,247,.12);color:#c4b5fd;border:1px solid rgba(168,85,247,.28)">No regex</span></div><div class="splash-door-desc">Design Nuvio stream badges visually, preview them, and hand the matching formatter back here.</div></div></a>
-      <a class="splash-door core-tool-door" href="../tools/banner-studio/"><div class="splash-door-icon"><span style="font-size:20px;line-height:1" aria-hidden="true">🎬</span></div><div class="splash-door-text"><div class="splash-door-title">Banner Studio <span class="splash-door-tag" style="background:rgba(248,113,113,.12);color:#fca5a5;border:1px solid rgba(248,113,113,.3)">17 brands</span></div><div class="splash-door-desc">Netflix-style streaming banners for any major streamer — render &amp; export locally.</div></div></a>
-      <a class="splash-door core-tool-door" href="../tools/"><div class="splash-door-icon">${ICO.folder(22,'#a78bfa')}</div><div class="splash-door-text"><div class="splash-door-title">All Core Tools</div><div class="splash-door-desc">Builder, backup, and upcoming inspection utilities.</div></div></a>
-    </div>
-
-    <div class="splash-tertiary splash-anim splash-anim-d6">
-      <button data-action="easy-start" class="splash-tertiary-btn">Guided Setup</button>
-      <a href="https://corebuilds-docs.docsalot.dev/templates/directory" target="_blank" rel="noopener noreferrer" class="splash-tertiary-btn">Browse Templates</a>
-      <button data-action="compare-templates" class="splash-tertiary-btn">Compare</button>
-      <a href="https://github.com/brevityA/Core-Builds" target="_blank" rel="noopener noreferrer" class="splash-tertiary-btn">GitHub</a>
-      <a href="https://www.reddit.com/r/CoreBuilds/" target="_blank" rel="noopener noreferrer" class="splash-tertiary-btn">Core Crew</a>
-      <a href="https://discord.gg/AwJ49yzbqT" target="_blank" rel="noopener noreferrer" class="splash-tertiary-btn">Discord</a>
-      <button data-action="show-changelog" class="splash-tertiary-btn">What's new · v${CONFIGURATOR_VERSION}</button>
-      <button data-action="open-diagnostics" class="splash-tertiary-btn">Report Issue</button>
-    </div>
-    <div class="splash-footer">Built by Brevity · Core Builds is not affiliated with TorBox or AIOStreams</div>
   </div>`;
 }
 function initScrollFades() {
@@ -2384,12 +2311,14 @@ function renderCore() {
         </div>
         ${sizeLimitHtml()}
         ${livePayloadHtml()}
-        <button class="btn-dl" data-action="generate-dl">${ICO.download(14,'currentColor')} Export Template JSON</button>
+        <div class="rv-action-dock">
+        ${telemetryHtml()}
+        <button type="button" id="btn-dl" class="btn-dl" data-action="generate-dl">${ICO.download(14,'currentColor')} Export Template JSON</button>
         <div class="action-help">Writes a JSON file in your browser. If you added debrid keys, they're in the file in plain text — keep it private.</div>
         <div id="exportCredNotice"></div>
         <button type="button" data-action="open-feedback-report" class="rv-tool-btn">🧾 Need help? Copy a safe feedback report</button>
         <div class="rv-actions-row">
-          <button type="button" data-action="share-config" class="rv-secondary-btn"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg> Share</button>
+          <button type="button" data-action="share-config" class="rv-secondary-btn"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg> Share Link</button>
           <button type="button" class="btn-aio" data-action="create-import" id="btnImport">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
             Import to AIOStreams
@@ -2397,6 +2326,7 @@ function renderCore() {
         </div>
         <div class="action-help">Uploads your template (debrid keys stripped) to a paste service, then gives you an import link to open in AIOStreams.</div>
         <div id="importUrlResult"></div>
+        </div>
         <details class="rv-section" open>
           <summary class="rv-section-hdr"><span class="rv-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg> Deploy</span><span class="rv-arr">›</span></summary>
           <div class="rv-section-body">
@@ -2418,7 +2348,7 @@ function renderCore() {
                 <input id="stremioPasswordInline" type="password" placeholder="Stremio password" autocomplete="current-password" enterkeyhint="go" autocapitalize="none" data-action="update-stremio-password"
                   value="${escH(S.stremioPassword||'')}"
                   class="th-input" style="padding-right:40px">
-                <button type="button" data-action="toggle-stremio-pwd" aria-label="Show or hide password"
+                <button type="button" class="input-eye-btn" data-action="toggle-stremio-pwd" aria-label="Show or hide password"
                   style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--th-tx4);padding:2px;line-height:1;display:flex;align-items:center">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                 </button>
@@ -2472,7 +2402,7 @@ function renderCore() {
                   <input class="name-input" id="aioPwd" type="password" placeholder="Create a password to protect your manifest" autocapitalize="none" enterkeyhint="done"
                     value="${escH(S.instancePassword||'')}" data-action="update-pwd" maxlength="200" autocomplete="new-password"
                     style="padding-right:40px">
-                  <button type="button" id="pwdEye" data-action="toggle-pwd"
+                  <button type="button" id="pwdEye" class="input-eye-btn" data-action="toggle-pwd"
                     title="Show/hide password"
                     style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#4b5563;padding:2px;line-height:1;display:flex;align-items:center">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
@@ -2487,8 +2417,8 @@ function renderCore() {
               </div>
               <div id="aioUuidRow" class="name-row" style="margin-bottom:0;${S.instanceHost==='auto'?'display:none':''}">
                 <label>UUID</label>
-                <input class="name-input" id="aioUuid" type="text" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx or paste manifest URL"
-                  value="${escHtml(S.instanceUuid || '')}" data-action="update-uuid" maxlength="500" style="font-family:monospace;font-size:.88rem;transition:border-color .15s">
+                <div class="input-action-wrap"><input class="name-input" id="aioUuid" type="text" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx or paste manifest URL"
+                  value="${escHtml(S.instanceUuid || '')}" data-action="update-uuid" maxlength="500" style="font-family:monospace;font-size:.88rem;transition:border-color .15s"><button type="button" class="input-paste-btn" data-action="paste-input" data-target="aioUuid">Paste</button></div>
                 <div id="uuidStatus" role="status" aria-live="polite" style="font-size:.73rem;margin-top:4px;min-height:18px"></div>
               </div>
             </div>
@@ -2535,9 +2465,9 @@ function renderCore() {
               </summary>
               <div class="u-mt10">
                 <div style="color:#6b7280;font-size:.76rem;margin-bottom:8px;line-height:1.45">Paste a manifest URL for instant install links:</div>
-                <input class="name-input" id="pasteManifest" type="url"
+                <div class="input-action-wrap"><input class="name-input" id="pasteManifest" type="url"
                   placeholder="https://aiostreams.elfhosted.com/stremio/uuid/password/manifest.json"
-                  data-action="paste-manifest" style="font-size:.8rem;font-family:monospace">
+                  data-action="paste-manifest" style="font-size:.8rem;font-family:monospace"><button type="button" class="input-paste-btn" data-action="paste-input" data-target="pasteManifest">Paste</button></div>
                 <div id="pasteManifestResult"></div>
               </div>
             </details>
@@ -2547,7 +2477,6 @@ function renderCore() {
           <summary class="rv-section-hdr"><span class="rv-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg> Customize</span><span class="rv-arr">›</span></summary>
           <div class="rv-section-body">
             ${insightsHtml()}
-            ${telemetryHtml()}
             <details id="fmtPickerDetails" data-persist-open class="rv-accord" style="margin-top:0;margin-bottom:12px">
               <summary class="rv-accord-hdr">
                 <span class="u-rowc8"><span>${ICO.palette(14,'currentColor')}</span> Stream Formatter <span style="font-weight:600;color:var(--th-tx5);text-transform:none;letter-spacing:0;font-size:.72rem">— ${label('formatter', S.formatter)}</span></span><span class="rv-arr">›</span>
@@ -2625,7 +2554,7 @@ function renderCore() {
         <div class="srh">
           <div class="srh-ring">
             <svg viewBox="0 0 52 52" width="52" height="52" style="overflow:visible">
-              <defs><linearGradient id="rg${step}" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#00d4ff"/><stop offset="100%" stop-color="#a855f7"/></linearGradient></defs>
+              <defs><linearGradient id="rg${step}" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#00d4ff"/><stop offset="100%" stop-color="#4facfe"/></linearGradient></defs>
               <circle cx="26" cy="26" r="21" fill="none" stroke="rgba(255,255,255,.07)" stroke-width="2.5"/>
               <circle cx="26" cy="26" r="21" fill="none" stroke="url(#rg${step})" stroke-width="2.5"
                 stroke-dasharray="${ringC}" stroke-dashoffset="${(ringC*(1-ringPct)).toFixed(1)}"
@@ -2691,8 +2620,8 @@ function renderCore() {
           </div>
           <div class="u-relrow">
             <input class="name-input" id="cred_${inp.id}" data-service="${inp.id}" data-action="update-cred" type="password" autocapitalize="none" spellcheck="false" enterkeyhint="done" placeholder="${inp.placeholder}"
-              value="${escH(S.creds[inp.id] || '')}" maxlength="120" style="padding-right:38px">
-            <button type="button" data-action="toggle-cred-vis" data-target="cred_${inp.id}" title="Show / hide"
+              value="${escH(S.creds[inp.id] || '')}" maxlength="120">
+            <button type="button" class="input-paste-btn" data-action="paste-input" data-target="cred_${inp.id}">Paste Key</button><button type="button" class="input-eye-btn" aria-label="Show or hide credential" data-action="toggle-cred-vis" data-target="cred_${inp.id}" title="Show / hide"
               style="position:absolute;right:10px;background:none;border:none;cursor:pointer;color:#4b5563;padding:0;line-height:1;font-size:.72rem;transition:color .15s"
               onmouseover="this.style.color='#9ca3af'" onmouseout="this.style.color='#4b5563'">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
@@ -2719,8 +2648,8 @@ function renderCore() {
               </div>
               <div class="u-relrow">
                 <input class="name-input" id="tmdbIn" data-action="update-tmdb" type="password" autocapitalize="none" spellcheck="false" enterkeyhint="done" placeholder="eyJhbGciOiJSUzI1NiJ9…"
-                  value="${escH(S.tmdbToken)}" maxlength="400" style="padding-right:38px">
-                <button type="button" data-action="toggle-cred-vis" data-target="tmdbIn" title="Show / hide"
+                  value="${escH(S.tmdbToken)}" maxlength="400">
+                <button type="button" class="input-paste-btn" data-action="paste-input" data-target="tmdbIn">Paste Key</button><button type="button" class="input-eye-btn" aria-label="Show or hide credential" data-action="toggle-cred-vis" data-target="tmdbIn" title="Show / hide"
                   style="position:absolute;right:10px;background:none;border:none;cursor:pointer;color:#4b5563;padding:0;line-height:1;font-size:.72rem;transition:color .15s"
                   onmouseover="this.style.color='#9ca3af'" onmouseout="this.style.color='#4b5563'">
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
@@ -2736,8 +2665,8 @@ function renderCore() {
               </div>
               <div class="u-relrow">
                 <input class="name-input" id="tmdbKeyIn" data-action="update-tmdb-key" type="password" autocapitalize="none" spellcheck="false" enterkeyhint="done" placeholder="abc123def456…"
-                  value="${escH(S.tmdbApiKey)}" maxlength="60" style="padding-right:38px">
-                <button type="button" data-action="toggle-cred-vis" data-target="tmdbKeyIn" title="Show / hide"
+                  value="${escH(S.tmdbApiKey)}" maxlength="60">
+                <button type="button" class="input-paste-btn" data-action="paste-input" data-target="tmdbKeyIn">Paste Key</button><button type="button" class="input-eye-btn" aria-label="Show or hide credential" data-action="toggle-cred-vis" data-target="tmdbKeyIn" title="Show / hide"
                   style="position:absolute;right:10px;background:none;border:none;cursor:pointer;color:#4b5563;padding:0;line-height:1;font-size:.72rem;transition:color .15s"
                   onmouseover="this.style.color='#9ca3af'" onmouseout="this.style.color='#4b5563'">
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
@@ -2760,7 +2689,7 @@ function renderCore() {
         <div class="srh">
           <div class="srh-ring">
             <svg viewBox="0 0 52 52" width="52" height="52" style="overflow:visible">
-              <defs><linearGradient id="rg${step}" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#00d4ff"/><stop offset="100%" stop-color="#a855f7"/></linearGradient></defs>
+              <defs><linearGradient id="rg${step}" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#00d4ff"/><stop offset="100%" stop-color="#4facfe"/></linearGradient></defs>
               <circle cx="26" cy="26" r="21" fill="none" stroke="rgba(255,255,255,.07)" stroke-width="2.5"/>
               <circle cx="26" cy="26" r="21" fill="none" stroke="url(#rg${step})" stroke-width="2.5"
                 stroke-dasharray="${ringC}" stroke-dashoffset="${(ringC * (1 - ringPct)).toFixed(1)}"
@@ -2823,37 +2752,27 @@ function syncNext() {
 const TUT_STEPS = [
   { id:'welcome' },
   {
-    id:'paths', badge:'Step 1 of 7', title:'Choose the Right Path',
-    desc:'<strong>Quick install</strong> is the shortest setup: service, device, resolution and key, then Deploy.<br><br><span class="hl">Custom build</span> exposes every filter and stream card. <span class="gold">Update an existing setup</span> brings an older template up to date, and <strong>Import a config</strong> starts from one you already have.',
+    id:'paths', badge:'Step 1 of 5', title:'Choose the Right Path',
+    desc:'<strong>Core Builds</strong> opens Quick install, the shortest setup: service, device, resolution and key, then Deploy.<br><br><span class="hl">Custom build</span> is one tap away inside Quick install (Options &amp; defaults → Customize every setting), and on the All Core Tools page with Guided setup, update and import.',
     target:'#splashStart', arrow:'top', nextLabel:'Next'
   },
   {
-    id:'sources', badge:'Step 2 of 7', title:'Choose One or More Providers',
-    desc:'Select every provider you actually use. Multi-select is supported for debrid and Usenet services.<br><br>Optional P2P, HTTP, Debridio, NZBGeek, StreamNZB, and extra indexers live under <strong>Additional services & scrapers</strong> so the main list stays simple.',
-    target:'.hybrid-services', arrow:'top', nextLabel:'Next'
-  },
-  {
-    id:'presets', badge:'Step 3 of 7', title:'Ready-Made Setups',
-    desc:'These presets apply sensible device, quality, cache, and sorting choices for common use cases. They are the fastest route when one of the descriptions already matches what you want.',
-    target:'#splashPresets', arrow:'top', nextLabel:'Next'
-  },
-  {
-    id:'quick', badge:'Step 4 of 7', title:'Quick Install',
+    id:'quick', badge:'Step 2 of 5', title:'Quick Install',
     desc:'Quick Install asks only what is required. Choose Stremio, Nuvio, WuPlay, or another app; select multiple providers; then pick <strong>Fast & Light</strong>, <strong>Balanced</strong>, or <strong>Maximum Quality</strong>.<br><br>Credential fields appear only for selected providers.',
     target:'#splashStart [data-action="open-express-lane"]', arrow:'top', nextLabel:'Next'
   },
   {
-    id:'guided', badge:'Step 5 of 7', title:'Guided Setup and Custom build',
+    id:'guided', badge:'Step 3 of 5', title:'Guided Setup and Custom build',
     desc:'<strong>Guided Setup</strong> walks through Sources, Device, Video Quality, Content Preferences, Accounts & Keys, and Review & Install.<br><br><span class="hl">Custom build</span> adds detailed audio, video, formatter, subtitles, catalogs, proxy, matching, and filtering controls. Safe defaults are used when you skip an option.',
     center:true, nextLabel:'Next'
   },
   {
-    id:'install', badge:'Step 6 of 7', title:'Review, Validate, and Install',
+    id:'install', badge:'Step 4 of 5', title:'Review, Validate, and Install',
     desc:'Before installation, Core Builds runs credential, template, device, and host checks. The final screen prioritises the install action, then manifest recovery, exports, diagnostics, and the detailed configuration summary.<br><br>Direct Install sends the generated configuration to the selected AIOStreams host. Export JSON keeps the generated file local until you import it yourself.',
     center:true, nextLabel:'Next'
   },
   {
-    id:'start', badge:'Step 7 of 7', title:'Ready to Build',
+    id:'start', badge:'Step 5 of 5', title:'Ready to Build',
     desc:'For most people, start with <strong>Quick install</strong>. Choose Guided Setup if you want help with each decision, or Custom build when you already know the exact formats and filters you need.',
     target:'#splashStart [data-action="open-express-lane"]', arrow:'top', nextLabel:'Open Quick install'
   },
@@ -3038,11 +2957,12 @@ document.addEventListener('DOMContentLoaded', () => {
   render();
   if (!_genieRoute && !_badgeBuilderRoute) {
     try { handleDeepLink(location.hash); } catch(e) { logError('deeplink', e.message, { hash: location.hash }); }
+    window.addEventListener('hashchange', () => { try { handleDeepLink(location.hash); } catch(e) { logError('deeplink', e.message, { hash: location.hash }); } });
   }
   if (_genieRoute) {
     setTimeout(() => {
       try {
-        if (_genieRoute === 'advanced') document.querySelector('[data-action="custom-start"]')?.click();
+        if (_genieRoute === 'advanced') runDeepAction('custom-start');
         else showExpressLane();
         showToast('Genie hand-off applied — service + device pre-set. Check them before you continue.');
       } catch(e) { logError('genie-handoff', e.message); }
@@ -3051,7 +2971,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (_badgeBuilderRoute) {
     setTimeout(() => {
       try {
-        document.querySelector('[data-action="custom-start"]')?.click();
+        runDeepAction('custom-start');
         showToast('Core Badge Companion applied — review your setup, then generate the full template.');
       } catch(e) { logError('badge-builder-handoff', e.message); }
     }, 350);
@@ -3072,7 +2992,7 @@ document.addEventListener('DOMContentLoaded', () => {
       el.innerHTML = `<span class="stat"><span class="stat-val">${fmt(d.visits)}</span> visits</span><span class="stat-dot"></span><span class="stat"><span class="stat-val">${fmt(d.generates)}</span> templates built</span>`;
       el.classList.add('loaded');
     }).catch(() => {});
-    beaconPost(COUNTER_URL + '/api/visit');
+    if (S.telemetryOk) beaconPost(COUNTER_URL + '/api/visit');
   }
   try { history.replaceState({ step: step }, ''); } catch(e) {}
   window.addEventListener('popstate', (e) => {
@@ -3210,6 +3130,19 @@ document.addEventListener('DOMContentLoaded', () => {
     if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); card.click(); }
   });
   document.addEventListener('click', (e) => {
+    const pasteBtn = e.target.closest('[data-action="paste-input"]');
+    if (pasteBtn) {
+      const input = document.getElementById(pasteBtn.dataset.target);
+      if (!input) return;
+      if (!navigator.clipboard?.readText) { input.focus(); showToast('Use your device’s Paste command in this field'); return; }
+      navigator.clipboard.readText().then(text => {
+        if (!input.isConnected) return;
+        input.value = input.maxLength > 0 ? text.slice(0, input.maxLength) : text;
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+        input.focus();
+      }).catch(() => { input.focus(); showToast('Clipboard access denied — paste directly into the field'); });
+      return;
+    }
     const flashBtn = e.target.closest('button:not(:disabled):not(.btn-manifest):not(.btn-dl)');
     if (flashBtn) {
       flashBtn.classList.remove('btn-flash');
@@ -4122,9 +4055,12 @@ function insightsHtml() {
   return '<div class="insights-box"><div class="insights-hdr">Template Highlights</div><ul style="list-style:none;display:flex;flex-direction:column;gap:5px">' + pts.map(p => '<li><span style="color:#3fb950;flex-shrink:0">' + ICO.check(12,'#3fb950') + '</span><span>' + p + '</span></li>').join('') + '</ul></div>';
 }
 
+// Shared opt-in usage consent control rendered in BOTH full Review (immediately
+// above Export Template JSON) and Quick Start (`simpleFinishHtml()`, immediately
+// before its install/export action block), outside every collapsed <details>.
+// Both flows share this single control, `S.telemetryOk`, `toggle-telemetry`, and default-off.
 function telemetryHtml() {
-  if (!USAGE_BEACON_URL) return '';
-  return `<label style="display:flex;align-items:center;gap:9px;margin-bottom:14px;cursor:pointer;font-size:.78rem;color:#8b949e"><input type="checkbox" data-action="toggle-telemetry" ${S.telemetryOk ? 'checked' : ''} style="accent-color:#00d4ff;flex-shrink:0">Share an anonymous usage ping on download (service + device only — never keys or names)</label>`;
+  return `<label class="rv-telemetry" style="display:flex;align-items:center;gap:9px;margin-bottom:14px;cursor:pointer;font-size:.78rem;color:var(--th-tx2)"><input type="checkbox" data-action="toggle-telemetry" ${S.telemetryOk ? 'checked' : ''} style="accent-color:#00d4ff;flex-shrink:0">Share basic usage statistics with the project: page visits and downloads, including service, device and resolution. No API keys, account names, or full configuration are sent.</label>`;
 }
 
 function sizeLimitHtml() {
@@ -4533,7 +4469,7 @@ function eses() {
     }
     if (S.content !== 'anime') out.push({ enabled:true, expression: "/* Bad Dual Audio Groups */ releaseGroup(streams,'alfaHD','BAT','BiOMA','BlackBit','BNd','Cory','EXTREME','FF','FOXX','G4RiS','GUEIRA','LCD','N3G4N','PD','PTHome','RiPER','RK','SiGLA','Tars','TM','tokar86a','TURG','vnlls','WTV','Yatogam1','YusukeFLA','ZigZag','ZNM')" });
     if (is1080) out.push({ enabled:true, expression:"/* Hard Resolution Kill */ resolution(streams,'2160p','1440p')" });
-    if (['generic','samsung','firestick-hd','roku','projector','onn'].includes(dev)) out.push({ enabled:true, expression: "/* DV-Only Kill */ negate(visualTag(streams,'DV'),merge(visualTag(streams,'HDR10+'),visualTag(streams,'HDR10'),visualTag(streams,'HDR'),visualTag(streams,'HLG'),visualTag(streams,'SDR')))" });
+    if (['generic','samsung','firestick-hd','roku','projector','onn'].includes(dev)) out.unshift({ enabled:true, expression: "/* DV-Only Kill */ negate(merge(visualTag(streams,'HDR10+'),visualTag(streams,'HDR10'),visualTag(streams,'HDR'),visualTag(streams,'HLG'),visualTag(streams,'SDR')),visualTag(streams,'DV'))" });
     if (S.exclude4K && !is1080) out.push({ enabled:true, expression:"/* Exclude 4K / UHD */ resolution(streams,'2160p','1440p')" });
     if (S.excludeDV) out.push({ enabled:true, expression:"/* Exclude Dolby Vision */ visualTag(streams,'DV','HDR+DV')" });
       // Size cap is owned by the native size policy (sizePolicy() reads the same
@@ -4563,7 +4499,7 @@ function eses() {
     { enabled:true, expression:"/*Bad 4k Anime*/ (isAnime and originalLanguage == 'Japanese' and count(quality(resolution(cached(streams),'2160p'),'Bluray REMUX')) == 0 and count(seadex(resolution(streams,'2160p'))) == 0) ? negate(merge(library(streams),seadex(streams)),resolution(streams,'2160p')) : []" },
     { enabled:true, expression:"/*Upscaled 4k*/ (queryType=='movie' or queryType=='series') and (count(quality(resolution(streams,'1080p'),'Bluray REMUX'))>=1) and count(quality(resolution(streams,'2160p'),'Bluray REMUX'))==0 and count(quality(resolution(streams,'2160p'),'WEB-DL','WEBRip'))==0 ? negate(merge(seadex(streams),library(streams)),resolution(streams,'2160p')) : []" },
     { enabled:true, expression:"/*Bad 4k Bluray*/ (queryType=='movie' or queryType=='series') and count(quality(resolution(streams,'2160p'),'Bluray REMUX'))==0 and count(seadex(resolution(streams,'2160p')))==0 ? negate(merge(seadex(streams),library(streams)),resolution(quality(streams,'Bluray'),'2160p')) : []" },
-    { enabled:true, expression:"/*Bad 1080P Bluray*/ (queryType=='movie') and count(quality(resolution(streams,'2160p'),'Bluray REMUX'))==0 and (count(quality(resolution(streams,'1080p'),'Bluray REMUX'))==0) and count(seadex(resolution(streams,'1080p')))==0 ? negate(merge(seadex(streams),library(streams)),quality(resolution(streams,'1080p'),'Bluray')) : []" },
+    { enabled:true, expression:"/*Bad 1080P Bluray*/ (queryType=='movie') and (daysSinceRelease >= 0 and daysSinceRelease < 90) and count(quality(resolution(streams,'2160p'),'Bluray REMUX'))==0 and (count(quality(resolution(streams,'1080p'),'Bluray REMUX'))==0) and count(seadex(resolution(streams,'1080p')))==0 ? negate(merge(seadex(streams),library(streams)),quality(resolution(streams,'1080p'),'Bluray')) : []" },
     { enabled:true, expression:"/* Adaptive Score Floor */ count(streamExpressionScore(negate(merge(library(streams),seadex(streams)),merge(cached(streams),type(streams,'p2p','http'))),-50+min(30,daysSinceRelease*0.1)))<5?[]:streamExpressionScore(negate(merge(library(streams),seadex(streams)),streams),-1000000,-50+min(30,daysSinceRelease*0.1))" },
     { enabled:true, expression:"/* Low Seeder Cull */ count(seeders(merge(type(streams,'p2p'),type(uncached(streams),'debrid')),2))<=3?[]:seeders(merge(type(streams,'p2p'),type(uncached(streams),'debrid')),0,0)" },
     ...(S.service!=='p2p'&&S.service!=='http'&&((S.multiServices||[]).includes('realdebrid')||S.service==='realdebrid') ? [{ enabled:true, expression:"/* RD Copyright */ service(keyword(streams,'all','web-dl','webrip','bdrip','hdrip','dvdrip','bluray.x264','hdtv.x264','hdtv.xvid','web.x264','web.h264'),'realdebrid')" }] : []),
@@ -4573,7 +4509,7 @@ function eses() {
     { enabled:true, expression:"/*Final Limit — Resolution Quota*/ count(resolution(negate(merge(library(streams),seadex(streams)),merge(cached(streams),type(streams,'p2p','http'))),'2160p','1440p','1080p'))>15?negate(merge(library(streams),seadex(streams)),merge(type(uncached(streams),'debrid'),resolution(merge(type(streams,'usenet','stremio-usenet','http','p2p'),type(cached(streams),'debrid')),'720p','576p','480p','360p','240p','144p','Unknown'))):count(resolution(negate(merge(library(streams),seadex(streams)),merge(cached(streams),type(streams,'p2p','http'))),'2160p','1440p','1080p'))>12?negate(merge(library(streams),seadex(streams)),merge(type(uncached(streams),'debrid'),slice(resolution(merge(type(streams,'usenet','stremio-usenet','http','p2p'),type(cached(streams),'debrid')),'720p','576p','480p','360p','240p','144p','Unknown'),3))):count(resolution(negate(merge(library(streams),seadex(streams)),merge(cached(streams),type(streams,'p2p','http'))),'2160p','1440p','1080p','720p'))>12?negate(merge(library(streams),seadex(streams)),merge(type(uncached(streams),'debrid'),resolution(merge(type(streams,'usenet','stremio-usenet','http','p2p'),type(cached(streams),'debrid')),'576p','480p','360p','240p','144p','Unknown'))):count(resolution(negate(merge(library(streams),seadex(streams)),merge(cached(streams),type(streams,'p2p','http'))),'2160p','1440p','1080p','720p'))>9?negate(merge(library(streams),seadex(streams)),merge(type(uncached(streams),'debrid'),slice(resolution(merge(type(streams,'usenet','stremio-usenet','http','p2p'),type(cached(streams),'debrid')),'576p','480p','360p','240p','144p','Unknown'),3))):count(resolution(negate(merge(library(streams),seadex(streams)),merge(cached(streams),type(streams,'p2p','http'))),'2160p','1440p','1080p','720p'))>6?negate(merge(library(streams),seadex(streams)),merge(type(uncached(streams),'debrid'),slice(resolution(merge(type(streams,'usenet','stremio-usenet','http','p2p'),type(cached(streams),'debrid')),'576p','480p','360p','240p','144p','Unknown'),6))):count(resolution(negate(merge(library(streams),seadex(streams)),merge(cached(streams),type(streams,'p2p','http'))),'2160p','1440p','1080p','720p'))>3?negate(merge(library(streams),seadex(streams)),merge(slice(type(uncached(streams),'debrid'),6),slice(resolution(merge(type(streams,'usenet','stremio-usenet','http','p2p'),type(cached(streams),'debrid')),'576p','480p','360p','240p','144p','Unknown'),-1))):[]" }
   );
   if (is1080) out.push({ enabled:true, expression:"/* Hard Resolution Kill */ resolution(streams,'2160p','1440p')" });
-  if (['generic','samsung','firestick-hd','roku','projector','onn'].includes(dev)) out.push({ enabled:true, expression: "/* DV-Only Kill */ negate(visualTag(streams,'DV'),merge(visualTag(streams,'HDR10+'),visualTag(streams,'HDR10'),visualTag(streams,'HDR'),visualTag(streams,'HLG'),visualTag(streams,'SDR')))" });
+  if (['generic','samsung','firestick-hd','roku','projector','onn'].includes(dev)) out.unshift({ enabled:true, expression: "/* DV-Only Kill */ negate(merge(visualTag(streams,'HDR10+'),visualTag(streams,'HDR10'),visualTag(streams,'HDR'),visualTag(streams,'HLG'),visualTag(streams,'SDR')),visualTag(streams,'DV'))" });
   const hasRD = S.service==='realdebrid' || S.service==='hybrid' || (S.service==='multi' && S.multiServices && S.multiServices.includes('realdebrid'));
   if (hasRD) out.push({ enabled:true, expression:"/*RD Copyright (per DMM)*/ service(keyword(streams,'all','web-dl','webrip','bdrip','hdrip','dvdrip','bluray.x264','hdtv.x264','hdtv.xvid','web.x264','web.h264'),'realdebrid')" });
   out.push({ enabled:true, expression:"/* Indexer Diversity */ count(negate(merge(library(streams),seadex(streams)),merge(cached(streams),type(streams,'p2p','http'))))>20 ? negate(perGroup(negate(merge(library(streams),seadex(streams)),merge(cached(streams),type(streams,'p2p','http'))),'indexer',2),negate(merge(library(streams),seadex(streams)),merge(cached(streams),type(streams,'p2p','http')))) : []" });
@@ -5186,7 +5122,7 @@ async function generate() {
   if (USAGE_BEACON_URL && S.telemetryOk) {
     beaconPost(USAGE_BEACON_URL, { v: CONFIGURATOR_VERSION, service: S.service, device: S.device, resolution: S.resolution });
   }
-  if (COUNTER_URL) {
+  if (COUNTER_URL && S.telemetryOk) {
     beaconPost(COUNTER_URL + '/api/generate', { v: CONFIGURATOR_VERSION, service: S.service, device: S.device, resolution: S.resolution });
   }
   const dlBtn = document.querySelector('.btn-dl');
@@ -6581,7 +6517,7 @@ function showApiReminder(onContinue) {
               type="password"
               placeholder="${inp.placeholder}"
               value="${escH(S.creds[inp.id] || '')}" maxlength="120" style="padding-right:40px">
-            <button type="button" data-action="toggle-cred-vis" data-target="rem_${inp.id}" title="Show / hide"
+            <button type="button" class="input-paste-btn" data-action="paste-input" data-target="rem_${inp.id}">Paste Key</button><button type="button" class="input-eye-btn" aria-label="Show or hide credential" data-action="toggle-cred-vis" data-target="rem_${inp.id}" title="Show / hide"
               style="position:absolute;right:10px;background:none;border:none;cursor:pointer;color:#4b5563;padding:0;line-height:1;transition:color .15s"
               onmouseover="this.style.color='#9ca3af'" onmouseout="this.style.color='#4b5563'">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
@@ -6668,8 +6604,8 @@ function simpleFinishHtml() {
           </div>
           <div class="u-relrow">
             <input class="name-input" id="cred_${inp.id}" data-service="${inp.id}" data-action="update-cred" type="password" autocapitalize="none" spellcheck="false" enterkeyhint="done" placeholder="${inp.placeholder}"
-              value="${escH(S.creds[inp.id] || '')}" maxlength="120" style="padding-right:38px">
-            <button type="button" data-action="toggle-cred-vis" data-target="cred_${inp.id}" title="Show / hide"
+              value="${escH(S.creds[inp.id] || '')}" maxlength="120">
+            <button type="button" class="input-paste-btn" data-action="paste-input" data-target="cred_${inp.id}">Paste Key</button><button type="button" class="input-eye-btn" aria-label="Show or hide credential" data-action="toggle-cred-vis" data-target="cred_${inp.id}" title="Show / hide"
               style="position:absolute;right:10px;background:none;border:none;cursor:pointer;color:#4b5563;padding:0;line-height:1;transition:color .15s"
               onmouseover="this.style.color='#9ca3af'" onmouseout="this.style.color='#4b5563'">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
@@ -6707,8 +6643,8 @@ function simpleFinishHtml() {
             </div>
             <div class="u-relrow">
               <input class="name-input" id="tmdbIn" data-action="update-tmdb" type="password" autocapitalize="none" spellcheck="false" enterkeyhint="done" placeholder="eyJhbGciOiJSUzI1NiJ9…"
-                value="${escH(S.tmdbToken)}" maxlength="400" style="padding-right:38px">
-              <button type="button" data-action="toggle-cred-vis" data-target="tmdbIn" title="Show / hide"
+                value="${escH(S.tmdbToken)}" maxlength="400">
+              <button type="button" class="input-paste-btn" data-action="paste-input" data-target="tmdbIn">Paste Key</button><button type="button" class="input-eye-btn" aria-label="Show or hide credential" data-action="toggle-cred-vis" data-target="tmdbIn" title="Show / hide"
                 style="position:absolute;right:10px;background:none;border:none;cursor:pointer;color:#4b5563;padding:0;line-height:1;transition:color .15s"
                 onmouseover="this.style.color='#9ca3af'" onmouseout="this.style.color='#4b5563'">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
@@ -6724,8 +6660,8 @@ function simpleFinishHtml() {
             </div>
             <div class="u-relrow">
               <input class="name-input" id="tmdbKeyIn" data-action="update-tmdb-key" type="password" autocapitalize="none" spellcheck="false" enterkeyhint="done" placeholder="abc123def456…"
-                value="${escH(S.tmdbApiKey)}" maxlength="60" style="padding-right:38px">
-              <button type="button" data-action="toggle-cred-vis" data-target="tmdbKeyIn" title="Show / hide"
+                value="${escH(S.tmdbApiKey)}" maxlength="60">
+              <button type="button" class="input-paste-btn" data-action="paste-input" data-target="tmdbKeyIn">Paste Key</button><button type="button" class="input-eye-btn" aria-label="Show or hide credential" data-action="toggle-cred-vis" data-target="tmdbKeyIn" title="Show / hide"
                 style="position:absolute;right:10px;background:none;border:none;cursor:pointer;color:#4b5563;padding:0;line-height:1;transition:color .15s"
                 onmouseover="this.style.color='#9ca3af'" onmouseout="this.style.color='#4b5563'">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
@@ -6794,6 +6730,7 @@ function simpleFinishHtml() {
         <label>Template name (optional)</label>
         <input class="name-input" id="nameIn" type="text" placeholder="${escH(S.name)}" value="${escH(S.name)}" data-action="update-name" maxlength="60">
       </div>
+      ${telemetryHtml()}
       ${isFree ? `
       <button class="u-mb8 btn-manifest" id="btnAio" data-action="simple-install" data-target="app">${ICO.link(18,'currentColor')} Import to AIOStreams</button>
       <div style="font-size:.74rem;color:#6b7280;text-align:center;margin-top:8px;line-height:1.5">Free templates need manual import — we'll create a link and open AIOStreams for you.</div>
@@ -6811,7 +6748,7 @@ function simpleFinishHtml() {
           <input id="stremioPasswordInline" type="password" placeholder="Stremio password" autocomplete="current-password" enterkeyhint="go" autocapitalize="none" data-action="update-stremio-password"
             value="${escH(S.stremioPassword||'')}"
             style="width:100%;box-sizing:border-box;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:9px 12px;padding-right:38px;color:var(--tx);font-size:.8rem;outline:none">
-          <button type="button" data-action="toggle-stremio-pwd" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#4b5563;padding:2px;line-height:1;display:flex;align-items:center">
+          <button type="button" class="input-eye-btn" data-action="toggle-stremio-pwd" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#4b5563;padding:2px;line-height:1;display:flex;align-items:center">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
           </button>
         </div>
@@ -7343,15 +7280,24 @@ function troubleshootHtml() {
   }
   return back + body;
 }
+function runDeepAction(action) {
+  const b = document.createElement('button');
+  b.type = 'button'; b.hidden = true; b.dataset.action = action;
+  document.body.appendChild(b); b.click(); b.remove();
+}
 function handleDeepLink(hash) {
   if (!hash || hash.startsWith('#cfg=')) return;
   if (hash === '#troubleshooter') { setTimeout(showTroubleshooter, 300); return; }
   if (hash === '#health-score') { step = STEPS; pushStep(); render(); window.scrollTo(0, 0); return; }
   // Entry deep-links (used by the Genie pages + tools landing). Splash stays the base view;
   // these call the same handlers the splash doors use, so behavior can't drift apart.
-  if (hash === '#express') { setTimeout(() => document.querySelector('[data-action="open-express-lane"]')?.click(), 250); return; }
-  if (hash === '#advanced') { setTimeout(() => document.querySelector('[data-action="custom-start"]')?.click(), 250); return; }
-  if (hash === '#update') { setTimeout(() => document.querySelector('[data-action="update-template"]')?.click(), 250); return; }
+  // A deep link runs the same delegated handler a button would, without needing that button on screen.
+  const DEEP_ACTIONS = { '#express':'open-express-lane', '#advanced':'custom-start', '#guided':'easy-start', '#update':'update-template', '#import':'paste-manifest-splash', '#tour':'open-tutorial', '#compare':'compare-templates', '#report':'open-diagnostics', '#support':'open-support' };
+  if (DEEP_ACTIONS[hash]) {
+    // Clear the link once it has run, so a reload does not reopen the dialog and the same link works again.
+    try { history.replaceState(history.state, '', location.pathname + location.search); } catch (e) { /* the action still runs */ }
+    setTimeout(() => runDeepAction(DEEP_ACTIONS[hash]), 250); return;
+  }
   if (hash === '#backup') { step = STEPS; pushStep(); render(); window.scrollTo(0, 0); return; } // backup timeline lives on the final/Done screen
   if (hash === '#changelog') { setTimeout(showChangelog, 250); return; } // tools page "Full Configurator changelog" link
 }
@@ -7631,6 +7577,20 @@ const EXPRESS_PROFILES = [
   ['balanced', 'Balanced', '4K when available · starts quickly'],
   ['maximum', 'Maximum', 'Best picture · widest search · any file size'],
 ];
+// Logos for the phone layout's list rows (hidden on wider screens).
+// Core Builds Icon Pack glyphs where the pack has one; the configurator's own icons otherwise.
+const EXPRESS_GLYPH = { app:'stremio', nuvio:'nuvio', wuplay:'wuplay', chillio:'chillio', 'torbox-pro':'torbox', realdebrid:'realdebrid', alldebrid:'alldebrid', premiumize:'premiumize' };
+function expressIcon(kind, v) {
+  const g = BRAND_GLYPHS[EXPRESS_GLYPH[v]];
+  if (g) return `<span class="fl-ico fl-glyph" aria-hidden="true">${g}</span>`;
+  if (kind === 'target') {
+    const t = { manifest: ICO.link(28, 'currentColor') }[v];
+    return t ? `<span class="fl-ico" aria-hidden="true">${t}</span>` : '';
+  }
+  const opt = DEFS.find(d => d.key === 'service')?.opts.find(o => o.v === v);
+  return opt?.icon ? `<span class="fl-ico" aria-hidden="true">${opt.icon}</span>` : '';
+}
+
 const EXPRESS_SERVICES = [
   ['torbox-pro','TorBox','Debrid · fast cache'],
   ['realdebrid','Real-Debrid','Debrid · large library'],
@@ -7641,18 +7601,25 @@ const EXPRESS_SERVICES = [
   ['p2p','Free / P2P','No account required'],
 ];
 
+// Pill controls retain a hidden native value bridge so the existing change
+// handlers and payload readers remain the sole owners of persisted state.
+function pillSelectHtml(id, title, choices, value) {
+  if (!choices.some(([v]) => v === value)) value = choices[0]?.[0] || '';
+  return `<fieldset class="ux-pill-field"><legend>${escHtml(title)}</legend><div class="ux-pill-grid" id="${id}Pills" role="radiogroup" aria-label="${escHtml(title)}" data-pill-select="${id}">${choices.map(([v, n]) => `<button type="button" class="chip-btn${v===value?' active':''}" role="radio" aria-checked="${v===value}" tabindex="${v===value?'0':'-1'}" data-pill-value="${escHtml(v)}">${escHtml(n)}</button>`).join('')}</div><select id="${id}" hidden aria-hidden="true" tabindex="-1">${choices.map(([v,n]) => `<option value="${escHtml(v)}"${v===value?' selected':''}>${escHtml(n)}</option>`).join('')}</select></fieldset>`;
+}
+
 function showExpressLane() {
   document.getElementById('expressLaneModal')?.remove();
   const gh = window.__genieHandoff; window.__genieHandoff = null; // one-shot seed: read both fields, then clear (review P4)
   const svc = gh?.service || ((S.service && EXPRESS_SERVICES.some(([v]) => v === S.service)) ? S.service : 'torbox-pro');
-  const state = { service: svc, target: gh?.app || 'app', profile:S.quickProfile || 'balanced', device:S.device || 'generic', resolution:S.resolution || '4k', extras:(S.multiServices||[]).filter(v=>CAROUSEL_SVCS.includes(v) && v!==svc), scrapers:[...(S.optionalScrapers||[])],
+  const state = { service: svc, target: gh?.app || 'app', mode:S.installMode === 'manifest' ? 'manifest' : 'direct', profile:S.quickProfile || 'balanced', device:S.device || 'generic', resolution:S.resolution || '4k', extras:(S.multiServices||[]).filter(v=>CAROUSEL_SVCS.includes(v) && v!==svc), scrapers:[...(S.optionalScrapers||[])],
     // A language already chosen (Custom build or an earlier Quick install) wins, English
     // included; only a never-chosen list falls back to the browser's language.
     lang: (S.langsSet && S.langs?.[0]) || ((S.langs?.[0] && S.langs[0] !== 'English') ? S.langs[0] : browserLang()) };
   const credInput = (key) => {
     const d = PROVIDER_CREDENTIALS[key] || { label: key, placeholder:'Paste your key', url:'#', linkLabel:'Get key' };
     const link = (d.url && d.url !== '#') ? `<a class="fastlane-get-key" href="${d.url}" target="_blank" rel="noopener noreferrer">${d.linkLabel||'Get key'} &nearr;</a>` : '';
-    return `<div class="fastlane-credential"><div class="fastlane-credential-head"><label>${d.label}</label>${link}</div><input class="fastlane-field" data-express-cred="${key}" type="password" autocomplete="off" spellcheck="false" autocapitalize="none" enterkeyhint="done" placeholder="${d.placeholder||'Paste your API key'}" value="${escH(S.creds[key]||'')}"></div>`;
+    return `<div class="fastlane-credential"><div class="fastlane-credential-head"><label>${d.label}</label>${link}</div><div class="u-relrow"><input id="expressCred_${key}" class="fastlane-field" data-express-cred="${key}" type="password" autocomplete="off" spellcheck="false" autocapitalize="none" enterkeyhint="done" placeholder="${d.placeholder||'Paste your API key'}" value="${escH(S.creds[key]||'')}"><button type="button" class="input-paste-btn" data-action="paste-input" data-target="expressCred_${key}">Paste Key</button><button type="button" class="input-eye-btn" data-action="toggle-cred-vis" data-target="expressCred_${key}" aria-label="Show or hide credential">${ICO.eye(16,'currentColor')}</button></div></div>`;
   };
   const credArea = (service) => {
     if (service === 'p2p') return `<div style="margin:10px 2px 4px;font-size:.78rem;color:#8b949e;line-height:1.5">No key needed — Core Builds uses free P2P scrapers. Results depend on public torrent availability.</div>`;
@@ -7697,74 +7664,143 @@ function showExpressLane() {
     if (!fromHistory && history.state?.expressLane) { _expressLanePop = true; try { history.back(); } catch(e) { _expressLanePop = false; } }
   };
   overlay._closeLane = closeLane;
-  const expressLaneEscKey = (e) => { if (e.key === 'Escape') closeLane(); };
+  const expressLaneEscKey = (e) => {
+    // Password, preflight and native diagnostics dialogs own their own focus.
+    if (!overlay.contains(document.activeElement)) return;
+    if (e.key === 'Escape') { closeLane(); return; }
+    if (e.key !== 'Tab') return;
+    const focusable = [...overlay.querySelectorAll('button:not(:disabled), input:not(:disabled), select, summary, a[href], [tabindex="0"]')].filter(el => el.tabIndex >= 0 && el.getClientRects().length && !el.closest('[hidden]'));
+    const first = focusable[0], last = focusable[focusable.length - 1];
+    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last?.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first?.focus(); }
+  };
   document.addEventListener('keydown', expressLaneEscKey);
   overlay.addEventListener('click', (e) => { if (e.target === overlay || e.target.closest('#expressClose')) closeLane(); }, { once:false });
   overlay.dataset.bound = '1';
   overlay.id = 'expressLaneModal';
   overlay.className = 'fastlane-overlay';
-  overlay.innerHTML = `<div class="fastlane-panel fastlane-express" role="dialog" aria-modal="true" aria-labelledby="expressTitle">
-    <div class="fastlane-head"><button class="fastlane-back" type="button" data-express-back aria-label="Back">&larr; Back</button><div class="fastlane-head-copy"><div class="fastlane-kicker">Express install</div><div class="fastlane-title" id="expressTitle">Working streams in about 30 seconds.</div><div class="fastlane-sub">Pick your debrid, connect Stremio, done. Everything else has a sensible default — change any of them under Defaults we’ll use.</div></div><button class="fastlane-close" id="expressClose" aria-label="Close">✕</button></div>
-    <div class="fastlane-section"><div class="fastlane-label">1 · Debrid service</div>
-      <div class="fastlane-grid services">${EXPRESS_SERVICES.map(([v,n,d])=>`<button type="button" class="fastlane-choice${state.service===v?' active':''}" data-express-service="${v}"><b>${n}</b><span>${d}</span></button>`).join('')}</div>
-      <div id="expressCreds">${renderCreds()}</div>
-      <div style="display:flex;align-items:center;gap:8px;margin-top:10px" title="An explicitly picked host is honored exactly — no silent failover to another host.">
-        <label for="expressHost" style="font-size:.6rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#566372;white-space:nowrap">AIOStreams host</label>
-        <span id="expressHostChip" style="flex-shrink:0;font-size:.58rem;font-weight:800;padding:3px 9px;border-radius:99px;border:1px solid rgba(255,255,255,.12);color:#6b7280;white-space:nowrap">…</span>
-        <select id="expressHost" class="fastlane-field" style="min-height:40px;font-size:.72rem;padding:8px 10px">
+  overlay.innerHTML = `<div class="fastlane-panel fastlane-express ux-v2" role="dialog" aria-modal="true" aria-labelledby="expressTitle">
+    <div class="fastlane-head ux-hero"><button class="fastlane-back" type="button" data-express-back aria-label="Back">&larr; Back</button>
+      <div class="ux-hero-copy"><span class="ux-core-mark">${BRAND_GLYPHS.corebuilds}</span><div class="ux-wordmark" id="expressTitle">Core <span>Builds</span></div><p class="ux-tagline">Quick install · working streams in about 30 seconds</p><p class="ux-ver">v${CONFIGURATOR_VERSION} · <a href="https://corebuilds-docs.docsalot.dev/" target="_blank" rel="noopener noreferrer">Docs</a></p></div>
+      <button class="fastlane-close" id="expressClose" aria-label="Close">✕</button></div>
+    <div class="ux-body"><div class="ux-main">
+    <section class="ux-step" id="ux-target" aria-labelledby="ux-target-title"><h2 class="ux-step-label" id="ux-target-title">Step 1 <b>Install to</b></h2>
+      <div class="ux-card">
+        <div class="ux-seg" role="group" aria-label="Delivery mode">${[['direct','Direct Install'],['manifest','Manifest URL'],['json','Raw JSON']].map(([v,n]) => `<button type="button" data-express-mode="${v}" aria-pressed="${state.mode===v}">${n}</button>`).join('')}</div><p class="ux-hint" id="expressModeHelp"></p>
+        <div class="ux-field-label">App</div>
+        <div class="fastlane-grid ux-rows" role="group" aria-label="App">${[['app','Stremio','Recommended — direct install'],['nuvio','Nuvio','Manifest URL'],['wuplay','WuPlay','Manifest URL'],['chillio','Chillio','ChillLink URL'],['manifest','Other app','Copy manifest']].map(([v,n,d])=>`<button type="button" class="fastlane-choice${state.target===v?' active':''}" data-express-target="${v}">${expressIcon('target', v)}<b>${n}</b><span>${d}</span></button>`).join('')}</div>
+      <div id="expressStremio"${state.target==='app'?'':' style="display:none"'}>
+        <div class="fastlane-pair ux-pair">
+          <input class="fastlane-field" id="stremioEmailInline" type="email" autocomplete="username" placeholder="Stremio email" value="${escH(S.stremioEmail||'')}">
+          <input class="fastlane-field" id="stremioPasswordInline" type="password" autocomplete="current-password" placeholder="Stremio password" value="${escH(S.stremioPassword||'')}">
+        </div>
+        <button type="button" class="ux-text-link" data-action="create-stremio-account">Create random account</button>
+        <p class="fastlane-trust">Adds Core Builds to your Stremio account. Your other addons stay; only <b>Clean reinstall</b> replaces earlier Core Builds addons.</p>
+      </div>
+      </div>
+    </section>
+    <section class="ux-step" id="ux-service" aria-labelledby="ux-service-title"><h2 class="ux-step-label" id="ux-service-title">Step 2 <b>Service</b></h2>
+      <div class="ux-card">
+        <div class="fastlane-grid ux-rows" role="group" aria-label="Service">${EXPRESS_SERVICES.map(([v,n,d])=>`<button type="button" class="fastlane-choice${state.service===v?' active':''}" data-express-service="${v}">${expressIcon('service', v)}<b>${n}</b><span>${d}</span></button>`).join('')}</div>
+        <div id="expressCreds">${renderCreds()}</div>
+      <div class="ux-host-row" title="An explicitly picked host is honored exactly — no silent failover to another host.">
+        <label for="expressHost" class="ux-host-label">AIOStreams host</label>
+        <span id="expressHostChip" class="ux-host-chip" role="status" aria-live="polite">…</span>
+        <select id="expressHost" class="fastlane-field">
           <option value="auto"${(S.instanceHost==='auto')?' selected':''}>Auto (fastest healthy)</option>
           ${Object.entries(HOST_BASE_URLS).map(([k,u])=>`<option value="${escHtml(k)}"${S.instanceHost===k?' selected':''}>${escHtml(hostPickerLabel(k))}</option>`).join('')}
           <option value="custom"${S.instanceHost==='custom'?' selected':''}>Custom / self-hosted (set its URL in Advanced)</option>
         </select>
       </div>
-      <button type="button" id="expressExtrasBtn" class="additional-services-btn" style="width:100%;margin-top:8px;display:flex;align-items:center;gap:10px;padding:11px 13px;border-radius:11px;border:1px solid rgba(255,255,255,.09);background:#0e1621;color:#c9d5df;cursor:pointer;text-align:left"><span style="font-size:1rem;color:#a78bfa">＋</span><span class="u-flex1"><b style="display:block;font-size:.72rem">Additional services &amp; scrapers</b><span style="display:block;font-size:.6rem;color:#718093;margin-top:1px">Debridio, Debrider, Usenet, indexers and more</span></span><span id="expressExtrasCount" style="font-size:.6rem;font-weight:900;color:#67e8f9"></span><span>→</span></button>
-    </div>
-    <div class="fastlane-section"><div class="fastlane-label">2 · What matters most</div>
-      <div class="fastlane-grid services cols-3">${EXPRESS_PROFILES.map(([v,n,d])=>`<button type="button" class="fastlane-choice${state.profile===v?' active':''}" data-express-profile="${v}"><b>${n}${v==='balanced'?' <span class="fastlane-reco">Recommended</span>':''}</b><span>${d}</span></button>`).join('')}</div>
-    </div>
-    <div class="fastlane-section"><div class="fastlane-label">3 · Streams shown ${ftTip('<strong>Cached only</strong> = instant play; nothing that still needs downloading appears at all. <strong>Mixed</strong> also shows torrents your debrid must fetch first — those stall on a “downloading to debrid” screen the first time. Fast profile implies Cached-only until you change it here.')}</div>
-      <div class="fastlane-grid services cols-2">
+        <button type="button" id="expressExtrasBtn" class="ux-text-row"><span aria-hidden="true">＋</span><span class="u-flex1">Additional services &amp; scrapers</span><span id="expressExtrasCount"></span><span aria-hidden="true">›</span></button>
+      </div>
+    </section>
+    <section class="ux-step" id="ux-prefs" aria-labelledby="ux-prefs-title"><h2 class="ux-step-label" id="ux-prefs-title">Step 3 <b>Preferences</b></h2>
+      <div class="ux-card">
+        <div class="ux-field-label">What matters most</div>
+        <div class="ux-seg" role="group" aria-label="What matters most">${EXPRESS_PROFILES.map(([v,n,d])=>`<button type="button" class="fastlane-choice${state.profile===v?' active':''}" data-express-profile="${v}"><b>${n}${v==='balanced'?' <span class="fastlane-reco">Recommended</span>':''}</b><span>${d}</span></button>`).join('')}</div>
+        <p class="ux-hint" id="expressProfileHint"></p>
+        <div class="ux-field-label">Streams shown ${ftTip('<strong>Cached only</strong> = instant play; nothing that still needs downloading appears at all. <strong>Mixed</strong> also shows torrents your debrid must fetch first — those stall on a “downloading to debrid” screen the first time. Fast profile implies Cached-only until you change it here.')}</div>
+        <div class="ux-seg" role="group" aria-label="Streams shown">
         <button type="button" class="fastlane-choice${S.cacheMode!=='cached' && S.cacheMode!=='uncached'?' active':''}" data-express-cache="mixed"><b>Mixed</b><span>Cached first · uncached can download first</span></button>
         <button type="button" class="fastlane-choice${S.cacheMode==='cached'?' active':''}" data-express-cache="cached"><b>⚡ Cached only</b><span>Instant play guaranteed — uncached hidden</span></button>
-        ${S.cacheMode==='uncached' ? '<div style="font-size:.6rem;color:#fbbf24;margin-top:6px">Advanced is set to “Uncached only” — Express will honor it unless you pick here.</div>' : ''}
-      </div>
-    </div>
-    <div class="fastlane-section"><div class="fastlane-label">4 · Install to</div>
-      <div class="fastlane-grid services">${[['app','Stremio','Recommended — direct install'],['nuvio','Nuvio','Manifest URL'],['wuplay','WuPlay','Manifest URL'],['chillio','Chillio','ChillLink URL'],['manifest','Other app','Copy manifest']].map(([v,n,d])=>`<button type="button" class="fastlane-choice${state.target===v?' active':''}" data-express-target="${v}"><b>${n}</b><span>${d}</span></button>`).join('')}</div>
-      <div id="expressStremio"${state.target==='app'?'':' style="display:none"'}>
-        <div class="fastlane-pair" style="display:flex;gap:8px;margin-top:10px">
-          <input class="fastlane-field" id="stremioEmailInline" type="email" autocomplete="username" placeholder="Stremio email" value="${escH(S.stremioEmail||'')}" style="flex:1">
-          <input class="fastlane-field" id="stremioPasswordInline" type="password" autocomplete="current-password" placeholder="Stremio password" value="${escH(S.stremioPassword||'')}" style="flex:1">
         </div>
-        <button type="button" data-action="create-stremio-account" style="margin-top:6px;font-size:.74rem;color:var(--th-accent);background:none;border:none;cursor:pointer;padding:0;font-weight:600">Create random account →</button>
-        <p class="fastlane-trust">Adds Core Builds to your Stremio account. Your other addons stay; only <b>Clean reinstall</b> replaces earlier Core Builds addons.</p>
+        <p class="ux-hint" id="expressCacheHint"></p>
       </div>
-    </div>
-    <div class="fastlane-section"><div class="fastlane-label">Defaults we’ll use</div>
-      <div class="fastlane-defaults" id="expressDefaults">${expressDefaultRows().map(([sec, name, val]) => `<button type="button" class="fastlane-default" data-express-customize="${sec}"><span class="fastlane-default-name">${name}</span><span class="fastlane-default-val">${val}</span><span class="fastlane-default-go" aria-hidden="true">›</span></button>`).join('')}</div>
-      <button type="button" class="fastlane-customize" data-express-customize="">Customize every setting →</button>
-    </div>
-    <details class="fastlane-optional"><summary style="cursor:pointer;color:#8b949e;font-weight:700;letter-spacing:.04em;text-transform:uppercase">Optional</summary>
-      <div class="u-mt8"><div style="font-size:.64rem;font-weight:800;color:#8b949e;letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px">Device</div>
-        <div class="fastlane-grid services devices cols-4">${[['generic','Standard'],['shield','NVIDIA Shield'],['firestick-4kmax','Fire Stick 4K Max'],['googletv','Google TV'],['samsung','Samsung TV'],['onn','onn 4K'],['appletv-new','Apple TV 4K'],['windows','Windows PC']].map(([v,n])=>`<button type="button" class="fastlane-choice${state.device===v?' active':''}" data-express-device="${v}"><b>${n}</b></button>`).join('')}</div>
+    </section>
+    <details class="fastlane-optional ux-advanced ux-more" id="expressAdvanced"><summary><span class="ux-more-title">Options &amp; defaults</span><span class="ux-advanced-hint">Device, resolution, speed, profile, language</span></summary>
+      <div class="u-mt8"><div class="fastlane-label">Device</div>
+        <div class="fastlane-grid services devices cols-4 ux-pill-grid" role="radiogroup" aria-label="Device">${[['generic','Standard'],['lgtv','LG webOS'],['firestick-hd','Low-RAM Android'],['shield','NVIDIA Shield'],['firestick-4kmax','Fire Stick 4K Max'],['googletv','Google TV'],['samsung','Samsung TV'],['onn','onn 4K'],['appletv-new','Apple TV 4K'],['windows','Windows PC']].map(([v,n])=>`<button type="button" class="fastlane-choice${state.device===v?' active':''}" data-express-device="${v}"><b>${n}</b></button>`).join('')}</div>
+        <p class="ux-spec" id="expressDeviceSpec"></p>
       </div>
-      <div class="u-mt8"><div style="font-size:.64rem;font-weight:800;color:#8b949e;letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px">Resolution</div>
-        <div class="fastlane-grid services cols-3">${[['4k','4K','2160p primary · 1080p fallback'],['1080p','1080p','Excludes 4K'],['mixed','Mixed','Adaptive · no hard caps']].map(([v,n,d])=>`<button type="button" class="fastlane-choice${state.resolution===v?' active':''}" data-express-res="${v}"><b>${n}</b><span>${d}</span></button>`).join('')}</div>
+      <div class="u-mt8"><div class="fastlane-label">Resolution</div>
+        <div class="fastlane-grid services cols-3 ux-pill-grid" role="radiogroup" aria-label="Resolution">${[['4k','4K','2160p primary · 1080p fallback'],['1080p','1080p','Excludes 4K'],['mixed','Mixed','Adaptive · no hard caps']].map(([v,n,d])=>`<button type="button" class="fastlane-choice${state.resolution===v?' active':''}" data-express-res="${v}"><b>${n}</b><span>${d}</span></button>`).join('')}</div>
       </div>
+      <fieldset class="ux-pill-field"><legend>Connection speed · Mbps</legend><p class="fastlane-trust">Sets the existing bandwidth policy's bitrate cap to 80% of your connection speed. Auto leaves the manual connection cap unset; existing device and profile limits still apply.</p><div class="ux-pill-grid" id="expressBandwidthPills" role="radiogroup" aria-label="Connection speed">${[0,25,50,100,250].map(v => `<button type="button" class="chip-btn" role="radio" data-express-bandwidth="${v}">${v ? v+' Mbps' : 'Auto'}</button>`).join('')}<button type="button" class="chip-btn" role="radio" data-express-bandwidth="custom">Custom</button></div></fieldset>
+      <label class="fastlane-sublabel" for="expressBandwidth">Custom connection speed · Mbps</label><input class="fastlane-field" id="expressBandwidth" type="number" min="1" max="10000" inputmode="numeric" placeholder="Auto" value="${Number(S.bandwidthMbps)||''}" data-action="set-bandwidth">
+      ${pillSelectHtml('expressOutputProfile', 'Template profile', ['stable','balanced','advanced','labs'].map(v => [v, OUTPUT_PROFILE_INFO[v].label + (v==='stable'?' · Recommended':'')]), activeOutputProfile())}<p class="fastlane-trust">Core Stable is the default for fresh sessions. Advanced and Labs change fetching behaviour; review before installing.</p>
       <div class="u-mt8"><label for="expressLang" class="fastlane-sublabel">Language you watch in</label>
         <select class="fastlane-field" id="expressLang">${LANG_OPTS.map(l => `<option value="${l.v}"${state.lang === l.v ? ' selected' : ''}>${l.v}</option>`).join('')}</select>
         <p class="fastlane-trust">Releases in this language come first when everything else is equal. English and original-audio releases still show.</p>
       </div>
-      <label style="display:flex;align-items:flex-start;gap:8px;cursor:pointer;margin-top:8px"><input type="checkbox" id="expressFullStack" ${S.installAIOMeta !== false?'checked':''} style="margin-top:2px"><span style="color:#c9d5df"><b class="u-tx">Full stack</b><br><span class="u-tx2">Install AIOMetadata + patch Cinemeta for better posters and catalogs. Cinebye, a separate service, makes the Cinemeta patch using your Stremio sign-in.</span></span></label>
-      <label style="display:flex;align-items:flex-start;gap:8px;cursor:pointer;margin-top:8px"><input type="checkbox" id="expressClean" ${S.cleanInstall?'checked':''} style="margin-top:2px"><span style="color:#c9d5df"><b class="u-tx">Clean reinstall</b><br><span class="u-tx2">Remove previous Core Builds addons from your Stremio account.</span></span></label>
-      <div class="u-mt8"><input class="fastlane-field" id="expressTmdb" type="password" autocomplete="off" spellcheck="false" placeholder="TMDB Read Access Token (optional — improves matching)" value="${escH(S.tmdbToken||'')}" style="width:100%"></div>
+      <label class="ux-toggle-row"><input type="checkbox" id="expressFullStack" ${S.installAIOMeta !== false?'checked':''}><span class="ux-toggle-copy"><b class="u-tx">Full stack</b><br><span class="u-tx2">Install AIOMetadata + patch Cinemeta for better posters and catalogs. Cinebye, a separate service, makes the Cinemeta patch using your Stremio sign-in.</span></span></label>
+      <label class="ux-toggle-row"><input type="checkbox" id="expressClean" ${S.cleanInstall?'checked':''}><span class="ux-toggle-copy"><b class="u-tx">Clean reinstall</b><br><span class="u-tx2">Remove previous Core Builds addons from your Stremio account.</span></span></label>
+      <div class="u-mt8"><div class="input-action-wrap"><input class="fastlane-field" id="expressTmdb" type="password" autocomplete="off" spellcheck="false" placeholder="TMDB Read Access Token (optional — improves matching)" value="${escH(S.tmdbToken||'')}" style="width:100%"><button type="button" class="input-paste-btn" data-action="paste-input" data-target="expressTmdb">Paste</button></div></div>
+      <div class="fastlane-section"><div class="fastlane-label">Defaults we’ll use</div>
+      <div class="fastlane-defaults" id="expressDefaults">${expressDefaultRows().map(([sec, name, val]) => `<button type="button" class="fastlane-default" data-express-customize="${sec}"><span class="fastlane-default-name">${name}</span><span class="fastlane-default-val">${val}</span><span class="fastlane-default-go" aria-hidden="true">›</span></button>`).join('')}</div>
+      <button type="button" class="fastlane-customize" data-express-customize="">Customize every setting →</button>
+      </div>
     </details>
+    </div><aside class="ux-aside">
+    <section class="ux-review" aria-labelledby="ux-review-title"><h3 class="ux-step-label" id="ux-review-title">Your build</h3><div id="expressSummary" class="fastlane-summary ux-sum"></div>${telemetryHtml()}</section>
     <div class="fastlane-foot">
-      <div id="expressSummary" class="fastlane-summary"></div>
       <button class="fastlane-go" id="expressGo" style="width:100%">Install in ~30 seconds</button><div class="u-mt10" id="aioResult"></div><button id="btnAutoCreate" style="display:none" aria-hidden="true"></button></div>
+    </aside></div>
   </div>`;
   document.body.appendChild(overlay);
   try { history.pushState({ ...(history.state || {}), expressLane: true }, ''); } catch(e) {}
+  const syncRadioGroup = (selector, value, key) => {
+    overlay.querySelectorAll(selector).forEach(button => {
+      const active = button.dataset[key] === String(value);
+      button.setAttribute('role', 'radio'); button.setAttribute('aria-checked', String(active));
+      button.tabIndex = active ? 0 : -1; button.classList.toggle('active', active);
+    });
+    const buttons = [...overlay.querySelectorAll(selector)];
+    if (buttons.length && !buttons.some(b => b.tabIndex === 0)) buttons[0].tabIndex = 0;
+  };
+  const syncBandwidth = () => {
+    const mbps = Number(document.getElementById('expressBandwidth').value) || 0;
+    syncRadioGroup('[data-express-bandwidth]', [0,25,50,100,250].includes(mbps) ? String(mbps) : 'custom', 'expressBandwidth');
+  };
+  syncRadioGroup('[data-express-device]', state.device, 'expressDevice');
+  syncRadioGroup('[data-express-res]', state.resolution, 'expressRes');
+  syncBandwidth();
+  overlay.addEventListener('keydown', e => {
+    const radio = e.target.closest('[role="radio"]');
+    const group = radio?.closest('[role="radiogroup"]');
+    if (!radio || !group || !['ArrowRight','ArrowDown','ArrowLeft','ArrowUp','Home','End'].includes(e.key)) return;
+    e.preventDefault();
+    const buttons = [...group.querySelectorAll('[role="radio"]')];
+    const index = buttons.indexOf(radio), delta = ['ArrowLeft','ArrowUp'].includes(e.key) ? -1 : 1;
+    const next = buttons[e.key === 'Home' ? 0 : e.key === 'End' ? buttons.length-1 : (index+delta+buttons.length)%buttons.length];
+    next.focus(); next.click();
+  });
+  overlay.addEventListener('click', e => {
+    const button = e.target.closest('[data-pill-value]');
+    if (!button) return;
+    const group = button.closest('[data-pill-select]');
+    const select = document.getElementById(group.dataset.pillSelect);
+    select.value = button.dataset.pillValue;
+    syncRadioGroup(`#${group.id} [data-pill-value]`, select.value, 'pillValue');
+    select.dispatchEvent(new Event('change', { bubbles: true }));
+  });
+  const bandwidthInput = document.getElementById('expressBandwidth');
+  bandwidthInput.addEventListener('input', syncBandwidth);
+  bandwidthInput.addEventListener('change', () => {
+    const mbps = Math.floor(Number(bandwidthInput.value));
+    bandwidthInput.value = Number.isFinite(mbps) && mbps > 0 ? String(Math.min(mbps, 10000)) : '';
+    syncBandwidth();
+  });
   document.getElementById('expressHost')?.addEventListener('change', e => { S.instanceHost = e.target.value; saveState(); probeExpressHost(); refreshExpressSummary(); });
   _expressLaneService = state.service;
   probeExpressHost();
@@ -7772,6 +7808,7 @@ function showExpressLane() {
   const expressPayload = () => ({
     service: state.service,
     target: state.target,
+    mode: state.mode,
     creds: Object.fromEntries([...overlay.querySelectorAll('[data-express-cred]')].map(i => [i.dataset.expressCred, i.value.trim()])),
     stremioEmail: document.getElementById('stremioEmailInline')?.value.trim() || '',
     stremioPassword: document.getElementById('stremioPasswordInline')?.value || '',
@@ -7793,13 +7830,51 @@ function showExpressLane() {
     const tgtName = { app:'Stremio', nuvio:'Nuvio', wuplay:'WuPlay', chillio:'Chillio', manifest:'Manifest URL' }[state.target] || 'Stremio';
     const cacheName = S.cacheMode === 'cached' ? '⚡ Cached only' : S.cacheMode === 'uncached' ? 'Uncached only' : 'Mixed cache (uncached may download first)';
     const fsOn = document.getElementById('expressFullStack')?.checked;
-    elSum.innerHTML = `${escHtml(svcName)} → ${escHtml(tgtName)} · ${profName} · ${escHtml(resName)} · ${escHtml(state.lang)} · <b style="color:${S.cacheMode==='cached'?'#34d399':'#fbbf24'}">${cacheName}</b> · host ${escHtml(HOST_LABEL_MAP[S.instanceHost] || S.instanceHost || 'auto')}${fsOn ? ' · <span class="u-purple">+ full stack (AIOMetadata + Cinemeta patch)</span>' : ''}`;
+    const chip = (t, cls = '') => `<span class="ux-chip${cls}">${t}</span>`;
+    elSum.innerHTML = [chip(`${escHtml(svcName)} → ${escHtml(tgtName)}`), chip(OUTPUT_PROFILE_INFO[activeOutputProfile()].label), chip(`search ${profName}`), chip(escHtml(resName)), chip(escHtml(state.lang)), chip(cacheName, S.cacheMode === 'cached' ? ' ok' : ' warn'), chip(`host ${escHtml(HOST_LABEL_MAP[S.instanceHost] || S.instanceHost || 'auto')}`), fsOn ? chip('+ full stack (AIOMetadata + Cinemeta patch)') : ''].join('');
+    const ph = document.getElementById('expressProfileHint');
+    if (ph) { const pr = EXPRESS_PROFILES.find(([v]) => v === state.profile); ph.textContent = pr ? pr[2] + (state.profile === 'balanced' ? ' · Recommended' : '') : ''; }
+    const ch = document.getElementById('expressCacheHint');
+    if (ch) ch.textContent = S.cacheMode === 'cached' ? 'Instant play only. Anything that still needs downloading is hidden.' : S.cacheMode === 'uncached' ? 'Uncached only, as set in the full builder.' : 'Cached first. Uncached results can download to your debrid first.';
   };
+  const refreshDeliveryMode = () => {
+    if (!overlay.isConnected) return;
+    const direct = state.mode === 'direct' && state.target === 'app';
+    document.getElementById('expressStremio').hidden = !direct;
+    document.getElementById('expressStremio').style.display = direct ? '' : 'none';
+    overlay.querySelectorAll('[data-express-mode]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.expressMode === state.mode)));
+    document.getElementById('expressModeHelp').textContent = state.mode === 'json'
+      ? 'Export a local JSON file. Provider keys, if entered, are included — keep the file private. No host is contacted for export.'
+      : direct ? 'Authenticate with Stremio and install into your account. Your account password stays in memory only.'
+      : 'Create a config on your selected AIOStreams host, then copy its manifest URL. No Stremio sign-in required.';
+    document.getElementById('expressGo').textContent = state.mode === 'json' ? 'Export Template JSON' : 'Install in ~30 seconds';
+  };
+  document.getElementById('expressOutputProfile').addEventListener('change', e => {
+    S.outputProfile = e.target.value; saveState(); refreshExpressSummary();
+  });
+  const refreshDeviceSpec = () => {
+    const hint = DEVICE_BANDWIDTH_HINTS[state.device];
+    document.getElementById('expressDeviceSpec').textContent = `${label('device', state.device) || 'Standard'} · ${hint ? 'Recommended connection: ' + hint.recommended + ' Mbps+' : 'Device defaults applied'} · Audio follows your search preference`;
+  };
+  refreshDeviceSpec();
+  refreshDeliveryMode();
   refreshExpressSummary();
   document.getElementById('expressFullStack')?.addEventListener('change', refreshExpressSummary);
   document.getElementById('expressLang')?.addEventListener('change', e => { state.lang = e.target.value; refreshExpressSummary(); });
   overlay.addEventListener('click', e => {
     if (e.target === overlay || e.target.closest('#expressClose') || e.target.closest('[data-express-back]')) { closeLane(); return; }
+    const bandwidthBtn = e.target.closest('[data-express-bandwidth]');
+    if (bandwidthBtn) {
+      const input = document.getElementById('expressBandwidth');
+      if (bandwidthBtn.dataset.expressBandwidth === 'custom') {
+        document.getElementById('expressAdvanced').open = true; input.focus(); return;
+      }
+      input.value = bandwidthBtn.dataset.expressBandwidth;
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+      syncBandwidth(); refreshExpressSummary(); return;
+    }
+    const modeBtn = e.target.closest('[data-express-mode]');
+    if (modeBtn) { state.mode = modeBtn.dataset.expressMode; refreshDeliveryMode(); return; }
     const svcBtn = e.target.closest('[data-express-service]');
     if (svcBtn) {
       state.service = svcBtn.dataset.expressService;
@@ -7825,6 +7900,7 @@ function showExpressLane() {
       overlay.querySelectorAll('[data-express-target]').forEach(b => b.classList.toggle('active', b.dataset.expressTarget === state.target));
       const box = document.getElementById('expressStremio');
       if (box) box.style.display = state.target === 'app' ? '' : 'none';
+      refreshDeliveryMode();
       refreshExpressSummary();
       return;
     }
@@ -7838,6 +7914,7 @@ function showExpressLane() {
       // The profile's resolution too: Quick install passes its own resolution to
       // applyExpressChoices, which overrides the profile's, so Fast used to build 4K.
       state.resolution = state.profile === 'fast' ? '1080p' : '4k';
+      syncRadioGroup('[data-express-res]', state.resolution, 'expressRes');
       saveState();
       overlay.querySelectorAll('[data-express-cache]').forEach(b => b.classList.toggle('active', b.dataset.expressCache === S.cacheMode));
       overlay.querySelectorAll('[data-express-res]').forEach(b => b.classList.toggle('active', b.dataset.expressRes === state.resolution));
@@ -7847,6 +7924,8 @@ function showExpressLane() {
     const devBtn = e.target.closest('[data-express-device]');
     if (devBtn) {
       state.device = devBtn.dataset.expressDevice;
+      syncRadioGroup('[data-express-device]', state.device, 'expressDevice');
+      refreshDeviceSpec();
       overlay.querySelectorAll('[data-express-device]').forEach(b => b.classList.toggle('active', b.dataset.expressDevice === state.device));
       refreshExpressSummary();
       return;
@@ -7854,6 +7933,7 @@ function showExpressLane() {
     const resBtn = e.target.closest('[data-express-res]');
     if (resBtn) {
       state.resolution = resBtn.dataset.expressRes;
+      syncRadioGroup('[data-express-res]', state.resolution, 'expressRes');
       overlay.querySelectorAll('[data-express-res]').forEach(b => b.classList.toggle('active', b.dataset.expressRes === state.resolution));
       refreshExpressSummary();
       return;
@@ -7899,7 +7979,7 @@ function showExpressLane() {
       }
       const goBtn = document.getElementById('expressGo');
       if (goBtn) { goBtn.disabled = true; goBtn.textContent = 'Installing…'; }
-      runExpressInstall(payload).finally(() => { if (goBtn) { goBtn.disabled = false; goBtn.textContent = 'Install in ~30 seconds'; } });
+      runExpressInstall(payload).finally(() => { if (goBtn) { goBtn.disabled = false; refreshDeliveryMode(); } });
     }
   });
   document.getElementById('expressClose').focus();
@@ -7955,7 +8035,8 @@ function expressDefaultRows() {
 
 async function runExpressInstall(p) {
   const isFree = p.service === 'p2p';
-  if (p.target === 'app' && !isFree) {
+  if (p.mode === 'json') { applyExpressChoices(p); S.quickStart = true; saveState(); await generate(); return; }
+  if (p.target === 'app' && p.mode !== 'manifest' && !isFree) {
     if (!p.stremioEmail || !p.stremioPassword) { showToast('Add your Stremio login or create a random account', true); return; }
     S.stremioEmail = p.stremioEmail; S.stremioPassword = p.stremioPassword;
   }
@@ -8010,13 +8091,13 @@ async function runExpressInstall(p) {
       return;
     }
   }
-  S.installMode = p.target === 'app' ? 'direct' : 'manifest';
+  S.installMode = p.target === 'app' && p.mode !== 'manifest' ? 'direct' : 'manifest';
   saveState();
   try {
     // Renders progress + result into the modal's #aioResult.
     // Chillio keeps its own tab in the manifest modal; every other non-Stremio
     // target (WuPlay, Nuvio, Other app) collapses to the generic manifest tab.
-    await simpleInstall(p.target === 'app' ? 'app' : (p.target === 'chillio' ? 'chillio' : 'manifest'), { profile: p.profile });
+    await simpleInstall(p.target === 'app' && p.mode !== 'manifest' ? 'app' : (p.target === 'wuplay' ? 'wuplay' : (p.target === 'chillio' ? 'chillio' : 'manifest')), { profile: p.profile });
   } catch (err) {
     showToast('Install failed: ' + (err?.message || err), true);
   }
@@ -8107,6 +8188,45 @@ function showDiagnosticsModal() {
   document.getElementById('diagClose').focus();
 }
 
+// Presentation-only observer: progress advances only after the corresponding
+// real compile / host / compatibility / relay / account operation has returned.
+// It neither performs requests nor controls the install pipeline.
+function showDeploymentProgress(labels) {
+  const previous = document.activeElement;
+  document.getElementById('deploymentProgress')?.remove();
+  const dialog = document.createElement('dialog');
+  dialog.id = 'deploymentProgress';
+  dialog.className = 'deployment-progress';
+  dialog.setAttribute('aria-labelledby', 'deploymentTitle');
+  dialog.innerHTML = '<h2 id="deploymentTitle">Build diagnostics</h2><p id="deploymentStatus" role="status" aria-live="polite">Working…</p><progress id="deploymentBar" max="1" value="0" aria-label="Completed deployment stages"></progress><ol id="deploymentSteps"></ol><p class="ux-diagnostics-note">Closing diagnostics does not cancel the deployment.</p><button type="button" id="deploymentClose">View result / close diagnostics</button>';
+  const list = dialog.querySelector('ol');
+  labels.forEach(label => { const li = document.createElement('li'); li.textContent = label; li.dataset.state = 'pending'; list.appendChild(li); });
+  const bar = dialog.querySelector('progress');
+  bar.max = labels.length;
+  const close = () => { dialog.close(); dialog.remove(); if (previous?.isConnected) previous.focus(); };
+  dialog.querySelector('button').addEventListener('click', close);
+  dialog.addEventListener('cancel', e => { e.preventDefault(); close(); });
+  document.body.appendChild(dialog);
+  dialog.showModal();
+  return {
+    advance(count, text) {
+      bar.value = count;
+      [...list.children].forEach((li, i) => { if (li.dataset.state !== 'skipped') li.dataset.state = i < count ? 'done' : i === count ? 'running' : 'pending'; });
+      dialog.querySelector('p').textContent = text;
+    },
+    skip(index, text) {
+      if (list.children[index]) { list.children[index].dataset.state = 'skipped'; list.children[index].textContent = text; }
+    },
+    settle(ok, text) {
+      dialog.dataset.outcome = ok ? 'success' : 'attention';
+      if (ok) { bar.value = labels.length; [...list.children].forEach(li => { if (li.dataset.state !== 'skipped') li.dataset.state = 'done'; }); }
+      else { [...list.children].filter(li => li.dataset.state === 'running').forEach(li => { li.dataset.state = 'failed'; }); }
+      dialog.querySelector('p').textContent = text;
+    },
+    close,
+  };
+}
+
 async function simpleInstall(target, { profile = '' } = {}) {
   if (!S.service) { showToast('Pick a service first — go back to step 1', true); return; }
   // ChillLink carries direct URLs only — AIOStreams' ChillLink transformer drops
@@ -8156,7 +8276,9 @@ async function simpleInstall(target, { profile = '' } = {}) {
   if (isFree) {
     btn.disabled = true; btn.innerHTML = `<span class="dot-spin"><span></span><span></span><span></span></span> Creating import link…`;
     result.innerHTML = '';
+    const freeProgress = showDeploymentProgress(['Creating a credential-stripped import link']);
     const importUrl = await uploadTemplateForImport();
+    freeProgress.settle(Boolean(importUrl), importUrl ? 'Import link ready — manual setup still required' : 'Import link unavailable');
     btn.disabled = false; btn.innerHTML = origHtml;
     if (importUrl) {
       saveLastGen();
@@ -8188,8 +8310,11 @@ async function simpleInstall(target, { profile = '' } = {}) {
   const hostLabels = {};
   _allHosts.forEach(([n, u]) => { hostLabels[u] = n; });
 
+  const deployment = showDeploymentProgress(['Compile manifest configuration', 'Check AIOStreams host & latency', 'Check host regex compatibility', 'Save configuration through relay', target === 'app' ? 'Install & verify Stremio addons' : 'Prepare your install link']);
+  deployment.advance(1, 'Configuration compiled locally. Checking your selected host…');
   try {
     const fastest = await resolveInstallHost(4000);
+    deployment.advance(2, 'Host selected. Checking regex compatibility…');
     // Regex-allowlist preflight (2026-09-06 race diagnosis): the same union
     // the host validates (synced URLs resolved live + inline patterns),
     // checked against the host's own allowlist before the POST that would
@@ -8197,10 +8322,13 @@ async function simpleInstall(target, { profile = '' } = {}) {
     // it must never create one.
     const rgx = await regexGateForHost(fastest, cfg);
     if (rgx.status === 'blocked') {
+      deployment.settle(false, 'Host compatibility blocked this build. Review the result below.');
       btn.disabled = false; btn.innerHTML = 'Install';
       result.innerHTML = hostRoutingNoticeHtml({ status: 'blocked', reasons: [rgx.reason] });
       return;
     }
+    if (rgx.status === 'skip') deployment.skip(2, 'Host regex compatibility — not independently verified');
+    deployment.advance(3, rgx.status === 'skip' ? 'Regex check unavailable; proceeding under existing host policy.' : 'Compatibility check returned. Saving configuration…');
     const res = await writeHostFetch(fastest, '/api/v1/user', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ config:cfg, password:pwd }) }, 8000);
     const data = await res.json().catch(() => ({}));
     if (!res.ok || data?.success === false) {
@@ -8208,6 +8336,7 @@ async function simpleInstall(target, { profile = '' } = {}) {
       throw new Error(`API_ERROR:${apiMsg}`);
     }
     {
+      deployment.advance(4, 'AIOStreams acknowledged the save.');
       const uuid = data?.data?.uuid || data?.uuid || data?.user?.uuid || data?.id;
       const epwd = data?.data?.encryptedPassword || encodeURIComponent(pwd);
       if (uuid) { S.instanceUuid = uuid; S.instancePassword = pwd; saveState(); recordSavedConfig(fastest, uuid, cfg); }
@@ -8236,9 +8365,11 @@ async function simpleInstall(target, { profile = '' } = {}) {
             const stackColour = stackResult.ok ? '#3fb950' : '#fbbf24';
             result.innerHTML = `<div style="margin-top:10px;padding:12px 14px;border-radius:10px;background:rgba(63,185,80,.06);border:1px solid rgba(63,185,80,.2)"><div style="font-size:.82rem;font-weight:700;color:${stackColour};margin-bottom:4px">${ICO.check(14,stackColour)} ${stackTitle}</div><div style="font-size:.78rem;color:#8b949e">${stackResult.ok?'The requested addons were read back from your account successfully. Reopen Stremio to see your new setup.':'AIOStreams was verified, but one or more optional full-stack operations did not verify. Review the details below.'}</div>${stackHtml}<div style="margin-top:8px;font-size:.74rem;color:#6b7280">Config password: <code style="background:rgba(255,255,255,.05);padding:2px 6px;border-radius:4px;font-size:.72rem;color:#e6edf3">${pwd.replace(/&/g,'&amp;').replace(/</g,'&lt;')}</code> — save it for later edits</div></div>`;
           }
+          deployment.settle(stackResult.ok, stackResult.ok ? 'Install verified in your Stremio library.' : 'AIOStreams installed; optional stack needs attention.');
           showToast(stackResult.ok ? 'Install verified in your Stremio library' : 'AIOStreams verified; optional stack needs attention', !stackResult.ok);
           return;
         } catch(err) {
+          deployment.settle(false, 'Stremio verification stopped. A manual manifest link is available below.');
           btn.disabled = false; btn.innerHTML = origHtml;
           result.innerHTML = `<div style="margin-top:10px;padding:12px 14px;border-radius:10px;background:rgba(248,113,113,.06);border:1px solid rgba(248,113,113,.2)"><div style="font-size:.82rem;font-weight:700;color:#f87171;margin-bottom:4px">Stremio install stopped safely</div><div style="font-size:.78rem;color:#8b949e">${esc(err.message || 'Something went wrong')}</div><div style="margin-top:8px;font-size:.76rem;color:#6b7280">Your config was created successfully — use the manifest URL below to install manually.</div><div style="margin-top:6px;display:flex;gap:6px;align-items:stretch"><div class="manifest-url" style="flex:1;min-width:0;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.72rem;padding:8px 10px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:6px;color:#8b949e;cursor:pointer" data-action="copy-manifest" data-url="${manifestUrl.replace(/"/g,'&quot;')}">${escHtml(manifestUrl)}</div><button data-action="copy-manifest" data-url="${manifestUrl.replace(/"/g,'&quot;')}" style="flex-shrink:0;padding:0 12px;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.28);border-radius:6px;color:#00d4ff;font-size:.8rem;font-weight:700;cursor:pointer">Copy</button></div></div>`;
           return;
@@ -8247,11 +8378,13 @@ async function simpleInstall(target, { profile = '' } = {}) {
       btn.disabled = false; btn.innerHTML = origHtml;
       // The manifest modal is a z-index 200 layer; Express sits at 10020. Close
       // Express first or the URL the user came for opens hidden behind it.
+      deployment.close();
       document.getElementById('expressLaneModal')?.remove();
       showManifestModal(manifestUrl, pwd, hostLbl, target);
       return;
     }
   } catch(e) {
+    deployment.settle(false, 'Deployment did not complete. Review the error or recovery link below.');
     if (e.message && e.message.startsWith('HOST_')) {
       btn.disabled = false; btn.innerHTML = origHtml;
       result.innerHTML = hostErrorHtml(e.message);
@@ -8859,6 +8992,14 @@ if (new URLSearchParams(location.search).get('cb-e2e') === '1') {
     },
     checkUpdate() {
       return checkForTemplateUpdate(true);
+    },
+    webVitalsReady() {
+      return typeof _cbWebVitalsSend === 'function';
+    },
+    webVitalsSend(name, value) {
+      if (typeof _cbWebVitalsSend !== 'function') return false;
+      _cbWebVitalsSend(name, value);
+      return true;
     },
   };
 }

@@ -38,8 +38,9 @@ test('media width tiers are the documented set only (phone 599/480, express 640,
   assert.ok(tiers.has(599), 'the phone band must exist');
 });
 
-test('splash preview wall ships honest, layout-stable images', () => {
-  const wall = app.match(/class="hybrid-wall[\s\S]*?<\/div>/);
+test('the formatter preview wall ships honest, layout-stable images', () => {
+  // v3.33: the previews moved from the main page to All Core Tools.
+  const wall = readFileSync(new URL('../../tools/index.html', import.meta.url), 'utf8').match(/class="hybrid-wall[\s\S]*?<\/div>/);
   assert.ok(wall, 'the formatter preview wall must be on the splash');
   const imgs = wall[0].match(/<img [^>]*>/g) || [];
   assert.equal(imgs.length, 6, 'six curated formatter previews (not all 19 — a scroller, not a dump)');

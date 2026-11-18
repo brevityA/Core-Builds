@@ -1,14 +1,78 @@
 ---
-title: "What's New — Configurator v3.32"
+title: "What's New — Configurator v3.33"
 sidebarTitle: "What's New"
-description: "Latest Core Builds Configurator releases (v3.32 and earlier), auto-generated from the in-app changelog."
+description: "Latest Core Builds Configurator releases (v3.33 and earlier), auto-generated from the in-app changelog."
 ---
 
 # What's New in the Configurator
 
-This page is regenerated from `configurator/src/data/changelog.js` by `scripts/sync-docs.py`, so it always reflects the latest shipped configurator version (currently **v3.32**).
+This page is regenerated from `configurator/src/data/changelog.js` by `scripts/sync-docs.py`, so it always reflects the latest shipped configurator version (currently **v3.33**).
 
 For the template-suite release log, see the [Changelog](https://corebuilds-docs.docsalot.dev/changelog).
+
+## Configurator v3.33 (Nov 18 2026)
+
+<CardGroup cols={2}>
+  <Card title="A one-screen main page" icon="sparkles">
+    the Core mark, the Core Builds name and the version, then six equal rows: Core Builds (opens Quick install), Template Inspector, Back Up Addons, Nuvio Stack Genie, Core Badge Builder and All Core Tools. Each row has a hexagon icon and a short tag saying what it is.
+  </Card>
+  <Card title="Support and shortcuts" icon="bolt">
+    a Support Core Builds button sits under the rows, and Custom build, Guided setup, update, import, the tour, template compare, what’s new and Report an issue are one tap away on All Core Tools. Each also has its own link (for example …/configurator/#advanced), and the links now work while the page is open as well as on first load.
+  </Card>
+  <Card title="Smooth page changes" icon="shield-check">
+    moving between the configurator and the tool pages cross-fades instead of flashing white, the main page’s rows rise in, and Quick install glides up. All of it switches off when your device asks for reduced motion.
+  </Card>
+  <Card title="Quick install, redesigned" icon="sliders">
+    three labelled steps: where to install, your service, and your preferences. Apps and services are full-width rows with logos from the Core Builds Icon Pack; what matters most and streams shown are one-tap switches. On a computer your build summary and the Install button stay pinned on the right.
+  </Card>
+  <Card title="Delivery up front" icon="gauge">
+    Direct Install, Manifest URL or Raw JSON is the first switch in Quick install, so you can export the template file without signing in to Stremio or contacting a host. Device, resolution, connection speed, template profile, language, Full stack, Clean reinstall and TMDB sit under Options & defaults.
+  </Card>
+  <Card title="Every install target kept" icon="wand">
+    Stremio, Nuvio, WuPlay, Chillio and Other app all stay in Quick install, on the Review screen and in the manifest window, and the Nuvio Stack Genie still hands off into Nuvio.
+  </Card>
+  <Card title="Install progress you can trust" icon="layers">
+    a progress window ticks each step (host check, regex check, save, install) only after it finishes, and marks a check it could not run as not verified. The last step names your target: Stremio, or your install link for every other app.
+  </Card>
+  <Card title="Paste and show buttons on key fields" icon="bug">
+    every provider key, TMDB and manifest field gets a Paste button and a show or hide toggle. Connection speed has 25, 50, 100 and 250 Mbps presets, and the bitrate cap stays at 80% of it.
+  </Card>
+  <Card title="A better message form" icon="sparkles">
+    pick Problem, Idea, Question or Thanks and the form says what to include, with a Start with a template button that fills in an outline. Your name is optional, the setup details it attaches are shown with a switch to leave them out (never keys or passwords), and a draft survives closing the panel. If a message cannot be sent you see why, and get Copy message, Discord and GitHub issue buttons so nothing is lost.
+  </Card>
+  <Card title="Feedback carries your current setup" icon="bolt">
+    the message form attached setup details from your last saved state instead of the build on screen; it now reads the live one.
+  </Card>
+  <Card title="All Core Tools, regrouped" icon="shield-check">
+    the tools page leads with the Template Builder, then configurator shortcuts, AIOStreams, Genies, Stremio account, and Speed & media, one row per tool. Stream card previews, what’s new and the built-in tools list fold away. Its Health Score and Troubleshooter links used to land on the plain main page because the site’s redirect dropped the link’s target; they now open the right screen.
+  </Card>
+  <Card title="Usage statistics are opt-in" icon="sliders">
+    page visits and downloads are counted only after you tick the box on Review or in Quick install; it starts unticked and never sends keys, account names or your configuration. (#839)
+  </Card>
+  <Card title="H.264 10-bit regex accepted again" icon="gauge">
+    restricted hosts such as ElfHosted refused every save because the H.264 10-bit pattern no longer matched their allowlist word for word after Vidhin05 rewrote it; the regex is re-synced from upstream. (#838)
+  </Card>
+  <Card title="Samsung TV 4K saves accepted again" icon="wand">
+    the same allowlist drift refused Samsung TV 4K setups on restricted hosts; the regex snapshot is re-pinned to upstream. (#822)
+  </Card>
+  <Card title="DV-Only Kill removes only Dolby Vision-only releases" icon="layers">
+    on Samsung, Fire Stick HD, Roku, projectors and other devices without Dolby Vision, the rule had its arguments reversed and removed the HDR10, HDR10+, HLG and SDR streams that lacked DV. It now removes only DV-only releases, and runs before the rules that count streams. (#841)
+  </Card>
+  <Card title="Elite REMUX pins work again" icon="bug">
+    the 4K and 1080p elite REMUX pins asked for the wrong field in each filter and matched nothing; FraMeSToR-class REMUXes are pinned to the top again. (#841)
+  </Card>
+  <Card title="Bad 1080P Bluray limited to new movies" icon="sparkles">
+    the rule now applies only in a movie’s first 90 days, so older movies keep the 1080p Bluray encodes it used to remove. Other quality filters are unchanged. (#841)
+  </Card>
+  <Card title="Titles named “AI” are no longer filtered out" icon="bolt">
+    the AI-upscale exclusion now needs an upscale word such as Upscaled or Enhanced. Restricted hosts accept only the original allowlisted pattern, so there the original is swapped in rather than dropped. (#841)
+  </Card>
+  <Card title="Generated output unchanged" icon="shield-check">
+    this release adds no config change of its own; the config changes since 3.32 are the four stream-selection fixes and two regex re-syncs listed above, already on the main branch.
+  </Card>
+</CardGroup>
+
+---
 
 ## Configurator v3.32 (Oct 31 2026)
 
@@ -59,21 +123,5 @@ For the template-suite release log, see the [Changelog](https://corebuilds-docs.
   </Card>
   <Card title="Generated output unchanged" icon="shield-check">
     every config the configurator and the CLI build is byte-for-byte what 3.29 produced apart from the version stamp; only the way an existing setup is updated changed.
-  </Card>
-</CardGroup>
-
----
-
-## Configurator v3.29 (Oct 30 2026)
-
-<CardGroup cols={2}>
-  <Card title="Quick install asks your language" icon="sparkles">
-    under Optional, filled in from your browser’s language (a language you already chose in Custom build wins). It goes first in the preferred-language list with English kept behind it, so releases in your language come first when everything else is equal. Nothing is made strict: English and original-audio releases still show.
-  </Card>
-  <Card title="Chinese saves again" icon="bolt">
-    the language list offered “Chinese (Simplified)” and “Chinese (Traditional)”, but AIOStreams only knows “Chinese”, so any config carrying either was refused when saved. Both are now “Chinese”, including in settings saved in your browser and in share links, and a test checks every offered language against AIOStreams’ own list.
-  </Card>
-  <Card title="Generated output unchanged" icon="shield-check">
-    for every setting that saved before, configs are byte-for-byte what 3.28 produced apart from the version stamp; only a build that picked a Chinese option changes, from refused to saved.
   </Card>
 </CardGroup>
