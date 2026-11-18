@@ -15,7 +15,7 @@ async function fresh(page) {
 }
 
 async function openDrawer(page) {
-  await page.locator('[data-action="custom-start"]').click();
+  await page.evaluate(() => { location.hash = ''; location.hash = '#advanced'; }); // deep link (the main page has no menu)
   await page.locator('[data-action="open-advanced"]').click();
   await expect(page.locator('#advancedDrawer')).toBeVisible();
 }

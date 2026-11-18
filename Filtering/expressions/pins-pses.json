@@ -1,6 +1,6 @@
 [
   {
-    "expression": "/* Elite 1080p Remux pin */ pin(releaseGroup(quality(resolution(streams, 'BluRay REMUX'), '1080p'), 'NTb', 'FLUX', 'KiNGS', 'NTG', 'BHDStudio', 'FraMeSToR', 'SiC', '126811'), 'top')",
+    "expression": "/* Elite 1080p Remux pin */ pin(releaseGroup(resolution(quality(streams, 'BluRay REMUX'), '1080p'), 'NTb', 'FLUX', 'KiNGS', 'NTG', 'BHDStudio', 'FraMeSToR', 'SiC', '126811'), 'top')",
     "enabled": true,
     "templates": [
       "4K AllDebrid",
@@ -11,7 +11,7 @@
     ]
   },
   {
-    "expression": "/* Elite 4K Remux pin */ pin(releaseGroup(quality(resolution(streams, 'BluRay REMUX'), '2160p'), 'FraMeSToR', 'DON', 'FLUX', 'HIFI', 'playBD', 'BMF', 'QxR', 'EPSiLON', 'BLURANiUM', 'PmP'), 'top')",
+    "expression": "/* Elite 4K Remux pin */ pin(releaseGroup(resolution(quality(streams, 'BluRay REMUX'), '2160p'), 'FraMeSToR', 'DON', 'FLUX', 'HIFI', 'playBD', 'BMF', 'QxR', 'EPSiLON', 'BLURANiUM', 'PmP'), 'top')",
     "enabled": true,
     "templates": [
       "4K AllDebrid",

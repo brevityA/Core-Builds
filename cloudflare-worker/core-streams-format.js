@@ -231,10 +231,14 @@ export function formatStream(stream, { inferHeight, inferSeeders }) {
   const spoken = parsed.languages.filter((language) => language !== 'Dual Audio');
   const languages = parsed.flags.length ? parsed.flags.join(' ') : spoken.join(', ');
   const group = releaseGroup(filename || release) || releaseGroup(release);
-  const tags = [group, ...parsed.editions, parsed.repack ? 'REPACK' : '', facts.pack ? 'Season pack' : ''].filter(Boolean);
+  // Episode requests carry their own line (ranked in core-streams-episode.js),
+  // which already says whether a pack's episode was selected.
+  const episode = facts.episode?.line || '';
+  const tags = [group, ...parsed.editions, parsed.repack ? 'REPACK' : '', facts.pack && !episode ? 'Season pack' : ''].filter(Boolean);
   const origin = [facts.source, tracker && tracker !== facts.source ? tracker : ''].filter(Boolean).join(' · ');
 
   const lines = [
+    episode ? `📺 ${episode}` : '',
     video.length ? `🎞 ${video.join(' · ')}` : '',
     [audio.length ? `🔊 ${audio.join(' · ')}` : '', dub ? `🎙 ${dub}` : '', languages ? `🌐 ${languages}` : ''].filter(Boolean).join(' · '),
     [formatSize(size) ? `📦 ${formatSize(size)}` : '', !facts.cached && stream.infoHash && seeders > 0 ? `👤 ${seeders}` : '', origin ? `🔎 ${origin}` : ''].filter(Boolean).join(' · '),
