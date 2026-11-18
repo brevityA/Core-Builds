@@ -2,12 +2,22 @@
   "metadata": {
     "id": "core-builds-base",
     "name": "Core Builds Base Config",
-    "version": "1.4.8",
+    "version": "1.4.10",
     "description": "Shared scraper + expression layer for all Core Builds templates. USAGE: (1) Import this file into AIOStreams to create the parent config and get its UUID. (2) In each child template, add: \"parentConfig\": {\"uuid\": \"PASTE_UUID_HERE\", \"password\": \"PASTE_PASSWORD_HERE\", \"mergeStrategies\": {\"presets\": \"extend\", \"services\": \"extend\", \"filters\": \"override\", \"sorting\": \"inherit\", \"formatter\": \"inherit\", \"branding\": \"override\", \"misc\": \"inherit\"}}. (3) Child template only needs: its service preset (stremthruTorz / stremthruStore), its PSEs, and its template-specific ESEs (Hard Resolution Kill, Score IQR Guard, DV-Only Kill, etc.). Scrapers, sort criteria, formatter, and universal ESEs all inherit from this parent. One update here propagates to all child templates instantly.",
     "sourceUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Core-Builds-Base-Config.json",
     "author": "Branding-Brevity",
     "category": "Base",
     "changelog": [
+      {
+        "date": "2026-11-18",
+        "version": "1.4.10",
+        "content": "Bad 1080P Bluray now applies only to movies in their first 90 days after release, so older movies keep the 1080p Bluray encodes this rule used to remove; other quality filters are unchanged."
+      },
+      {
+        "date": "2026-11-16",
+        "version": "1.4.9",
+        "content": "Inline regex sync: patterns re-derived from the current Vidhin05 English ranked list (H.264 10bit). No filter/sort/formatter changes."
+      },
       {
         "date": "2026-11-02",
         "version": "1.4.8",
@@ -399,7 +409,7 @@
         "enabled": true
       },
       {
-        "expression": "/*Bad 1080P Bluray*/(queryType=='movie') and count(quality(resolution(streams,'2160p'),'Bluray REMUX'))==0 and (count(quality(resolution(streams,'1080p'),'Bluray REMUX'))==0) and count(seadex(resolution(streams,'1080p')))==0? negate(merge(seadex(streams),library(streams)),quality(resolution(streams,'1080p'),'Bluray')):[]",
+        "expression": "/*Bad 1080P Bluray*/(queryType=='movie') and (daysSinceRelease >= 0 and daysSinceRelease < 90) and count(quality(resolution(streams,'2160p'),'Bluray REMUX'))==0 and (count(quality(resolution(streams,'1080p'),'Bluray REMUX'))==0) and count(seadex(resolution(streams,'1080p')))==0? negate(merge(seadex(streams),library(streams)),quality(resolution(streams,'1080p'),'Bluray')):[]",
         "enabled": true
       },
       {
@@ -1312,7 +1322,7 @@
       },
       {
         "name": "H.264 10bit",
-        "pattern": "/\\bhi10p?\\b|(?=.*10[.-]?bit)(?=.*\\b[xh][-_. ]?264\\b)/i",
+        "pattern": "/\\bhi10(?:p|res)?\\b|(?=.*(?:\\b10[ .\\-_]?bits?\\b|yuv4\\d\\dp10))(?=.*\\b(?:[xh][-_. ]?264|avc)\\b)/i",
         "score": 20
       },
       {

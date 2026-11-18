@@ -33,7 +33,7 @@ test('collectRegexPatternSet: a regex-scoring golden carries the synced URL + it
   const golden = JSON.parse(await readFile(new URL('../e2e/golden/torbox-4k-apex-mixed.json', import.meta.url), 'utf8'));
   const set = collectRegexPatternSet(golden.config);
   assert.deepEqual(set.syncedUrls, [VIDHIN_URL]);
-  // 83 unique: the 5 preferred + 3 excluded arrays overlap the 83 ranked entries
+  // 83 unique: the 5 preferred + 2 ElfHosted-allowlisted excluded arrays overlap the 83 ranked entries
   assert.equal(set.inline.size, 83);
 });
 

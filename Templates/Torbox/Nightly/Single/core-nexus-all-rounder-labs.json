@@ -5,7 +5,7 @@
     "description": "Nightly Labs build — single template for live-action TV, movies, and anime. Uses isAnime + hasSeaDex conditional PSEs to switch between anime and live-action quality tiers dynamically. Includes SeaDex, AnimeTosho, NekoBT, Meteor, Comet, MediaFusion, and all LABS features. v0.4.0: Private Tracker Kill for uncached private streams, DAF cached-count fix, catalog-content exemptions on Unknown Resolution/Quality Kills (15y+). Not a daily driver.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "0.4.8",
+    "version": "0.4.10",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -50,6 +50,16 @@
       }
     ],
     "changelog": [
+      {
+        "date": "2026-11-18",
+        "version": "0.4.10",
+        "content": "DV-Only Kill now removes only Dolby-Vision-only releases; it was removing the HDR10, HDR10+, HLG and SDR-tagged streams that lacked DV instead."
+      },
+      {
+        "date": "2026-11-16",
+        "version": "0.4.9",
+        "content": "Inline regex sync: patterns re-derived from the current Vidhin05 English ranked list (H.264 10bit). No filter/sort/formatter changes."
+      },
       {
         "date": "2026-11-02",
         "version": "0.4.8",
@@ -386,7 +396,7 @@
       },
       {
         "enabled": false,
-        "expression": "/* DV-Only Kill — enable for devices without Dolby Vision support (e.g. Samsung TV) */ negate(visualTag(streams, 'DV'), merge(visualTag(streams, 'HDR10+'), visualTag(streams, 'HDR10'), visualTag(streams, 'HDR'), visualTag(streams, 'HLG'), visualTag(streams, 'SDR')))"
+        "expression": "/* DV-Only Kill — enable for devices without Dolby Vision support (e.g. Samsung TV) */ negate(merge(visualTag(streams, 'HDR10+'), visualTag(streams, 'HDR10'), visualTag(streams, 'HDR'), visualTag(streams, 'HLG'), visualTag(streams, 'SDR')), visualTag(streams, 'DV'))"
       },
       {
         "enabled": true,
@@ -780,7 +790,7 @@
         "score": 20
       },
       {
-        "pattern": "/\\bhi10p?\\b|(?=.*10[.-]?bit)(?=.*\\b[xh][-_. ]?264\\b)/i",
+        "pattern": "/\\bhi10(?:p|res)?\\b|(?=.*(?:\\b10[ .\\-_]?bits?\\b|yuv4\\d\\dp10))(?=.*\\b(?:[xh][-_. ]?264|avc)\\b)/i",
         "name": "H.264 10bit",
         "score": 20
       },
