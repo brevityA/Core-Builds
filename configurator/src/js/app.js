@@ -1506,52 +1506,57 @@ function fmtDropdownHtml() {
   const isCustom = S.formatter === 'custom' && S.customFormatter;
   const allFmts = [...FORMATTERS];
   if (S.customFormatter) allFmts.push({ id:'custom', label:S.customFormatter.label||'Custom', badge:'Imported', bc:'#a78bfa', desc:'Your imported formatter' });
-  const cards = allFmts.map(f => {
+  const rows = allFmts.map(f => {
     const active = (isCustom && f.id === 'custom') || (!isCustom && f.id === S.formatter);
-    const p = corePreview(f.id) || enginePreview(f.id) || FMT_PREVIEWS[f.id] || FMT_PREVIEWS['family-v4'];
-    return `<div class="fmt-scroll-card" data-active="${active}" data-action="fmt-scroll-pick" data-fmt="${f.id}" role="button" tabindex="0" aria-pressed="${active}">
-      <div class="fmt-scroll-head">
-        <div class="fmt-scroll-dot" style="background:${f.bc}"></div>
-        <span class="fmt-scroll-label">${f.label}</span>
-        <span class="fmt-scroll-badge" style="background:${f.bc}22;color:${f.bc}">${f.badge}</span>
-      </div>
-      <div class="fmt-scroll-desc">${f.desc}</div>
-      <div class="fmt-live-preview">
-        <div class="fmt-live-poster">${ICO.film(14,'#6b7280')}</div>
-        <div class="fmt-live-lines">
-          <div class="fmt-live-n">${p.n}</div>
-          ${p.d.map(l=>`<div class="fmt-live-d">${l}</div>`).join('')}
-        </div>
-      </div>
-      <div class="fmt-preview-note">${p.rendered ? `Rendered by AIOStreams ${p.core ? CORE_PREVIEW_ENGINE_VERSION : FORMATTER_PREVIEW_ENGINE_VERSION}'s formatter for a sample stream` : 'Illustrative preview'}</div>
+    return `<div class="fmt-row" data-active="${active}" data-action="fmt-scroll-pick" data-fmt="${f.id}" role="button" tabindex="0" aria-pressed="${active}">
+      <span class="fmt-row-dot" style="background:${f.bc}" aria-hidden="true"></span>
+      <span class="fmt-row-main"><span class="fmt-row-name">${escHtml(f.label)}</span><span class="fmt-row-desc">${escHtml(f.desc)}</span></span>
+      <span class="fmt-row-tag">${escHtml(f.badge)}</span>
     </div>`;
   }).join('');
-  return `<div class="scroll-fade-wrap" data-scroll-start="true" data-scroll-end="false"><div class="fmt-scroll" id="fmtScroll">${cards}</div></div>${fmtScoreControlHtml()}<div class="fmt-compare-wrap">${fmtCompareHtml()}</div>`;
+  return `<div class="fmt-pick">${fmtStageHtml()}<div class="fmt-list" id="fmtScroll">${rows}</div></div>${fmtScoreControlHtml()}<div class="fmt-compare-wrap">${fmtCompareHtml()}</div>`;
+}
+
+/**
+ * The one large preview above the list: the selected formatter on a sample
+ * stream, as the app's results screen shows it. An imported formatter has no
+ * rendered preview, so it says so rather than borrowing another one's.
+ */
+function fmtStageHtml() {
+  const isCustom = S.formatter === 'custom' && S.customFormatter;
+  const id = isCustom ? 'custom' : (S.formatter || 'family-v4');
+  const f = isCustom ? { label: S.customFormatter.label || 'Custom', badge: 'Imported' } : (FORMATTERS.find(x => x.id === id) || FORMATTERS[0]);
+  const p = isCustom ? null : (corePreview(id) || enginePreview(id) || FMT_PREVIEWS[id]);
+  const body = p
+    ? `<div class="fmt-cmp-row"><div class="fmt-cmp-n">${p.n}</div><div class="fmt-cmp-d">${p.d.map(l => `<div>${l}</div>`).join('')}</div></div>`
+    : '<div class="fmt-cmp-blank">No preview for an imported formatter. Save a config and check it in your app.</div>';
+  const note = p && p.rendered
+    ? `Sample 4K REMUX stream, rendered by AIOStreams ${escHtml(p.core ? CORE_PREVIEW_ENGINE_VERSION : FORMATTER_PREVIEW_ENGINE_VERSION)}'s formatter. Fonts and emoji are your app's.`
+    : p ? 'Illustrative preview.' : '';
+  return `<div class="fmt-stage" aria-live="polite">
+    <div class="fmt-stage-head"><span class="fmt-stage-eyebrow">Preview</span><b class="fmt-stage-name">${escHtml(f.label)}</b><span class="fmt-row-tag">${escHtml(f.badge)}</span></div>
+    <div class="fmt-cmp-screen fmt-stage-screen">${body}</div>
+    ${note ? `<p class="fmt-preview-note">${note}</p>` : ''}
+  </div>`;
+}
+
+function refreshFmtStage() {
+  document.querySelectorAll('.fmt-stage').forEach(el => { el.outerHTML = fmtStageHtml(); });
 }
 
 function updateFmtFeatured() {
-  document.querySelectorAll('.fmt-scroll-card').forEach(card => {
+  document.querySelectorAll('.fmt-row').forEach(card => {
     const isSel = card.dataset.fmt === S.formatter;
     card.dataset.active = isSel ? 'true' : 'false';
     card.setAttribute('aria-pressed', String(isSel));
-    if (isSel) card.scrollIntoView({ behavior:'smooth', block:'nearest', inline:'center' });
   });
+  refreshFmtStage();
   document.querySelectorAll('.fmt-score').forEach(el => { el.hidden = !isCoreFormatter(S.formatter); });
 }
 
-/** Re-render the Core cards' previews after the score display changes. */
+/** Re-render the preview after the score display changes. */
 function updateCorePreviews() {
-  document.querySelectorAll('.fmt-scroll-card').forEach(card => {
-    const p = corePreview(card.dataset.fmt);
-    if (!p) return;
-    const n = card.querySelector('.fmt-live-n');
-    const lines = card.querySelector('.fmt-live-lines');
-    if (n) n.innerHTML = p.n;
-    if (lines) {
-      lines.querySelectorAll('.fmt-live-d').forEach(el => el.remove());
-      lines.insertAdjacentHTML('beforeend', p.d.map(l => `<div class="fmt-live-d">${l}</div>`).join(''));
-    }
-  });
+  refreshFmtStage();
   document.querySelectorAll('input[data-action="set-fmt-score"]').forEach(input => { input.checked = input.value === S.fmtScore; });
 }
 
@@ -1995,9 +2000,9 @@ function renderAdvancedPanel() {
   return `<div class="card" style="padding:0">
     <div class="ft-top">
     <div style="display:flex;align-items:center;gap:12px;padding:18px 20px 12px">
-      <button data-action="close-advanced" style="background:var(--th-input-bg);border:1px solid var(--th-border-strong);border-radius:8px;color:var(--th-tx2);font-size:.9rem;padding:6px 11px;cursor:pointer;transition:all .15s" onmouseover="this.style.background='var(--th-accent-bg)'" onmouseout="this.style.background='var(--th-input-bg)'">${backText}</button>
+      <button type="button" class="ft-close" data-action="close-advanced" style="background:var(--th-input-bg);border:1px solid var(--th-border-strong);border-radius:8px;color:var(--th-tx2);font-size:.9rem;padding:6px 11px;cursor:pointer;transition:all .15s" onmouseover="this.style.background='var(--th-accent-bg)'" onmouseout="this.style.background='var(--th-input-bg)'">${backText}</button>
       <div>
-        <div style="font-weight:800;font-size:1rem;color:var(--th-tx)">Fine-Tune</div>
+        <div class="ft-title">Fine-Tune</div>
         <div style="font-size:.72rem;color:var(--th-tx3);margin-top:1px">Every setting Quick install leaves at its default</div>
       </div>
     </div>
@@ -3388,7 +3393,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
   // Keyboard support for the device grid cards and the stream-card picker (Enter / Space activates them).
   document.addEventListener('keydown', (e) => {
-    const card = e.target.closest && e.target.closest('.device-card, .fmt-scroll-card');
+    const card = e.target.closest && e.target.closest('.device-card, .fmt-row');
     if (!card) return;
     if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); card.click(); }
   });

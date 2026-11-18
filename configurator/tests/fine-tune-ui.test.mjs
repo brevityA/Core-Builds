@@ -63,7 +63,7 @@ test('Quick install shows Stream cards in step 3, once', () => {
 
 test('stream cards are keyboard-operable and score radios are grouped per picker', () => {
   assert.match(app, /data-action="fmt-scroll-pick" data-fmt="\$\{f\.id\}" role="button" tabindex="0" aria-pressed="\$\{active\}"/);
-  assert.match(app, /closest\('\.device-card, \.fmt-scroll-card'\)/);
+  assert.match(app, /closest\('\.device-card, \.fmt-row'\)/);
   assert.match(fnBody('fmtScoreControlHtml'), /name="\$\{group\}"/);
   assert.doesNotMatch(app, /name="fmtScore"/);
 });
@@ -76,4 +76,15 @@ test('a newer section jump cancels the slide-in correction of an older one', () 
   const fn = app.slice(app.indexOf('function ftJumpTo('), app.indexOf('function syncFtJump('));
   assert.match(fn, /const jump = \+\+_ftJumpSeq;/);
   assert.match(fn, /if \(jump !== _ftJumpSeq\) return;/);
+});
+
+test('the stream-card picker shows one preview above plain rows', () => {
+  const picker = fnBody('fmtDropdownHtml');
+  assert.match(picker, /fmtStageHtml\(\)/);
+  assert.doesNotMatch(picker, /fmt-live-preview|corePreview|enginePreview/, 'rows carry no preview of their own');
+  assert.match(picker, /escHtml\(f\.label\)/, 'an imported formatter\'s name is escaped');
+  const stage = fnBody('fmtStageHtml');
+  assert.match(stage, /isCustom \? null :/, 'an imported formatter does not borrow another preview');
+  assert.match(css, /\.fmt-row\{display:flex;/);
+  assert.match(css, /\.fmt-row-tag\{[^}]*font-family:var\(--font-mono\)/, 'tags match the main page');
 });

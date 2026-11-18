@@ -373,3 +373,31 @@ html body:has(.hybrid-splash) #themeToggle{display:none}
 .fmt-compare-note{margin:10px 0 0;font-size:.7rem;line-height:1.45;color:var(--th-tx3)}
 /* Phones: keep the columns side by side and let them scroll sideways. */
 @media(max-width:640px){.fmt-cmp-cols[data-device="phone"]{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:4px}.fmt-cmp-cols[data-device="phone"] .fmt-cmp-col{flex:0 0 78%;scroll-snap-align:start}}
+/* Stream-card picker (v3.35): one preview on top, quiet rows in the main page's style below. */
+.fmt-pick{display:flex;flex-direction:column;gap:14px;min-width:0}
+.fmt-stage{display:flex;flex-direction:column;gap:8px;min-width:0}
+.fmt-stage-head{display:flex;align-items:center;gap:10px;min-width:0}
+.fmt-stage-eyebrow{font-family:var(--font-mono);font-size:.62rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--th-signal-bright)}
+.fmt-stage-name{flex:1;min-width:0;font-size:.92rem;font-weight:600;color:var(--th-tx);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fmt-stage-screen{min-height:0;padding:14px 16px}
+.fmt-stage .fmt-preview-note{margin:0;font-size:.68rem;color:var(--th-tx3);line-height:1.45}
+.fmt-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.fmt-row{display:flex;align-items:center;gap:12px;min-width:0;min-height:56px;padding:9px 14px;border:1px solid var(--th-border);border-radius:12px;background:var(--th-card);cursor:pointer;transition:border-color .15s,background .15s}
+.fmt-row:focus-visible{outline:2px solid var(--th-signal-bright);outline-offset:2px}
+.fmt-row[data-active="true"]{border-color:var(--th-accent-border);background:var(--th-accent-bg)}
+.fmt-row-dot{flex:none;width:8px;height:8px;border-radius:50%;opacity:.85}
+.fmt-row-main{display:flex;flex-direction:column;gap:2px;flex:1;min-width:0}
+.fmt-row-name{font-size:.86rem;font-weight:600;color:var(--th-tx);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fmt-row[data-active="true"] .fmt-row-name{color:var(--th-signal-bright)}
+.fmt-row-desc{font-size:.7rem;color:var(--th-tx3);line-height:1.35;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fmt-row-tag{flex:none;padding:3px 7px;border:1px solid var(--th-border);border-radius:6px;font-family:var(--font-mono);font-size:.58rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--th-tx3);white-space:nowrap}
+.fmt-row[data-active="true"] .fmt-row-tag,.fmt-stage-head .fmt-row-tag{border-color:var(--th-accent-border);color:var(--th-signal-bright)}
+@media(hover:hover){.fmt-row:hover{border-color:var(--th-accent-border)}}
+@media(max-width:640px){.fmt-list{grid-template-columns:minmax(0,1fr)}.fmt-row{min-height:52px}}
+/* Fine-Tune in the main page's style: mono section labels, light chips, round help marks. */
+#advancedDrawer .ft-head{font-family:var(--font-mono);font-size:.66rem;letter-spacing:.14em;color:var(--th-signal-bright)}
+#advancedDrawer .ft-head svg{display:none}
+#advancedDrawer .ft-head-alt{font-family:var(--font-sans);letter-spacing:0;text-transform:none;color:var(--th-tx3)}
+#advancedDrawer .ft-info{flex:none;width:20px;height:20px;min-width:0;min-height:0;padding:0;border-radius:50%;line-height:1}
+#advancedDrawer .ft-close{flex:none;white-space:nowrap;min-height:36px}
+#advancedDrawer .ft-title{font-family:var(--font-display);font-size:1.25rem;font-weight:700;letter-spacing:-.02em;color:var(--th-tx)}

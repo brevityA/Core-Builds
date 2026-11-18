@@ -59,6 +59,6 @@ test('picking from compare is a real formatter choice', () => {
   assert.match(use, /saveState\(\);/);
 });
 
-test('cards show the engine render, with the illustration only as a fallback', () => {
-  assert.match(app, /corePreview\(f\.id\) \|\| enginePreview\(f\.id\) \|\| FMT_PREVIEWS\[f\.id\]/);
+test('the preview shows the engine render, with the illustration only as a fallback', () => {
+  assert.match(app, /corePreview\(id\) \|\| enginePreview\(id\) \|\| FMT_PREVIEWS\[id\]/);
 });
