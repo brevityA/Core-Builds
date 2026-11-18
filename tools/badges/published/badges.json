@@ -1,0 +1,964 @@
+{
+  "name": "Core Builds badge artwork",
+  "license": "CC-BY-4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+  "attribution": "Badge artwork: Core Builds (brevityA/Core-Builds), CC BY 4.0",
+  "source": "https://github.com/brevityA/Core-Builds/tree/main/tools/badges/assets",
+  "groups": [
+    {
+      "id": "resolution",
+      "name": "Resolution",
+      "description": "4K through SD resolution classes."
+    },
+    {
+      "id": "quality",
+      "name": "Quality & source",
+      "description": "Remux, disc, web, broadcast, and low-quality sources."
+    },
+    {
+      "id": "visual",
+      "name": "Visual",
+      "description": "Dolby Vision, HDR variants, IMAX, bit depth, and 3D."
+    },
+    {
+      "id": "audio",
+      "name": "Audio",
+      "description": "Lossless, object-based, Dolby, DTS, and common codecs."
+    },
+    {
+      "id": "channels",
+      "name": "Channels",
+      "description": "Common audio channel layouts."
+    },
+    {
+      "id": "codec",
+      "name": "Video codec",
+      "description": "AV1, HEVC, AVC, VC-1, XviD, and DivX."
+    },
+    {
+      "id": "status",
+      "name": "Playback state",
+      "description": "Cached, uncached, library, P2P, and proxied state."
+    },
+    {
+      "id": "ranking",
+      "name": "Release tiers",
+      "description": "Matched Remux, BluRay, WEB, and penalty tiers."
+    },
+    {
+      "id": "trust",
+      "name": "Trust & torrent",
+      "description": "SeaDex, premier groups, freeleech, and packs."
+    },
+    {
+      "id": "editions",
+      "name": "Editions & special",
+      "description": "Cuts, editions, fixes, and presentation variants."
+    },
+    {
+      "id": "network",
+      "name": "Streaming source",
+      "description": "Recognised streaming-service sources."
+    },
+    {
+      "id": "language",
+      "name": "Audio language",
+      "description": "Common audio-language and dubbing indicators."
+    },
+    {
+      "id": "subtitles",
+      "name": "Subtitles",
+      "description": "Common subtitle-language indicators."
+    }
+  ],
+  "badges": [
+    {
+      "id": "res-4k",
+      "name": "4K",
+      "group": "resolution",
+      "label": "4K",
+      "png": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/res-4k.png",
+      "svg": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/res-4k.svg"
+    },
+    {
+      "id": "res-1440p",
+      "name": "1440p",
+      "group": "resolution",
+      "label": "1440P",
+      "png": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/res-1440p.png",
+      "svg": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/res-1440p.svg"
+    },
+    {
+      "id": "res-1080p",
+      "name": "1080p",
+      "group": "resolution",
+      "label": "1080P",
+      "png": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/res-1080p.png",
+      "svg": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/res-1080p.svg"
+    },
+    {
+      "id": "res-720p",
+      "name": "720p",
+      "group": "resolution",
+      "label": "720P",
+      "png": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/res-720p.png",
+      "svg": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/res-720p.svg"
+    },
+    {
+      "id": "res-576p",
+      "name": "576p",
+      "group": "resolution",
+      "label": "576P",
+      "png": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/res-576p.png",
+      "svg": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/res-576p.svg"
+    },
+    {
+      "id": "res-480p",
+      "name": "480p",
+      "group": "resolution",
+      "label": "480P",
+      "png": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/res-480p.png",
+      "svg": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/res-480p.svg"
+    },
+    {
+      "id": "res-360p",
+      "name": "360p",
+      "group": "resolution",
+      "label": "360P",
+      "png": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/res-360p.png",
+      "svg": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/res-360p.svg"
+    },
+    {
+      "id": "res-240p",
+      "name": "240p",
+      "group": "resolution",
+      "label": "240P",
+      "png": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/res-240p.png",
+      "svg": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/res-240p.svg"
+    },
+    {
+      "id": "res-144p",
+      "name": "144p",
+      "group": "resolution",
+      "label": "144P",
+      "png": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/res-144p.png",
+      "svg": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/res-144p.svg"
+    },
+    {
+      "id": "src-remux",
+      "name": "Remux",
+      "group": "quality",
+      "label": "REMUX",
+      "png": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/src-remux.png",
+      "svg": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/src-remux.svg"
+    },
+    {
+      "id": "src-bluray",
+      "name": "BluRay",
+      "group": "quality",
+      "label": "BLURAY",
+      "png": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/src-bluray.png",
+      "svg": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/src-bluray.svg"
+    },
+    {
+      "id": "src-webdl",
+      "name": "WEB-DL",
+      "group": "quality",
+      "label": "WEB-DL",
+      "png": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/src-webdl.png",
+      "svg": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/src-webdl.svg"
+    },
+    {
+      "id": "src-webrip",
+      "name": "WEBRip",
+      "group": "quality",
+      "label": "WEBRIP",
+      "png": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/src-webrip.png",
+      "svg": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/src-webrip.svg"
+    },
+    {
+      "id": "src-hdtv",
+      "name": "HDTV",
+      "group": "quality",
+      "label": "HDTV",
+      "png": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/src-hdtv.png",
+      "svg": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/src-hdtv.svg"
+    },
+    {
+      "id": "src-hdrip",
+      "name": "HDRip",
+      "group": "quality",
+      "label": "HDRIP",
+      "png": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/src-hdrip.png",
+      "svg": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/src-hdrip.svg"
+    },
+    {
+      "id": "src-dvdrip",
+      "name": "DVDRip",
+      "group": "quality",
+      "label": "DVDRIP",
+      "png": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/src-dvdrip.png",
+      "svg": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/src-dvdrip.svg"
+    },
+    {
+      "id": "src-dvd",
+      "name": "DVD",
+      "group": "quality",
+      "label": "DVD",
+      "png": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/src-dvd.png",
+      "svg": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/src-dvd.svg"
+    },
+    {
+      "id": "src-cam",
+      "name": "CAM",
+      "group": "quality",
+      "label": "CAM",
+      "png": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/src-cam.png",
+      "svg": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/src-cam.svg"
+    },
+    {
+      "id": "src-ts",
+      "name": "Telesync",
+      "group": "quality",
+      "label": "TS",
+      "png": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/src-ts.png",
+      "svg": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/src-ts.svg"
+    },
+    {
+      "id": "vis-dv",
+      "name": "Dolby Vision",
+      "group": "visual",
+      "label": "DOLBY VISION",
+      "png": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/vis-dv.png",
+      "svg": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/vis-dv.svg"
+    },
+    {
+      "id": "vis-hdr10plus",
+      "name": "HDR10+",
+      "group": "visual",
+      "label": "HDR10+",
+      "png": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/vis-hdr10plus.png",
+      "svg": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/vis-hdr10plus.svg"
+    },
+    {
+      "id": "vis-hdr10",
+      "name": "HDR10",
+      "group": "visual",
+      "label": "HDR10",
+      "png": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/vis-hdr10.png",
+      "svg": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/vis-hdr10.svg"
+    },
+    {
+      "id": "vis-hdr",
+      "name": "HDR",
+      "group": "visual",
+      "label": "HDR",
+      "png": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/vis-hdr.png",
+      "svg": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/vis-hdr.svg"
+    },
+    {
+      "id": "vis-hlg",
+      "name": "HLG",
+      "group": "visual",
+      "label": "HLG",
+      "png": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/vis-hlg.png",
+      "svg": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/vis-hlg.svg"
+    },
+    {
+      "id": "vis-sdr",
+      "name": "SDR",
+      "group": "visual",
+      "label": "SDR",
+      "png": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/vis-sdr.png",
+      "svg": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/vis-sdr.svg"
+    },
+    {
+      "id": "vis-10bit",
+      "name": "10-bit",
+      "group": "visual",
+      "label": "10-BIT",
+      "png": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/vis-10bit.png",
+      "svg": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/vis-10bit.svg"
+    },
+    {
+      "id": "vis-imax-enhanced",
+      "name": "IMAX Enhanced",
+      "group": "visual",
+      "label": "IMAX ENH",
+      "png": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/vis-imax-enhanced.png",
+      "svg": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/vis-imax-enhanced.svg"
+    },
+    {
+      "id": "vis-imax",
+      "name": "IMAX",
+      "group": "visual",
+      "label": "IMAX",
+      "png": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/vis-imax.png",
+      "svg": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/vis-imax.svg"
+    },
+    {
+      "id": "vis-3d",
+      "name": "3D",
+      "group": "visual",
+      "label": "3D",
+      "png": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/vis-3d.png",
+      "svg": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/vis-3d.svg"
+    },
+    {
+      "id": "vis-upscaled",
+      "name": "Upscaled",
+      "group": "visual",
+      "label": "UPSCALED",
+      "png": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/vis-upscaled.png",
+      "svg": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/vis-upscaled.svg"
+    },
+    {
+      "id": "aud-atmos",
+      "name": "Dolby Atmos",
+      "group": "audio",
+      "label": "ATMOS",
+      "png": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/aud-atmos.png",
+      "svg": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/aud-atmos.svg"
+    },
+    {
+      "id": "aud-truehd",
+      "name": "TrueHD",
+      "group": "audio",
+      "label": "TRUEHD",
+      "png": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/aud-truehd.png",
+      "svg": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/aud-truehd.svg"
+    },
+    {
+      "id": "aud-ddplus",
+      "name": "Dolby Digital+",
+      "group": "audio",
+      "label": "DD+",
+      "png": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/aud-ddplus.png",
+      "svg": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/aud-ddplus.svg"
+    },
+    {
+      "id": "aud-dd",
+      "name": "Dolby Digital",
+      "group": "audio",
+      "label": "DD",
+      "png": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/aud-dd.png",
+      "svg": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/aud-dd.svg"
+    },
+    {
+      "id": "aud-dtsx",
+      "name": "DTS:X",
+      "group": "audio",
+      "label": "DTS:X",
+      "png": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/aud-dtsx.png",
+      "svg": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/aud-dtsx.svg"
+    },
+    {
+      "id": "aud-dtshdma",
+      "name": "DTS-HD MA",
+      "group": "audio",
+      "label": "DTS-HD MA",
+      "png": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/aud-dtshdma.png",
+      "svg": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/aud-dtshdma.svg"
+    },
+    {
+      "id": "aud-dtshd",
+      "name": "DTS-HD",
+      "group": "audio",
+      "label": "DTS-HD",
+      "png": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/aud-dtshd.png",
+      "svg": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/aud-dtshd.svg"
+    },
+    {
+      "id": "aud-dts",
+      "name": "DTS",
+      "group": "audio",
+      "label": "DTS",
+      "png": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/aud-dts.png",
+      "svg": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/aud-dts.svg"
+    },
+    {
+      "id": "aud-flac",
+      "name": "FLAC",
+      "group": "audio",
+      "label": "FLAC",
+      "png": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/aud-flac.png",
+      "svg": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/aud-flac.svg"
+    },
+    {
+      "id": "aud-pcm",
+      "name": "PCM",
+      "group": "audio",
+      "label": "PCM",
+      "png": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/aud-pcm.png",
+      "svg": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/aud-pcm.svg"
+    },
+    {
+      "id": "aud-opus",
+      "name": "Opus",
+      "group": "audio",
+      "label": "OPUS",
+      "png": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/aud-opus.png",
+      "svg": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/aud-opus.svg"
+    },
+    {
+      "id": "aud-aac",
+      "name": "AAC",
+      "group": "audio",
+      "label": "AAC",
+      "png": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/aud-aac.png",
+      "svg": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/aud-aac.svg"
+    },
+    {
+      "id": "aud-mp3",
+      "name": "MP3",
+      "group": "audio",
+      "label": "MP3",
+      "png": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/aud-mp3.png",
+      "svg": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/aud-mp3.svg"
+    },
+    {
+      "id": "aud-vorbis",
+      "name": "Vorbis",
+      "group": "audio",
+      "label": "VORBIS",
+      "png": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/aud-vorbis.png",
+      "svg": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/aud-vorbis.svg"
+    },
+    {
+      "id": "ch-71",
+      "name": "7.1 channels",
+      "group": "channels",
+      "label": "7.1",
+      "png": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/ch-71.png",
+      "svg": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/ch-71.svg"
+    },
+    {
+      "id": "ch-61",
+      "name": "6.1 channels",
+      "group": "channels",
+      "label": "6.1",
+      "png": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/ch-61.png",
+      "svg": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/ch-61.svg"
+    },
+    {
+      "id": "ch-51",
+      "name": "5.1 channels",
+      "group": "channels",
+      "label": "5.1",
+      "png": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/ch-51.png",
+      "svg": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/ch-51.svg"
+    },
+    {
+      "id": "ch-20",
+      "name": "2.0 channels",
+      "group": "channels",
+      "label": "2.0",
+      "png": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/ch-20.png",
+      "svg": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/ch-20.svg"
+    },
+    {
+      "id": "ch-10",
+      "name": "1.0 channel",
+      "group": "channels",
+      "label": "1.0",
+      "png": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/ch-10.png",
+      "svg": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/ch-10.svg"
+    },
+    {
+      "id": "codec-av1",
+      "name": "AV1",
+      "group": "codec",
+      "label": "AV1",
+      "png": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/codec-av1.png",
+      "svg": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/codec-av1.svg"
+    },
+    {
+      "id": "codec-hevc",
+      "name": "HEVC / H.265",
+      "group": "codec",
+      "label": "HEVC",
+      "png": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/codec-hevc.png",
+      "svg": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/codec-hevc.svg"
+    },
+    {
+      "id": "codec-avc",
+      "name": "AVC / H.264",
+      "group": "codec",
+      "label": "AVC",
+      "png": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/codec-avc.png",
+      "svg": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/codec-avc.svg"
+    },
+    {
+      "id": "codec-vc1",
+      "name": "VC-1",
+      "group": "codec",
+      "label": "VC-1",
+      "png": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/codec-vc1.png",
+      "svg": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/codec-vc1.svg"
+    },
+    {
+      "id": "codec-xvid",
+      "name": "XviD",
+      "group": "codec",
+      "label": "XVID",
+      "png": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/codec-xvid.png",
+      "svg": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/codec-xvid.svg"
+    },
+    {
+      "id": "codec-divx",
+      "name": "DivX",
+      "group": "codec",
+      "label": "DIVX",
+      "png": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/codec-divx.png",
+      "svg": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/codec-divx.svg"
+    },
+    {
+      "id": "status-cached",
+      "name": "Cached / instant",
+      "group": "status",
+      "label": "CACHED",
+      "png": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/status-cached.png",
+      "svg": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/status-cached.svg"
+    },
+    {
+      "id": "status-uncached",
+      "name": "Uncached",
+      "group": "status",
+      "label": "UNCACHED",
+      "png": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/status-uncached.png",
+      "svg": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/status-uncached.svg"
+    },
+    {
+      "id": "status-library",
+      "name": "Library",
+      "group": "status",
+      "label": "LIBRARY",
+      "png": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/status-library.png",
+      "svg": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/status-library.svg"
+    },
+    {
+      "id": "status-p2p",
+      "name": "P2P",
+      "group": "status",
+      "label": "P2P",
+      "png": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/status-p2p.png",
+      "svg": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/status-p2p.svg"
+    },
+    {
+      "id": "status-proxied",
+      "name": "Proxied",
+      "group": "status",
+      "label": "PROXIED",
+      "png": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/status-proxied.png",
+      "svg": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/status-proxied.svg"
+    },
+    {
+      "id": "tier-remux-t1",
+      "name": "Remux T1",
+      "group": "ranking",
+      "label": "REMUX T1",
+      "png": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/tier-remux-t1.png",
+      "svg": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/tier-remux-t1.svg"
+    },
+    {
+      "id": "tier-remux-t2",
+      "name": "Remux T2",
+      "group": "ranking",
+      "label": "REMUX T2",
+      "png": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/tier-remux-t2.png",
+      "svg": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/tier-remux-t2.svg"
+    },
+    {
+      "id": "tier-bluray-t1",
+      "name": "BluRay T1",
+      "group": "ranking",
+      "label": "BLURAY T1",
+      "png": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/tier-bluray-t1.png",
+      "svg": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/tier-bluray-t1.svg"
+    },
+    {
+      "id": "tier-bluray-t2",
+      "name": "BluRay T2",
+      "group": "ranking",
+      "label": "BLURAY T2",
+      "png": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/tier-bluray-t2.png",
+      "svg": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/tier-bluray-t2.svg"
+    },
+    {
+      "id": "tier-web-t1",
+      "name": "WEB T1",
+      "group": "ranking",
+      "label": "WEB T1",
+      "png": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/tier-web-t1.png",
+      "svg": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/tier-web-t1.svg"
+    },
+    {
+      "id": "tier-web-t2",
+      "name": "WEB T2",
+      "group": "ranking",
+      "label": "WEB T2",
+      "png": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/tier-web-t2.png",
+      "svg": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/tier-web-t2.svg"
+    },
+    {
+      "id": "tier-penalty",
+      "name": "Penalty / bad",
+      "group": "ranking",
+      "label": "PENALTY",
+      "png": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/tier-penalty.png",
+      "svg": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/tier-penalty.svg"
+    },
+    {
+      "id": "trust-seadex-best",
+      "name": "SeaDex Best",
+      "group": "trust",
+      "label": "SEADEX BEST",
+      "png": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/trust-seadex-best.png",
+      "svg": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/trust-seadex-best.svg"
+    },
+    {
+      "id": "trust-seadex",
+      "name": "SeaDex",
+      "group": "trust",
+      "label": "SEADEX",
+      "png": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/trust-seadex.png",
+      "svg": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/trust-seadex.svg"
+    },
+    {
+      "id": "trust-premier",
+      "name": "Premier group",
+      "group": "trust",
+      "label": "PREMIER",
+      "png": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/trust-premier.png",
+      "svg": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/trust-premier.svg"
+    },
+    {
+      "id": "trust-freeleech",
+      "name": "Freeleech",
+      "group": "trust",
+      "label": "FREELEECH",
+      "png": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/trust-freeleech.png",
+      "svg": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/trust-freeleech.svg"
+    },
+    {
+      "id": "trust-season-pack",
+      "name": "Season pack",
+      "group": "trust",
+      "label": "SEASON PACK",
+      "png": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/trust-season-pack.png",
+      "svg": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/trust-season-pack.svg"
+    },
+    {
+      "id": "edition-director",
+      "name": "Director’s Cut",
+      "group": "editions",
+      "label": "DIRECTOR CUT",
+      "png": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/edition-director.png",
+      "svg": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/edition-director.svg"
+    },
+    {
+      "id": "edition-extended",
+      "name": "Extended",
+      "group": "editions",
+      "label": "EXTENDED",
+      "png": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/edition-extended.png",
+      "svg": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/edition-extended.svg"
+    },
+    {
+      "id": "edition-theatrical",
+      "name": "Theatrical",
+      "group": "editions",
+      "label": "THEATRICAL",
+      "png": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/edition-theatrical.png",
+      "svg": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/edition-theatrical.svg"
+    },
+    {
+      "id": "edition-criterion",
+      "name": "Criterion",
+      "group": "editions",
+      "label": "CRITERION",
+      "png": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/edition-criterion.png",
+      "svg": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/edition-criterion.svg"
+    },
+    {
+      "id": "edition-open-matte",
+      "name": "Open Matte",
+      "group": "editions",
+      "label": "OPEN MATTE",
+      "png": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/edition-open-matte.png",
+      "svg": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/edition-open-matte.svg"
+    },
+    {
+      "id": "edition-hybrid",
+      "name": "Hybrid",
+      "group": "editions",
+      "label": "HYBRID",
+      "png": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/edition-hybrid.png",
+      "svg": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/edition-hybrid.svg"
+    },
+    {
+      "id": "edition-repack",
+      "name": "REPACK / PROPER",
+      "group": "editions",
+      "label": "REPACK",
+      "png": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/edition-repack.png",
+      "svg": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/edition-repack.svg"
+    },
+    {
+      "id": "edition-remastered",
+      "name": "Remastered",
+      "group": "editions",
+      "label": "REMASTERED",
+      "png": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/edition-remastered.png",
+      "svg": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/edition-remastered.svg"
+    },
+    {
+      "id": "edition-uncensored",
+      "name": "Uncensored",
+      "group": "editions",
+      "label": "UNCENSORED",
+      "png": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/edition-uncensored.png",
+      "svg": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/edition-uncensored.svg"
+    },
+    {
+      "id": "edition-unrated",
+      "name": "Unrated",
+      "group": "editions",
+      "label": "UNRATED",
+      "png": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/edition-unrated.png",
+      "svg": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/edition-unrated.svg"
+    },
+    {
+      "id": "edition-blackwhite",
+      "name": "Black & white",
+      "group": "editions",
+      "label": "B&W",
+      "png": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/edition-blackwhite.png",
+      "svg": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/edition-blackwhite.svg"
+    },
+    {
+      "id": "net-netflix",
+      "name": "Netflix",
+      "group": "network",
+      "label": "NETFLIX",
+      "png": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/net-netflix.png",
+      "svg": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/net-netflix.svg"
+    },
+    {
+      "id": "net-prime",
+      "name": "Prime Video",
+      "group": "network",
+      "label": "PRIME VIDEO",
+      "png": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/net-prime.png",
+      "svg": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/net-prime.svg"
+    },
+    {
+      "id": "net-apple",
+      "name": "Apple TV+",
+      "group": "network",
+      "label": "APPLE TV+",
+      "png": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/net-apple.png",
+      "svg": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/net-apple.svg"
+    },
+    {
+      "id": "net-disney",
+      "name": "Disney+",
+      "group": "network",
+      "label": "DISNEY+",
+      "png": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/net-disney.png",
+      "svg": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/net-disney.svg"
+    },
+    {
+      "id": "net-max",
+      "name": "Max",
+      "group": "network",
+      "label": "MAX",
+      "png": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/net-max.png",
+      "svg": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/net-max.svg"
+    },
+    {
+      "id": "net-hulu",
+      "name": "Hulu",
+      "group": "network",
+      "label": "HULU",
+      "png": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/net-hulu.png",
+      "svg": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/net-hulu.svg"
+    },
+    {
+      "id": "net-peacock",
+      "name": "Peacock",
+      "group": "network",
+      "label": "PEACOCK",
+      "png": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/net-peacock.png",
+      "svg": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/net-peacock.svg"
+    },
+    {
+      "id": "net-paramount",
+      "name": "Paramount+",
+      "group": "network",
+      "label": "PARAMOUNT+",
+      "png": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/net-paramount.png",
+      "svg": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/net-paramount.svg"
+    },
+    {
+      "id": "net-crunchyroll",
+      "name": "Crunchyroll",
+      "group": "network",
+      "label": "CRUNCHYROLL",
+      "png": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/net-crunchyroll.png",
+      "svg": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/net-crunchyroll.svg"
+    },
+    {
+      "id": "lang-en",
+      "name": "English audio",
+      "group": "language",
+      "label": "EN AUDIO",
+      "png": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/lang-en.png",
+      "svg": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/lang-en.svg"
+    },
+    {
+      "id": "lang-es",
+      "name": "Spanish audio",
+      "group": "language",
+      "label": "ES AUDIO",
+      "png": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/lang-es.png",
+      "svg": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/lang-es.svg"
+    },
+    {
+      "id": "lang-fr",
+      "name": "French audio",
+      "group": "language",
+      "label": "FR AUDIO",
+      "png": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/lang-fr.png",
+      "svg": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/lang-fr.svg"
+    },
+    {
+      "id": "lang-de",
+      "name": "German audio",
+      "group": "language",
+      "label": "DE AUDIO",
+      "png": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/lang-de.png",
+      "svg": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/lang-de.svg"
+    },
+    {
+      "id": "lang-it",
+      "name": "Italian audio",
+      "group": "language",
+      "label": "IT AUDIO",
+      "png": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/lang-it.png",
+      "svg": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/lang-it.svg"
+    },
+    {
+      "id": "lang-pt",
+      "name": "Portuguese audio",
+      "group": "language",
+      "label": "PT AUDIO",
+      "png": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/lang-pt.png",
+      "svg": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/lang-pt.svg"
+    },
+    {
+      "id": "lang-ja",
+      "name": "Japanese audio",
+      "group": "language",
+      "label": "JA AUDIO",
+      "png": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/lang-ja.png",
+      "svg": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/lang-ja.svg"
+    },
+    {
+      "id": "lang-ko",
+      "name": "Korean audio",
+      "group": "language",
+      "label": "KO AUDIO",
+      "png": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/lang-ko.png",
+      "svg": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/lang-ko.svg"
+    },
+    {
+      "id": "lang-multi",
+      "name": "Multi audio",
+      "group": "language",
+      "label": "MULTI AUDIO",
+      "png": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/lang-multi.png",
+      "svg": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/lang-multi.svg"
+    },
+    {
+      "id": "lang-dubbed",
+      "name": "Dubbed",
+      "group": "language",
+      "label": "DUBBED",
+      "png": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/lang-dubbed.png",
+      "svg": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/lang-dubbed.svg"
+    },
+    {
+      "id": "sub-en",
+      "name": "English subtitles",
+      "group": "subtitles",
+      "label": "EN SUB",
+      "png": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/sub-en.png",
+      "svg": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/sub-en.svg"
+    },
+    {
+      "id": "sub-es",
+      "name": "Spanish subtitles",
+      "group": "subtitles",
+      "label": "ES SUB",
+      "png": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/sub-es.png",
+      "svg": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/sub-es.svg"
+    },
+    {
+      "id": "sub-fr",
+      "name": "French subtitles",
+      "group": "subtitles",
+      "label": "FR SUB",
+      "png": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/sub-fr.png",
+      "svg": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/sub-fr.svg"
+    },
+    {
+      "id": "sub-de",
+      "name": "German subtitles",
+      "group": "subtitles",
+      "label": "DE SUB",
+      "png": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/sub-de.png",
+      "svg": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/sub-de.svg"
+    },
+    {
+      "id": "sub-it",
+      "name": "Italian subtitles",
+      "group": "subtitles",
+      "label": "IT SUB",
+      "png": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/sub-it.png",
+      "svg": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/sub-it.svg"
+    },
+    {
+      "id": "sub-pt",
+      "name": "Portuguese subtitles",
+      "group": "subtitles",
+      "label": "PT SUB",
+      "png": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/sub-pt.png",
+      "svg": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/sub-pt.svg"
+    },
+    {
+      "id": "sub-ja",
+      "name": "Japanese subtitles",
+      "group": "subtitles",
+      "label": "JA SUB",
+      "png": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/sub-ja.png",
+      "svg": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/sub-ja.svg"
+    },
+    {
+      "id": "sub-ko",
+      "name": "Korean subtitles",
+      "group": "subtitles",
+      "label": "KO SUB",
+      "png": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/sub-ko.png",
+      "svg": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/sub-ko.svg"
+    },
+    {
+      "id": "sub-any",
+      "name": "Subtitles present",
+      "group": "subtitles",
+      "label": "SUBTITLES",
+      "png": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/sub-any.png",
+      "svg": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/assets/sub-any.svg"
+    }
+  ]
+}

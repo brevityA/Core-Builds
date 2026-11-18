@@ -175,10 +175,11 @@ test('PIN steps name WuPlay Age Restrictions and the missing Stremio PIN', () =>
   assert.equal(EMOJI.test(text), false);
 });
 
-test('configuratorPatch is English PG 1080p, exclusive off', () => {
+test('configuratorPatch is English 1080p, exclusive off, no rating filter', () => {
   const patch = configuratorPatch();
   assert.deepEqual(patch.langs, ['English']);
-  assert.equal(patch.ageLimit, 'PG');
+  // AIOStreams has no rating filter; the configurator dropped its no-op age setting.
+  assert.equal('ageLimit' in patch, false);
   assert.equal(patch.exclude4K, true);
   assert.equal(patch.langExclusive, false);
 });

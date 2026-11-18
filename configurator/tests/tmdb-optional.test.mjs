@@ -26,7 +26,7 @@ test('digital-release passthrough expression is emitted only when TMDB is config
   assert.doesNotMatch(app, /bitrate:\s*\{\s*useMetadataRuntime:true/);
 });
 
-test('Quick Install explains that TMDB is optional and does not add a blocking preflight warning', () => {
-  assert.ok(app.includes('Leave both blank and Core Builds will disable every TMDB-dependent feature so AIOStreams accepts the config.'));
+test('Express marks TMDB optional and does not add a blocking preflight warning', () => {
+  assert.ok(app.includes('TMDB Read Access Token (optional — improves matching)'));
   assert.ok(!app.includes("warns.push('No TMDB key"));
 });

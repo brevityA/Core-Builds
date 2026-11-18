@@ -1,0 +1,83 @@
+name: Addon Directory Drift
+
+# Diffs the AIOStreams instances the community directory (stremio-addons.net)
+# approves against the configurator's hand-audited host registry
+# (configurator/src/data/hosts.js). The directory API is experimental and
+# advisory only; this workflow never edits the registry or blocks a build, it
+# opens a tracking issue so a newly listed public host gets reviewed.
+#
+# Soft-fails on directory outage (script exit 0 with warning) so network blips
+# never spam issues, mirroring upstream-drift-watch.yml.
+
+on:
+  schedule:
+    - cron: '23 9 * * 1'   # weekly Monday, off-the-hour
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  drift-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+
+      - name: Diff directory instances against the host registry
+        id: drift
+        run: |
+          set +e
+          node scripts/check-addon-directory-drift.mjs --output reports/addon-directory-drift.md 2>&1 | tee /tmp/directory_drift.txt
+          # Same pipeline gotcha as upstream-drift-watch: $? after a pipe is
+          # tee's status; read the script's own status from PIPESTATUS.
+          code=${PIPESTATUS[0]}
+          set -e
+          echo "exit_code=$code" >> "$GITHUB_OUTPUT"
+          # 0 = clean or soft-skipped outage/contract change, 1 = drift (the
+          # issue step below handles it). A 2 is an unexpected checker failure:
+          # fail the job rather than go green with no tracking issue.
+          if [ "$code" -eq 2 ]; then
+            exit 2
+          fi
+
+      - name: Open or refresh drift issue
+        if: steps.drift.outputs.exit_code == '1'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          LABEL="addon-directory"
+          gh label create "$LABEL" --color "0969DA" --description "Community addon directory listed a new AIOStreams instance — review" 2>/dev/null || true
+
+          EXISTING=$(gh issue list --label "$LABEL" --state open --json number --jq '.[0].number')
+          if [ -n "$EXISTING" ]; then
+            gh issue comment "$EXISTING" --body-file reports/addon-directory-drift.md
+          else
+            gh issue create \
+              --title "Addon directory drift: review new public AIOStreams instances" \
+              --label "$LABEL" \
+              --body-file reports/addon-directory-drift.md
+          fi
+
+      - name: Close stale drift issue once the diff is clean
+        if: steps.drift.outputs.exit_code == '0'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Exit 0 means either genuinely no drift or "directory unreachable —
+          # soft pass". Only a clean run justifies closing an open issue; an
+          # outage is not evidence the drift went away.
+          if grep -q "unreachable" /tmp/directory_drift.txt || \
+             grep -q "contract may have changed" /tmp/directory_drift.txt; then
+            echo "Directory was unreachable or changed shape — leaving any open issue alone."
+            exit 0
+          fi
+          EXISTING=$(gh issue list --label addon-directory --state open --json number --jq '.[0].number')
+          if [ -n "$EXISTING" ]; then
+            gh issue close "$EXISTING" --comment "Directory and registry match again (verified $(date -u +%Y-%m-%dT%H:%M:%SZ))."
+          fi

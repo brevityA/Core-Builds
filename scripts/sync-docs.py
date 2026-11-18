@@ -196,36 +196,65 @@ def patch_torbox_readme(patcher, versions, release_version):
 
 # ─── 7. Patch Mintlify docs ─────────────────────────────────────────────────
 
+# template-directory.mdx heading name -> template stem. Every "### Name — vX.Y.Z"
+# heading on that page needs an entry, or its version silently stops updating;
+# tests/test_sync_docs_headings.py holds the page to this map. Until v3.18 it
+# matched 21 of the page's 43 headings, and all 22 others had drifted: every
+# Lite, Fire Stick, Labs and device variant (Windows Ultrawide read v0.2.4
+# against a v0.2.13 template).
+TEMPLATE_DIRECTORY_HEADINGS = {
+    "4K Apex": "core-nexus-4k-apex",
+    "4K Apex (TorBox-only)": "core-nexus-4k-apex-torbox",
+    "4K Hybrid": "core-nexus-4k-hybrid",
+    "Samsung TV 4K": "core-nexus-samsung-tv-4k",
+    "Samsung TV": "core-nexus-samsung-tv",
+    "Samsung RU7100 4K": "core-nexus-samsung-ru7100-4k",
+    "Google TV Streamer 4K": "core-nexus-google-tv-streamer-4k",
+    "Windows Ultrawide": "core-nexus-ultrawide",
+    "Ultrawide": "core-nexus-ultrawide",
+    "Stream": "core-nexus-stream",
+    "Stream (Fire Stick)": "core-nexus-stream-firestick",
+    "Stream Lite": "core-nexus-stream-lite",
+    "Stream (Fire Stick) Lite": "core-nexus-stream-firestick-lite",
+    "Hybrid": "core-nexus-hybrid",
+    "Hybrid Lite": "core-nexus-hybrid-lite",
+    "4K Essential": "core-nexus-4k-essential",
+    "4K Essential Lite": "core-nexus-4k-essential-lite",
+    "Essential": "core-nexus-essential",
+    "Essential Lite": "core-nexus-essential-lite",
+    "Flash 4K": "core-nexus-flash-4k",
+    "Flash": "core-nexus-flash",
+    "Speed 4K": "core-nexus-speed-4k",
+    "Speed 4K Lite": "core-nexus-speed-4k-lite",
+    "Speed": "core-nexus-speed",
+    "Speed Lite": "core-nexus-speed-lite",
+    "Speed 4K+": "core-nexus-speed-4k-plus",
+    "Speed EasyNews": "core-nexus-speed-easynews",
+    "4K AllDebrid": "core-nexus-4k-alldebrid",
+    "4K AllDebrid Lite": "core-nexus-4k-alldebrid-lite",
+    "AllDebrid": "core-nexus-alldebrid",
+    "AllDebrid Lite": "core-nexus-alldebrid-lite",
+    "Anime 4K": "core-nexus-anime-4k",
+    "Anime 4K Lite": "core-nexus-anime-4k-lite",
+    "Anime": "core-nexus-anime",
+    "Anime Lite": "core-nexus-anime-lite",
+    "Anime Dub": "core-nexus-anime-dub",
+    "Anime Dub Lite": "core-nexus-anime-dub-lite",
+    "Apple TV 4K": "core-nexus-apple-tv-4k",
+    "4K Apex Labs": "core-nexus-4k-apex-labs",
+    "Stream Labs": "core-nexus-stream-labs",
+    "All-Rounder Labs": "core-nexus-all-rounder-labs",
+    "Anime 4K Labs": "core-nexus-anime-4k-labs",
+    "Essential Labs": "core-nexus-essential-labs",
+    "4K Essential Labs": "core-nexus-4k-essential-labs",
+}
+
+
 def patch_mintlify_docs(patcher, versions, release_version):
     """Patch docs/*.mdx files with current versions."""
     lookup = build_lookup(versions)
 
-    # Template heading name→stem mapping for template-directory.mdx
-    heading_map = {
-        "4K Apex": "core-nexus-4k-apex",
-        "4K Apex (TorBox-only)": "core-nexus-4k-apex-torbox",
-        "4K Hybrid": "core-nexus-4k-hybrid",
-        "Samsung TV 4K": "core-nexus-samsung-tv-4k",
-        "Samsung TV": "core-nexus-samsung-tv",
-        "Samsung RU7100 4K": "core-nexus-samsung-ru7100-4k",
-        "Stream": "core-nexus-stream",
-        "Hybrid": "core-nexus-hybrid",
-        "4K Essential": "core-nexus-4k-essential",
-        "Essential": "core-nexus-essential",
-        "Flash 4K": "core-nexus-flash-4k",
-        "Flash": "core-nexus-flash",
-        "Speed 4K": "core-nexus-speed-4k",
-        "Speed": "core-nexus-speed",
-        "Speed 4K+": "core-nexus-speed-4k-plus",
-        "Speed EasyNews": "core-nexus-speed-easynews",
-        "Anime 4K": "core-nexus-anime-4k",
-        "Anime": "core-nexus-anime",
-        "Anime Dub": "core-nexus-anime-dub",
-        "4K AllDebrid": "core-nexus-4k-alldebrid",
-        "AllDebrid": "core-nexus-alldebrid",
-        "Ultrawide": "core-nexus-ultrawide",
-    }
-
+    heading_map = TEMPLATE_DIRECTORY_HEADINGS
     labs_heading_map = {
         "4K Apex Labs": "core-nexus-4k-apex-labs",
         "Stream Labs": "core-nexus-stream-labs",
@@ -414,14 +443,15 @@ def main():
 # plus a What's-New page and a roadmap "Shipped" table that were hand-updated and
 # stopped being updated. The functions below regenerate the *index* parts from the
 # canonical sources so they can never freeze, while curated prose stays hand-edited
-# inside managed regions (<!-- AUTO:* --> markers).
+# inside managed regions. Mintlify pages use MDX comments: HTML <!-- --> markers
+# make its parser reject the whole page when one of these files is deployed.
 
 import datetime as _dt
 
-CHANGELOG_BEGIN = "<!-- AUTO:RECENT_RELEASES:BEGIN -->"
-CHANGELOG_END = "<!-- AUTO:RECENT_RELEASES:END -->"
-ROADMAP_BEGIN = "<!-- AUTO:SHIPPED:BEGIN -->"
-ROADMAP_END = "<!-- AUTO:SHIPPED:END -->"
+CHANGELOG_BEGIN = "{/* AUTO:RECENT_RELEASES:BEGIN */}"
+CHANGELOG_END = "{/* AUTO:RECENT_RELEASES:END */}"
+ROADMAP_BEGIN = "{/* AUTO:SHIPPED:BEGIN */}"
+ROADMAP_END = "{/* AUTO:SHIPPED:END */}"
 ROOT_ROADMAP_BEGIN = "<!-- AUTO:ROOT_COMPLETED:BEGIN -->"
 ROOT_ROADMAP_END = "<!-- AUTO:ROOT_COMPLETED:END -->"
 TOOLS_WN_BEGIN = "<!-- AUTO:TOOLS_WHATSNEW:BEGIN -->"
@@ -678,7 +708,7 @@ def gen_tools_whatsnew(cfg_entries, limit=4, per_version=4):
     link = (
         '      <div class="news-item"><span class="badge" style="flex-shrink:0;background:'
         'rgba(0,212,255,.12);color:var(--th-accent)">↗</span><span style="color:var(--th-tx2)">'
-        '<a href="https://brevitya.github.io/Core-Builds/#changelog" style="color:var(--th-accent);'
+        '<a href="https://brevitya.github.io/Core-Builds/configurator/#changelog" style="color:var(--th-accent);'
         'text-decoration:none">Full Configurator changelog →</a> &nbsp;·&nbsp; '
         '<a href="https://corebuilds-docs.docsalot.dev/changelog" style="color:var(--th-accent);'
         'text-decoration:none">suite changelog →</a></span></div>'

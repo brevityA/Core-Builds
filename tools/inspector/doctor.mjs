@@ -123,14 +123,6 @@ export function diagnoseTemplate(input) {
   const requiredLanguages = Array.isArray(config.requiredLanguages) ? config.requiredLanguages : [];
   if (requiredLanguages.length) add('required-languages','advisory','Required languages are a hard filter',`${requiredLanguages.join(', ')} must be detected or the stream is removed.`,'$.config.requiredLanguages');
 
-  const expressions = [
-    ...(config.includedStreamExpressions || []),
-    ...(config.excludedStreamExpressions || []),
-    ...(config.preferredStreamExpressions || []),
-  ];
-  expressions.forEach((expr, i) => {
-    if (typeof expr?.expression === 'string' && /\bnot\s*\(/.test(expr.expression)) add(`legacy-not:${i}`,'blocker','SEL uses unsupported not()','Current expression syntax uses negate().','$.config.*StreamExpressions',{ type:'replace-sel-not' });
-  });
 
   const rank = { blocker:0, warning:1, advisory:2 };
   findings.sort((a,b) => rank[a.severity]-rank[b.severity] || a.id.localeCompare(b.id));
@@ -177,11 +169,6 @@ export function applyRepairs(input, selectedIds) {
       preset.instanceId = id;
     }
     if (repair.type === 'cap-timeout' && config.presets?.[repair.index]?.options) config.presets[repair.index].options.timeout = repair.value;
-    if (repair.type === 'replace-sel-not') {
-      for (const key of ['includedStreamExpressions','excludedStreamExpressions','preferredStreamExpressions']) {
-        for (const expr of config[key] || []) if (typeof expr?.expression === 'string') expr.expression = expr.expression.replace(/\bnot\s*\(/g,'negate(');
-      }
-    }
   }
   if (remove.size && Array.isArray(config.presets)) {
     // Groups reference presets by instanceId. Removing a preset without

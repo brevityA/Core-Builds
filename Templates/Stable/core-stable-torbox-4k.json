@@ -5,7 +5,7 @@
     "description": "Minimal, predictable 4K TorBox baseline. Uses local/native filtering, no remote SEL or regex sync, no fetch groups, and no dynamic early exit.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -13,7 +13,14 @@
     "changelogUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md",
     "coreBuildsProfile": "stable",
     "coreBuildsProfileVersion": "1",
-    "coreBuildsVersion": "2.89"
+    "coreBuildsVersion": "2.89",
+    "changelog": [
+      {
+        "date": "2026-10-22",
+        "version": "1.0.3",
+        "content": "Subtitles moved from AIOSubtitle to OpenSubtitles v3+: AIOStreams 2.36.0 removed the AIOSubtitle preset (its addon is no longer hosted), and every host on 2.36 refused this template with \"AIO Subtitle has been removed\". Same languages; no filter/sort/formatter changes."
+      }
+    ]
   },
   "config": {
     "trusted": false,
@@ -311,15 +318,18 @@
         }
       },
       {
-        "type": "aiosubtitle",
-        "instanceId": "aio-sub-1",
+        "type": "opensubtitles-v3-plus",
+        "instanceId": "osub-v3-1",
         "enabled": true,
         "options": {
-          "name": "AIOSubtitle",
-          "timeout": 6000,
-          "languages": [
+          "name": "OpenSubtitles v3+",
+          "timeout": 5000,
+          "language": [
             "en"
-          ]
+          ],
+          "sources": "all",
+          "includeAiTranslated": false,
+          "movieHashPlusAutoAdjustment": false
         }
       },
       {

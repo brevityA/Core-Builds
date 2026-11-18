@@ -20,12 +20,12 @@ export const OUTPUT_PROFILES = Object.freeze(['stable', 'balanced', 'advanced', 
 // 2.35.7 is the schema pin (#770): by the 2026-10-02 audit every public host ran
 // 2.35.4 or later, and the 2.34.1 -> 2.35.7 contract drift was additive only.
 // Older entries stay so existing saved sessions and shared links keep resolving.
-export const AIOSTREAMS_COMPATIBILITY_TARGETS = Object.freeze(['2.31.1', '2.32.0', '2.33.2', '2.34.0', '2.34.1', '2.35.7', 'unknown']);
+export const AIOSTREAMS_COMPATIBILITY_TARGETS = Object.freeze(['2.31.1', '2.32.0', '2.33.2', '2.34.0', '2.34.1', '2.35.7', '2.36.0', 'unknown']);
 
 // The target a fresh session gets: the AIOStreams release this configurator is
 // pinned against (see UPSTREAM.pin). Single source of truth — app.js imports it
 // for the state default and every fallback that used to hard-code '2.32.0'.
-export const DEFAULT_AIOSTREAMS_VERSION = '2.35.7';
+export const DEFAULT_AIOSTREAMS_VERSION = '2.36.0';
 
 export const OUTPUT_PROFILE_INFO = Object.freeze({
   stable: Object.freeze({
@@ -82,13 +82,13 @@ const EXPLICIT_STREAM_TYPES = new Set([
 // included so Stable/Balanced do not filter them back out
 // the moment a user switches them on.
 const OPTIONAL_EXTRAS_STREAM_TYPES = new Set([
-  'knaben', 'zilean', 'neko-bt', 'sootio', 'webstreamr', 'yastream',
+  'knaben', 'zilean', 'neko-bt', 'sootio', 'webstreamr', 'yastream', 'penguplay',
   // 17 safe add-ons (v2.34.1 audit — all isSimpleTogglePreset, lowercased, torbox-search removed in v2.32)
-  'anime-kitsu', 'argentina-tv', 'bitmagnet', 'brazuca-torrents',
-  'content-deep-dive', 'debridio-tmdb', 'debridio-tvdb', 'debridio-watchtower',
+  'anime-kitsu', 'bitmagnet', 'brazuca-torrents',
+  'content-deep-dive', 'debridio-tmdb', 'debridio-tvdb',
   'doctor-who-universe', 'easynews', 'easynewsplus', 'jackettio',
   'opensubtitles', 'tmdb-collections', 'torbox',
-  'usa-tv', 'usa-tv-next',
+  'usa-tv-next',
 ]);
 
 const STABLE_STREAM_TYPES = new Set([
@@ -100,8 +100,8 @@ const STABLE_STREAM_TYPES = new Set([
   'torrentio', 'sootio', 'peerflix', 'hdhub',
 ]);
 
-// Balanced is the default profile, so its source list is what most users get.
-// Restricting it to the Stable set cut a TorBox build to three torrent sources,
+// Balanced was the default profile until v3.17 and is still the first step up from
+// Core Stable. Restricting it to the Stable set cut a TorBox build to three torrent sources,
 // and because AIOStreams applies a template by replacing the whole preset list,
 // every update silently removed these five from configs that predated it.
 const BALANCED_STREAM_TYPES = new Set([
@@ -109,7 +109,8 @@ const BALANCED_STREAM_TYPES = new Set([
   'mediafusion', 'eztv', 'torrent-galaxy', 'zilean', 'knaben',
   // Emitted only for Anime / Movies + Anime content with a torrent debrid service;
   // without it, choosing Anime added no anime source on the default profile.
-  'animetosho',
+  // anime-tosho-new replaces animetosho from 2.36 (see applyAIOStreamsCompatibility).
+  'animetosho', 'anime-tosho-new',
 ]);
 
 const CORE_EXTERNAL_KILL = Object.freeze({
@@ -187,6 +188,11 @@ function isExplicitPreset(preset, context) {
   const services = new Set([context.service, ...values(context.multiServices)]);
   if (type === 'debridio') return services.has('debridio');
   if (type === 'debrider') return services.has('debrider');
+  // A lean profile may trim sources, never leave a chosen service or content
+  // type with none: MediaFusion is the only preset that can use Seedr, and the
+  // generator emits AnimeTosho only for Anime / Movies + Anime content.
+  if (type === 'mediafusion') return services.has('seedr');
+  if (type === 'animetosho' || type === 'anime-tosho-new') return ['anime', 'mixed'].includes(context.content);
   const optional = new Set(values(context.optionalScrapers).map(v => String(v).toLowerCase()));
   // Optional-extras toggles are explicit by definition. Without this the four extras that are
   // advertised *disabled* on most lanes (neko-bt/sootio/webstreamr/yastream) get filtered back
@@ -252,7 +258,8 @@ function stableSortCriteria(context) {
   // sort-policy.js#hoistResolution, so an uncached 2160p never outranks a
   // cached one on quality alone.
   const lead = ['resolution', 'cached', 'quality'];
-  const global = resolutionTierFirst(context)
+  // Resolution First leads with resolution at any tier; Quality First still wins, as in sort-policy.
+  const global = resolutionTierFirst(context) || (context.resolutionFirst && !context.qualityFirst)
     ? [
       ...lead.flatMap(key => base.filter(entry => entry.key === key)),
       ...base.filter(entry => !lead.includes(entry.key)),
@@ -402,7 +409,72 @@ function applyAIOStreamsCompatibility(template, context) {
       : {}),
   };
   if (target !== '2.31.1') delete template.metadata.coreBuildsLegacyTorboxSearch;
+  useAnimeToshoForTarget(config, target);
+  dropRemovedPresets(config, target);
+  stripNonSchemaPresetKeys(config);
   return template;
+}
+
+// AnimeTosho's feed (feed.animetosho.org) stopped taking new releases on 2026-05-09
+// and shuts down in October 2026; AIOStreams 2.36 archived that preset. The
+// generators emit its community continuation, anime-tosho-new (feed.animetosho.net),
+// which needs no API key from 2.36.0 but requires one before it. An explicitly
+// older target keeps the archived preset so its save is not refused; 'unknown'
+// is treated as current.
+const ANIME_TOSHO_NEW_FROM = '2.36.0';
+
+// Presets AIOStreams 2.36.0 marks removed (METADATA.DISABLED.removed): their addons are
+// gone, and a save carrying one is refused ("AIO Subtitle has been removed: Addon is no
+// longer hosted"). An imported or updated config can still hold one, so exports for the
+// pinned or an unknown target drop them; an explicit older target keeps them, since those
+// releases accept them. Held equal to the pinned host data by
+// configurator/tests/preset-resources.test.mjs.
+export const PRESETS_REMOVED_IN_2_36 = Object.freeze([
+  'ai-companion', 'aiosubtitle', 'argentina-tv', 'astream', 'baguettio', 'debridio-ic4a', 'debridio-tv',
+  'debridio-watchtower', 'nuvio-streams', 'streamasia', 'streamfusion', 'subhero', 'torbox', 'torbox-search', 'usa-tv',
+]);
+const REMOVED_PRESET_TYPES = new Set(PRESETS_REMOVED_IN_2_36.map(type => type.toLowerCase()));
+function dropRemovedPresets(config, target) {
+  if (!Array.isArray(config.presets) || (target !== 'unknown' && !targetAtLeast(target, ANIME_TOSHO_NEW_FROM))) return;
+  config.presets = config.presets.filter(preset => !REMOVED_PRESET_TYPES.has(String(preset?.type || '').toLowerCase()));
+}
+function targetAtLeast(target, floor) {
+  const [a, b, c] = target.split('.').map(Number), [x, y, z] = floor.split('.').map(Number);
+  return a !== x ? a > x : b !== y ? b > y : c >= z;
+}
+function useAnimeToshoForTarget(config, target) {
+  if (target === 'unknown' || !Array.isArray(config.presets) || targetAtLeast(target, ANIME_TOSHO_NEW_FROM)) return;
+  config.presets = config.presets.map(preset => (
+    preset && String(preset.type).toLowerCase() === 'anime-tosho-new' ? { ...preset, type: 'animetosho' } : preset
+  ));
+}
+
+// AIOStreams' PresetSchema keeps type, instanceId, enabled, options and category,
+// and strips anything else on save. The generators tag presets with a top-level
+// `resources` hint that isStreamPreset() reads while the profiles trim sources;
+// AIOStreams never sees it (it reads options.resources, falling back to everything
+// the preset supports), so it is dropped here, after the reducers.
+//
+// Where a preset supports more than the role Core Builds gives it, the hint becomes
+// the options.resources restriction AIOStreams applies. Read from the pinned
+// release's /api/v1/status (2.36.0, 2026-10-22; held by
+// configurator/tests/upstream/preset-resources-2.36.0.json): without it Torrentio,
+// StremThru Store and Peerflix add debrid-library catalogs, Sootio and Flix-Streams
+// catalogs, YaStream catalogs and subtitles, and TMDB Collections streams.
+// MediaFusion and Meteor set options.resources in the generators directly.
+const PRESET_SCHEMA_KEYS = new Set(['type', 'instanceId', 'enabled', 'options', 'category']);
+const RESOURCE_LIMITED_TYPES = new Set(['torrentio', 'stremthrustore', 'peerflix', 'sootio', 'yastream', 'flix-streams', 'tmdb-collections']);
+function stripNonSchemaPresetKeys(config) {
+  if (!Array.isArray(config.presets)) return;
+  config.presets = config.presets.map(preset => {
+    if (!preset || typeof preset !== 'object') return preset;
+    const kept = Object.fromEntries(Object.entries(preset).filter(([key]) => PRESET_SCHEMA_KEYS.has(key)));
+    const hint = values(preset.resources);
+    if (hint.length && RESOURCE_LIMITED_TYPES.has(String(preset.type || '').toLowerCase()) && !values(kept.options?.resources).length) {
+      kept.options = { ...(kept.options || {}), resources: [...hint] };
+    }
+    return kept;
+  });
 }
 
 function applyNativeFilters(config, context) {
@@ -432,6 +504,16 @@ function applyNativeFilters(config, context) {
         '2160p', '1440p',
       ]);
     }
+  }
+
+  // Hide 4K and Hide Dolby Vision are plain filters, so they belong in native
+  // fields that every profile keeps. Emitted only as stream expressions, they
+  // were wiped with the rest by Stable and Balanced and the toggles did nothing.
+  if (context.exclude4K && resolution !== '1080p') {
+    config.excludedResolutions = unique([...values(config.excludedResolutions), '2160p', '1440p']);
+  }
+  if (context.excludeDV) {
+    config.excludedVisualTags = unique([...values(config.excludedVisualTags), 'DV', 'HDR+DV']);
   }
 
   const selectedLanguages = unique(values(context.langs));
@@ -556,9 +638,8 @@ function applyBalancedProfile(template, context) {
 }
 
 /**
- * Resolve a requested profile. `auto` makes Simple Mode and Quick Install
- * genuinely Stable, maps the ordinary Custom flow to Balanced, and reserves
- * Advanced/Labs for an explicit architecture or profile selection.
+ * Resolve a requested profile. `auto` is Core Stable for every flow; only an
+ * explicit architecture (IQR, Apex Mixed) or an explicit profile selects more.
  */
 export function resolveOutputProfile(input = {}) {
   const requested = String(input.outputProfile || 'auto').toLowerCase();
@@ -566,7 +647,36 @@ export function resolveOutputProfile(input = {}) {
   if (input.simpleMode || input.quickStart) return 'stable';
   if (input.pseArch === 'apex-mixed') return 'labs';
   if (input.pseArch === 'iqr') return 'advanced';
-  return 'balanced';
+  return 'stable';
+}
+
+// Builder choices a profile replaces or drops, and why. Stable rewrites the
+// formatter, sort list (where Library Boost lives) and auto-play; Stable and
+// Balanced both drop rules that exist only as stream expressions, and preloading.
+const PROFILE_DROPS = Object.freeze({
+  formatter: Object.freeze({ dropped: ['stable'], reason: 'Core Stable always uses its own stream card' }),
+  libraryBoost: Object.freeze({ dropped: ['stable'], reason: 'Core Stable does not boost library items' }),
+  autoPlay: Object.freeze({ dropped: ['stable'], reason: 'Core Stable turns auto-play off' }),
+  foreignLangKill: Object.freeze({ dropped: ['stable', 'balanced'], reason: 'the foreign-language filter runs only in the Advanced and Labs profiles' }),
+  preload: Object.freeze({ dropped: ['stable', 'balanced'], reason: 'preloading runs only in the Advanced and Labs profiles' }),
+  streamPool: Object.freeze({ dropped: ['stable', 'balanced'], reason: 'the stream pool sizes dynamic fetching, which runs only in the Advanced and Labs profiles' }),
+});
+
+/**
+ * What to tell the user when the resolved profile would silently drop a choice
+ * they just made. An `auto` build moves to Balanced when Balanced honours the
+ * choice, so it takes effect; an explicitly chosen profile is never overridden,
+ * and nothing switches to Advanced on its own (it fetches differently). Null
+ * when the choice takes effect as is.
+ */
+export function profileVerdictForChoice(setting, context = {}) {
+  const rule = PROFILE_DROPS[setting];
+  if (!rule) return null;
+  const profile = resolveOutputProfile(context);
+  if (!rule.dropped.includes(profile)) return null;
+  const explicit = OUTPUT_PROFILES.includes(String(context.outputProfile || 'auto').toLowerCase());
+  const switchTo = !explicit && !rule.dropped.includes('balanced') ? 'balanced' : null;
+  return { profile, reason: rule.reason, switchTo };
 }
 
 /**

@@ -1,6 +1,6 @@
 ---
 title: "Template Directory"
-description: "Every active template with import URLs, versions, and plan requirements. Current version: v3.10.0"
+description: "Every active template with import URLs, versions, and plan requirements. Current version: v3.13.0"
 ---
 
 <Frame>
@@ -14,7 +14,9 @@ description: "Every active template with import URLs, versions, and plan require
 All templates require **AIOStreams v2.32+**. Each section has a **Lite** tab for lower-overhead setups.
 
 <Note>
-  **Quick import:** click an Import button to open the template directly in your AIOStreams instance. Or copy the raw URL to paste manually into any host.
+  **Quick import:** click an Import button (or a host under **Also on**) to open the template in that AIOStreams instance, then follow its prompts. Hosts below AIOStreams 2.36 aren't listed. To use your own instance, copy the raw URL and paste it under **About → Get Started → Load Template**.
+
+  **ElfHosted** may refuse a template's regex with "Forbidden URL" unless the instance trusts Core Builds. If that happens, use another host.
 </Note>
 
 <Warning>
@@ -23,184 +25,215 @@ All templates require **AIOStreams v2.32+**. Each section has a **Lite** tab for
   Get yours free at [themoviedb.org/settings/api](https://www.themoviedb.org/settings/api) → **Read Access Token** → paste into AIOStreams → **Settings → TMDB Access Token**.
 </Warning>
 
+## Start here: Core Builds
+
+One template for every device and service. AIOStreams asks what you watch on, the picture you want, what matters most, whether to show only streams that play straight away, your language and whether you mostly watch anime; then you pick your service: TorBox, Real-Debrid, AllDebrid, Premiumize, Debrid-Link, Offcloud, EasyDebrid, PikPak, Seedr, Debrider or EasyNews, or none for free P2P. You get the same setup the [configurator's Quick install](https://brevitya.github.io/Core-Builds/configurator/) would build for those answers. For Debridio, Usenet indexers or HTTP streams, use the configurator instead.
+
+Free P2P needs a host that allows it: ElfHosted refuses P2P, so import on Yeb's / ForTheWeak or a host under **Also on**.
+
+<CardGroup cols={2}>
+  <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Smart/core-builds.json" />
+  <Card title="Import on Yeb's / ForTheWeak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Smart/core-builds.json" />
+</CardGroup>
+Also on: [Midnight's](https://aiostreamsfortheweebsstable.midnightignite.me/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Smart/core-builds.json) · [Kuu's](https://aiostreams.stremio.ru/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Smart/core-builds.json) · [ATBP](https://aio.atbphosting.com/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Smart/core-builds.json) · [Wizaardd](https://aiostreams-stable.forthewizards.uk/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Smart/core-builds.json) · [Viren's Nightly](https://aiostreams.viren070.me/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Smart/core-builds.json)
+```
+https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Smart/core-builds.json
+```
+
+The templates below are the hand-tuned Core Nexus lineup, for when you want a specific build.
+
 ## TorBox Pro
 
 <Tabs>
   <Tab title="4K">
-    ### 4K Apex — v0.9.4
+    ### 4K Apex — v0.9.9
     Flagship 4K. IQR Tukey fence adaptive bitrate filtering, DV/HDR priority, TorBox Usenet, Score IQR Guard, elite group pins, perGroup() Extra Cached.
 
     <CardGroup cols={2}>
-      <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-4k-apex.json" />
-      <Card title="Import on Fortheweak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-4k-apex.json" />
+      <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-4k-apex.json" />
+      <Card title="Import on Yeb's / ForTheWeak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-4k-apex.json" />
     </CardGroup>
+    Also on: [Midnight's](https://aiostreamsfortheweebsstable.midnightignite.me/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-4k-apex.json) · [Kuu's](https://aiostreams.stremio.ru/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-4k-apex.json) · [ATBP](https://aio.atbphosting.com/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-4k-apex.json) · [Wizaardd](https://aiostreams-stable.forthewizards.uk/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-4k-apex.json) · [Viren's Nightly](https://aiostreams.viren070.me/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-4k-apex.json)
     ```
     https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-4k-apex.json
     ```
 
     ---
 
-    ### 4K Apex (TorBox-only) — v2.12.13
+    ### 4K Apex (TorBox-only) — v2.12.19
     Cached-only Apex variant. No external scrapers — instant results from TorBox cache only. Score IQR Guard, elite group pins, perGroup() Extra Cached.
 
     <CardGroup cols={2}>
-      <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-4k-apex-torbox.json" />
-      <Card title="Import on Fortheweak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-4k-apex-torbox.json" />
+      <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-4k-apex-torbox.json" />
+      <Card title="Import on Yeb's / ForTheWeak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-4k-apex-torbox.json" />
     </CardGroup>
+    Also on: [Midnight's](https://aiostreamsfortheweebsstable.midnightignite.me/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-4k-apex-torbox.json) · [Kuu's](https://aiostreams.stremio.ru/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-4k-apex-torbox.json) · [ATBP](https://aio.atbphosting.com/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-4k-apex-torbox.json) · [Wizaardd](https://aiostreams-stable.forthewizards.uk/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-4k-apex-torbox.json) · [Viren's Nightly](https://aiostreams.viren070.me/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-4k-apex-torbox.json)
     ```
     https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-4k-apex-torbox.json
     ```
 
     ---
 
-    ### 4K Hybrid — v2.12.13
+    ### 4K Hybrid — v2.12.18
     TorBox Pro + Usenet indexer (NZBGeek included, disabled by default). Full 4K with TorBox-priority PSEs, Score IQR Guard, elite group pins, perGroup() Extra Cached. Enable the Newznab preset after import — see the [importing guide](/importing) for shared-hosting notes.
 
     <CardGroup cols={2}>
-      <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Hybrid/core-nexus-4k-hybrid.json" />
-      <Card title="Import on Fortheweak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Hybrid/core-nexus-4k-hybrid.json" />
+      <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Hybrid/core-nexus-4k-hybrid.json" />
+      <Card title="Import on Yeb's / ForTheWeak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Hybrid/core-nexus-4k-hybrid.json" />
     </CardGroup>
+    Also on: [Midnight's](https://aiostreamsfortheweebsstable.midnightignite.me/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Hybrid/core-nexus-4k-hybrid.json) · [Kuu's](https://aiostreams.stremio.ru/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Hybrid/core-nexus-4k-hybrid.json) · [ATBP](https://aio.atbphosting.com/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Hybrid/core-nexus-4k-hybrid.json) · [Wizaardd](https://aiostreams-stable.forthewizards.uk/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Hybrid/core-nexus-4k-hybrid.json) · [Viren's Nightly](https://aiostreams.viren070.me/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Hybrid/core-nexus-4k-hybrid.json)
     ```
     https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Hybrid/core-nexus-4k-hybrid.json
     ```
 
     ---
 
-    ### Samsung TV 4K — v0.3.12
+    ### Samsung TV 4K — v0.3.18
     AV1/VC-1/DV hard-excluded for Tizen. HDR10+ preferred. REPACK ISE, booster PSEs.
 
     <CardGroup cols={2}>
-      <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Device/Samsung/core-nexus-samsung-tv-4k.json" />
-      <Card title="Import on Fortheweak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Device/Samsung/core-nexus-samsung-tv-4k.json" />
+      <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Device/Samsung/core-nexus-samsung-tv-4k.json" />
+      <Card title="Import on Yeb's / ForTheWeak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Device/Samsung/core-nexus-samsung-tv-4k.json" />
     </CardGroup>
+    Also on: [Midnight's](https://aiostreamsfortheweebsstable.midnightignite.me/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Device/Samsung/core-nexus-samsung-tv-4k.json) · [Kuu's](https://aiostreams.stremio.ru/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Device/Samsung/core-nexus-samsung-tv-4k.json) · [ATBP](https://aio.atbphosting.com/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Device/Samsung/core-nexus-samsung-tv-4k.json) · [Wizaardd](https://aiostreams-stable.forthewizards.uk/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Device/Samsung/core-nexus-samsung-tv-4k.json) · [Viren's Nightly](https://aiostreams.viren070.me/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Device/Samsung/core-nexus-samsung-tv-4k.json)
     ```
     https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Device/Samsung/core-nexus-samsung-tv-4k.json
     ```
 
     ---
 
-    ### Samsung RU7100 4K — v0.3.12
+    ### Samsung RU7100 4K — v0.3.18
     RU7100 and compatible 2019–2022 Tizen TVs. Full APEX IQR Tukey fence PSE stack — more aggressive filtering than Samsung TV 4K. AV1/VC-1/DV hard-excluded, FLAC/AAC native audio, HDR10+/HDR10/HLG.
 
     <CardGroup cols={2}>
-      <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Device/Samsung/core-nexus-samsung-ru7100-4k.json" />
-      <Card title="Import on Fortheweak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Device/Samsung/core-nexus-samsung-ru7100-4k.json" />
+      <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Device/Samsung/core-nexus-samsung-ru7100-4k.json" />
+      <Card title="Import on Yeb's / ForTheWeak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Device/Samsung/core-nexus-samsung-ru7100-4k.json" />
     </CardGroup>
+    Also on: [Midnight's](https://aiostreamsfortheweebsstable.midnightignite.me/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Device/Samsung/core-nexus-samsung-ru7100-4k.json) · [Kuu's](https://aiostreams.stremio.ru/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Device/Samsung/core-nexus-samsung-ru7100-4k.json) · [ATBP](https://aio.atbphosting.com/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Device/Samsung/core-nexus-samsung-ru7100-4k.json) · [Wizaardd](https://aiostreams-stable.forthewizards.uk/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Device/Samsung/core-nexus-samsung-ru7100-4k.json) · [Viren's Nightly](https://aiostreams.viren070.me/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Device/Samsung/core-nexus-samsung-ru7100-4k.json)
     ```
     https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Device/Samsung/core-nexus-samsung-ru7100-4k.json
     ```
 
     ---
 
-    ### Google TV Streamer 4K — v0.1.0
+    ### Google TV Streamer 4K — v0.1.12
     Google TV Streamer (2024). DV, HDR10+, HDR10, HLG supported. AV1 hardware decode. Lossless audio excluded (DD+ Atmos ceiling, 5.1ch max). Based on 4K Apex with full IQR Tukey fence PSE stack.
 
     <CardGroup cols={2}>
-      <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Device/GoogleTV/core-nexus-google-tv-streamer-4k.json" />
-      <Card title="Import on Fortheweak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Device/GoogleTV/core-nexus-google-tv-streamer-4k.json" />
+      <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Device/GoogleTV/core-nexus-google-tv-streamer-4k.json" />
+      <Card title="Import on Yeb's / ForTheWeak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Device/GoogleTV/core-nexus-google-tv-streamer-4k.json" />
     </CardGroup>
+    Also on: [Midnight's](https://aiostreamsfortheweebsstable.midnightignite.me/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Device/GoogleTV/core-nexus-google-tv-streamer-4k.json) · [Kuu's](https://aiostreams.stremio.ru/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Device/GoogleTV/core-nexus-google-tv-streamer-4k.json) · [ATBP](https://aio.atbphosting.com/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Device/GoogleTV/core-nexus-google-tv-streamer-4k.json) · [Wizaardd](https://aiostreams-stable.forthewizards.uk/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Device/GoogleTV/core-nexus-google-tv-streamer-4k.json) · [Viren's Nightly](https://aiostreams.viren070.me/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Device/GoogleTV/core-nexus-google-tv-streamer-4k.json)
     ```
     https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Device/GoogleTV/core-nexus-google-tv-streamer-4k.json
     ```
 
     ---
 
-    ### Windows Ultrawide — v0.2.4
+    ### Windows Ultrawide — v0.2.18
     Windows PC / ultrawide monitor. 1080p primary (S/A/B/C tiers) with 1440p and 4K fallback. Full lossless audio (TrueHD, DTS-HD MA, DTS:X, FLAC). HDR-first visual tag ordering. AV1 and HEVC preferred; VC-1 excluded. 14-PSE stack.
 
     <CardGroup cols={2}>
-      <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Device/Windows/core-nexus-ultrawide.json" />
-      <Card title="Import on Fortheweak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Device/Windows/core-nexus-ultrawide.json" />
+      <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Device/Windows/core-nexus-ultrawide.json" />
+      <Card title="Import on Yeb's / ForTheWeak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Device/Windows/core-nexus-ultrawide.json" />
     </CardGroup>
+    Also on: [Midnight's](https://aiostreamsfortheweebsstable.midnightignite.me/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Device/Windows/core-nexus-ultrawide.json) · [Kuu's](https://aiostreams.stremio.ru/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Device/Windows/core-nexus-ultrawide.json) · [ATBP](https://aio.atbphosting.com/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Device/Windows/core-nexus-ultrawide.json) · [Wizaardd](https://aiostreams-stable.forthewizards.uk/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Device/Windows/core-nexus-ultrawide.json) · [Viren's Nightly](https://aiostreams.viren070.me/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Device/Windows/core-nexus-ultrawide.json)
     ```
     https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Device/Windows/core-nexus-ultrawide.json
     ```
   </Tab>
 
   <Tab title="1080p">
-    ### Stream — v2.10.12
+    ### Stream — v2.10.19
     1080p streaming quality, 720p fallback.
 
     <CardGroup cols={2}>
-      <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-stream.json" />
-      <Card title="Import on Fortheweak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-stream.json" />
+      <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-stream.json" />
+      <Card title="Import on Yeb's / ForTheWeak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-stream.json" />
     </CardGroup>
+    Also on: [Midnight's](https://aiostreamsfortheweebsstable.midnightignite.me/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-stream.json) · [Kuu's](https://aiostreams.stremio.ru/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-stream.json) · [ATBP](https://aio.atbphosting.com/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-stream.json) · [Wizaardd](https://aiostreams-stable.forthewizards.uk/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-stream.json) · [Viren's Nightly](https://aiostreams.viren070.me/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-stream.json)
     ```
     https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-stream.json
     ```
 
     ---
 
-    ### Stream (Fire Stick) — v2.10.4
+    ### Stream (Fire Stick) — v2.10.18
     1080p SDR, tuned for Fire Stick and low-RAM devices.
 
     <CardGroup cols={2}>
-      <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-stream-firestick.json" />
-      <Card title="Import on Fortheweak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-stream-firestick.json" />
+      <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-stream-firestick.json" />
+      <Card title="Import on Yeb's / ForTheWeak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-stream-firestick.json" />
     </CardGroup>
+    Also on: [Midnight's](https://aiostreamsfortheweebsstable.midnightignite.me/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-stream-firestick.json) · [Kuu's](https://aiostreams.stremio.ru/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-stream-firestick.json) · [ATBP](https://aio.atbphosting.com/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-stream-firestick.json) · [Wizaardd](https://aiostreams-stable.forthewizards.uk/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-stream-firestick.json) · [Viren's Nightly](https://aiostreams.viren070.me/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-stream-firestick.json)
     ```
     https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-stream-firestick.json
     ```
 
     ---
 
-    ### Samsung TV — v0.3.12
+    ### Samsung TV — v0.3.18
     1080p, AV1/VC-1/DV hard-excluded for Tizen. REPACK ISE, booster PSEs.
 
     <CardGroup cols={2}>
-      <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Device/Samsung/core-nexus-samsung-tv.json" />
-      <Card title="Import on Fortheweak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Device/Samsung/core-nexus-samsung-tv.json" />
+      <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Device/Samsung/core-nexus-samsung-tv.json" />
+      <Card title="Import on Yeb's / ForTheWeak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Device/Samsung/core-nexus-samsung-tv.json" />
     </CardGroup>
+    Also on: [Midnight's](https://aiostreamsfortheweebsstable.midnightignite.me/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Device/Samsung/core-nexus-samsung-tv.json) · [Kuu's](https://aiostreams.stremio.ru/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Device/Samsung/core-nexus-samsung-tv.json) · [ATBP](https://aio.atbphosting.com/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Device/Samsung/core-nexus-samsung-tv.json) · [Wizaardd](https://aiostreams-stable.forthewizards.uk/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Device/Samsung/core-nexus-samsung-tv.json) · [Viren's Nightly](https://aiostreams.viren070.me/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Device/Samsung/core-nexus-samsung-tv.json)
     ```
     https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Device/Samsung/core-nexus-samsung-tv.json
     ```
 
     ---
 
-    ### Hybrid — v2.10.13
+    ### Hybrid — v2.10.20
     TorBox + Usenet indexer (NZBGeek included, disabled by default), 1080p. TorBox-priority twin PSEs (IQR). Enable the Newznab preset after import — see the [importing guide](/importing) for shared-hosting notes.
 
     <CardGroup cols={2}>
-      <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Hybrid/core-nexus-hybrid.json" />
-      <Card title="Import on Fortheweak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Hybrid/core-nexus-hybrid.json" />
+      <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Hybrid/core-nexus-hybrid.json" />
+      <Card title="Import on Yeb's / ForTheWeak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Hybrid/core-nexus-hybrid.json" />
     </CardGroup>
+    Also on: [Midnight's](https://aiostreamsfortheweebsstable.midnightignite.me/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Hybrid/core-nexus-hybrid.json) · [Kuu's](https://aiostreams.stremio.ru/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Hybrid/core-nexus-hybrid.json) · [ATBP](https://aio.atbphosting.com/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Hybrid/core-nexus-hybrid.json) · [Wizaardd](https://aiostreams-stable.forthewizards.uk/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Hybrid/core-nexus-hybrid.json) · [Viren's Nightly](https://aiostreams.viren070.me/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Hybrid/core-nexus-hybrid.json)
     ```
     https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Hybrid/core-nexus-hybrid.json
     ```
   </Tab>
 
   <Tab title="Lite">
-    ### Stream Lite — v2.10.4
+    ### Stream Lite — v2.10.18
     Reduced ESE set. Faster, lighter on the host.
 
     <CardGroup cols={2}>
-      <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-stream-lite.json" />
-      <Card title="Import on Fortheweak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-stream-lite.json" />
+      <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-stream-lite.json" />
+      <Card title="Import on Yeb's / ForTheWeak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-stream-lite.json" />
     </CardGroup>
+    Also on: [Midnight's](https://aiostreamsfortheweebsstable.midnightignite.me/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-stream-lite.json) · [Kuu's](https://aiostreams.stremio.ru/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-stream-lite.json) · [ATBP](https://aio.atbphosting.com/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-stream-lite.json) · [Wizaardd](https://aiostreams-stable.forthewizards.uk/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-stream-lite.json) · [Viren's Nightly](https://aiostreams.viren070.me/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-stream-lite.json)
     ```
     https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-stream-lite.json
     ```
 
     ---
 
-    ### Stream (Fire Stick) Lite — v2.10.4
+    ### Stream (Fire Stick) Lite — v2.10.17
 
     <CardGroup cols={2}>
-      <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-stream-firestick-lite.json" />
-      <Card title="Import on Fortheweak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-stream-firestick-lite.json" />
+      <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-stream-firestick-lite.json" />
+      <Card title="Import on Yeb's / ForTheWeak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-stream-firestick-lite.json" />
     </CardGroup>
+    Also on: [Midnight's](https://aiostreamsfortheweebsstable.midnightignite.me/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-stream-firestick-lite.json) · [Kuu's](https://aiostreams.stremio.ru/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-stream-firestick-lite.json) · [ATBP](https://aio.atbphosting.com/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-stream-firestick-lite.json) · [Wizaardd](https://aiostreams-stable.forthewizards.uk/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-stream-firestick-lite.json) · [Viren's Nightly](https://aiostreams.viren070.me/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-stream-firestick-lite.json)
     ```
     https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Single/core-nexus-stream-firestick-lite.json
     ```
 
     ---
 
-    ### Hybrid Lite — v2.10.4
+    ### Hybrid Lite — v2.10.19
 
     <CardGroup cols={2}>
-      <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Hybrid/core-nexus-hybrid-lite.json" />
-      <Card title="Import on Fortheweak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Hybrid/core-nexus-hybrid-lite.json" />
+      <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Hybrid/core-nexus-hybrid-lite.json" />
+      <Card title="Import on Yeb's / ForTheWeak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Hybrid/core-nexus-hybrid-lite.json" />
     </CardGroup>
+    Also on: [Midnight's](https://aiostreamsfortheweebsstable.midnightignite.me/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Hybrid/core-nexus-hybrid-lite.json) · [Kuu's](https://aiostreams.stremio.ru/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Hybrid/core-nexus-hybrid-lite.json) · [ATBP](https://aio.atbphosting.com/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Hybrid/core-nexus-hybrid-lite.json) · [Wizaardd](https://aiostreams-stable.forthewizards.uk/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Hybrid/core-nexus-hybrid-lite.json) · [Viren's Nightly](https://aiostreams.viren070.me/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Hybrid/core-nexus-hybrid-lite.json)
     ```
     https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Hybrid/core-nexus-hybrid-lite.json
     ```
@@ -213,127 +246,137 @@ All templates require **AIOStreams v2.32+**. Each section has a **Lite** tab for
 
 <Tabs>
   <Tab title="4K">
-    ### 4K Essential — v2.12.12
+    ### 4K Essential — v2.12.18
     Full 4K on Essential plan. IQR PSEs, pow() decay, Score IQR Guard, elite group pins, perGroup() Extra Cached.
 
     <CardGroup cols={2}>
-      <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Essential/core-nexus-4k-essential.json" />
-      <Card title="Import on Fortheweak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Essential/core-nexus-4k-essential.json" />
+      <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Essential/core-nexus-4k-essential.json" />
+      <Card title="Import on Yeb's / ForTheWeak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Essential/core-nexus-4k-essential.json" />
     </CardGroup>
+    Also on: [Midnight's](https://aiostreamsfortheweebsstable.midnightignite.me/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Essential/core-nexus-4k-essential.json) · [Kuu's](https://aiostreams.stremio.ru/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Essential/core-nexus-4k-essential.json) · [ATBP](https://aio.atbphosting.com/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Essential/core-nexus-4k-essential.json) · [Wizaardd](https://aiostreams-stable.forthewizards.uk/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Essential/core-nexus-4k-essential.json) · [Viren's Nightly](https://aiostreams.viren070.me/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Essential/core-nexus-4k-essential.json)
     ```
     https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Essential/core-nexus-4k-essential.json
     ```
 
     ---
 
-    ### Flash 4K — v2.10.11
+    ### Flash 4K — v2.10.17
     Cached-only instant play. Returns nothing if title isn't cached.
 
     <CardGroup cols={2}>
-      <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Flash/core-nexus-flash-4k.json" />
-      <Card title="Import on Fortheweak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Flash/core-nexus-flash-4k.json" />
+      <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Flash/core-nexus-flash-4k.json" />
+      <Card title="Import on Yeb's / ForTheWeak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Flash/core-nexus-flash-4k.json" />
     </CardGroup>
+    Also on: [Midnight's](https://aiostreamsfortheweebsstable.midnightignite.me/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Flash/core-nexus-flash-4k.json) · [Kuu's](https://aiostreams.stremio.ru/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Flash/core-nexus-flash-4k.json) · [ATBP](https://aio.atbphosting.com/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Flash/core-nexus-flash-4k.json) · [Wizaardd](https://aiostreams-stable.forthewizards.uk/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Flash/core-nexus-flash-4k.json) · [Viren's Nightly](https://aiostreams.viren070.me/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Flash/core-nexus-flash-4k.json)
     ```
     https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Flash/core-nexus-flash-4k.json
     ```
 
     ---
 
-    ### Speed 4K — v2.10.11
+    ### Speed 4K — v2.10.17
     Fast cached 4K. Exits at 3 cached results or timeout.
 
     <CardGroup cols={2}>
-      <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/TorBox/core-nexus-speed-4k.json" />
-      <Card title="Import on Fortheweak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/TorBox/core-nexus-speed-4k.json" />
+      <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/TorBox/core-nexus-speed-4k.json" />
+      <Card title="Import on Yeb's / ForTheWeak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/TorBox/core-nexus-speed-4k.json" />
     </CardGroup>
+    Also on: [Midnight's](https://aiostreamsfortheweebsstable.midnightignite.me/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/TorBox/core-nexus-speed-4k.json) · [Kuu's](https://aiostreams.stremio.ru/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/TorBox/core-nexus-speed-4k.json) · [ATBP](https://aio.atbphosting.com/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/TorBox/core-nexus-speed-4k.json) · [Wizaardd](https://aiostreams-stable.forthewizards.uk/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/TorBox/core-nexus-speed-4k.json) · [Viren's Nightly](https://aiostreams.viren070.me/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/TorBox/core-nexus-speed-4k.json)
     ```
     https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/TorBox/core-nexus-speed-4k.json
     ```
   </Tab>
 
   <Tab title="1080p">
-    ### Essential — v2.10.12
+    ### Essential — v2.10.19
     Standard 1080p for Essential subscribers.
 
     <CardGroup cols={2}>
-      <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Essential/core-nexus-essential.json" />
-      <Card title="Import on Fortheweak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Essential/core-nexus-essential.json" />
+      <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Essential/core-nexus-essential.json" />
+      <Card title="Import on Yeb's / ForTheWeak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Essential/core-nexus-essential.json" />
     </CardGroup>
+    Also on: [Midnight's](https://aiostreamsfortheweebsstable.midnightignite.me/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Essential/core-nexus-essential.json) · [Kuu's](https://aiostreams.stremio.ru/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Essential/core-nexus-essential.json) · [ATBP](https://aio.atbphosting.com/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Essential/core-nexus-essential.json) · [Wizaardd](https://aiostreams-stable.forthewizards.uk/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Essential/core-nexus-essential.json) · [Viren's Nightly](https://aiostreams.viren070.me/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Essential/core-nexus-essential.json)
     ```
     https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Essential/core-nexus-essential.json
     ```
 
     ---
 
-    ### Flash — v2.10.11
+    ### Flash — v2.10.16
     Cached-only instant 1080p play.
 
     <CardGroup cols={2}>
-      <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Flash/core-nexus-flash.json" />
-      <Card title="Import on Fortheweak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Flash/core-nexus-flash.json" />
+      <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Flash/core-nexus-flash.json" />
+      <Card title="Import on Yeb's / ForTheWeak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Flash/core-nexus-flash.json" />
     </CardGroup>
+    Also on: [Midnight's](https://aiostreamsfortheweebsstable.midnightignite.me/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Flash/core-nexus-flash.json) · [Kuu's](https://aiostreams.stremio.ru/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Flash/core-nexus-flash.json) · [ATBP](https://aio.atbphosting.com/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Flash/core-nexus-flash.json) · [Wizaardd](https://aiostreams-stable.forthewizards.uk/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Flash/core-nexus-flash.json) · [Viren's Nightly](https://aiostreams.viren070.me/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Flash/core-nexus-flash.json)
     ```
     https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Flash/core-nexus-flash.json
     ```
 
     ---
 
-    ### Speed — v2.10.11
+    ### Speed — v2.10.18
     Fast cached 1080p. Exits at 3 cached results or timeout.
 
     <CardGroup cols={2}>
-      <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/TorBox/core-nexus-speed.json" />
-      <Card title="Import on Fortheweak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/TorBox/core-nexus-speed.json" />
+      <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/TorBox/core-nexus-speed.json" />
+      <Card title="Import on Yeb's / ForTheWeak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/TorBox/core-nexus-speed.json" />
     </CardGroup>
+    Also on: [Midnight's](https://aiostreamsfortheweebsstable.midnightignite.me/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/TorBox/core-nexus-speed.json) · [Kuu's](https://aiostreams.stremio.ru/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/TorBox/core-nexus-speed.json) · [ATBP](https://aio.atbphosting.com/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/TorBox/core-nexus-speed.json) · [Wizaardd](https://aiostreams-stable.forthewizards.uk/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/TorBox/core-nexus-speed.json) · [Viren's Nightly](https://aiostreams.viren070.me/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/TorBox/core-nexus-speed.json)
     ```
     https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/TorBox/core-nexus-speed.json
     ```
   </Tab>
 
   <Tab title="Lite">
-    ### 4K Essential Lite — v2.10.4
+    ### 4K Essential Lite — v2.10.17
     CB-style PSEs — simpler scoring, lower CPU overhead.
 
     <CardGroup cols={2}>
-      <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Essential/core-nexus-4k-essential-lite.json" />
-      <Card title="Import on Fortheweak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Essential/core-nexus-4k-essential-lite.json" />
+      <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Essential/core-nexus-4k-essential-lite.json" />
+      <Card title="Import on Yeb's / ForTheWeak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Essential/core-nexus-4k-essential-lite.json" />
     </CardGroup>
+    Also on: [Midnight's](https://aiostreamsfortheweebsstable.midnightignite.me/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Essential/core-nexus-4k-essential-lite.json) · [Kuu's](https://aiostreams.stremio.ru/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Essential/core-nexus-4k-essential-lite.json) · [ATBP](https://aio.atbphosting.com/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Essential/core-nexus-4k-essential-lite.json) · [Wizaardd](https://aiostreams-stable.forthewizards.uk/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Essential/core-nexus-4k-essential-lite.json) · [Viren's Nightly](https://aiostreams.viren070.me/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Essential/core-nexus-4k-essential-lite.json)
     ```
     https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Essential/core-nexus-4k-essential-lite.json
     ```
 
     ---
 
-    ### Speed 4K Lite — v2.10.4
+    ### Speed 4K Lite — v2.10.17
 
     <CardGroup cols={2}>
-      <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/TorBox/core-nexus-speed-4k-lite.json" />
-      <Card title="Import on Fortheweak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/TorBox/core-nexus-speed-4k-lite.json" />
+      <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/TorBox/core-nexus-speed-4k-lite.json" />
+      <Card title="Import on Yeb's / ForTheWeak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/TorBox/core-nexus-speed-4k-lite.json" />
     </CardGroup>
+    Also on: [Midnight's](https://aiostreamsfortheweebsstable.midnightignite.me/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/TorBox/core-nexus-speed-4k-lite.json) · [Kuu's](https://aiostreams.stremio.ru/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/TorBox/core-nexus-speed-4k-lite.json) · [ATBP](https://aio.atbphosting.com/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/TorBox/core-nexus-speed-4k-lite.json) · [Wizaardd](https://aiostreams-stable.forthewizards.uk/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/TorBox/core-nexus-speed-4k-lite.json) · [Viren's Nightly](https://aiostreams.viren070.me/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/TorBox/core-nexus-speed-4k-lite.json)
     ```
     https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/TorBox/core-nexus-speed-4k-lite.json
     ```
 
     ---
 
-    ### Essential Lite — v2.10.4
+    ### Essential Lite — v2.10.18
 
     <CardGroup cols={2}>
-      <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Essential/core-nexus-essential-lite.json" />
-      <Card title="Import on Fortheweak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Essential/core-nexus-essential-lite.json" />
+      <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Essential/core-nexus-essential-lite.json" />
+      <Card title="Import on Yeb's / ForTheWeak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Essential/core-nexus-essential-lite.json" />
     </CardGroup>
+    Also on: [Midnight's](https://aiostreamsfortheweebsstable.midnightignite.me/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Essential/core-nexus-essential-lite.json) · [Kuu's](https://aiostreams.stremio.ru/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Essential/core-nexus-essential-lite.json) · [ATBP](https://aio.atbphosting.com/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Essential/core-nexus-essential-lite.json) · [Wizaardd](https://aiostreams-stable.forthewizards.uk/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Essential/core-nexus-essential-lite.json) · [Viren's Nightly](https://aiostreams.viren070.me/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Essential/core-nexus-essential-lite.json)
     ```
     https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Essential/core-nexus-essential-lite.json
     ```
 
     ---
 
-    ### Speed Lite — v2.10.4
+    ### Speed Lite — v2.10.17
 
     <CardGroup cols={2}>
-      <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/TorBox/core-nexus-speed-lite.json" />
-      <Card title="Import on Fortheweak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/TorBox/core-nexus-speed-lite.json" />
+      <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/TorBox/core-nexus-speed-lite.json" />
+      <Card title="Import on Yeb's / ForTheWeak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/TorBox/core-nexus-speed-lite.json" />
     </CardGroup>
+    Also on: [Midnight's](https://aiostreamsfortheweebsstable.midnightignite.me/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/TorBox/core-nexus-speed-lite.json) · [Kuu's](https://aiostreams.stremio.ru/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/TorBox/core-nexus-speed-lite.json) · [ATBP](https://aio.atbphosting.com/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/TorBox/core-nexus-speed-lite.json) · [Wizaardd](https://aiostreams-stable.forthewizards.uk/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/TorBox/core-nexus-speed-lite.json) · [Viren's Nightly](https://aiostreams.viren070.me/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/TorBox/core-nexus-speed-lite.json)
     ```
     https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/TorBox/core-nexus-speed-lite.json
     ```
@@ -346,49 +389,53 @@ All templates require **AIOStreams v2.32+**. Each section has a **Lite** tab for
 
 <Tabs>
   <Tab title="4K">
-    ### 4K AllDebrid — v0.4.13
+    ### 4K AllDebrid — v0.4.20
     Full 4K with IQR Tukey fence PSEs, Score IQR Guard, elite group pins, perGroup() Extra Cached.
 
     <CardGroup cols={2}>
-      <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/AllDebrid/core-nexus-4k-alldebrid.json" />
-      <Card title="Import on Fortheweak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/AllDebrid/core-nexus-4k-alldebrid.json" />
+      <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/AllDebrid/core-nexus-4k-alldebrid.json" />
+      <Card title="Import on Yeb's / ForTheWeak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/AllDebrid/core-nexus-4k-alldebrid.json" />
     </CardGroup>
+    Also on: [Midnight's](https://aiostreamsfortheweebsstable.midnightignite.me/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/AllDebrid/core-nexus-4k-alldebrid.json) · [Kuu's](https://aiostreams.stremio.ru/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/AllDebrid/core-nexus-4k-alldebrid.json) · [ATBP](https://aio.atbphosting.com/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/AllDebrid/core-nexus-4k-alldebrid.json) · [Wizaardd](https://aiostreams-stable.forthewizards.uk/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/AllDebrid/core-nexus-4k-alldebrid.json) · [Viren's Nightly](https://aiostreams.viren070.me/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/AllDebrid/core-nexus-4k-alldebrid.json)
     ```
     https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/AllDebrid/core-nexus-4k-alldebrid.json
     ```
   </Tab>
 
   <Tab title="1080p">
-    ### AllDebrid — v0.2.13
+    ### AllDebrid — v0.2.21
 
     <CardGroup cols={2}>
-      <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/AllDebrid/core-nexus-alldebrid.json" />
-      <Card title="Import on Fortheweak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/AllDebrid/core-nexus-alldebrid.json" />
+      <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/AllDebrid/core-nexus-alldebrid.json" />
+      <Card title="Import on Yeb's / ForTheWeak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/AllDebrid/core-nexus-alldebrid.json" />
     </CardGroup>
+    Also on: [Midnight's](https://aiostreamsfortheweebsstable.midnightignite.me/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/AllDebrid/core-nexus-alldebrid.json) · [Kuu's](https://aiostreams.stremio.ru/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/AllDebrid/core-nexus-alldebrid.json) · [ATBP](https://aio.atbphosting.com/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/AllDebrid/core-nexus-alldebrid.json) · [Wizaardd](https://aiostreams-stable.forthewizards.uk/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/AllDebrid/core-nexus-alldebrid.json) · [Viren's Nightly](https://aiostreams.viren070.me/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/AllDebrid/core-nexus-alldebrid.json)
     ```
     https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/AllDebrid/core-nexus-alldebrid.json
     ```
   </Tab>
 
   <Tab title="Lite">
-    ### 4K AllDebrid Lite — v0.2.4
+    ### 4K AllDebrid Lite — v0.2.19
 
     <CardGroup cols={2}>
-      <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/AllDebrid/core-nexus-4k-alldebrid-lite.json" />
-      <Card title="Import on Fortheweak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/AllDebrid/core-nexus-4k-alldebrid-lite.json" />
+      <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/AllDebrid/core-nexus-4k-alldebrid-lite.json" />
+      <Card title="Import on Yeb's / ForTheWeak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/AllDebrid/core-nexus-4k-alldebrid-lite.json" />
     </CardGroup>
+    Also on: [Midnight's](https://aiostreamsfortheweebsstable.midnightignite.me/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/AllDebrid/core-nexus-4k-alldebrid-lite.json) · [Kuu's](https://aiostreams.stremio.ru/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/AllDebrid/core-nexus-4k-alldebrid-lite.json) · [ATBP](https://aio.atbphosting.com/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/AllDebrid/core-nexus-4k-alldebrid-lite.json) · [Wizaardd](https://aiostreams-stable.forthewizards.uk/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/AllDebrid/core-nexus-4k-alldebrid-lite.json) · [Viren's Nightly](https://aiostreams.viren070.me/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/AllDebrid/core-nexus-4k-alldebrid-lite.json)
     ```
     https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/AllDebrid/core-nexus-4k-alldebrid-lite.json
     ```
 
     ---
 
-    ### AllDebrid Lite — v0.2.4
+    ### AllDebrid Lite — v0.2.21
 
     <CardGroup cols={2}>
-      <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/AllDebrid/core-nexus-alldebrid-lite.json" />
-      <Card title="Import on Fortheweak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/AllDebrid/core-nexus-alldebrid-lite.json" />
+      <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/AllDebrid/core-nexus-alldebrid-lite.json" />
+      <Card title="Import on Yeb's / ForTheWeak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/AllDebrid/core-nexus-alldebrid-lite.json" />
     </CardGroup>
+    Also on: [Midnight's](https://aiostreamsfortheweebsstable.midnightignite.me/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/AllDebrid/core-nexus-alldebrid-lite.json) · [Kuu's](https://aiostreams.stremio.ru/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/AllDebrid/core-nexus-alldebrid-lite.json) · [ATBP](https://aio.atbphosting.com/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/AllDebrid/core-nexus-alldebrid-lite.json) · [Wizaardd](https://aiostreams-stable.forthewizards.uk/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/AllDebrid/core-nexus-alldebrid-lite.json) · [Viren's Nightly](https://aiostreams.viren070.me/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/AllDebrid/core-nexus-alldebrid-lite.json)
     ```
     https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/AllDebrid/core-nexus-alldebrid-lite.json
     ```
@@ -401,24 +448,26 @@ All templates require **AIOStreams v2.32+**. Each section has a **Lite** tab for
 
 <Tabs>
   <Tab title="4K">
-    ### Speed 4K+ — v2.10.13
+    ### Speed 4K+ — v2.10.20
 
     <CardGroup cols={2}>
-      <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/EasyNews/core-nexus-speed-4k-plus.json" />
-      <Card title="Import on Fortheweak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/EasyNews/core-nexus-speed-4k-plus.json" />
+      <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/EasyNews/core-nexus-speed-4k-plus.json" />
+      <Card title="Import on Yeb's / ForTheWeak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/EasyNews/core-nexus-speed-4k-plus.json" />
     </CardGroup>
+    Also on: [Midnight's](https://aiostreamsfortheweebsstable.midnightignite.me/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/EasyNews/core-nexus-speed-4k-plus.json) · [Kuu's](https://aiostreams.stremio.ru/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/EasyNews/core-nexus-speed-4k-plus.json) · [ATBP](https://aio.atbphosting.com/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/EasyNews/core-nexus-speed-4k-plus.json) · [Wizaardd](https://aiostreams-stable.forthewizards.uk/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/EasyNews/core-nexus-speed-4k-plus.json) · [Viren's Nightly](https://aiostreams.viren070.me/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/EasyNews/core-nexus-speed-4k-plus.json)
     ```
     https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/EasyNews/core-nexus-speed-4k-plus.json
     ```
   </Tab>
 
   <Tab title="1080p">
-    ### Speed EasyNews — v2.10.13
+    ### Speed EasyNews — v2.10.19
 
     <CardGroup cols={2}>
-      <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/EasyNews/core-nexus-speed-easynews.json" />
-      <Card title="Import on Fortheweak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/EasyNews/core-nexus-speed-easynews.json" />
+      <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/EasyNews/core-nexus-speed-easynews.json" />
+      <Card title="Import on Yeb's / ForTheWeak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/EasyNews/core-nexus-speed-easynews.json" />
     </CardGroup>
+    Also on: [Midnight's](https://aiostreamsfortheweebsstable.midnightignite.me/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/EasyNews/core-nexus-speed-easynews.json) · [Kuu's](https://aiostreams.stremio.ru/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/EasyNews/core-nexus-speed-easynews.json) · [ATBP](https://aio.atbphosting.com/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/EasyNews/core-nexus-speed-easynews.json) · [Wizaardd](https://aiostreams-stable.forthewizards.uk/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/EasyNews/core-nexus-speed-easynews.json) · [Viren's Nightly](https://aiostreams.viren070.me/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/EasyNews/core-nexus-speed-easynews.json)
     ```
     https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Speed/EasyNews/core-nexus-speed-easynews.json
     ```
@@ -431,72 +480,78 @@ All templates require **AIOStreams v2.32+**. Each section has a **Lite** tab for
 
 <Tabs>
   <Tab title="4K">
-    ### Anime 4K — v2.8.19
+    ### Anime 4K — v2.8.22
 
     <CardGroup cols={2}>
-      <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime-4k.json" />
-      <Card title="Import on Fortheweak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime-4k.json" />
+      <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime-4k.json" />
+      <Card title="Import on Yeb's / ForTheWeak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime-4k.json" />
     </CardGroup>
+    Also on: [Midnight's](https://aiostreamsfortheweebsstable.midnightignite.me/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime-4k.json) · [Kuu's](https://aiostreams.stremio.ru/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime-4k.json) · [ATBP](https://aio.atbphosting.com/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime-4k.json) · [Wizaardd](https://aiostreams-stable.forthewizards.uk/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime-4k.json) · [Viren's Nightly](https://aiostreams.viren070.me/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime-4k.json)
     ```
     https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime-4k.json
     ```
   </Tab>
 
   <Tab title="1080p">
-    ### Anime — v2.8.19
+    ### Anime — v2.8.23
 
     <CardGroup cols={2}>
-      <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime.json" />
-      <Card title="Import on Fortheweak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime.json" />
+      <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime.json" />
+      <Card title="Import on Yeb's / ForTheWeak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime.json" />
     </CardGroup>
+    Also on: [Midnight's](https://aiostreamsfortheweebsstable.midnightignite.me/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime.json) · [Kuu's](https://aiostreams.stremio.ru/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime.json) · [ATBP](https://aio.atbphosting.com/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime.json) · [Wizaardd](https://aiostreams-stable.forthewizards.uk/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime.json) · [Viren's Nightly](https://aiostreams.viren070.me/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime.json)
     ```
     https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime.json
     ```
 
     ---
 
-    ### Anime Dub — v2.8.19
+    ### Anime Dub — v2.8.23
 
     <CardGroup cols={2}>
-      <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime-dub.json" />
-      <Card title="Import on Fortheweak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime-dub.json" />
+      <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime-dub.json" />
+      <Card title="Import on Yeb's / ForTheWeak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime-dub.json" />
     </CardGroup>
+    Also on: [Midnight's](https://aiostreamsfortheweebsstable.midnightignite.me/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime-dub.json) · [Kuu's](https://aiostreams.stremio.ru/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime-dub.json) · [ATBP](https://aio.atbphosting.com/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime-dub.json) · [Wizaardd](https://aiostreams-stable.forthewizards.uk/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime-dub.json) · [Viren's Nightly](https://aiostreams.viren070.me/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime-dub.json)
     ```
     https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime-dub.json
     ```
   </Tab>
 
   <Tab title="Lite">
-    ### Anime 4K Lite — v2.8.9
+    ### Anime 4K Lite — v2.8.19
 
     <CardGroup cols={2}>
-      <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime-4k-lite.json" />
-      <Card title="Import on Fortheweak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime-4k-lite.json" />
+      <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime-4k-lite.json" />
+      <Card title="Import on Yeb's / ForTheWeak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime-4k-lite.json" />
     </CardGroup>
+    Also on: [Midnight's](https://aiostreamsfortheweebsstable.midnightignite.me/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime-4k-lite.json) · [Kuu's](https://aiostreams.stremio.ru/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime-4k-lite.json) · [ATBP](https://aio.atbphosting.com/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime-4k-lite.json) · [Wizaardd](https://aiostreams-stable.forthewizards.uk/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime-4k-lite.json) · [Viren's Nightly](https://aiostreams.viren070.me/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime-4k-lite.json)
     ```
     https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime-4k-lite.json
     ```
 
     ---
 
-    ### Anime Lite — v2.8.9
+    ### Anime Lite — v2.8.20
 
     <CardGroup cols={2}>
-      <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime-lite.json" />
-      <Card title="Import on Fortheweak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime-lite.json" />
+      <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime-lite.json" />
+      <Card title="Import on Yeb's / ForTheWeak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime-lite.json" />
     </CardGroup>
+    Also on: [Midnight's](https://aiostreamsfortheweebsstable.midnightignite.me/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime-lite.json) · [Kuu's](https://aiostreams.stremio.ru/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime-lite.json) · [ATBP](https://aio.atbphosting.com/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime-lite.json) · [Wizaardd](https://aiostreams-stable.forthewizards.uk/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime-lite.json) · [Viren's Nightly](https://aiostreams.viren070.me/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime-lite.json)
     ```
     https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime-lite.json
     ```
 
     ---
 
-    ### Anime Dub Lite — v2.8.9
+    ### Anime Dub Lite — v2.8.20
 
     <CardGroup cols={2}>
-      <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime-dub-lite.json" />
-      <Card title="Import on Fortheweak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime-dub-lite.json" />
+      <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime-dub-lite.json" />
+      <Card title="Import on Yeb's / ForTheWeak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime-dub-lite.json" />
     </CardGroup>
+    Also on: [Midnight's](https://aiostreamsfortheweebsstable.midnightignite.me/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime-dub-lite.json) · [Kuu's](https://aiostreams.stremio.ru/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime-dub-lite.json) · [ATBP](https://aio.atbphosting.com/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime-dub-lite.json) · [Wizaardd](https://aiostreams-stable.forthewizards.uk/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime-dub-lite.json) · [Viren's Nightly](https://aiostreams.viren070.me/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime-dub-lite.json)
     ```
     https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime-dub-lite.json
     ```
@@ -513,89 +568,96 @@ All templates require **AIOStreams v2.32+**. Each section has a **Lite** tab for
 
 <Tabs>
   <Tab title="Nightly">
-    ### Apple TV 4K — v0.2.4
+    ### Apple TV 4K — v0.2.16
     DV Profile 5/8 prioritised. AV1 hard-excluded for tvOS compatibility. SeaDex ISE, REPACK ISE.
 
     <CardGroup cols={2}>
-      <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/AppleTV/core-nexus-apple-tv-4k.json" />
-      <Card title="Import on Fortheweak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/AppleTV/core-nexus-apple-tv-4k.json" />
+      <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/AppleTV/core-nexus-apple-tv-4k.json" />
+      <Card title="Import on Yeb's / ForTheWeak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/AppleTV/core-nexus-apple-tv-4k.json" />
     </CardGroup>
+    Also on: [Midnight's](https://aiostreamsfortheweebsstable.midnightignite.me/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/AppleTV/core-nexus-apple-tv-4k.json) · [Kuu's](https://aiostreams.stremio.ru/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/AppleTV/core-nexus-apple-tv-4k.json) · [ATBP](https://aio.atbphosting.com/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/AppleTV/core-nexus-apple-tv-4k.json) · [Wizaardd](https://aiostreams-stable.forthewizards.uk/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/AppleTV/core-nexus-apple-tv-4k.json) · [Viren's Nightly](https://aiostreams.viren070.me/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/AppleTV/core-nexus-apple-tv-4k.json)
     ```
     https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/AppleTV/core-nexus-apple-tv-4k.json
     ```
   </Tab>
 
   <Tab title="Labs">
-    ### 4K Apex Labs — v0.11.4
+    ### 4K Apex Labs — v0.15.9
     Full Apex PSE stack with all LABS features enabled: Score IQR Guard, perGroup() dedup, Indexer Diversity, Bad Dual Audio Groups, elite group pins, Bitrate Floor ESEs (4K + 1080p REMUX).
 
     <CardGroup cols={2}>
-      <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-4k-apex-labs.json" />
-      <Card title="Import on Fortheweak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-4k-apex-labs.json" />
+      <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-4k-apex-labs.json" />
+      <Card title="Import on Yeb's / ForTheWeak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-4k-apex-labs.json" />
     </CardGroup>
+    Also on: [Midnight's](https://aiostreamsfortheweebsstable.midnightignite.me/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-4k-apex-labs.json) · [Kuu's](https://aiostreams.stremio.ru/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-4k-apex-labs.json) · [ATBP](https://aio.atbphosting.com/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-4k-apex-labs.json) · [Wizaardd](https://aiostreams-stable.forthewizards.uk/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-4k-apex-labs.json) · [Viren's Nightly](https://aiostreams.viren070.me/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-4k-apex-labs.json)
     ```
     https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-4k-apex-labs.json
     ```
 
     ---
 
-    ### Stream Labs — v0.8.4
+    ### Stream Labs — v0.10.10
     1080p with perGroup() prototypes, dynamicAddonFetching, StreamNZB preset, Bitrate Floor ESEs. Most ESEs in fleet (42).
 
     <CardGroup cols={2}>
-      <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-stream-labs.json" />
-      <Card title="Import on Fortheweak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-stream-labs.json" />
+      <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-stream-labs.json" />
+      <Card title="Import on Yeb's / ForTheWeak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-stream-labs.json" />
     </CardGroup>
+    Also on: [Midnight's](https://aiostreamsfortheweebsstable.midnightignite.me/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-stream-labs.json) · [Kuu's](https://aiostreams.stremio.ru/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-stream-labs.json) · [ATBP](https://aio.atbphosting.com/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-stream-labs.json) · [Wizaardd](https://aiostreams-stable.forthewizards.uk/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-stream-labs.json) · [Viren's Nightly](https://aiostreams.viren070.me/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-stream-labs.json)
     ```
     https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-stream-labs.json
     ```
 
     ---
 
-    ### All-Rounder Labs — v0.2.4
+    ### All-Rounder Labs — v0.4.10
     Single template for live-action TV, movies, and anime. Uses `isAnime` + `hasSeaDex` conditional PSEs to switch quality tiers dynamically. Includes SeaDex, AnimeTosho, and NekoBT alongside standard scrapers. All LABS features.
 
     <CardGroup cols={2}>
-      <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-all-rounder-labs.json" />
-      <Card title="Import on Fortheweak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-all-rounder-labs.json" />
+      <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-all-rounder-labs.json" />
+      <Card title="Import on Yeb's / ForTheWeak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-all-rounder-labs.json" />
     </CardGroup>
+    Also on: [Midnight's](https://aiostreamsfortheweebsstable.midnightignite.me/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-all-rounder-labs.json) · [Kuu's](https://aiostreams.stremio.ru/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-all-rounder-labs.json) · [ATBP](https://aio.atbphosting.com/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-all-rounder-labs.json) · [Wizaardd](https://aiostreams-stable.forthewizards.uk/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-all-rounder-labs.json) · [Viren's Nightly](https://aiostreams.viren070.me/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-all-rounder-labs.json)
     ```
     https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Single/core-nexus-all-rounder-labs.json
     ```
 
     ---
 
-    ### Anime 4K Labs — v0.1.3
+    ### Anime 4K Labs — v0.3.4
     Anime 4K with `hasSeaDex` conditional PSEs, SeaDex Best pin, anime group pins (SubsPlease, Erai-raws, VCB-Studio), Score IQR Guard, perGroup() dedup, and Indexer Diversity.
 
     <CardGroup cols={2}>
-      <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Anime/core-nexus-anime-4k-labs.json" />
-      <Card title="Import on Fortheweak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Anime/core-nexus-anime-4k-labs.json" />
+      <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Anime/core-nexus-anime-4k-labs.json" />
+      <Card title="Import on Yeb's / ForTheWeak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Anime/core-nexus-anime-4k-labs.json" />
     </CardGroup>
+    Also on: [Midnight's](https://aiostreamsfortheweebsstable.midnightignite.me/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Anime/core-nexus-anime-4k-labs.json) · [Kuu's](https://aiostreams.stremio.ru/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Anime/core-nexus-anime-4k-labs.json) · [ATBP](https://aio.atbphosting.com/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Anime/core-nexus-anime-4k-labs.json) · [Wizaardd](https://aiostreams-stable.forthewizards.uk/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Anime/core-nexus-anime-4k-labs.json) · [Viren's Nightly](https://aiostreams.viren070.me/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Anime/core-nexus-anime-4k-labs.json)
     ```
     https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Anime/core-nexus-anime-4k-labs.json
     ```
 
     ---
 
-    ### Essential Labs — v0.2.4
+    ### Essential Labs — v0.4.9
 
     <CardGroup cols={2}>
-      <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Essential/core-nexus-essential-labs.json" />
-      <Card title="Import on Fortheweak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Essential/core-nexus-essential-labs.json" />
+      <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Essential/core-nexus-essential-labs.json" />
+      <Card title="Import on Yeb's / ForTheWeak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Essential/core-nexus-essential-labs.json" />
     </CardGroup>
+    Also on: [Midnight's](https://aiostreamsfortheweebsstable.midnightignite.me/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Essential/core-nexus-essential-labs.json) · [Kuu's](https://aiostreams.stremio.ru/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Essential/core-nexus-essential-labs.json) · [ATBP](https://aio.atbphosting.com/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Essential/core-nexus-essential-labs.json) · [Wizaardd](https://aiostreams-stable.forthewizards.uk/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Essential/core-nexus-essential-labs.json) · [Viren's Nightly](https://aiostreams.viren070.me/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Essential/core-nexus-essential-labs.json)
     ```
     https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Essential/core-nexus-essential-labs.json
     ```
 
     ---
 
-    ### 4K Essential Labs — v0.3.4
+    ### 4K Essential Labs — v0.6.10
 
     <CardGroup cols={2}>
-      <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Essential/core-nexus-4k-essential-labs.json" />
-      <Card title="Import on Fortheweak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Essential/core-nexus-4k-essential-labs.json" />
+      <Card title="Import on ElfHosted" icon="arrow-up-right" href="https://aiostreams.elfhosted.com/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Essential/core-nexus-4k-essential-labs.json" />
+      <Card title="Import on Yeb's / ForTheWeak" icon="arrow-up-right" href="https://aiostreams.fortheweak.cloud/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Essential/core-nexus-4k-essential-labs.json" />
     </CardGroup>
+    Also on: [Midnight's](https://aiostreamsfortheweebsstable.midnightignite.me/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Essential/core-nexus-4k-essential-labs.json) · [Kuu's](https://aiostreams.stremio.ru/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Essential/core-nexus-4k-essential-labs.json) · [ATBP](https://aio.atbphosting.com/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Essential/core-nexus-4k-essential-labs.json) · [Wizaardd](https://aiostreams-stable.forthewizards.uk/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Essential/core-nexus-4k-essential-labs.json) · [Viren's Nightly](https://aiostreams.viren070.me/stremio/configure?menu=about&template=https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Essential/core-nexus-4k-essential-labs.json)
     ```
     https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Nightly/Essential/core-nexus-4k-essential-labs.json
     ```

@@ -14,8 +14,7 @@
 - [ ] `instanceId` present on all presets
 - [ ] `timeout` set in all preset `options`
 - [ ] `formatter.id` is `"tamtaro"` (or `"custom"` for community formatters)
-- [ ] No `not()` — use `negate()` instead
-- [ ] No `or()` / `keyword()` / `language()` in stream expressions
+- [ ] Stream expressions save on the pinned AIOStreams (`scripts/aio-save-test/run.sh open`) — `and` / `or` / `not` are operators (`not isAnime`, `not(x)` both work); `negate(a, b)` takes two stream lists
 - [ ] `preferredResolutions` matches `includedResolutions` exactly
 - [ ] Usenet settings (`cacheAndPlay`, `nzbFailover`) correct for plan tier
 - [ ] `addonName` and `meta.id` are unique and correct

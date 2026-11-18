@@ -17,6 +17,7 @@ This is **brevityA/Core-Builds**, the canonical repo for Core Builds by Brevity 
   - Run `npm test` in `configurator/`, `cli/` **and** `packages/core/` before pushing. The configurator suite alone will not catch a version-coupling break.
 - **Changelog items are `Short title — body`.** `docs/whats-new.mdx` builds each Mintlify `<Card>` by splitting an item on its **first** `" — "`: the part before it becomes the card title. An item that leads straight into prose ships a card with a 300-character title, or — with no separator at all — one whose title and body are the same paragraph printed twice. `python3 scripts/sync-docs.py --check-changelog` lints the newest entry and blocks the PR; the renderer derives a short title for older entries so they degrade rather than break.
 - **Say when a release changes no generated output.** If a configurator release leaves every golden in `configurator/e2e/golden/` unchanged apart from its `coreBuildsVersion`/`generatedAt` stamps, its changelog entry must include an item starting `Generated output unchanged — `. Claiming unchanged output when a golden did move also fails. `scripts/check_output_note.py` enforces both in the blocking `changelog-format` job. Why: 3.12→3.13 shipped byte-identical configs as an apparent config release, users re-imported, AIOStreams correctly showed "no changes", and the configurator looked broken.
+- **A change to generator output means recompiling the smart template.** Run `node scripts/smart-template/compile.mjs` and `python3 scripts/sync_template_collection.py`. The compiler raises the template's patch version itself when the output changed. `packages/core/tests/smart-template.test.mjs` fails until you recompile (it resolves the template through AIOStreams' own evaluator for every answer and service).
 - **Touching `configurator/src/data/hosts.js` means running e2e, not just `npm test`.** Host metadata is asserted in browser specs (`direct-install-gate.spec.mjs` pins each host's advertised version), so the unit suite goes green on a change that fails CI. #755 did exactly this.
 
 ---
@@ -49,7 +50,6 @@ configurator/               — Web app (main product)
 
 tools/                      — Tools hub
   inspector/                — Template Inspector (paste JSON for instant validation)
-  debug/                    — Debug utilities
 account-tools/              — Addon Backup (read-only Stremio addon backup)
 cli/                        — CLI tool (available)
 cloudflare-worker/          — CORS proxy (Cloudflare Worker for cross-origin requests)
@@ -173,7 +173,6 @@ The `build()` function (line ~3400) assembles the full AIOStreams config from cu
 - **Backup timeline** — 20-entry local backup with restore
 - **Library Boost** — three modes: Default, Strong (top priority), None (disabled)
 - **Bandwidth Estimator** — device-aware bandwidth suggestion with manual override
-- **Age Limit** — content age filter with 7d/30d/90d/1y/2y presets
 - **NZB Failover** — configurable position (before/after torrents) and max NZB count
 - **Patch Cinemeta** — automatic by default (hides Cinemeta catalogs, uses Cinebye)
 
@@ -285,6 +284,10 @@ python3 scripts/template_builder.py --only stream  # filter by name
 8. **NC-17 label** — means "Adults Only" (most restrictive), NOT "No Restriction"
 9. **Jackett/Prowlarr filter** — use `x.credKey && !x.apiUrl` (NOT `x.credKey && x.apiUrl`)
 10. **validate_templates.py** — guard `isinstance(t, list)` before `t.get()` (Filtering/*.json are arrays)
+11. **Preset keys** — AIOStreams' `PresetSchema` keeps `type`, `instanceId`, `enabled`, `options`, `category` and strips anything else on save. A resource restriction goes in `options.resources`; a top-level `resources` is ignored (the preset falls back to everything it supports). The generators still tag presets with a top-level `resources` hint because `isStreamPreset()` reads it while the profiles trim sources; `applyAIOStreamsCompatibility` strips it from the export. Verified by saving 334 generated configs into the pinned image and reading them back (`?raw=true`).
+12. **`not()` is valid SEL** — AIOStreams builds its expr-eval parser with logical operators on, so `not(x)` works on every host. Never "repair" it to `negate(`: `negate(streams, originalStreams)` takes two stream arrays and throws otherwise.
+13. **No rating filter exists** — AIOStreams has no `certification()`; the always-null age-rating stub and `ageLimit` state were removed in v3.17. Family setups rely on a separate kids profile, the app's own age restriction, a PIN and the adult-title filename ESE.
+14. **Stream proxy needs `enabled`, `url` and `credentials`** — the proxifier skips every stream unless `proxy.enabled && proxy.url`, and saving refuses an enabled proxy without credentials, then asks the proxy for its public IP (an unreachable proxy or wrong password refuses the whole save). `src/core/stream-proxy-policy.js` emits the neutral stub until all three are present, recovers a live config's proxy on import (passing AIOStreams-encrypted values back untouched), and `streamProxySaveError` explains the refusals. The address and password live in `S.streamProxy` / `S.streamProxyPassword`, never in `SHARE_KEYS`.
 
 ---
 
@@ -470,6 +473,8 @@ Preset `type` values confirmed in AIOStreams source (as of v2.31.0+):
 
 **Preset categories:** `streams`, `subtitles`, `meta_catalogs`, `misc` (enum `PresetCategory`)
 
+**Removed in v2.36.0 (a save carrying one is refused, e.g. "AIO Subtitle has been removed: Addon is no longer hosted"):** `aiosubtitle`, `argentina-tv`, `usa-tv`, `nuvio-streams`, `debridio-watchtower`, `debridio-tv`, `debridio-ic4a`, `astream`, `streamasia`, `streamfusion`, `baguettio`, `subhero`, `ai-companion`, plus the long-dead `torbox` and `torbox-search`. Upstream keeps them in the preset list with `METADATA.DISABLED.removed`, so the contract diff does not flag them; the save test does. `output-profile-policy.js#PRESETS_REMOVED_IN_2_36` drops them from exports for the 2.36 and unknown targets, held equal to `configurator/tests/upstream/preset-resources-2.36.0.json` (re-capture it from a pinned host's `/api/v1/status` on every pin bump). The type lists below predate the removal.
+
 **Debrid/service:** `stremthruTorz`, `stremthruStore`, `sootio`, `peerflix`
 - `torbox` — **DEPRECATED** (removed/disabled v2.30.2)
 - `torbox-search` — **REMOVED in v2.32.0** (API shut down); legacy-lane only (`Templates/Legacy/v2.31.1/`)
@@ -488,7 +493,8 @@ Preset `type` values confirmed in AIOStreams source (as of v2.31.0+):
 - `mediafusion-public` — not a separate preset file; likely a config option on `mediafusion`, not a distinct type
 - `torrentio` — TorBox supported but **blocked on elfhosted public instance** by developer request; unstable hosting (March 2026 suspension)
 
-**Anime-specific:** `seadex`, `animetosho`, `neko-bt`, `yastream`, `astream`, `fkstream`
+**Anime-specific:** `seadex`, `anime-tosho-new`, `neko-bt`, `yastream`, `astream`, `fkstream`, `tsukihime`
+- `animetosho` — **ARCHIVED in v2.36.0**: the original feed stopped taking releases on 2026-05-09 and shuts down in October 2026. Generators and Anime templates emit `anime-tosho-new` (same Torznab base, services and options). It needs an API key before 2.36.0 and the generators send none, so `PRESET_MIN_VERSIONS` keeps those builds off older hosts and `applyAIOStreamsCompatibility` swaps it back to `animetosho` for an explicit pre-2.36 target.
 
 **Catalog/meta (META_CATALOGS):** `tmdb-addon` (TMDB metadata), `streaming-catalogs` (streaming service catalogs), `anime-catalogs` (MAL/AniDB/AniList/Kitsu/etc.), `anime-kitsu` (Kitsu anime catalog), `torrent-catalogs` (top seeded torrents), `rpdb-catalogs` (RPDB release tracking), `tmdb-collections` (TMDB collections), `debridio-tmdb` (Debridio TMDB catalogs), `debridio-tvdb` (Debridio TVDB catalogs), `marvel-universe`, `star-wars-universe`, `dc-universe`, `doctor-who-universe` (franchise catalogs)
 
@@ -508,70 +514,70 @@ Meteor ≤ 5, Comet ≤ 5, MediaFusion ≤ 4, EZTV ≤ 3, HdHub ≤ 3, Torrent G
 
 ---
 
-## Active Template Inventory (as of v3.10.0)
+## Active Template Inventory (as of v3.13.0)
 
 ### Single (TorBox Pro)
-- `Single/core-nexus-4k-apex.json` v0.9.4 — flagship 4K, IQR PSEs, pow() decay, 5s dynamic fetching cap, Score IQR Guard, elite group pins, perGroup() Extra Cached
-- `Single/core-nexus-4k-apex-torbox.json` v2.12.13 — TorBox-cached-only Apex variant, Score IQR Guard, elite group pins, perGroup() Extra Cached
-- `Single/core-nexus-stream.json` v2.10.12 — 1080p streaming quality, 720p fallback
-- `Single/core-nexus-stream-lite.json` v2.10.12 — lite variant
-- `Single/core-nexus-stream-firestick.json` v2.10.12 — Fire Stick optimised
+- `Single/core-nexus-4k-apex.json` v0.9.9 — flagship 4K, IQR PSEs, pow() decay, 5s dynamic fetching cap, Score IQR Guard, elite group pins, perGroup() Extra Cached
+- `Single/core-nexus-4k-apex-torbox.json` v2.12.19 — TorBox-cached-only Apex variant, Score IQR Guard, elite group pins, perGroup() Extra Cached
+- `Single/core-nexus-stream.json` v2.10.19 — 1080p streaming quality, 720p fallback
+- `Single/core-nexus-stream-lite.json` v2.10.18 — lite variant
+- `Single/core-nexus-stream-firestick.json` v2.10.18 — Fire Stick optimised
 - `Single/core-nexus-stream-firestick-lite.json` v2.10.5
 
 ### Essential (TorBox Essential)
-- `Essential/core-nexus-4k-essential.json` v2.12.12 — 4K with IQR PSEs, pow() decay, Score IQR Guard, elite group pins, perGroup() Extra Cached
-- `Essential/core-nexus-4k-essential-lite.json` v2.10.12 — CB-style PSEs
-- `Essential/core-nexus-essential.json` v2.10.12 — 1080p
+- `Essential/core-nexus-4k-essential.json` v2.12.18 — 4K with IQR PSEs, pow() decay, Score IQR Guard, elite group pins, perGroup() Extra Cached
+- `Essential/core-nexus-4k-essential-lite.json` v2.10.17 — CB-style PSEs
+- `Essential/core-nexus-essential.json` v2.10.19 — 1080p
 - `Essential/core-nexus-essential-lite.json` v2.10.5
 
 ### Flash
-- `Flash/core-nexus-flash-4k.json` v2.10.11 — cached-only 4K instant play
-- `Flash/core-nexus-flash.json` v2.10.11 — cached-only 1080p instant play
+- `Flash/core-nexus-flash-4k.json` v2.10.17 — cached-only 4K instant play
+- `Flash/core-nexus-flash.json` v2.10.16 — cached-only 1080p instant play
 
 ### Speed (TorBox)
-- `Speed/TorBox/core-nexus-speed-4k.json` v2.10.11 — fast cached 4K
+- `Speed/TorBox/core-nexus-speed-4k.json` v2.10.17 — fast cached 4K
 - `Speed/TorBox/core-nexus-speed-4k-lite.json` v2.10.5
-- `Speed/TorBox/core-nexus-speed.json` v2.10.11 — fast cached 1080p
+- `Speed/TorBox/core-nexus-speed.json` v2.10.18 — fast cached 1080p
 - `Speed/TorBox/core-nexus-speed-lite.json` v2.10.5
 
 ### Speed (EasyNews)
-- `Speed/EasyNews/core-nexus-speed-4k-plus.json` v2.10.13 — EasyNews 4K, davex preset (disabled by default)
-- `Speed/EasyNews/core-nexus-speed-easynews.json` v2.10.13 — EasyNews 1080p, davex preset (disabled by default)
+- `Speed/EasyNews/core-nexus-speed-4k-plus.json` v2.10.20 — EasyNews 4K, davex preset (disabled by default)
+- `Speed/EasyNews/core-nexus-speed-easynews.json` v2.10.19 — EasyNews 1080p, davex preset (disabled by default)
 
 ### AllDebrid
-- `AllDebrid/core-nexus-4k-alldebrid.json` v0.4.13 — 4K with IQR PSEs, Score IQR Guard, elite group pins, perGroup() Extra Cached
-- `AllDebrid/core-nexus-4k-alldebrid-lite.json` v0.2.13 — 4K CB-style
-- `AllDebrid/core-nexus-alldebrid.json` v0.2.13 — 1080p
-- `AllDebrid/core-nexus-alldebrid-lite.json` v0.2.13 — 1080p lite
+- `AllDebrid/core-nexus-4k-alldebrid.json` v0.4.20 — 4K with IQR PSEs, Score IQR Guard, elite group pins, perGroup() Extra Cached
+- `AllDebrid/core-nexus-4k-alldebrid-lite.json` v0.2.19 — 4K CB-style
+- `AllDebrid/core-nexus-alldebrid.json` v0.2.21 — 1080p
+- `AllDebrid/core-nexus-alldebrid-lite.json` v0.2.21 — 1080p lite
 
 ### Hybrid
-- `Hybrid/core-nexus-4k-hybrid.json` v2.12.13 — TorBox + RD, service() priority PSEs, IQR, Score IQR Guard, elite group pins, perGroup() Extra Cached, dedup tiebreakers (after_addon), NZBGeek preset (disabled by default)
-- `Hybrid/core-nexus-hybrid.json` v2.10.13 — 1080p hybrid, TorBox-priority twins (IQR), dedup tiebreakers (after_addon), NZBGeek preset (disabled by default)
-- `Hybrid/core-nexus-hybrid-lite.json` v2.10.13 — TorBox-priority twins (CB-style), dedup tiebreakers (after_addon), NZBGeek preset (disabled by default)
+- `Hybrid/core-nexus-4k-hybrid.json` v2.12.18 — TorBox + RD, service() priority PSEs, IQR, Score IQR Guard, elite group pins, perGroup() Extra Cached, dedup tiebreakers (after_addon), NZBGeek preset (disabled by default)
+- `Hybrid/core-nexus-hybrid.json` v2.10.20 — 1080p hybrid, TorBox-priority twins (IQR), dedup tiebreakers (after_addon), NZBGeek preset (disabled by default)
+- `Hybrid/core-nexus-hybrid-lite.json` v2.10.19 — TorBox-priority twins (CB-style), dedup tiebreakers (after_addon), NZBGeek preset (disabled by default)
 
 ### Device
-- `Device/Samsung/core-nexus-samsung-tv.json` v0.3.12 — 1080p, DV-Only Kill on, AV1/VC-1 excluded, REPACK ISE + booster PSEs
-- `Device/Samsung/core-nexus-samsung-tv-4k.json` v0.3.12 — 4K, DV-Only Kill on, AV1/VC-1 excluded, REPACK ISE + booster PSEs
-- `Device/Samsung/core-nexus-samsung-ru7100-4k.json` v0.3.12 — RU7100 4K, full APEX IQR PSE stack, FLAC/AAC native audio, HDR10+/HLG (promoted from Nightly)
-- `Device/Xiaomi/core-nexus-xiaomi-4k.json` v0.1.5 — Xiaomi Mi Box S 4K, DV Profile 5 + HDR10+ native, AV1/VC-1 excluded, lossless audio excluded (DD+ Atmos ceiling), handles REMUX
-- `Device/Windows/core-nexus-ultrawide.json` v0.2.12 — Windows PC / ultrawide monitor, 1080p primary + 4K fallback, full lossless audio, HDR-first visual tags, 14-PSE stack
+- `Device/Samsung/core-nexus-samsung-tv.json` v0.3.18 — 1080p, DV-Only Kill on, AV1/VC-1 excluded, REPACK ISE + booster PSEs
+- `Device/Samsung/core-nexus-samsung-tv-4k.json` v0.3.18 — 4K, DV-Only Kill on, AV1/VC-1 excluded, REPACK ISE + booster PSEs
+- `Device/Samsung/core-nexus-samsung-ru7100-4k.json` v0.3.18 — RU7100 4K, full APEX IQR PSE stack, FLAC/AAC native audio, HDR10+/HLG (promoted from Nightly)
+- `Device/Xiaomi/core-nexus-xiaomi-4k.json` v0.1.11 — Xiaomi Mi Box S 4K, DV Profile 5 + HDR10+ native, AV1/VC-1 excluded, lossless audio excluded (DD+ Atmos ceiling), handles REMUX
+- `Device/Windows/core-nexus-ultrawide.json` v0.2.18 — Windows PC / ultrawide monitor, 1080p primary + 4K fallback, full lossless audio, HDR-first visual tags, 14-PSE stack
 
 ### Anime
-- `Anime/core-nexus-anime-4k.json` v2.8.19 — 4K anime, SeaDex + AnimeTosho, cachedAnime/uncachedAnime sort
-- `Anime/core-nexus-anime-4k-lite.json` v2.8.17 — cachedAnime/uncachedAnime sort
-- `Anime/core-nexus-anime.json` v2.8.19 — 1080p anime, cachedAnime/uncachedAnime sort
-- `Anime/core-nexus-anime-lite.json` v2.8.17 — cachedAnime/uncachedAnime sort
-- `Anime/core-nexus-anime-dub.json` v2.8.19 — dubbed variant, cachedAnime/uncachedAnime sort
-- `Anime/core-nexus-anime-dub-lite.json` v2.8.17 — cachedAnime/uncachedAnime sort
+- `Anime/core-nexus-anime-4k.json` v2.8.22 — 4K anime, SeaDex + Anime Tosho (`anime-tosho-new`, needs AIOStreams 2.36+), cachedAnime/uncachedAnime sort
+- `Anime/core-nexus-anime-4k-lite.json` v2.8.19 — cachedAnime/uncachedAnime sort
+- `Anime/core-nexus-anime.json` v2.8.23 — 1080p anime, cachedAnime/uncachedAnime sort
+- `Anime/core-nexus-anime-lite.json` v2.8.20 — cachedAnime/uncachedAnime sort
+- `Anime/core-nexus-anime-dub.json` v2.8.23 — dubbed variant, cachedAnime/uncachedAnime sort
+- `Anime/core-nexus-anime-dub-lite.json` v2.8.20 — cachedAnime/uncachedAnime sort
 
 ### Nightly (gitignored — force-add to commit)
-- `Nightly/AppleTV/core-nexus-apple-tv-4k.json` v0.2.11 — DV Profile 5/8, AV1 excluded, SeaDex ISE, REPACK ISE
-- `Nightly/Essential/core-nexus-4k-essential-labs.json` v0.6.4 — Essential 4K experimental, ESE v2.0 (Protect Library, SeaDex Duplicates, rseMatched tier guards, Low Quality filter), Bitrate Floor ESEs (4K+1080p REMUX, runtime-aware), perGroup() Extra Cached, anime language passthrough, subtitle PSE, cachedAnime/uncachedAnime sort, age sort key
-- `Nightly/Essential/core-nexus-essential-labs.json` v0.4.4 — Essential 1080p experimental, ESE v2.0 (Protect Library, SeaDex Duplicates, Low Quality filter), perGroup() Extra Cached, anime language passthrough, subtitle PSE, cachedAnime/uncachedAnime sort, age sort key
-- `Nightly/Single/core-nexus-4k-apex-labs.json` v0.15.4 — ESE v2.0 (Protect Library, SeaDex Duplicates, rseMatched tier guards, Low Quality filter), Score IQR Guard, perGroup() dedup, Indexer Diversity, Bad Dual Audio Groups, elite group pins, Bitrate Floor ESEs (4K+1080p REMUX, runtime-aware), anime language passthrough, latestSeason season pack kill, subtitle PSE, cachedAnime/uncachedAnime sort, age sort key
-- `Nightly/Single/core-nexus-stream-labs.json` v0.10.4 — ESE v2.0 (Protect Library, SeaDex Duplicates, Low Quality filter), perGroup() prototypes, dynamicAddonFetching, StreamNZB preset, Bitrate Floor ESEs (1080p REMUX AV1 kill + 8Mbps floor, runtime-aware), anime language passthrough, subtitle PSE, cachedAnime/uncachedAnime sort, age sort key
-- `Nightly/Single/core-nexus-all-rounder-labs.json` v0.4.4 — ESE v2.0 (Protect Library, SeaDex Duplicates, rseMatched tier guards, Low Quality filter), isAnime+hasSeaDex conditional PSEs, anime+live-action scrapers, anime language passthrough, subtitle PSE, cachedAnime/uncachedAnime sort, age sort key, all LABS features
-- `Nightly/Anime/core-nexus-anime-4k-labs.json` v0.3.2 — ESE v2.0 (Protect Library, SeaDex Duplicates, rseMatched tier guards, Low Quality filter), Score IQR Guard, perGroup() dedup, Indexer Diversity, hasSeaDex conditional tiers, anime elite pins, anime language passthrough, subtitle PSE, cachedAnime/uncachedAnime sort, age sort key
+- `Nightly/AppleTV/core-nexus-apple-tv-4k.json` v0.2.16 — DV Profile 5/8, AV1 excluded, SeaDex ISE, REPACK ISE
+- `Nightly/Essential/core-nexus-4k-essential-labs.json` v0.6.10 — Essential 4K experimental, ESE v2.0 (Protect Library, SeaDex Duplicates, rseMatched tier guards, Low Quality filter), Bitrate Floor ESEs (4K+1080p REMUX, runtime-aware), perGroup() Extra Cached, anime language passthrough, subtitle PSE, cachedAnime/uncachedAnime sort, age sort key
+- `Nightly/Essential/core-nexus-essential-labs.json` v0.4.9 — Essential 1080p experimental, ESE v2.0 (Protect Library, SeaDex Duplicates, Low Quality filter), perGroup() Extra Cached, anime language passthrough, subtitle PSE, cachedAnime/uncachedAnime sort, age sort key
+- `Nightly/Single/core-nexus-4k-apex-labs.json` v0.15.9 — ESE v2.0 (Protect Library, SeaDex Duplicates, rseMatched tier guards, Low Quality filter), Score IQR Guard, perGroup() dedup, Indexer Diversity, Bad Dual Audio Groups, elite group pins, Bitrate Floor ESEs (4K+1080p REMUX, runtime-aware), anime language passthrough, latestSeason season pack kill, subtitle PSE, cachedAnime/uncachedAnime sort, age sort key
+- `Nightly/Single/core-nexus-stream-labs.json` v0.10.10 — ESE v2.0 (Protect Library, SeaDex Duplicates, Low Quality filter), perGroup() prototypes, dynamicAddonFetching, StreamNZB preset, Bitrate Floor ESEs (1080p REMUX AV1 kill + 8Mbps floor, runtime-aware), anime language passthrough, subtitle PSE, cachedAnime/uncachedAnime sort, age sort key
+- `Nightly/Single/core-nexus-all-rounder-labs.json` v0.4.10 — ESE v2.0 (Protect Library, SeaDex Duplicates, rseMatched tier guards, Low Quality filter), isAnime+hasSeaDex conditional PSEs, anime+live-action scrapers, anime language passthrough, subtitle PSE, cachedAnime/uncachedAnime sort, age sort key, all LABS features
+- `Nightly/Anime/core-nexus-anime-4k-labs.json` v0.3.4 — ESE v2.0 (Protect Library, SeaDex Duplicates, rseMatched tier guards, Low Quality filter), Score IQR Guard, perGroup() dedup, Indexer Diversity, hasSeaDex conditional tiers, anime elite pins, anime language passthrough, subtitle PSE, cachedAnime/uncachedAnime sort, age sort key
 
 ---
 
@@ -629,7 +635,7 @@ elfhosted's AIOStreams validates ALL regex fields against an allowlist built fro
 
 **fortheweak uses a different/stricter whitelist.** Patterns that pass elfhosted's Vidhin05 check may still be rejected on `streams-nightly.fortheweak.cloud`. As of v2.9.0, the following entries have been removed from all templates to ensure cross-host compatibility: `Radarr Web T1`, `Sonarr Web T1`, `Radarr Bad Dual Groups`, `Sonarr Bad Dual Groups`, `hallowed`, `LQ (Radarr)`, `LQ (Radarr) [B]`, `LQ (Sonarr)`, `LQ (Sonarr) [B]`, `LQ (Release Title) (Radarr)`, `LQ (Release Title) (Sonarr)` (ranked); LQ[B] large patterns + iVy-only (excluded). Do NOT re-add these without verifying on fortheweak first.
 
-**Drift risk:** Vidhin05 updates their file (adding/removing groups). If elfhosted reports "X/N not allowed" after a Vidhin05 update, re-run the comparison script in `scripts/` and bump to the new strings.
+**Drift risk:** Vidhin05 updates their file (adding/removing groups). If elfhosted reports "X/N not allowed" after a Vidhin05 update, re-run the comparison script in `scripts/` and bump to the new strings. The pipeline is `node scripts/check_upstream_drift.mjs --update` (keep a copy of the old snapshot), then `python3 scripts/sync_ranked_regex.py --apply --old-snapshot <copy> --date <today>`, then `python3 scripts/sync_template_collection.py --regex-allowlist` and `python3 scripts/sync_template_collection.py`. Refresh `scripts/aio-save-test/allowlist.elfhosted.json` in the same PR (`snapshot-allowlist.mjs`): in v3.17 a two-week-old copy still held the old literal, so the restricted save test stayed green while ElfHosted refused every save. Upstream repeats names (two "Generated Dynamic HDR" entries), so read drift reports as `Name [B]` for the second.
 
 ### `preferredRegexPatterns`
 Full `{name, pattern}` entries on all active non-Anime templates.
@@ -707,19 +713,21 @@ AIOStreams uses `registerTrustedAccess()` (`packages/core/src/utils/templates.ts
 
 ### Core Builds template collection
 
-`core-builds-template-collection.json` at repo root. Contains 3 representative templates (4K Apex, Stream, Anime 4K) with all Core Builds synced URLs declared.
+`core-builds-template-collection.json` at repo root holds **one entry: the Core Builds smart template** (v3.31; it held 50 static templates, Personal ones included, before). `scripts/sync_template_collection.py` builds it from `Templates/Smart/core-builds.json` and adds the trust strings (regex patterns and synced URLs) of every active static template, plus our own `Filtering/ranked-regex-patterns.json`, in a `__switch` on `services` whose only case is `core-builds-trust`. AIOStreams' `extractTemplateStrings` reads every case, so operators keep trusting all of it; the wizard switches on the picked services joined with commas and never lands on that case. A test asserts the entry resolves exactly like the standalone template.
 
 **Operator setup:** Add to `TEMPLATE_URLS`:
 ```
 https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/core-builds-template-collection.json
 ```
 
-**URLs auto-whitelisted when added:**
-- `Filtering/ranked-regex-patterns.json` — 107 scored regex patterns (via `syncedRankedRegexUrls`)
-- `Filtering/core-builds-eses.json` — 81 ESEs, full fleet superset (via `syncedExcludedStreamExpressionUrls`)
-- `Filtering/core-builds-ises.json` — 8 ISEs (via `syncedIncludedStreamExpressionUrls`)
-- `Filtering/core-builds-pses.json` — 163 PSEs, all architectures (via `syncedPreferredStreamExpressionUrls`)
-- Vidhin05's `regexes.json` (via `syncedRankedRegexUrls`, already whitelisted on most instances)
+### Smart template (`Templates/Smart/core-builds.json`)
+
+One AIOStreams template that asks device (26), picture, what matters most, cached only, language and anime, then reads the services picked in the AIOStreams wizard (none = free P2P). `scripts/smart-template/compile.mjs` runs `packages/core` `generateTemplate()` for every combination (168,480 builds, ~90 s) and emits each config key as a `__switch` tree over only the answers it depends on; presets are aligned by `instanceId` with an `__if` naming the services and answers they appear for.
+
+- **Regenerate it whenever generator output changes**: `node scripts/smart-template/compile.mjs`, then `python3 scripts/sync_template_collection.py`. `packages/core/tests/smart-template.test.mjs` resolves it through AIOStreams' own evaluator (fetched at `UPSTREAM.pin`, never vendored: AGPL) for every answer × service and fails on any difference, so a stale file cannot ship. The compiler raises the patch version whenever the compiled config differs from the committed file (and keeps it otherwise), so AIOStreams offers the update to people who imported it.
+- `dimensions.mjs` is the single source for the questions and their mapping to generator input. Always build through its `generateFor()`: it passes the device capability sets (`GENERATOR_OPTIONS`), which `generateTemplate()` otherwise defaults to empty — the first compile shipped lossless audio to 21 devices that cannot play it that way. `configurator/e2e/smart-template-parity.spec.mjs` holds `generateFor()` equal to what the configurator builds from Quick install's state, for every service and device.
+- Two services at once resolve to the union of both builds' presets (one StremThru Store preset serves every store service); the save test saves such picks in a real AIOStreams.
+- `validate_templates.py` skips this file: it is directives, not a plain config.
 
 ### AIOStreams trust mechanisms (3 levels)
 

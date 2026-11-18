@@ -1,5 +1,5 @@
 /** Local-only import/update helpers. No storage, network or browser globals. */
-import { OPTIONAL_SCRAPER_DEFS } from '../data/scrapers.js';
+import { OPTIONAL_SCRAPER_DEFS, penguplayPreset } from '../data/scrapers.js';
 
 export function cloneUpdateValue(value) {
   if (typeof structuredClone === 'function') return structuredClone(value);
@@ -59,6 +59,7 @@ const PRESET_CREDENTIALS = Object.freeze({
   jackett: ['jackett', 'jackettApiKey'],
   prowlarr: ['prowlarr', 'prowlarrApiKey'],
   streamnzb: ['streamnzb', 'url'],
+  penguplay: ['penguplay', 'manifestUrl'],
   'debridio-tmdb': ['debridio', 'debridioApiKey'],
   'debridio-tvdb': ['debridio', 'debridioApiKey'],
   'debridio-watchtower': ['debridio', 'debridioApiKey'],
@@ -162,6 +163,9 @@ export function mergeImportedPresets(generated = [], imported, { optionalScraper
     // AIOStreams refuses the whole save for a SubDL preset with no key, and an imported
     // one survives the generator's own key gate, so apply the same rule here.
     if (preset.type === 'subdl' && preset.enabled !== false && !String(options?.subDlApiKey || '').trim()) preset.enabled = false;
+    // Same for PenguPlay: a manifest URL that is not http(s) and does not end in
+    // /manifest.json is refused, whether it came with the import or was edited since.
+    if (preset.type === 'penguplay' && preset.enabled !== false && !penguplayPreset(options?.manifestUrl)) preset.enabled = false;
     if (preset.type === 'nzbhydra' && object(options.api)) {
       for (const [key, field] of [['nzbhydra', 'url'], ['nzbhydraApiKey', 'apiKey']]) {
         // The URL is applied first, so a key is written only next to the URL it was entered for.

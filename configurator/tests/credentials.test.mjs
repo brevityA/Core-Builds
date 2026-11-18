@@ -20,14 +20,14 @@ test('StreamNZB explicitly uses a user-owned manifest URL', () => {
   assert.equal(PROVIDER_CREDENTIALS.streamnzb.linkLabel, 'Use your manifest URL');
 });
 
-test('Quick Install renderer uses the credential registry and visible key links', async () => {
+test('Express renderer uses the credential registry and visible key links', async () => {
   const app = await readFile(new URL('../src/js/app.js', import.meta.url), 'utf8');
-  assert.match(app, /const credentialField=/);
+  assert.match(app, /const credInput = \(key\) =>/);
   assert.match(app, /PROVIDER_CREDENTIALS\[key\]/);
   assert.ok(app.includes('fastlane-get-key'));
   assert.ok(app.includes('noopener noreferrer'));
-  assert.ok(app.includes('data-fl-tmdb'));
-  assert.ok(app.includes('Optional · improves matching and release-date filtering'));
+  assert.ok(app.includes('id="expressTmdb"'));
+  assert.ok(app.includes('TMDB Read Access Token (optional — improves matching)'));
 });
 
 test('redaction denylist is derived from the credential registry (audit C4)', async () => {

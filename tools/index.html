@@ -162,6 +162,42 @@ body{
   .hdr-title{font-size:1.8rem}
 }
 @media(prefers-reduced-motion:reduce){.tool-card{transition:none}}
+
+/* Hub layout (v3.33): one centred column of rows, Core Builds' signal colours, the mark breathing gently. */
+.wrap{max-width:860px}
+.hdr-banner{flex-direction:column;text-align:center;gap:10px;background:none;border:0;padding:26px 0 8px;margin-bottom:6px;overflow:visible}
+.hdr-banner::before,.hdr-divider,.hdr-underline{display:none}
+.hdr-icon{width:84px;height:84px;filter:drop-shadow(0 0 18px rgba(34,211,238,.45));animation:hubBreathe 4.5s ease-in-out infinite}
+@keyframes hubBreathe{0%,100%{filter:drop-shadow(0 0 12px rgba(34,211,238,.3));transform:scale(1)}50%{filter:drop-shadow(0 0 26px rgba(34,211,238,.6));transform:scale(1.03)}}
+.hdr-text{align-items:center}.hdr-title{font-family:Georgia,'Times New Roman',serif;font-size:2.1rem;letter-spacing:-.035em}
+.hdr-builds{background:linear-gradient(100deg,#22d3ee,#4facfe);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hdr-actions{margin:6px 0 0;justify-content:center}.hdr-btn{border-radius:99px}
+.section-label{margin:28px 4px 10px;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:.7rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--th-accent)}
+.section-label::after{display:none}
+.tool-grid{gap:10px}.tool-grid.g1{grid-template-columns:1fr;margin-top:18px}.tool-grid.g3{grid-template-columns:1fr 1fr}
+.tool-card{display:grid;grid-template-columns:40px minmax(0,1fr) auto;column-gap:14px;row-gap:2px;align-items:center;min-height:72px;padding:14px 18px;border-radius:18px}
+.tool-card::after{content:'→';grid-column:3;grid-row:1/span 2;align-self:center;opacity:.55;font-size:1.05rem}
+.tool-idx,.tool-link{display:none}
+.tool-card .tool-icon{grid-column:1;grid-row:1/span 3;margin:0;width:40px;height:40px;border-radius:12px}
+.tool-card .tool-name{grid-column:2;margin:0;font-size:.95rem}
+.tool-card .tool-desc{grid-column:2;margin:0;font-size:.76rem;line-height:1.45;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.tool-card .tool-foot{grid-column:2;margin:4px 0 0;padding:0;border:0;justify-content:flex-start}
+.tool-card .tool-foot .badge{font-size:.6rem}
+.tool-card.tool-primary{background:linear-gradient(100deg,#22d3ee,#4facfe);border-color:transparent;color:#03151b;box-shadow:0 12px 30px rgba(34,211,238,.18)}
+.tool-card.tool-primary .tool-name,.tool-card.tool-primary .tool-desc{color:#03151b}.tool-card.tool-primary .tool-icon{background:rgba(255,255,255,.22);color:#03151b}.tool-card.tool-primary .tool-foot{display:none}
+[data-theme="light"] .tool-card.tool-primary{background:linear-gradient(100deg,#0891b2,#2563eb)}[data-theme="light"] .tool-card.tool-primary :is(.tool-name,.tool-desc,.tool-icon){color:#fff}
+.fold{margin-top:14px}.fold>summary{cursor:pointer;list-style:none;display:flex;align-items:center;font-weight:700;font-size:.85rem}.fold>summary::-webkit-details-marker{display:none}
+.fold>summary::after{content:'＋';margin-left:auto;color:var(--th-accent)}.fold[open]>summary::after{content:'－'}.fold[open]>summary{margin-bottom:10px}
+@media(max-width:640px){.tool-grid.g2,.tool-grid.g3{grid-template-columns:1fr}.hdr-icon{width:72px;height:72px}}
+@media(prefers-reduced-motion:reduce){.hdr-icon{animation:none}}
+
+.cfg-links{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px}
+.cfg-link{display:flex;flex-direction:column;gap:2px;min-height:58px;justify-content:center;padding:10px 14px;border:1px solid var(--th-border);border-radius:14px;background:var(--th-card);color:var(--th-tx);text-decoration:none;transition:border-color .18s}
+.cfg-link b{font-size:.86rem}.cfg-link span{font-size:.72rem;color:var(--th-tx3)}.cfg-link:hover{border-color:var(--th-accent-border)}.cfg-link:focus-visible{outline:2px solid var(--th-accent);outline-offset:2px}
+.hybrid-wall{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:6px}.hybrid-wall figure{flex:0 0 min(420px,86%);margin:0;scroll-snap-align:start}.hybrid-wall img{display:block;width:100%;height:auto;border-radius:10px}
+.hybrid-wall figcaption{display:flex;justify-content:space-between;margin-top:6px;font-size:.74rem;color:var(--th-tx2)}
+@media(prefers-reduced-motion:no-preference){@view-transition{navigation:auto}::view-transition-old(root){animation:cbPageOut .18s ease both}::view-transition-new(root){animation:cbPageIn .26s cubic-bezier(.2,.8,.2,1) both}}
+@keyframes cbPageOut{to{opacity:0;transform:translateY(-6px)}}@keyframes cbPageIn{from{opacity:0;transform:translateY(10px)}}
 </style>
 </head>
 <body>
@@ -171,7 +207,7 @@ body{
 
   <!-- Header (identical to configurator) -->
   <header class="hdr-banner">
-    <svg class="hdr-icon" width="46" height="46" viewBox="0 0 64 64" fill="none">
+    <svg class="hdr-icon" width="46" height="46" viewBox="0 0 64 64" fill="none" aria-hidden="true">
       <path d="M32 4 56 18v28L32 60 8 46V18L32 4Z" stroke="url(#hg1)" stroke-width="2.5"/>
       <path d="m32 20 12 12-12 12-12-12 12-12Z" fill="url(#hg1)" opacity=".9"/>
       <defs><linearGradient id="hg1" x1="9" y1="8" x2="55" y2="57"><stop stop-color="#00e5ff"/><stop offset=".55" stop-color="#a78bfa"/><stop offset="1" stop-color="#ff7043"/></linearGradient></defs>
@@ -184,15 +220,14 @@ body{
       <div class="hdr-sub">Tools &amp; utilities for your AIOStreams setup</div>
     </div>
     <div class="hdr-actions">
-      <a class="hdr-btn" href="../">← Configurator</a>
+      <a class="hdr-btn" href="../configurator/">← Configurator</a>
       <a class="hdr-btn" href="https://github.com/brevityA/Core-Builds" target="_blank" rel="noopener">GitHub</a>
     </div>
   </header>
 
-  <!-- Section 1: Core Tools -->
-  <div class="section-label">01 · Core tools</div>
-  <div class="tool-grid g2">
-    <a class="tool-card" href="../">
+  <!-- Hub layout: the builder first, then tools grouped by what they help with. -->
+  <div class="tool-grid g1">
+    <a class="tool-card tool-primary" href="../configurator/">
       <div class="tool-idx">Build</div>
       <div class="tool-icon cyan">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5 12 2"/><line x1="12" y1="22" x2="12" y2="15.5"/><polyline points="22 8.5 12 15.5 2 8.5"/></svg>
@@ -204,28 +239,105 @@ body{
         <span class="tool-link">Launch →</span>
       </div>
     </a>
-    <a class="tool-card" href="../account-tools/">
-      <div class="tool-idx">Safety</div>
-      <div class="tool-icon green">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+  </div>
+
+  <div class="section-label">Configurator</div>
+  <nav class="cfg-links" aria-label="Configurator shortcuts">
+    <a class="cfg-link" href="../configurator/#express"><b>Quick install</b><span>Service, device, key, done</span></a>
+    <a class="cfg-link" href="../configurator/#advanced"><b>Custom build</b><span>Every setting, step by step</span></a>
+    <a class="cfg-link" href="../configurator/#guided"><b>Guided setup</b><span>One decision at a time</span></a>
+    <a class="cfg-link" href="../configurator/#update"><b>Update an existing setup</b><span>Rebuild over your current config</span></a>
+    <a class="cfg-link" href="../configurator/#import"><b>Import a config</b><span>Paste a manifest or template</span></a>
+    <a class="cfg-link" href="../configurator/#tour"><b>Take the tour</b><span>Five steps, two minutes</span></a>
+    <a class="cfg-link" href="../configurator/#compare"><b>Compare templates</b><span>Side-by-side differences</span></a>
+    <a class="cfg-link" href="../configurator/#changelog"><b>What's new</b><span>Every configurator release</span></a>
+    <a class="cfg-link" href="../configurator/#report"><b>Report an issue</b><span>A safe diagnostics report</span></a>
+    <a class="cfg-link" href="../configurator/#support"><b>Support Core Builds</b><span>Keep it free and maintained</span></a>
+  </nav>
+
+  <div class="section-label">AIOStreams</div>
+  <div class="tool-grid g2">
+    <a class="tool-card" href="./inspector/">
+      <div class="tool-idx">Schema</div>
+      <div class="tool-icon purple">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
       </div>
-      <div class="tool-name">Addon Backup</div>
-      <p class="tool-desc">Read and download your current Stremio addon collection. No account changes. Nothing is modified.</p>
+      <div class="tool-name">Template Inspector</div>
+      <p class="tool-desc">Paste any AIOStreams JSON — get schema checks, plain-English findings, and host compatibility.</p>
       <div class="tool-foot">
-        <span class="badge badge-green">✓ Read-only</span>
+        <span class="badge badge-green">✓ Live</span>
         <span class="tool-link">Open →</span>
       </div>
     </a>
-    <a class="tool-card" href="./speedtest/">
-      <div class="tool-idx">Speed</div>
+    <a class="tool-card" href="../configurator/#health-score">
+      <div class="tool-idx">Quality</div>
       <div class="tool-icon cyan">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
       </div>
-      <div class="tool-name">CoreSpeed — CDN Speed Test</div>
-      <p class="tool-desc">Race every TorBox Hyperdrive CDN node at once — ping, multi-stream throughput, live world map, run history, and a streaming verdict per region. No API key.</p>
+      <div class="tool-name">Health Score</div>
+      <p class="tool-desc">0–100 score with letter grade on the Review step. Checks sort criteria, ESE/ISE balance, device awareness, formatter quality.</p>
       <div class="tool-foot">
-        <span class="badge badge-green">✓ Live</span>
-        <span class="tool-link">Test →</span>
+        <span class="badge badge-cyan">In Builder</span>
+        <span class="tool-link">Open Builder →</span>
+      </div>
+    </a>
+    <a class="tool-card" href="../configurator/#troubleshooter">
+      <div class="tool-idx">Fix</div>
+      <div class="tool-icon yellow">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+      </div>
+      <div class="tool-name">Troubleshooter</div>
+      <p class="tool-desc">Interactive decision tree for no streams, wrong quality, import errors, and buffering issues.</p>
+      <div class="tool-foot">
+        <span class="badge badge-cyan">In Builder</span>
+        <span class="tool-link">Open Builder →</span>
+      </div>
+    </a>
+    <a class="tool-card" href="https://www.npmjs.com/package/core-builds" target="_blank" rel="noopener">
+      <div class="tool-idx">CLI</div>
+      <div class="tool-icon red"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg></div>
+      <div class="tool-name">CLI Tool</div>
+      <p class="tool-desc">Generate, validate, and diff templates from the command line. <code>npx core-builds generate</code></p>
+      <div class="tool-foot"><span class="badge badge-green">&check; Available</span><span class="tool-link">npm &rarr;</span></div>
+    </a>
+  </div>
+
+  <div class="section-label">✨ Genies — guided setup companions</div>
+  <div class="tool-grid g2">
+    <a class="tool-card" href="./genies/">
+      <div class="tool-idx">Install</div>
+      <div class="tool-icon cyan">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 15l6 6m0-6l-6 6"/><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>
+      </div>
+      <div class="tool-name">✨ Guided Setup Genie</div>
+      <p class="tool-desc">Answers a few plain-English questions, then hands your picks to the full builder — Express lane pre-set, key hand-off, host checks. Nothing installs until you say so. Stremio, Nuvio &amp; WuPlay targets.</p>
+      <div class="tool-foot">
+        <span class="badge badge-cyan">BETA — works today</span>
+        <span class="tool-link">Try it →</span>
+      </div>
+    </a>
+    <a class="tool-card" href="./genies/nuvio-stacks.html">
+      <div class="tool-idx">Nuvio</div>
+      <div class="tool-icon yellow">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l10 6.5v9L12 24l-10-6.5v-9L12 2z"/><path d="M12 22V12"/><path d="M22 8.5l-10 3.5-10-3.5"/></svg>
+      </div>
+      <div class="tool-name">Nuvio Stack Genie</div>
+      <p class="tool-desc">Plans your Nuvio profiles &amp; ordered add-on stacks (metadata → stream engine → extras), with per-addon health chips, a copyable checklist, and one tap into the Core Builds builder to generate the real links.</p>
+      <div class="tool-foot">
+        <span class="badge" style="background:rgba(251,191,36,.12);color:#fbbf24">BETA — works today</span>
+        <span class="tool-link">Explore →</span>
+      </div>
+    </a>
+    <a class="tool-card" href="./genies/wuplay-catalogs.html">
+      <div class="tool-idx">WuPlay</div>
+      <div class="tool-icon purple">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M17 2l-5 5-5-5"/></svg>
+      </div>
+      <div class="tool-name">WuPlay Catalog Genie</div>
+      <p class="tool-desc">Designs your WuPlay home: Home/Discover rows, hubs (services · genres · studios · collections), kids-safe screens — then hands you a tap-by-tap guide + an import-ready .json. Read-only by design.</p>
+      <div class="tool-foot">
+        <span class="badge" style="background:rgba(167,139,250,.12);color:#a78bfa">BETA — early access · pending dev sign-off</span>
+        <span class="tool-link">Explore →</span>
       </div>
     </a>
     <a class="tool-card" href="./badges/">
@@ -238,6 +350,52 @@ body{
       <div class="tool-foot">
         <span class="badge badge-green">✓ Live</span>
         <span class="tool-link">Build badges →</span>
+      </div>
+    </a>
+  </div>
+
+  <div class="section-label">Stremio account</div>
+  <div class="tool-grid g2">
+    <a class="tool-card" href="../account-tools/">
+      <div class="tool-idx">Safety</div>
+      <div class="tool-icon green">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+      </div>
+      <div class="tool-name">Addon Backup</div>
+      <p class="tool-desc">Read and download your current Stremio addon collection. No account changes. Nothing is modified.</p>
+      <div class="tool-foot">
+        <span class="badge badge-green">✓ Read-only</span>
+        <span class="tool-link">Open →</span>
+      </div>
+    </a>
+    <a class="tool-card" href="../account-tools/">
+      <div class="tool-idx">Account</div>
+      <div class="tool-icon yellow"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+      <div class="tool-name">Account Manager</div>
+      <p class="tool-desc">Reorder, remove, restore, and undo addon changes. A backup is created before every account change.</p>
+      <div class="tool-foot"><span class="badge badge-green">&check; Available</span><span class="tool-link">Open &rarr;</span></div>
+    </a>
+    <a class="tool-card" href="https://stremio-addons.net/" target="_blank" rel="noopener">
+      <div class="tool-idx">Discover</div>
+      <div class="tool-icon cyan"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div>
+      <div class="tool-name">Community Addon Directory</div>
+      <p class="tool-desc">Browse the community-moderated stremio-addons.net catalog: categories, star ratings, manifest health and public AIOStreams instances. External and unaffiliated — includes adult addons.</p>
+      <div class="tool-foot"><span class="badge badge-cyan">External</span><span class="tool-link">stremio-addons.net &rarr;</span></div>
+    </a>
+  </div>
+
+  <div class="section-label">Speed &amp; media</div>
+  <div class="tool-grid g2">
+    <a class="tool-card" href="./speedtest/">
+      <div class="tool-idx">Speed</div>
+      <div class="tool-icon cyan">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+      </div>
+      <div class="tool-name">CoreSpeed — CDN Speed Test</div>
+      <p class="tool-desc">Race every TorBox Hyperdrive CDN node at once — ping, multi-stream throughput, live world map, run history, and a streaming verdict per region. No API key.</p>
+      <div class="tool-foot">
+        <span class="badge badge-green">✓ Live</span>
+        <span class="tool-link">Test →</span>
       </div>
     </a>
     <a class="tool-card" href="./banner-studio/">
@@ -254,136 +412,50 @@ body{
     </a>
   </div>
 
-  <!-- Section 2: Verification & Debug -->
-  <div class="section-label">02 · Verify &amp; debug</div>
-  <div class="tool-grid g3">
-    <a class="tool-card" href="./inspector/">
-      <div class="tool-idx">Schema</div>
-      <div class="tool-icon purple">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-      </div>
-      <div class="tool-name">Template Inspector</div>
-      <p class="tool-desc">Paste any AIOStreams JSON — get schema checks, plain-English findings, and host compatibility.</p>
-      <div class="tool-foot">
-        <span class="badge badge-green">✓ Live</span>
-        <span class="tool-link">Open →</span>
-      </div>
-    </a>
-    <a class="tool-card" href="../#health-score">
-      <div class="tool-idx">Quality</div>
-      <div class="tool-icon cyan">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
-      </div>
-      <div class="tool-name">Health Score</div>
-      <p class="tool-desc">0–100 score with letter grade on the Review step. Checks sort criteria, ESE/ISE balance, device awareness, formatter quality.</p>
-      <div class="tool-foot">
-        <span class="badge badge-cyan">In Builder</span>
-        <span class="tool-link">Open Builder →</span>
-      </div>
-    </a>
-    <a class="tool-card" href="../#troubleshooter">
-      <div class="tool-idx">Fix</div>
-      <div class="tool-icon yellow">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
-      </div>
-      <div class="tool-name">Troubleshooter</div>
-      <p class="tool-desc">Interactive decision tree for no streams, wrong quality, import errors, and buffering issues.</p>
-      <div class="tool-foot">
-        <span class="badge badge-cyan">In Builder</span>
-        <span class="tool-link">Open Builder →</span>
-      </div>
-    </a>
-  </div>
+  <details class="inline-card fold">
+    <summary>Stream card previews</summary>
+    <p style="margin:0 0 10px;color:var(--th-tx2);font-size:.78rem">The real cards AIOStreams draws with each formatter, generated from the same templates the configurator writes.</p>
+    <div class="hybrid-wall" aria-label="Formatter previews">
+      <figure><img src="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/family-v4-preview.svg" width="800" height="334" loading="lazy" alt="Real stream card preview — Family v4 — the default"><figcaption><b>Family v4</b><span>the default</span></figcaption></figure>
+      <figure><img src="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/apex-v2-preview.svg" width="800" height="334" loading="lazy" alt="Real stream card preview — Apex v2 — detail-rich"><figcaption><b>Apex v2</b><span>detail-rich</span></figcaption></figure>
+      <figure><img src="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/ultra-preview.svg" width="800" height="334" loading="lazy" alt="Real stream card preview — Ultra — flagship 3-line"><figcaption><b>Ultra</b><span>flagship 3-line</span></figcaption></figure>
+      <figure><img src="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/minimal-preview.svg" width="800" height="334" loading="lazy" alt="Real stream card preview — Minimal — title only"><figcaption><b>Minimal</b><span>title only</span></figcaption></figure>
+      <figure><img src="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/tv-preview.svg" width="800" height="334" loading="lazy" alt="Real stream card preview — TV — episode-first"><figcaption><b>TV</b><span>episode-first</span></figcaption></figure>
+      <figure><img src="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/core-syntax-v3-preview.svg" width="800" height="334" loading="lazy" alt="Real stream card preview — Core Syntax V3"><figcaption><b>Core Syntax V3</b><span></span></figcaption></figure>
+    </div>
+  </details>
 
-  <!-- Section 3: New tools -->
-  <div class="section-label">03 · New tools</div>
-  <div class="tool-grid g2">
-    <a class="tool-card" href="../account-tools/">
-      <div class="tool-idx">Account</div>
-      <div class="tool-icon yellow"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
-      <div class="tool-name">Account Manager</div>
-      <p class="tool-desc">Reorder, remove, restore, and undo addon changes. A backup is created before every account change.</p>
-      <div class="tool-foot"><span class="badge badge-green">&check; Available</span><span class="tool-link">Open &rarr;</span></div>
-    </a>
-    <a class="tool-card" href="https://www.npmjs.com/package/core-builds" target="_blank" rel="noopener">
-      <div class="tool-idx">CLI</div>
-      <div class="tool-icon red"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg></div>
-      <div class="tool-name">CLI Tool</div>
-      <p class="tool-desc">Generate, validate, and diff templates from the command line. <code>npx core-builds generate</code></p>
-      <div class="tool-foot"><span class="badge badge-green">&check; Available</span><span class="tool-link">npm &rarr;</span></div>
-    </a>
-  </div>
-
-  <!-- Genies: guided setup companions -->
-  <div class="section-label">04 · ✨ Genies — guided setup companions</div>
-  <div class="tool-grid g3">
-    <a class="tool-card" href="./genies/">
-      <div class="tool-idx">Install</div>
-      <div class="tool-icon cyan">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 15l6 6m0-6l-6 6"/><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>
-      </div>
-      <div class="tool-name">✨ Guided Setup Genie</div>
-      <p class="tool-desc">Answers a few plain-English questions, then hands your picks to the full builder — Express lane pre-set, key hand-off, host checks. Nothing installs until you say so. Stremio, Nuvio &amp; WuPlay targets.</p>
-      <div class="tool-foot">
-        <span class="badge badge-cyan">BETA — works today</span>
-        <span class="tool-link">Try it →</span>
-      </div>
-    </a>
-    <a class="tool-card" href="./genies/wuplay-catalogs.html">
-      <div class="tool-idx">WuPlay</div>
-      <div class="tool-icon purple">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M17 2l-5 5-5-5"/></svg>
-      </div>
-      <div class="tool-name">WuPlay Catalog Genie</div>
-      <p class="tool-desc">Designs your WuPlay home: Home/Discover rows, hubs (services · genres · studios · collections), kids-safe screens — then hands you a tap-by-tap guide + an import-ready .json. Read-only by design.</p>
-      <div class="tool-foot">
-        <span class="badge" style="background:rgba(167,139,250,.12);color:#a78bfa">BETA — early access · pending dev sign-off</span>
-        <span class="tool-link">Explore →</span>
-      </div>
-    </a>
-    <a class="tool-card" href="./genies/nuvio-stacks.html">
-      <div class="tool-idx">Nuvio</div>
-      <div class="tool-icon yellow">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l10 6.5v9L12 24l-10-6.5v-9L12 2z"/><path d="M12 22V12"/><path d="M22 8.5l-10 3.5-10-3.5"/></svg>
-      </div>
-      <div class="tool-name">Nuvio Stack Genie</div>
-      <p class="tool-desc">Plans your Nuvio profiles &amp; ordered add-on stacks (metadata → stream engine → extras), with per-addon health chips, a copyable checklist, and one tap into the Core Builds builder to generate the real links.</p>
-      <div class="tool-foot">
-        <span class="badge" style="background:rgba(251,191,36,.12);color:#fbbf24">BETA — works today</span>
-        <span class="tool-link">Explore →</span>
-      </div>
-    </a>
-  </div>
-
-  <!-- What's New -->
-  <div class="inline-card" style="margin-top:16px">
+  <details class="inline-card fold">
+    <summary>What's new</summary>
     <!-- AUTO:TOOLS_WHATSNEW:BEGIN -->
-    <h3>🆕 What's New — v3.16</h3>
+    <h3>🆕 What's New — v3.33</h3>
     <div style="margin-top:8px;display:flex;flex-direction:column;gap:4px">
-      <div class="news-item"><span class="badge" style="flex-shrink:0;background:rgba(0,212,255,.12);color:var(--th-accent)">↗</span><span style="color:var(--th-tx2)"><a href="https://brevitya.github.io/Core-Builds/#changelog" style="color:var(--th-accent);text-decoration:none">Full Configurator changelog →</a> &nbsp;·&nbsp; <a href="https://corebuilds-docs.docsalot.dev/changelog" style="color:var(--th-accent);text-decoration:none">suite changelog →</a></span></div>
-      <div style="font-size:.72rem;font-weight:800;color:var(--th-accent);letter-spacing:.04em;margin-top:8px">v3.16 · Oct 3 2026</div>
-      <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Builds save again: subtitles now default to OpenSubtitles v3+ — AIOSubtitle, the subtitle source every build used by default, now takes about 12 seconds to answer. AIOStreams loads every add-on before it saves, so hosts refused the whole save with "Failed to fetch manifest for AIOSubtitle: 502 - Bad Gateway". New builds use OpenSubtitles v3+, which answers in under a second, and saved sessions still on the old default move over automatically. AIOSubtitle stays available, labelled as slow.</span></div>
-      <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">SubDL without a key no longer blocks the save — AIOStreams requires a SubDL API key, but the configurator included SubDL even when the key field was empty, and the save was refused. SubDL is now only added once a key is entered; until then the build uses OpenSubtitles v3+, so it always has subtitles.</span></div>
-      <div style="font-size:.72rem;font-weight:800;color:var(--th-accent);letter-spacing:.04em;margin-top:8px">v3.15 · Oct 3 2026</div>
-      <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Built against AIOStreams 2.35.7 — the configurator’s schema was still read from AIOStreams 2.34.1, while every public host had moved to 2.35.4 or later. It is now read from the 2.35.7 release, which is also the new default compatibility target. Upstream only added things between the two (two new add-ons, five new settings), so no setting the configurator writes changed meaning. 2.35.4 and 2.35.5, which Wizaardd, ATBP and Omni’s run, have the same schema as 2.35.7.</span></div>
-      <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Generated configs now say they target 2.35.7 — besides the usual version stamp (coreBuildsVersion 3.14 to 3.15), the only change in generated output is the compatibility-target stamp in the template metadata (coreBuildsAIOStreamsTarget), which moves from 2.34.1 to 2.35.7. Filters, sorting, scrapers and formatting are byte-for-byte the same, so re-importing changes nothing AIOStreams acts on. Saved sessions that picked a target keep it.</span></div>
-      <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Names and settings from links can no longer inject page markup — a template name, a custom formatter label, an unrecognised setting from a shared link or imported config, and entries in the local backup history were written into the page as HTML. A crafted link could have run script in the configurator. They are now escaped wherever they are shown, and help tooltips keep their text out of the page attributes. Found by CodeQL; all 11 of its "DOM text reinterpreted as HTML" alerts are fixed.</span></div>
-      <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Upstream watch re-pinned — the AIOStreams contract watcher had flagged additive drift since September 26 (#770). It is re-pinned, and its source extraction no longer depends on GitHub’s API, which some networks refuse.</span></div>
-      <div style="font-size:.72rem;font-weight:800;color:var(--th-accent);letter-spacing:.04em;margin-top:8px">v3.14 · Oct 2 2026</div>
-      <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Default builds get their scrapers back — the Balanced profile, which every standard build has used since August, kept only a fixed short list of sources: a TorBox build shipped three torrent scrapers (StremThru Torz, Meteor, Comet) where an Advanced build ships eight. AIOStreams applies a template by replacing the whole addon list, so every update also deleted MediaFusion, EZTV, Torrent Galaxy, Zilean and Knaben from configs that had them. All five are back in Balanced; on P2P and EasyNews-only builds the four that need a debrid service are left out (see below). Simple Mode and Quick Install keep the short Stable list on purpose. The Knaben and Zilean toggle cards are gone: every build with a torrent debrid service already includes both, and neither can run without one, so the cards could not change anything.</span></div>
-      <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Default builds get their release filtering back — Balanced was meant to drop remote scoring and instead deleted every regex list, including the inline ones copied verbatim from host allowlists. Default users lost release-group ranking and the exclusions for upscaled, BR-DISK, extras and retagged releases, while the sort order kept a regexScore step that had nothing left to score. The inline lists return; synced regex URLs stay off, so nothing new depends on a remote file or a host allowlisting a URL.</span></div>
-      <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">P2P and EasyNews-only builds save again — EZTV, Torrent Galaxy, Knaben and Zilean are AIOStreams built-ins that need a torrent debrid service, and AIOStreams validates a config by building every enabled addon: one of them with no such service refuses the whole save, not just that addon. Advanced builds without debrid shipped all four switched on. They are now left out of builds with no debrid service and stay in everywhere else, so the save succeeds; rebuild after adding a debrid service to get them.</span></div>
-      <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">4K builds rank cached results first again — 4K builds sort every 2160p above every 1080p, but the same step also put quality above cache status, so an uncached 4K REMUX outranked a cached 4K WEB-DL. On a debrid account the top result could start a download instead of playing — the likely cause of reports that sorting sometimes misbehaves. Cached now comes straight after resolution in every 4K sort list, including Simple Mode and Quick Install builds: 4K still beats 1080p, and inside each resolution cached beats uncached. 1080p series also gain the separate cached/uncached ordering movies and anime always had, so uncached episodes now rank by seeders the way uncached movies do.</span></div>
-      <div style="font-size:.72rem;font-weight:800;color:var(--th-accent);letter-spacing:.04em;margin-top:8px">v3.13 · Sep 27 2026</div>
-      <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Configuration Doctor repairs hardened — three fixes from the post-release audit of the new Doctor. Credential redaction now covers the whole imported file: the diagnosis recorded paths relative to the unwrapped template while the repair pass walked the wrapper, so on array-wrapped exports every selected redaction silently did nothing and the "repaired" download still carried the keys. The scan now walks the entire input — wrapper keys, string arrays (a token in a synced-URL entry is flagged like any other), and every config in a multi-template array, not just the first one the structural checks unwrap. Removing a dead preset now also removes its instanceId from groups — AIOStreams rejects a config whose group references a preset that no longer exists, which would have turned a safe repair into a save failure; a grouping left empty is dropped, and groups disable entirely when none remain.</span></div>
-      <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Install verification is now real — the Full Stack success panel said your addons "were read back from your account", but nothing read them back. The install now ends with an actual re-read of the Stremio addon collection, checked against what was requested; a missing addon is reported plainly instead of celebrated. The Doctor's payload gauge also now measures the config the host actually receives rather than the template wrapper around it, so a wrapped export is no longer counted against the 100 KB save limit twice over.</span></div>
+      <div class="news-item"><span class="badge" style="flex-shrink:0;background:rgba(0,212,255,.12);color:var(--th-accent)">↗</span><span style="color:var(--th-tx2)"><a href="https://brevitya.github.io/Core-Builds/configurator/#changelog" style="color:var(--th-accent);text-decoration:none">Full Configurator changelog →</a> &nbsp;·&nbsp; <a href="https://corebuilds-docs.docsalot.dev/changelog" style="color:var(--th-accent);text-decoration:none">suite changelog →</a></span></div>
+      <div style="font-size:.72rem;font-weight:800;color:var(--th-accent);letter-spacing:.04em;margin-top:8px">v3.33 · Nov 18 2026</div>
+      <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">A one-screen main page — the Core mark, the Core Builds name and the version, then six equal rows: Core Builds (opens Quick install), Template Inspector, Back Up Addons, Nuvio Stack Genie, Core Badge Builder and All Core Tools. Each row has a hexagon icon and a short tag saying what it is.</span></div>
+      <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Support and shortcuts — a Support Core Builds button sits under the rows, and Custom build, Guided setup, update, import, the tour, template compare, what’s new and Report an issue are one tap away on All Core Tools. Each also has its own link (for example …/configurator/#advanced), and the links now work while the page is open as well as on first load.</span></div>
+      <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Smooth page changes — moving between the configurator and the tool pages cross-fades instead of flashing white, the main page’s rows rise in, and Quick install glides up. All of it switches off when your device asks for reduced motion.</span></div>
+      <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Quick install, redesigned — three labelled steps: where to install, your service, and your preferences. Apps and services are full-width rows with logos from the Core Builds Icon Pack; what matters most and streams shown are one-tap switches. On a computer your build summary and the Install button stay pinned on the right.</span></div>
+      <div style="font-size:.72rem;font-weight:800;color:var(--th-accent);letter-spacing:.04em;margin-top:8px">v3.32 · Oct 31 2026</div>
+      <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Truer line about your keys — Quick install said your keys go only to your AIOStreams host. They pass through the Core Builds relay on the way, which forwards them and keeps nothing, and the line now says so. The first screen says Core Builds keeps no copy of your keys.</span></div>
+      <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Full stack names Cinebye — the Full stack option now says that Cinebye, a separate service, makes the Cinemeta patch using your Stremio sign-in.</span></div>
+      <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Your language choice sticks — Quick install filled the language from your browser even after you had chosen one, so picking English in a Spanish browser reverted to Spanish next time. A language you chose in Quick install or Custom build now wins over the browser.</span></div>
+      <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Generated output unchanged — every config the configurator and the CLI build is byte-for-byte what 3.31 produced apart from the version stamp; only wording and the language prefill changed.</span></div>
+      <div style="font-size:.72rem;font-weight:800;color:var(--th-accent);letter-spacing:.04em;margin-top:8px">v3.31 · Oct 31 2026</div>
+      <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">One Core Builds template inside AIOStreams — a single template asks what you watch on (26 devices), the picture you want, what matters most, whether to show only streams that play straight away, your language and whether you mostly watch anime, then uses the service you pick in AIOStreams (none gives the free P2P setup). It builds the same config Quick install would for those answers. It is first in the template directory, with Import buttons for every host.</span></div>
+      <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Proven against AIOStreams itself — a test runs the template through AIOStreams’ own template code, fetched at the pinned release, for every answer and service, and fails on any difference from the configurator’s output; a browser test checks that output against what Quick install builds for every service and device. Picking two services at once gives one config with both, and those combinations are saved in a real AIOStreams on every pull request.</span></div>
+      <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Smaller operator collection — the collection hosts add to TEMPLATE_URLS now holds just this template (94 KB instead of 3.4 MB) and no longer includes personal templates. It still carries every regex pattern and synced address the other templates use, so instances that trusted them keep trusting them.</span></div>
+      <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Generated output unchanged — every config the configurator and the CLI build is byte-for-byte what 3.30 produced apart from the version stamp; the new template is a separate file that reproduces that output.</span></div>
+      <div style="font-size:.72rem;font-weight:800;color:var(--th-accent);letter-spacing:.04em;margin-top:8px">v3.30 · Oct 30 2026</div>
+      <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Update my setup — once Core Builds has saved a config to your AIOStreams and this browser still has its UUID and password, the first screen offers Update my setup. It rebuilds from your saved choices, shows what changes against what was last saved, and saves over the same config, so your Stremio link keeps working. Streams use the update straight away; changed catalogs show after reinstalling from your manifest link.</span></div>
+      <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">An update never makes a second config — if the host refuses, your existing config is left as it was and the paste method is offered. If it does not answer in time, the update may or may not have landed, and trying again is safe. Your password goes to a host from the list or your own custom address, passing through the Core Builds relay, which forwards it and keeps nothing.</span></div>
+      <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Generated output unchanged — every config the configurator and the CLI build is byte-for-byte what 3.29 produced apart from the version stamp; only the way an existing setup is updated changed.</span></div>
     </div>
 <!-- AUTO:TOOLS_WHATSNEW:END -->
-  </div>
+  </details>
 
-  <!-- Built-in tools reference -->
-  <div class="inline-card" style="margin-top:12px">
-    <h3>🔧 Built-in tools (inside the Builder)</h3>
+  <details class="inline-card fold">
+    <summary>🔧 Built-in tools (inside the Builder)</summary>
     <p style="margin-bottom:8px">These tools live inside the Template Builder. Open the Builder to use them:</p>
     <div style="display:flex;flex-direction:column;gap:6px">
       <div style="display:flex;align-items:center;gap:8px;font-size:.74rem"><span style="color:var(--th-accent);font-weight:700;min-width:100px">Health Score</span><span style="color:var(--th-tx2)">Review step — 0–100 score with 11 checks and letter grade</span></div>
@@ -395,7 +467,7 @@ body{
       <div style="display:flex;align-items:center;gap:8px;font-size:.74rem"><span style="color:var(--th-accent);font-weight:700;min-width:100px">Host Compat</span><span style="color:var(--th-tx2)">Review step — checks elfhosted/fortheweak/self-hosted compatibility</span></div>
       <div style="display:flex;align-items:center;gap:8px;font-size:.74rem"><span style="color:var(--th-accent);font-weight:700;min-width:100px">Preflight</span><span style="color:var(--th-tx2)">Install step — checks credentials, device mismatches, missing guards before deploy</span></div>
     </div>
-  </div>
+  </details>
 
   <div class="rule"></div>
   <footer class="foot">

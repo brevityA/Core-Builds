@@ -51,6 +51,7 @@ const REQUIRED_CONFIG_KEYS = [
   'size', 'bitrate', 'deduplicator', 'resultLimits',
 ];
 const DEBRID_EXTRA_KEYS = ['excludedRegexPatterns', 'rankedRegexPatterns', 'preferredRegexPatterns'];
+const STABLE_OPTIONAL_KEYS = ['size', 'bitrate'];
 
 const SENSITIVE_PATTERNS = [
   /apiKey/i, /password/i, /secret/i, /auth.*key/i, /token/i,
@@ -65,7 +66,9 @@ for (const combo of GOLDEN_COMBOS) {
       assert.ok(template[key], `missing top-level key: ${key}`);
     }
 
-    for (const key of REQUIRED_CONFIG_KEYS) {
+    // Core Stable (the default for Standard) omits caps the user did not set.
+    const optional = template.metadata.coreBuildsProfile === 'stable' ? STABLE_OPTIONAL_KEYS : [];
+    for (const key of REQUIRED_CONFIG_KEYS.filter(k => !optional.includes(k))) {
       assert.ok(key in template.config, `missing config key: ${key}`);
     }
 
@@ -91,12 +94,19 @@ for (const combo of GOLDEN_COMBOS) {
       assert.ok(!('order' in entry), `sortCriteria entry must not use "order": ${JSON.stringify(entry)}`);
     }
 
-    assert.ok(template.config.excludedStreamExpressions.length > 0, 'ESEs should not be empty');
-    assert.ok(template.config.includedStreamExpressions.length > 0, 'ISEs should not be empty');
-    assert.ok(template.config.preferredStreamExpressions.length > 0, 'PSEs should not be empty');
+    if (template.metadata.coreBuildsProfile === 'stable') {
+      // The Core Stable contract: one external-stream kill, no local ranking rules.
+      assert.equal(template.config.excludedStreamExpressions.length, 1, 'Stable carries exactly one ESE');
+      assert.equal(template.config.includedStreamExpressions.length, 0, 'Stable carries no ISEs');
+      assert.equal(template.config.preferredStreamExpressions.length, 0, 'Stable carries no PSEs');
+    } else {
+      assert.ok(template.config.excludedStreamExpressions.length > 0, 'ESEs should not be empty');
+      assert.ok(template.config.includedStreamExpressions.length > 0, 'ISEs should not be empty');
+      assert.ok(template.config.preferredStreamExpressions.length > 0, 'PSEs should not be empty');
+    }
 
-    assert.ok(template.config.size.global, 'size.global should exist');
-    assert.ok(template.config.bitrate.global, 'bitrate.global should exist');
+    if (!optional.includes('size')) assert.ok(template.config.size.global, 'size.global should exist');
+    if (!optional.includes('bitrate')) assert.ok(template.config.bitrate.global, 'bitrate.global should exist');
 
     assert.ok(template.config.deduplicator, 'deduplicator should exist');
     assert.ok(template.config.resultLimits, 'resultLimits should exist');
@@ -276,5 +286,6 @@ test('golden: unlimited size-limit does not add restrictive ESE', () => {
   const t = generate(['--service', 'torbox-pro', '--device', 'generic', '--resolution', '1080p', '--architecture', 'standard']);
   const eses = t.config.excludedStreamExpressions.map(e => e.expression);
   assert.ok(!eses.some(e => e.includes("Size Limit")), 'unlimited should not add size limit ESE');
-  assert.ok(t.config.size.global.movies[1] > 10_000_000_000, 'unlimited movie size cap should be large');
+  // Core Stable drops an unset cap entirely; a profile that keeps one keeps it large.
+  assert.ok(!t.config.size || t.config.size.global.movies[1] > 10_000_000_000, 'unlimited movie size cap should be absent or large');
 });

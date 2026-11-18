@@ -99,7 +99,6 @@ export function configuratorPatch() {
   return {
     langs: ['English'],
     subtitleLangs: ['en'],
-    ageLimit: 'PG',
     content: 'mixed',
     exclude4K: true,
     langExclusive: false,

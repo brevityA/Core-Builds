@@ -90,6 +90,167 @@ curl -s https://<worker>.workers.dev/healthz -H "Authorization: Bearer $ADMIN_TO
 The same `Authorization: Bearer $ADMIN_TOKEN` header unlocks the full
 `/api/stats` payload (see Routes below).
 
+## Core Streams (private Stremio add-on)
+
+Core Streams is an independent Stremio stream-list add-on served by this Worker. It federates bounded stream-result requests to Torrentio and TorrentsDB, looks the title up by IMDb ID in four public torrent indexes (YTS for movies, The Pirate Bay for movies and episodes, EZTV for episodes, Knaben for both), optionally turns cached torrents into instant TorBox HTTPS streams, queries the Stremio Public Domain Movies add-on for movie torrent results, includes a carefully filtered Internet Archive source for matching movie MP4s with an uploader-declared CC0/Public Domain Mark/CC public-domain certification/CC BY/CC BY-SA license (searched by exact title and year, most-downloaded first), includes four exact-match Library of Congress films from a collection explicitly declared public domain by LOC, includes the publisher's official Blender Open Movies PeerTube source for seven explicitly mapped titles: Big Buck Bunny, Elephants Dream, Sintel, Tears of Steel, Glass Half, Coffee Run, and Caminandes: Llamigos, and supports one optional operator-configured Stremio-compatible source. Configured sources may return validated native YouTube video IDs (`ytId`) as well as HTTPS URLs or torrent hashes; Stremio's YouTube-capable clients resolve those IDs without Core Streams fetching or proxying video. Clients such as WuPlay that only support HTTP(S) can use the same manifest, but will ignore the torrent/P2P results; direct HTTP coverage is limited to exact-matched open-media titles and any compatible configured source. Cinemeta lookups follow its single redirect to `cinemeta-live.strem.io` for titles missing from its cache (most open-media films). The fixed IMDb mappings for LOC and Blender are evaluated independently of Cinemeta availability, so a metadata outage does not hide their direct HTTP streams. It does not depend on AIOStreams and never relays media bytes. The `/proxy/*` AIOStreams lane remains unchanged. Internet Archive license metadata is uploader-declared and not independently verified; the Public Domain Movies add-on's classification is not a guarantee of public-domain status in Australia or another viewer's country. These are discovery filters, not legal clearance or a guarantee that a file plays.
+
+### Use it
+
+1. **Create a private install token and store it on the Worker** (never commit or post it):
+   ```bash
+   cd cloudflare-worker
+   CORE_STREAMS_INSTALL_TOKEN=$(openssl rand -hex 32)
+   printf '%s' "$CORE_STREAMS_INSTALL_TOKEN" | npx wrangler secret put CORE_STREAMS_INSTALL_TOKEN --env=""
+   ```
+2. *(Optional)* Configure a compatible Stremio stream add-on as described below.
+3. **Deploy the Worker code.** After the code is merged to `main`, the existing deploy workflow handles it; to deploy this checkout manually, run `npx wrangler deploy --env=""` from `cloudflare-worker/` (or deploy with `--env staging` first).
+4. **Build the install link** using your Worker base URL:
+   ```bash
+   printf 'https://core-builds-cors-proxy.tlorenzato26.workers.dev/core-streams/%s/manifest.json\n' "$CORE_STREAMS_INSTALL_TOKEN"
+   ```
+   Replace the base URL if your Worker has a different account subdomain.
+5. In Stremio, open **Add-ons → Install from URL** (wording varies by client), paste the link and install. Share the link only with the friends you intend to allow; it is a bearer credential.
+
+To revoke access, replace the `CORE_STREAMS_INSTALL_TOKEN` Worker secret and redeploy/reinstall using the new link. For local `wrangler dev`, put `CORE_STREAMS_INSTALL_TOKEN=<64 hex chars>` in the ignored `cloudflare-worker/.dev.vars` file.
+
+Movie/episode lookups are rate-limited using the existing `RL_PROXY_CUSTOM` lane.
+
+**Torrent indexes.** Torrentio refuses requests from shared Cloudflare egress and TorrentsDB has been returning 502, so on the deployed Worker both could fail at once and leave mainstream titles with nothing. The indexes are the independent fallback; each is a fixed JSON API, returns info hashes only (nothing is downloaded or relayed), and gets the same normalization, de-duplication and ranking as add-on results:
+
+- **YTS** (`movies-api.accel.li`, movies): exact `imdb_code` match only.
+- **The Pirate Bay** (`apibay.org`): movies by exact uploader IMDb tag, video categories, at least one seeder. For episodes it also searches `<Cinemeta title> S01E01`; untagged hits must start with the show's name (optionally followed by a year or US/UK/AU/NZ/CA). Single-episode releases come first; whole-season and complete-series packs follow with `fileMustInclude`, the stremio-core torrent field that makes the streaming server open the matching file inside the pack. Episode ranges (`S02E01-E03`) are skipped.
+- **EZTV** (`eztvx.to`, episodes): season/episode match plus the same show-title check, because EZTV's IMDb mapping is unreliable (Breaking Bad's ID returns a different show). It only sees each show's newest 100 releases, so it mostly helps with shows still airing.
+
+- **Knaben** (`api.knaben.org`, movies and episodes): a meta-search over about 30 trackers. It searches by title, so a film hit must start with the Cinemeta title and carry its year, an episode hit must name the episode and start with the show's name, and only video categories with at least one seeder are kept. `hide_unsafe` and `hide_xxx` are always on.
+
+**Faster repeat lookups.** Successful Cinemeta title/year lookups are reused for six hours in a bounded, isolate-local cache (at most 256 titles). Browsing episodes of the same show skips repeated metadata calls; a cache hit still works while Cinemeta's breaker is open. Missing titles, transport failures and invalid responses are never cached. Only public title/year metadata is retained—no install tokens, API keys or stream responses.
+
+**Anime (Kitsu ids and Nyaa).** Core Streams answers `kitsu:<id>` (films) and `kitsu:<id>:<episode>` (episodes) as well as IMDb ids, so anime catalogs such as Anime Kitsu get results; the manifest lists the `kitsu` prefix and the `anime` type.
+
+- A Kitsu id goes to the add-ons that understand it (Torrentio, TorrentsDB, a configured add-on) and to Nyaa. The IMDb-keyed indexes and open media are skipped. The titles come from Kitsu (`kitsu.app/api/edge/anime/:id`, which needs `Accept: application/vnd.api+json`).
+- An IMDb title is treated as anime when Cinemeta lists it as Animation from Japan; it keeps every normal source and adds Nyaa.
+- **Nyaa** (`nyaa.si` RSS, English-translated anime, sorted by seeders) gets two searches at once: the romaji title, which most fansub groups use, and the English title with `(dub|dual|multi)`, which is how dub releases are named. A hit must carry the title and the requested season (releases write it as `S2`, `Season 2` or `2nd Season`) and name the episode (` - 05`, `E05`, `S02E05`, `[05]`), or be a batch whose range spans it; batches get `fileMustInclude` so the player opens the episode. Remakes and dead torrents are dropped, and Nyaa's trusted uploads say so on the card.
+- **Dubs first.** `CORE_STREAMS_ANIME_AUDIO` (Worker variable) sets the order for anime: `dub` (default) lifts English-dub, dual-audio and multi-audio releases so a 1080p dub comes before even a 4K REMUX sub (the setting is part of the response-cache key); `sub` sinks dub-only releases; `any` ranks by quality alone. Cards say `🎙 English dub`, `🎙 Dual audio` or `🎙 Multi-audio`. Live action is never reordered by these words.
+- **Episode-aware ranking (every episode request, anime or not).** `core-streams-episode.js` judges how sure each result is that it plays the requested episode. It reads structured fields first (`behaviorHints.filename`, `fileIdx`, `fileMustInclude`, `folderName`, TorBox's own file pick), then the release title:
+  - `EXACT`: the file names the episode (`S01E05`, `1x05`, or an anime ` - 05` with the season named, in a first season, or under a Kitsu id). Card: `📺 S01E05 · Title`.
+  - `LIKELY`: only the release title names it, or the file names the episode but not the season. Card: `📺 S01E05 · from the release name`.
+  - `PACK`: a season, batch, volume or range that contains it (an unnamed range in a later season, which may be absolute numbering, is `UNKNOWN` instead). Card: `📺 Season 1 · Episode 5 selected`, or `📺 Episodes 1–8 · E05 selected`. A pack the add-on picked a file in (`fileIdx`/`fileMustInclude`) ranks above one it did not (`· episode not selected`).
+  - `UNKNOWN`: no reliable evidence. Card: `📺 Episode unverified`. For a later season with no season named and no Kitsu entry numbering, an anime number that differs from the request (`- 33` for S2E5, which may be absolute numbering) stays here as a fallback, labelled `· absolute numbering`. A matching number in that case is `LIKELY`.
+  - `MISMATCH`: the file, or a title with no file selection, names another episode or season. These results are **removed**.
+- Results are ordered by, in turn:
+  1. episode state;
+  2. delivery (TorBox-cached or HTTPS first, P2P last);
+  3. the anime audio preference;
+  4. device compatibility (AV1, 3D and DV-without-HDR sink);
+  5. quality (resolution, source, codec, HDR, size, seeders);
+  6. source diversity;
+  7. a stable key, so the order never depends on which provider answered first.
+
+  Each result also carries an additive score in its facts (EXACT 1000, LIKELY 700, PACK 450, +100 for a pack with a selection, UNKNOWN 100; delivery, audio, device, quality and diversity together stay under 100). A 4K REMUX of the wrong episode is gone, and a better pack never passes an exact single. The dub preference only reorders results that are equally sure of the episode. Film requests keep the quality-first order.
+- The same torrent with a different file selection is a different result. A copy with no selection is dropped once a selected copy has passed episode classification.
+- P2P playback of a pack opens the episode through `fileMustInclude`, which Stremio's torrent engine reads but the stream protocol does not promise. A TorBox-cached pack is different: Core Streams picks the episode file itself.
+- Kitsu titles are cached like Cinemeta's (positive answers, 6 h), so the title lookup is paid once per show. Both Nyaa searches start together once the title is known.
+- Not matched, on purpose: releases numbered absolutely (` - 33` for S2E5), since Kitsu does not give the offset. Kitsu subtitles are optional (`Mushoku Tensei II: …` matches `Mushoku Tensei S2`) and Roman numerals count as the season.
+- TorBox picks the episode inside a cached anime batch by its anime name (`Show - 05.mkv`).
+
+**TorBox (optional, your own account).** Set `TORBOX_API_KEY` as a Worker secret (dashboard: Workers & Pages → `core-builds-cors-proxy` → Settings → Variables and Secrets, type *Secret*; or `npx wrangler secret put TORBOX_API_KEY`). Not a GitHub secret: the deploy workflow does not forward it, and Worker secrets survive deploys. With it set:
+
+- After the sources answer, one `GET /torrents/checkcached` (up to 100 hashes, 3-second timeout) asks which torrents TorBox already has.
+- Each cached torrent is offered first as a `⚡ TorBox` card, an HTTPS link to `/core-streams/:token/play/:hash/{movie|SxE}` on this Worker, and its P2P copy is dropped. A cached season pack that lacks the requested episode stays a P2P result. These links play in HTTPS-only clients such as WuPlay.
+- `/play` (GET or HEAD, same token and rate limit) adds the torrent (`createtorrent`, instant when cached), reads its file list (`mylist`), picks the requested episode or the largest video (never samples or extras), asks for a link (`requestdl`, `redirect=false`, with the viewer's IP so TorBox can pick a nearby CDN) and answers **302** to TorBox's CDN. Up to 200 torrent ids are remembered per isolate and TorBox account. Simultaneous GET/HEAD probes share an in-flight add; each request still gets its own CDN link. A removed cached torrent is recreated once automatically, and rotating the API key clears the old account's ids and TorBox breaker state. Repeated TorBox play outages (timeouts, network/5xx errors) open a 30-second isolate-local play breaker: `/play` fast-fails with `503 + Retry-After: 30`, and stream lookups keep P2P results instead of promoting TorBox links. Account-limit errors such as `ACTIVE_LIMIT` and per-torrent conditions such as `ITEM_NOT_FOUND`, `BAD_LINK` or `NO_TORRENT_ID` are reported but do not open the account-wide outage breaker.
+- The key is only ever sent to `api.torbox.app`. It never appears in a stream URL, a response body or the status header; TorBox errors come back as their code (e.g. `TorBox: ACTIVE_LIMIT`). No media passes through the Worker.
+- Without the secret nothing is sent to TorBox and `/play` answers 404. Personal use only: the play links carry the install token, and every play counts against your TorBox account.
+
+Core Streams emits secret-free structured events through the Worker log sink: `core_streams_lookup` (`cache`, `scope`, `count`, `partial`, `ms`), `core_streams_source` (`source`, `outcome`, `ms`), `core_streams_torbox_add` (`outcome`, `ms`) and `core_streams_play` (`status`, `outcome`, `ms`). They never include install tokens, TorBox keys, info-hashes, media ids, URLs, headers or IPs. Every stream response also carries `X-Core-Streams-Sources`, e.g. `torrentio=http 403; tpb=ok 12; yts=ok 3; cinemeta=cache hit`, so an empty list can be explained. Stream lookup supports GET, not HEAD; use `curl -sS -D - -o /dev/null "$STREAM_URL"` to inspect headers without printing the stream list. Keep the token-bearing URL private. The header names sources and outcomes only, never IDs, URLs or the token. Outcomes include `ok N`, `http NNN`, `timeout`, `network error`, `paused` (breaker open), and `cache hit` (Cinemeta only).
+
+Index lookups share an 8-second request-wide deadline and a 512 KiB response cap. Torrentio, TorrentsDB, the movie-only Public Domain Movies add-on, and any configured add-on have a 5.5-second provider timeout that starts only after a header-wait slot is granted and stays active through the bounded body read; open-media metadata lookups are separately bounded to 4 seconds and 768 KiB per JSON response. Queue time is charged to the request-wide deadline, not to provider health. Each source has an isolate-local circuit breaker: after three consecutive provider failures/timeouts it is skipped for 30 seconds while other sources keep running. Request-wide deadline cancellations (including queued calls) do not count as provider failures.
+
+Results use a best-effort ordering heuristic: within each source, recognizable resolution, seed-count hints, release tags, and direct-play URLs contribute to ranking; the best first result is shown first, then provider lists are interleaved before the 80-result cap. This prevents a high-volume source from hiding every other provider. Labels can be inaccurate, so the ordering is advisory—not a guarantee of quality, playback, seed availability, or safety.
+
+### Compare Core Streams with PenguPlay and/or HDHub
+
+`benchmark-core-streams.mjs` runs the same small set of popular, episode, and open-media IMDb IDs against Core Streams and one or both comparison add-ons. It reports response time, non-empty coverage, stream counts/types, and advertised resolution/seeder hints. Requests run sequentially by title, with a one-second default pause; the script does not save responses, print manifest URLs/tokens, attempt playback, or establish rights. Labels and result counts are provider-reported signals—not verification. The sample cases are in `core-streams-benchmark.mjs`; limited runs are stratified so `--limit=3` still includes a popular movie, an episode, and an open-media title. Use `--json` for machine-readable aggregate output.
+
+The [HDHub directory page](https://stremio-addons.net/addons/hdhub) links to a configuration UI, not a ready-made comparison manifest. Generate a personal manifest there; only use it if you are authorized and its terms allow direct requests. The config page offers optional TorBox integration and warns about scraped-title mismatches and some download-only links with poor seeking support. Therefore, to test HDHub as a TorBox-outage fallback, use a configuration **without** TorBox credentials; a TorBox-connected manifest shares that dependency. Do not paste any private manifest or TorBox API key into the repository or chat.
+
+Enter the required Core Streams manifest and at least one authorized comparator manifest interactively. PenguPlay and HDHub are optional comparator variables; private values are not printed or saved:
+
+```bash
+cd cloudflare-worker
+read -rsp 'Core Streams manifest URL: ' CORE_STREAMS_BENCHMARK_MANIFEST_URL; echo
+export CORE_STREAMS_BENCHMARK_MANIFEST_URL
+read -rsp 'PenguPlay manifest URL (optional; Enter to skip): ' PENGUPLAY_BENCHMARK_MANIFEST_URL; echo
+[ -z "$PENGUPLAY_BENCHMARK_MANIFEST_URL" ] || export PENGUPLAY_BENCHMARK_MANIFEST_URL
+read -rsp 'HDHub manifest URL (optional; Enter to skip): ' HDHUB_BENCHMARK_MANIFEST_URL; echo
+[ -z "$HDHUB_BENCHMARK_MANIFEST_URL" ] || export HDHUB_BENCHMARK_MANIFEST_URL
+node benchmark-core-streams.mjs --limit=3
+unset CORE_STREAMS_BENCHMARK_MANIFEST_URL PENGUPLAY_BENCHMARK_MANIFEST_URL HDHUB_BENCHMARK_MANIFEST_URL
+```
+
+A live comparison requires deployed, authorized manifest URLs; this repository does not integrate or proxy PenguPlay/HDHub. The benchmark tests stream-list responses only, and a non-empty result is not proof that it plays.
+
+The Public Domain Movies endpoint currently returns torrent hashes from its curated collection. Its results carry a warning to verify local public-domain status: the add-on does not establish copyright status for Australia or every other territory.
+
+The Internet Archive adapter handles movies only, requires an exact normalized title/year match from Cinemeta and item metadata, and returns MP4 files only when the item has an explicit allowlisted CC0, Public Domain Mark, CC public-domain certification, CC BY, or CC BY-SA license URL. It filters restricted files and excludes non-commercial/no-derivatives license variants. The license declaration is uploader-supplied, not independently verified; results include the item, creator, license and caveat.
+
+The LOC source is limited to four static mappings from the *Before and After the Great Earthquake and Fire* collection: A Trip Down Market Street Before the Fire (`tt0205480`, 1906), Panoramic View of the Golden Gate (`tt0366872`, 1902), Bird's-Eye View of San Francisco, Cal., from a Balloon (`tt0309365`, 1902), and San Francisco Earthquake & Fire: April 18, 1906 (`tt1811321`, 1906). Each is guarded by exact Cinemeta title/year (one catalog-title alias is explicit), pinned to its official LOC MP4 path, and linked to the item and collection rights statement, which says those collection contents are public domain and free to use and reuse. The returned record notes the preserved viewing-copy duration; some editions are shorter than the IMDb/Cinemeta duration. This is an official collection statement, not legal advice for every territory.
+
+Blender Open Movies is statically mapped only for seven exact IMDb/title/year matches: Big Buck Bunny (`tt1254207`), Elephants Dream (`tt0807840`), Sintel (`tt1727587`), Tears of Steel (`tt2285752`), Glass Half (`tt5243642`), Coffee Run (`tt13716914`), and Caminandes: Llamigos (`tt7993892`). Official account/channel, exact title, public status, license evidence and publisher MP4 checks are required. Per-film evidence is preserved: Big Buck Bunny and Glass Half CC BY 3.0; Elephants Dream CC BY 2.5; Sintel and Tears of Steel CC BY 3.0; Coffee Run CC BY 4.0; Caminandes: Llamigos reports Attribution on the official PeerTube API, without a version. Its stream is labelled with that version uncertainty; an Internet Archive uploader's CC BY 3.0 declaration is not relied upon. Four PeerTube records report unknown license metadata; that is accepted only for these statically mapped titles where the canonical Blender project page independently states the license. This is not a general PeerTube license exception.
+
+These are best-effort per-isolate controls, not global guarantees. `.mp4` does not prove a supported codec/container profile. The Internet Archive documents H.264 video, AAC audio, `yuv420p`, and a front-loaded `moov` atom for MP4 web playback, but Core Streams does not inspect media bytes. Codec compatibility and actual playback remain untested until checked in the target Stremio client.
+
+### Repeat-lookup speed and ranking (0.12.0)
+
+**Stream cards.** Every torrent, TorBox and configured-add-on result gets the same clean card, built by `core-streams-format.js` from the release name the way AIOStreams parses one:
+
+```text
+🧲 P2P      🎞 BluRay REMUX · HEVC · DV · HDR10
+4K          🔊 TrueHD · Atmos · 7.1 · 🌐 🇬🇧 🇫🇷
+            📦 58.20 GB · 👤 312 · 🔎 Torrentio · 1337x
+            🏷 FraMeSToR · Extended · REPACK
+            📄 The.Matrix.1999.2160p.UHD.BluRay.REMUX.DV.HDR10.HEVC.TrueHD.7.1.Atmos-FraMeSToR.mkv
+```
+
+- The name column is the way it plays (`⚡ TorBox`, `🧲 P2P`, `🌐 Direct`) over the resolution. Lines with nothing to say are left out; seeders are hidden on TorBox cards, where they no longer matter.
+- Parsed: resolution, source (REMUX, BluRay, WEB-DL, WEBRip, HDTV, DVD, CAM/TS/TC/SCR), codec, DV/HDR10+/HDR10/HLG/10-bit, audio codec and channels, languages (a provider's flags first), release group, edition and REPACK. A season pack is labelled. Tags are what the release name claims, not checked against the file.
+- `bingeGroup` is `core-streams|service|resolution|source|codec|HDR|group`, so autoplay of the next episode stays on the same kind of release, as AIOStreams' binge groups do.
+- Open-media cards (Public Domain Movies, Internet Archive, Blender, Library of Congress) keep their rights notices word for word, and YouTube results keep the provider's card.
+
+Stream lists are cached only inside the current Worker isolate: 64 entries / 4 MiB, by default 90 seconds for complete responses and the lower of the configured TTL or 15 seconds when any source failed or timed out. `CORE_STREAMS_CACHE_SECONDS=0` disables the cache; empty responses are never cached. Simultaneous requests for the same title share one in-flight provider fan-out. Request-wide deadline cancellations do not count against provider breakers, and Archive lookup runs concurrently with the independent Blender chain once Cinemeta metadata is ready. The cache key is a SHA-256 hash of the origin, install token, media id, TorBox key, configured source manifest and result-cap setting; the anime audio setting is in it too; raw tokens and keys are never cache keys, and nothing is written to the shared Cloudflare Cache API. Responses still send `Cache-Control: no-store`.
+
+Optional Worker variables:
+
+- `CORE_STREAMS_CACHE_SECONDS` — `0` disables the response cache (single-flight coalescing still applies); default `90`, maximum `300`. Partial responses are always capped at 15 seconds.
+- `CORE_STREAMS_MAX_PER_RESOLUTION` — optional diversity cap after TorBox promotion, `0`–`80`; default `0` (off). Curated open-media results are exempt.
+
+After provider-fair interleaving and dedupe, a global quality pass ranks release-source labels (REMUX/BluRay/WEB-DL/WEBRip), resolution, seed hints, HDR/DV and lossless audio. Obvious CAM/screener/sample releases are kept only as fallbacks. The final 80 still reserve best-effort seats for each responding provider and all curated open-media results. Scores are memoized per stream object so sorting does not re-parse release text.
+
+Offline orchestration benchmark (simulated 120 ms provider headers, no live network):
+
+```bash
+node cloudflare-worker/core-streams-latency-benchmark.mjs
+```
+
+It reports cold/warm/coalesced latency shape and asserts header-wait concurrency never exceeds six. `core-streams-load.test.js` additionally saturates the six-slot queue, aborts queued requests at their own deadlines, and checks that a transient provider timeout can recover through the half-open breaker. These are not live provider or playback benchmarks; use the authorized-manifest comparison harness below for that.
+
+### Optional configured stream add-on
+
+If you have a Stremio-compatible stream add-on manifest URL and its terms allow forwarding its stream results, store the URL as a Worker secret:
+
+```bash
+npx wrangler secret put CORE_STREAMS_HTTP_SOURCE_MANIFEST --env=""
+```
+
+Use the add-on's **manifest URL**, not its configure page. HTTPS required; no query string, fragment, userinfo, explicit port, IP literal, or reserved hostname. Configuration may be in path segments, in any RFC 3986 path characters: Torrentio's `providers=…|sort=…`, base64 with `=`, and percent-encoded values such as `%2B`, `%3D` or JSON all work. A source that answers 404 for a type or ID it does not serve is treated as having nothing for that request, not as an outage. This secret is shared by everyone using the Core Streams install token; do not configure a personal service credential for friends unless the service explicitly permits that. PenguPlay has not been live-integrated or verified—the supplied configure URL requires sign-in before the personal install URL is available. The optional source can also return a Stremio-native `ytId`; this enables a compatible YouTube add-on such as a privately operated YouStream instance to pass video IDs to Stremio's own YouTube player. It does not make YouTube search results rights-cleared: use only source add-ons and videos you are authorized to access, and do not share a personal YouTube API key through a multi-user Core Streams install. For direct streams, only HTTPS links are accepted. Playback request headers are restricted to `Accept`, `Accept-Language`, `Origin`, `Referer`, and `User-Agent`; cookies, authorization, and fixed `Range` headers are intentionally stripped.
+
+Core Streams remains a bounded aggregator, not a debrid resolver or HTML scraper (the three indexes are fixed JSON APIs queried by IMDb ID or exact title): public add-on availability and overlap can change, the Archive source covers only exact-title/year matching movies with uploader-declared open-license MP4s, IMDb movie/episode IDs are accepted, and a failed source is skipped while others may still return results. It does not provide mainstream catalogue coverage through the Archive and does not prove playback from a stream-list response. See **[CORE-STREAMS-RESEARCH.md](./CORE-STREAMS-RESEARCH.md)** for provider research, Cloudflare constraints, and known gaps. For fresh, provenance-labelled web/GitHub discovery of additional candidates, see the [source-scout tool](../tools/source-scout/README.md) and [candidate triage notes](./SOURCE-SCOUT.md).
+
+Tests:
+
+```bash
+node --test cloudflare-worker/*.test.js cloudflare-worker/*.test.mjs tools/source-scout/*.test.mjs
+```
+
 ## Wire it into the configurator
 
 1. Set `CORS_PROXY` in `configurator/src/js/app.js` to the Worker URL above.
@@ -127,6 +288,9 @@ Set `CORS_PROXY = ''` to disable the proxy and fall back to direct-fetch-only.
 | `/contact` | POST | Discord webhook relay | 5/min (binding) + 5/h (KV, if bound) | Origin allowlist, 16 KB body cap |
 | `/paste` | POST | store template / badge pack | 10/min | ≤512 KB, two shapes only, 30-day TTL |
 | `/t/:id` | GET | read paste | 60/min | `ACAO: *`, `no-store` |
+| `/core-streams/:token/manifest.json` | GET | private Stremio add-on manifest | none | token is a bearer secret; `ACAO: *`, `no-store` |
+| `/core-streams/:token/play/:hash/{movie\|SxE}` | GET, HEAD | TorBox instant play: add torrent, pick file, 302 to TorBox CDN (only when `TORBOX_API_KEY` is set; otherwise 404) | 20/min/IP (shared) | normally 3 TorBox API calls (2 with a remembered id; up to 5 on stale-id recovery); concurrent adds coalesced per account/hash; 8 s timeout; 30 s play outage breaker after repeated failures; key stays server-side; no media relay |
+| `/core-streams/:token/stream/{movie\|series\|anime}/{imdb-id\|kitsu-id}.json` | GET | Torrentio + TorrentsDB + YTS/The Pirate Bay/Knaben (movies) or The Pirate Bay/EZTV/Knaben (episodes); Kitsu + Nyaa for anime + optional TorBox cache check + movie-only Public Domain Movies + optional configured add-on (HTTPS, torrent, or native YouTube ID); open-media lookup via Cinemeta/Internet Archive, four LOC films, and seven mapped Blender films | 20/min/IP | ≤19 total upstream requests worst case (anime movies; ≤13 for anime episodes, ≤6 for Kitsu ids; ≤17/≤11 otherwise), with header-wait fan-out explicitly capped at 6; 8 s request-wide deadline; 5.5 s add-on/index provider timeout started after a header slot is granted; 4 s per open-media metadata request; per-source isolate-local breakers count provider failures/timeouts, not request-deadline cancellations; isolate-local response cache (default 90 s full / ≤15 s partial, configurable via `CORE_STREAMS_CACHE_SECONDS`, 64 entries / 4 MiB) and single-flight coalescing; no media relay; `X-Core-Streams-Sources` per-source status and `X-Core-Streams-Cache` hit/miss/coalesced/bypass; `ACAO: *`, `no-store` |
 | `/proxy<path>?host=` | GET/POST/PATCH | allowlisted lane | 60/min | every allowlisted host is scoped to its own surface — AIOStreams hosts: `GET /api/v1/status`, `POST/PATCH /api/v1/user[/id]`, `GET /stremio/<uuid>/<pwd>/{manifest.json,stream/*/*.json}` (origin form) or `GET /stream/*/*.json` (manifest-base form); `api.wuplay.app`: `GET /app/version`, `POST /devices/register`, `GET/POST/PATCH /sync/**` and is the **only** host that receives `Authorization`; `api.torbox.app`: `GET /v1/api/speedtest`. An allowlisted host matching no scope is refused |
 | `/proxy<path>?host=` | GET/POST/PATCH | custom lane | 20/min | `https://` origin → `GET /api/v1/status`, `POST/PATCH /api/v1/user[/id]` (same bounded id shape as the allowlisted lane, so a self-hosted config can be updated in place); manifest base → `GET /stream/*/*.json`; no IP literals, no userinfo/port/query, no dotless or reserved names (`.local .internal .lan .corp .home .test .example .invalid .onion .arpa`) |
 
@@ -145,7 +309,7 @@ HSTS.
   configurator's `writeHostFetch` treats 429 as "not forwarded" and retries the
   write directly; a post-forward 429 would duplicate a user's config. The
   circuit breaker therefore returns `503 + Retry-After`, not 429.
-- `ACAO: *` on `/t/` and `GET /proxy/api/v1/status` only; strict origin echo everywhere else.
+- `ACAO: *` on `/t/`, `/core-streams/`, and `GET /proxy/api/v1/status`; strict origin echo everywhere else.
 - `/api/stats` keeps `visits`/`generates` numeric at the top level (splash screen).
 
 ### Rate limiting — three layers

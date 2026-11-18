@@ -109,6 +109,9 @@ const GATE_MATRIX = [
   { host: 'elfhosted', option: 'preset:anime-kitsu', blocked: true },
   { host: 'elfhosted', option: 'service:p2p', blocked: true },
   { host: 'elfhosted', option: 'service:http', blocked: true },
+  // PenguPlay serves only HTTP streams.
+  { host: 'elfhosted', option: 'preset:penguplay', blocked: true },
+  { host: 'fortheweak', option: 'preset:penguplay', blocked: false },
   { host: 'elfhosted', option: 'customRegex', blocked: true },
   { host: 'fortheweak', option: 'preset:torrentio', blocked: false },
   { host: 'fortheweak', option: 'service:p2p', blocked: false },

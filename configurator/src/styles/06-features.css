@@ -4,44 +4,31 @@
 .fastlane-head{display:flex;align-items:flex-start;gap:12px;margin-bottom:18px}.fastlane-head-copy{flex:1}.fastlane-kicker{font-size:.58rem;font-weight:900;letter-spacing:.13em;text-transform:uppercase;color:#67e8f9}.fastlane-title{font-family:Georgia,'Times New Roman',serif;font-size:1.55rem;letter-spacing:-.035em;margin-top:3px}.fastlane-sub{color:#7e8b9c;font-size:.75rem;line-height:1.55;margin-top:4px}.fastlane-close{border:1px solid var(--ui-line,rgba(255,255,255,.09));background:#101923;color:#7e8b9c;border-radius:9px;width:38px;height:38px;cursor:pointer;font-size:1rem}
 .fastlane-section{margin-top:15px}.fastlane-label{font:800 .62rem/1.2 ui-monospace,monospace;color:#647387;letter-spacing:.08em;text-transform:uppercase;margin-bottom:7px}.fastlane-grid{display:grid;gap:8px}.fastlane-grid.apps{grid-template-columns:repeat(4,1fr)}.fastlane-grid.services{grid-template-columns:repeat(3,1fr)}.fastlane-grid.profiles{grid-template-columns:repeat(3,1fr)}
 .fastlane-choice{border:1px solid var(--ui-line,rgba(255,255,255,.09));background:#0e1621;color:#8693a3;border-radius:12px;padding:11px 9px;cursor:pointer;text-align:left;transition:.15s;min-height:58px}.fastlane-choice:hover{border-color:rgba(0,212,255,.25);background:#12202c}.fastlane-choice.active{border-color:rgba(0,212,255,.48);background:rgba(0,212,255,.09);color:#dce8ef;box-shadow:inset 3px 0 var(--th-accent)}.fastlane-choice b{display:block;font-size:.73rem}.fastlane-choice span{display:block;color:#667487;font-size:.58rem;margin-top:2px;line-height:1.35}.fastlane-choice.active span{color:#7893a4}
-.fastlane-fields{display:grid;gap:8px}.fastlane-field{width:100%;min-height:46px;background:#0a121b;border:1px solid rgba(255,255,255,.13);border-radius:10px;color:#edf4f8;padding:10px 12px;font-size:.86rem;outline:none}.fastlane-field:focus{border-color:rgba(0,212,255,.55);box-shadow:0 0 0 3px rgba(0,212,255,.08)}.fastlane-note{padding:9px 11px;border:1px solid rgba(0,212,255,.12);background:rgba(0,212,255,.04);border-radius:9px;color:#778596;font-size:.66rem;line-height:1.5}.fastlane-check{display:flex;align-items:flex-start;gap:9px;padding:10px 11px;border:1px solid var(--ui-line,rgba(255,255,255,.09));border-radius:10px;color:#8794a4;font-size:.69rem;line-height:1.45;cursor:pointer}.fastlane-check input{accent-color:var(--th-accent);margin-top:2px}.fastlane-go{width:100%;min-height:50px;margin-top:16px;border:0;border-radius:12px;background:linear-gradient(135deg,#00abd3,var(--th-accent));color:#04202b;font-size:.9rem;font-weight:900;cursor:pointer;box-shadow:0 8px 28px rgba(0,212,255,.22)}.fastlane-go:disabled{opacity:.45;cursor:not-allowed}.fastlane-result{margin-top:10px}
+.fastlane-field{width:100%;min-height:46px;background:#0a121b;border:1px solid rgba(255,255,255,.13);border-radius:10px;color:#edf4f8;padding:10px 12px;font-size:.86rem;outline:none}.fastlane-field:focus{border-color:rgba(0,212,255,.55);box-shadow:0 0 0 3px rgba(0,212,255,.08)}.fastlane-go{width:100%;min-height:50px;margin-top:16px;border:0;border-radius:12px;background:linear-gradient(135deg,#00abd3,var(--th-accent));color:#04202b;font-size:.9rem;font-weight:900;cursor:pointer;box-shadow:0 8px 28px rgba(0,212,255,.22)}.fastlane-go:disabled{opacity:.45;cursor:not-allowed}
 .diag-pre{max-height:260px;overflow:auto;padding:12px;border-radius:10px;background:#081018;border:1px solid rgba(255,255,255,.08);color:#91a0b1;font: .68rem/1.55 ui-monospace,monospace;white-space:pre-wrap;word-break:break-word}.diag-actions{display:flex;gap:8px;margin-top:12px}.diag-actions button,.diag-actions a{flex:1;min-height:44px;display:flex;align-items:center;justify-content:center;text-decoration:none;border-radius:9px;font-size:.75rem;font-weight:800;cursor:pointer}.diag-primary{border:0;background:var(--th-accent);color:#04202b}.diag-secondary{border:1px solid rgba(255,255,255,.11);background:#101923;color:#8492a3}
 .splash-door.fastlane-door{border-color:rgba(0,212,255,.3)!important;background:radial-gradient(circle at 100% 0,rgba(0,212,255,.18),transparent 48%),linear-gradient(145deg,#123342,#111c29)!important}.fastlane-badge{background:rgba(0,212,255,.12)!important;border:1px solid rgba(0,212,255,.28)!important;color:#67e8f9!important}
-[data-theme='light'] .fastlane-panel{background:#fff;border-color:#cfd8e2;box-shadow:0 28px 80px rgba(32,48,64,.2)}[data-theme='light'] .fastlane-choice{background:#f6f8fa;border-color:#d7dee5;color:#5f6c78}[data-theme='light'] .fastlane-choice.active{background:rgba(9,105,218,.07);border-color:rgba(9,105,218,.42);color:#1c252d;box-shadow:inset 3px 0 #0969da}[data-theme='light'] .fastlane-field{background:#fff;border-color:#cdd5de;color:#1c252d}[data-theme='light'] .fastlane-note,[data-theme='light'] .fastlane-check{border-color:#d7dee5;background:#f8fafc;color:#5f6c78}[data-theme='light'] .diag-pre{background:#f6f8fa;border-color:#d7dee5;color:#45525e}
+[data-theme='light'] .fastlane-panel{background:#fff;border-color:#cfd8e2;box-shadow:0 28px 80px rgba(32,48,64,.2)}[data-theme='light'] .fastlane-choice{background:#f6f8fa;border-color:#d7dee5;color:#5f6c78}[data-theme='light'] .fastlane-choice.active{background:rgba(9,105,218,.07);border-color:rgba(9,105,218,.42);color:#1c252d;box-shadow:inset 3px 0 #0969da}[data-theme='light'] .fastlane-field{background:#fff;border-color:#cdd5de;color:#1c252d}[data-theme='light'] .diag-pre{background:#f6f8fa;border-color:#d7dee5;color:#45525e}
 @media(max-width:640px){.fastlane-panel{padding:18px 14px;border-radius:16px}.fastlane-grid.apps{grid-template-columns:1fr 1fr}.fastlane-grid.services{grid-template-columns:1fr 1fr}.fastlane-grid.profiles{grid-template-columns:1fr}.fastlane-choice{min-height:54px}.fastlane-field{font-size:16px}.diag-actions{flex-direction:column}}
 /* Keep the mode control clear of the Core Builds wordmark, version badge, and phone navigation. */
-#themeToggle{top:auto!important;left:auto!important;right:max(12px,env(safe-area-inset-right))!important;bottom:max(12px,env(safe-area-inset-bottom))!important}
-@media(max-width:599px){#themeToggle{right:max(10px,env(safe-area-inset-right))!important;bottom:max(76px,calc(env(safe-area-inset-bottom) + 66px))!important}}
+/* Above the 52px contact button (bottom 20px), not on top of it. */
+#themeToggle{top:auto!important;left:auto!important;right:max(20px,env(safe-area-inset-right))!important;bottom:max(84px,calc(env(safe-area-inset-bottom) + 84px))!important}
+@media(max-width:599px){#themeToggle{right:max(27px,env(safe-area-inset-right))!important;bottom:max(84px,calc(env(safe-area-inset-bottom) + 84px))!important}}
 @media(max-height:520px) and (orientation:landscape){#themeToggle{right:max(8px,env(safe-area-inset-right))!important;bottom:max(8px,env(safe-area-inset-bottom))!important}}
 
 /* Quick Install contextual credential links */
-.fastlane-credential{display:flex;flex-direction:column;gap:6px}
+.fastlane-credential{display:flex;flex-direction:column;gap:6px}.fastlane-trust{margin:8px 2px 0;font-size:.66rem;line-height:1.45;color:var(--th-tx2,#8b949e)}.fastlane-trust b{color:var(--th-tx1,#e6edf3);font-weight:700}
+.fastlane-sublabel{display:block;font-size:.64rem;font-weight:800;color:#8b949e;letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px}
 .fastlane-credential-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
 .fastlane-credential-head label{font-size:.7rem;font-weight:800;color:#b9c7d2;letter-spacing:.02em}
 .fastlane-get-key{flex-shrink:0;color:#67e8f9;text-decoration:none;font-size:.66rem;font-weight:800;padding:3px 7px;border-radius:6px;border:1px solid rgba(0,212,255,.2);background:rgba(0,212,255,.06)}
 .fastlane-get-key:hover,.fastlane-get-key:focus-visible{color:#fff;border-color:rgba(0,212,255,.45);background:rgba(0,212,255,.12);outline:none}
-.fastlane-key-hint{font-size:.62rem;color:#718093}
+.fastlane-choice b .fastlane-reco{display:inline-block;margin:0 0 0 6px;padding:1px 6px;border:1px solid currentColor;border-radius:99px;color:var(--th-accent);font-size:.52rem;font-weight:800;letter-spacing:.04em;text-transform:uppercase;vertical-align:1px}
 [data-theme='light'] .fastlane-credential-head label{color:#1f2933}
 [data-theme='light'] .fastlane-get-key{color:#075ebd;border-color:#9fc4ea;background:#edf6ff}
 [data-theme='light'] .fastlane-get-key:hover,[data-theme='light'] .fastlane-get-key:focus-visible{color:#064f9d;border-color:#6aa7e8;background:#dfeeff}
-[data-theme='light'] .fastlane-key-hint{color:#526170}
 
 /* Optional TMDB metadata in Quick Install */
-.fastlane-metadata{margin-top:14px;border:1px solid rgba(251,191,36,.2);border-radius:12px;background:rgba(251,191,36,.025);overflow:hidden}
-.fastlane-metadata summary{display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer;list-style:none;padding:12px 14px;color:#dbe5ec}
-.fastlane-metadata summary::-webkit-details-marker{display:none}
-.fastlane-metadata summary span:first-child{display:flex;flex-direction:column;gap:2px}
-.fastlane-metadata summary b{font-size:.74rem;letter-spacing:.02em}
-.fastlane-metadata summary small{font-size:.62rem;color:#82909b;font-weight:600}
-.fastlane-metadata-state{font-size:.62rem;font-weight:800;color:#fbbf24;border:1px solid rgba(251,191,36,.25);background:rgba(251,191,36,.07);border-radius:999px;padding:3px 8px;white-space:nowrap}
-.fastlane-metadata-body{padding:0 14px 14px;border-top:1px solid rgba(255,255,255,.05)}
-.fastlane-metadata-body>.fastlane-note{margin:10px 0}
-[data-theme='light'] .fastlane-metadata{border-color:#e5bd69;background:#fffaf0}
-[data-theme='light'] .fastlane-metadata summary{color:#17202a}
-[data-theme='light'] .fastlane-metadata summary small{color:#596875}
-[data-theme='light'] .fastlane-metadata-state{color:#7a4a00;border-color:#d9ad59;background:#fff2d2}
-[data-theme='light'] .fastlane-metadata-body{border-top-color:#ead9b7}
-@media(max-width:480px){.fastlane-metadata summary{align-items:flex-start}.fastlane-metadata-state{margin-top:1px}}
+
 
 /* Fine-Tune pop-out: keeps the wizard and Next step intact underneath. */
 body.advanced-drawer-open{overflow:hidden}
@@ -66,9 +53,6 @@ body.advanced-drawer-open{overflow:hidden}
 /* Core Tools launcher cards */
 a.core-tool-door{text-decoration:none;color:inherit}
 a.core-tool-door:focus-visible{outline:2px solid #67e8f9;outline-offset:3px}
-.fastlane-backup-link{display:inline-block;margin-top:5px;color:#67e8f9;text-decoration:none;font-size:.66rem;font-weight:800}
-.fastlane-backup-link:hover,.fastlane-backup-link:focus-visible{text-decoration:underline;outline:none}
-[data-theme='light'] .fastlane-backup-link{color:#075ebd}
 
 /* ── Core Score (explainable quality number) ───────────────────────── */
 .td-stream{position:relative}
@@ -107,3 +91,100 @@ a.core-tool-door:focus-visible{outline:2px solid #67e8f9;outline-offset:3px}
    exclusion is intended behaviour, just easy to walk into unknowingly. */
 .res-lock-note{margin-top:10px;padding:9px 12px;border-radius:10px;border:1px solid rgba(251,191,36,.22);background:rgba(251,191,36,.06);color:#d7c69a;font-size:.72rem;line-height:1.5}
 .res-lock-note b{color:#fbbf24;font-weight:800}
+/* Express lane layout (v3.21). Its grid columns, Optional drawer and footer were
+   inline styles; as classes the phone layout below can change them without
+   !important. */
+.fastlane-express{max-width:640px}
+.fastlane-grid.cols-2{grid-template-columns:1fr 1fr}.fastlane-grid.cols-3{grid-template-columns:repeat(3,1fr)}.fastlane-grid.cols-4{grid-template-columns:repeat(4,1fr)}
+.fastlane-optional{margin:0 22px 8px;font-size:.74rem}
+.fastlane-foot{padding:0 22px 18px}
+.fastlane-summary{font-size:.62rem;color:#718093;text-align:center;margin-bottom:8px;line-height:1.6}
+#expressLaneModal .fastlane-back{display:none}
+/* On phones it is a full-screen page: edge to edge, a sticky header with Back,
+   one column of full-width rows and Install pinned to the bottom. Scoped to the
+   Express lane; the other dialogs sharing .fastlane-panel stay bottom sheets
+   (07-menu-parity skips this lane rather than being overridden). */
+@media(max-width:640px){
+  #expressLaneModal.fastlane-overlay{padding:0;align-items:stretch;background:var(--th-bg)}
+  #expressLaneModal .fastlane-express{width:100%;max-width:none;height:100dvh;max-height:none;border:0;border-radius:0;box-shadow:none;padding:0 16px;overscroll-behavior:contain}
+  #expressLaneModal .fastlane-head{position:sticky;top:0;z-index:2;flex-wrap:wrap;gap:4px 10px;margin:0 -16px 6px;padding:max(10px,env(safe-area-inset-top)) 16px 12px;background:linear-gradient(180deg,#0f1822 82%,rgba(15,24,34,0))}
+  #expressLaneModal .fastlane-back{display:inline-flex;align-items:center;min-height:44px;padding:0 4px;border:0;background:none;color:var(--th-accent);font-size:1rem;font-weight:800;cursor:pointer}
+  #expressLaneModal .fastlane-close{display:none}
+  #expressLaneModal .fastlane-head-copy{flex-basis:100%}
+  #expressLaneModal .fastlane-title{font-size:1.45rem}
+  #expressLaneModal .fastlane-sub{font-size:.88rem}
+  #expressLaneModal .fastlane-section{margin-top:22px}
+  #expressLaneModal .fastlane-label{font-size:.74rem;margin-bottom:10px;color:#8b98a9}
+  #expressLaneModal .fastlane-grid.services{grid-template-columns:1fr;gap:10px}
+  #expressLaneModal .fastlane-grid.services.devices{grid-template-columns:1fr 1fr}
+  #expressLaneModal .fastlane-choice{min-height:64px;padding:14px 16px;border-radius:14px}
+  #expressLaneModal .fastlane-choice b{font-size:1rem}
+  #expressLaneModal .fastlane-choice span{font-size:.8rem;margin-top:3px}
+  #expressLaneModal .fastlane-credential-head label{font-size:.88rem}
+  #expressLaneModal .fastlane-get-key{font-size:.8rem;padding:6px 10px}
+  #expressLaneModal .fastlane-field{min-height:52px}
+  #expressLaneModal .fastlane-pair{flex-direction:column}
+  #expressLaneModal .fastlane-optional{margin:22px 0 8px;font-size:.88rem}
+  #expressLaneModal .fastlane-optional summary{min-height:44px;display:flex;align-items:center}
+  #expressLaneModal .fastlane-foot{position:sticky;bottom:0;z-index:2;margin:16px -16px 0;padding:14px 16px max(14px,env(safe-area-inset-bottom));background:linear-gradient(0deg,#0f1822 82%,rgba(15,24,34,0))}
+  #expressLaneModal .fastlane-foot .fastlane-go{margin-top:0;min-height:56px;font-size:1rem}
+  #expressLaneModal .fastlane-summary{font-size:.74rem}
+  [data-theme='light'] #expressLaneModal .fastlane-head,[data-theme='light'] #expressLaneModal .fastlane-foot{background:#fff}
+}
+/* "Defaults we'll use" in Quick install (v3.22): what Quick leaves at its default,
+   each row opening the Fine-Tune section that changes it. */
+.fastlane-defaults{display:flex;flex-direction:column;border:1px solid var(--ui-line,rgba(255,255,255,.09));border-radius:12px;overflow:hidden}
+.fastlane-default{appearance:none;font:inherit;display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:10px;min-height:44px;padding:9px 12px;border:0;border-top:1px solid var(--ui-line,rgba(255,255,255,.07));background:#0e1621;color:#c9d5df;cursor:pointer;text-align:left}
+.fastlane-default:first-child{border-top:0}
+.fastlane-default:hover,.fastlane-default:focus-visible{background:#12202c;outline:none}
+.fastlane-default-name{font-size:.72rem;font-weight:800}
+.fastlane-default-val{font-size:.68rem;color:#8b98a9;text-align:right;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fastlane-default-go{color:var(--th-accent);font-size:1rem}
+.fastlane-customize{appearance:none;font:inherit;margin-top:8px;padding:6px 0;border:0;background:none;color:var(--th-accent);font-size:.74rem;font-weight:800;cursor:pointer}
+[data-theme='light'] .fastlane-default{background:#f6f8fa;color:#1f2933}
+[data-theme='light'] .fastlane-default-val{color:#57606a}
+@media(max-width:640px){#expressLaneModal .fastlane-default{min-height:56px;padding:12px 16px}#expressLaneModal .fastlane-default-name{font-size:.95rem}#expressLaneModal .fastlane-default-val{font-size:.82rem}#expressLaneModal .fastlane-customize{font-size:.9rem;min-height:44px}}
+
+.upd-list{display:flex;flex-direction:column;gap:6px;max-height:42vh;overflow:auto}
+.upd-sec{border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:7px 10px;font-size:.76rem}
+.upd-sec summary{cursor:pointer;font-weight:700;display:flex;align-items:center;gap:6px}
+.upd-sec ul{margin:6px 0 2px 18px;padding:0;color:var(--th-tx2,#8b949e);font-size:.7rem;line-height:1.5}
+.upd-none{font-size:.78rem;color:var(--th-tx2,#8b949e);margin:4px 0}
+.upd-go{flex:2;padding:10px;border-radius:8px;border:1.5px solid rgba(52,211,153,.45);background:rgba(52,211,153,.1);color:#34d399;font-weight:800;cursor:pointer}
+.upd-go:disabled{opacity:.6;cursor:wait}
+.upd-cancel{flex:1;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,.12);background:transparent;color:var(--th-tx2,#8b949e);font-weight:600;cursor:pointer}
+.upd-ok,.upd-err{margin-top:10px;font-size:.76rem;line-height:1.5}.upd-ok{color:#34d399}.upd-err{color:#f87171}
+[data-theme='light'] .upd-go{color:#047857;border-color:rgba(4,120,87,.45)}[data-theme='light'] .upd-sec{border-color:#d7dee5}[data-theme='light'] .upd-ok{color:#047857}[data-theme='light'] .upd-err{color:#b91c1c}
+.upd-box{max-width:520px}.upd-title{font-size:1.05rem}.upd-title svg{color:var(--th-accent)}.upd-actions{display:flex;gap:8px;margin-top:12px}.upd-paste{margin-top:8px}
+
+/* ── 2026-11 UI pass: journey components (classes replace inline styles) ── */
+/* Fine-Tune: the one advanced entry point. Quiet secondary, no uppercase glow. */
+.fine-tune-btn{appearance:none;font:inherit;width:100%;margin-top:14px;padding:12px 16px;background:var(--th-card-alt);border:1px solid var(--th-border-strong);border-radius:11px;color:var(--th-tx);font-size:.88rem;font-weight:700;cursor:pointer;transition:border-color .18s,background .18s;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px}
+.fine-tune-btn:hover{border-color:var(--th-accent-border);background:var(--th-accent-bg)}
+.fine-tune-btn:focus-visible{outline:2px solid var(--th-accent);outline-offset:2px}
+.fine-tune-sub{font-size:.7rem;font-weight:500;color:var(--th-tx3);letter-spacing:.01em}
+/* Skip buttons: explicit opt-out, never styled like the primary path. */
+.skip-step-btn{appearance:none;font:inherit;width:100%;margin-top:10px;padding:9px 14px;background:transparent;border:1px dashed var(--th-border-strong);border-radius:10px;color:var(--th-tx3);font-size:.86rem;font-weight:600;cursor:pointer;transition:all .15s;letter-spacing:.02em}
+.skip-step-btn:hover{color:var(--th-tx2);border-color:var(--th-tx4);background:var(--th-card-alt)}
+.skip-step-btn:focus-visible{outline:2px solid var(--th-accent);outline-offset:2px}
+/* What the next action does — one short line, plain language. */
+.action-help{font-size:.7rem;color:var(--th-tx3);line-height:1.45;margin:6px 0 10px}
+/* Review-screen secondary actions (Share / feedback report). */
+.rv-tool-btn{appearance:none;font:inherit;width:100%;margin-top:8px;padding:10px;font-size:.78rem;font-weight:700;border-radius:10px;border:1px solid var(--th-accent-border);background:var(--th-accent-bg);color:var(--th-accent);cursor:pointer;transition:background .15s}
+.rv-tool-btn:hover{background:var(--th-accent-border)}
+.rv-tool-btn:focus-visible{outline:2px solid var(--th-accent);outline-offset:2px}
+.rv-actions-row{display:flex;gap:8px;margin-top:8px}
+.rv-actions-row .btn-aio{flex:1;margin-top:0;padding:11px;font-size:.82rem}
+.rv-secondary-btn{appearance:none;font:inherit;flex:1;padding:11px;font-size:.82rem;font-weight:700;border-radius:10px;border:1px solid var(--th-border-strong);background:var(--th-card-alt);color:var(--th-tx2);cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:6px}
+.rv-secondary-btn:hover{color:var(--th-tx);border-color:var(--th-tx5)}
+.rv-secondary-btn:focus-visible{outline:2px solid var(--th-accent);outline-offset:2px}
+/* Splash: the returning-user routes get a quiet label, not another button box. */
+.splash-alt-lead{flex-basis:100%;font-size:.62rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--th-tx3);padding-top:2px}
+@media(prefers-reduced-motion:reduce){.fine-tune-btn,.skip-step-btn,.rv-tool-btn,.rv-secondary-btn{transition:none}}
+
+/* 2026-11 UI pass (2): consistent disabled + touch states for action buttons. */
+.btn-aio:disabled,.rv-tool-btn:disabled,.rv-secondary-btn:disabled,.skip-step-btn:disabled,.fine-tune-btn:disabled{opacity:.55;cursor:wait;filter:saturate(.4)}
+.rv-tool-btn:disabled:hover{background:var(--th-accent-bg);border-color:var(--th-accent-border);color:var(--th-accent)}
+.rv-secondary-btn:disabled:hover{color:var(--th-tx2);border-color:var(--th-border-strong);background:var(--th-card-alt)}
+/* Touch: the new controls meet the 44px target on coarse pointers. */
+@media(pointer:coarse){.skip-step-btn,.rv-tool-btn,.rv-secondary-btn{min-height:44px;display:flex;align-items:center;justify-content:center}.fine-tune-btn{min-height:48px}}

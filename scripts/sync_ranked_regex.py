@@ -55,8 +55,15 @@ SNAPSHOT = ROOT / 'Filtering' / 'upstream' / 'vidhin05-regexes.snapshot.json'
 RANKED = ROOT / 'Filtering' / 'ranked-regex-patterns.json'
 TEMPLATES = ROOT / 'Templates'
 APP_JS = ROOT / 'configurator' / 'src' / 'js' / 'app.js'
+CORE_JS = ROOT / 'packages' / 'core' / 'src' / 'generate-template.js'
 CLI_RANKED = ROOT / 'cli' / 'data' / 'ranked-regex.json'
-APP_CONST_NAMES = ('EXCLUDED_REGEX', 'PREFERRED_REGEX_4K', 'RANKED_REGEX_COMMON', 'RANKED_REGEX_UHD')
+# Both generators embed these consts (packages/core carries no RANKED_* copy; the CLI
+# reads cli/data). PREFERRED_REGEX_1080P and the core file were missing until
+# 2026-10-22, so their FLUX and BR-DISK copies drifted unseen.
+APP_CONST_NAMES = ('EXCLUDED_REGEX', 'PREFERRED_REGEX_4K', 'PREFERRED_REGEX_1080P',
+                   'RANKED_REGEX_COMMON', 'RANKED_REGEX_UHD')
+JS_EMBEDS = ((APP_JS, 'configurator/src/js/app.js', 'app.js'),
+             (CORE_JS, 'packages/core/src/generate-template.js', 'core'))
 APP_CONST_RE = re.compile(r'^const (' + '|'.join(APP_CONST_NAMES) + r') = (\[.*\]);$', re.M)
 
 REGEX_FIELDS = ('rankedRegexPatterns', 'preferredRegexPatterns',
@@ -70,6 +77,16 @@ def norm(p):
     if s.startswith('/') and s.rfind('/') > 0:
         s = s[1:s.rfind('/')]
     return s
+
+
+def in_snapshot(p, new_exact, new_norm_all):
+    """Hosts compare the whole /…/flags string, so a wrapped copy is synced only on an
+    exact match (FLUX dropping its /i flag on 2026-10-22 left every copy refused while
+    the body still matched). An unwrapped body has no flags to differ: match by body."""
+    s = str(p).strip()
+    if s.startswith('/') and s.rfind('/') > 0:
+        return s in new_exact
+    return s in new_norm_all
 
 
 def wrapped_like(template_str, new_wrapped):
@@ -146,7 +163,7 @@ def sync_list(items, old_map, new_lookup, new_norm_set, new_entries, changes):
         replacement = None
         for slot in slots:
             pat = new_lookup.get(slot)
-            if pat is not None and norm(pat) != norm(p):
+            if pat is not None and wrapped_like(p, pat) != p:
                 replacement = pat
                 break
             if pat is None and norm(p) in new_norm_set:
@@ -179,16 +196,18 @@ def load(path):
 
 def _embed_lists():
     """Yield (label, items) for every derived embedded copy of the regex lists."""
-    if APP_JS.exists():
-        text = APP_JS.read_text(encoding='utf-8')
+    for path, _, short in JS_EMBEDS:
+        if not path.exists():
+            continue
+        text = path.read_text(encoding='utf-8')
         for m in APP_CONST_RE.finditer(text):
             try:
                 items = json.loads(m.group(2))
             except json.JSONDecodeError:
-                print(f'note: app.js const {m.group(1)} is not JSON — left alone')
+                print(f'note: {short} const {m.group(1)} is not JSON — left alone')
                 continue
             if isinstance(items, list) and items:
-                yield f'app.js:{m.group(1)}', items
+                yield f'{short}:{m.group(1)}', items
     if CLI_RANKED.exists():
         obj = json.loads(CLI_RANKED.read_text(encoding='utf-8'))
         for key in ('common', 'uhd'):
@@ -196,7 +215,7 @@ def _embed_lists():
                 yield f'cli/data/ranked-regex.json:{key}', obj[key]
 
 
-def check_embeds(new_norm_all):
+def check_embeds(new_norm_all, new_exact):
     """Offenders for embedded copies — same rule as the template scan: any embedded
     pattern neither in the pinned snapshot nor a known custom is stale (the host gate
     strips it from generated output; CLI/golden equivalence silently diverges)."""
@@ -206,7 +225,7 @@ def check_embeds(new_norm_all):
             p = item.get('pattern') if isinstance(item, dict) else item
             if isinstance(p, str) and p.strip():
                 n = norm(p)
-                if n not in new_norm_all and not is_known_custom(n):
+                if not in_snapshot(p, new_exact, new_norm_all) and not is_known_custom(n):
                     offenders.append(f'{label}:{p[:48]}')
     return offenders
 
@@ -217,8 +236,10 @@ def sync_embeds(old_map, new_lookup, new_norm_set, new_entries, changes, apply):
     membership/order never touched). Minimal diff: only the replaced string literals
     are rewritten, so const lines keep their original byte formatting."""
     n_files = 0
-    if APP_JS.exists():
-        text = APP_JS.read_text(encoding='utf-8')
+    for path, label, _ in JS_EMBEDS:
+        if not path.exists():
+            continue
+        text = path.read_text(encoding='utf-8')
         out, at, file_changed = [], 0, False
         for m in APP_CONST_RE.finditer(text):
             name, body = m.group(1), m.group(2)
@@ -238,14 +259,14 @@ def sync_embeds(old_map, new_lookup, new_norm_set, new_entries, changes, apply):
                                             json.dumps(us_, ensure_ascii=False), 1)
                 changes |= ch
                 file_changed = True
-                print(f'  ~ configurator/src/js/app.js:{name} ← {", ".join(sorted(ch))}')
+                print(f'  ~ {label}:{name} ← {", ".join(sorted(ch))}')
             out.append(body)
             at = m.end(2)
         out.append(text[at:])
         if file_changed:
             n_files += 1
             if apply:
-                APP_JS.write_text(''.join(out), encoding='utf-8')
+                path.write_text(''.join(out), encoding='utf-8')
     if CLI_RANKED.exists():
         raw = CLI_RANKED.read_text(encoding='utf-8')
         obj = json.loads(raw)
@@ -323,6 +344,7 @@ def main():
     old_map = build_old_map(old_entries)
     new_lookup, new_norm_set = build_new_lookup(new_entries)
     new_norm_all = {norm(e.get('pattern', '')) for e in new_entries}
+    new_exact = {str(e.get('pattern', '')).strip() for e in new_entries}
     old_norm_all = {norm(e.get('pattern', '')) for e in old_entries}
 
     stale_now = sorted(new_norm_all - old_norm_all)   # added/changed upstream
@@ -340,9 +362,9 @@ def main():
                     p = item.get('pattern') if isinstance(item, dict) else item
                     if isinstance(p, str) and p.strip():
                         n = norm(p)
-                        if n not in new_norm_all and not is_known_custom(n):
+                        if not in_snapshot(p, new_exact, new_norm_all) and not is_known_custom(n):
                             offenders.append(f'{f.relative_to(ROOT)}:{fld}:{p[:40]}')
-        offenders += check_embeds(new_norm_all)
+        offenders += check_embeds(new_norm_all, new_exact)
         if offenders:
             print(f'❌ {len(offenders)} inline pattern(s) not synced to the pinned snapshot:')
             for o in offenders:
@@ -367,7 +389,7 @@ def main():
             RANKED.write_text(dump(ranked), encoding='utf-8')
         print(f'reranked: Filtering/ranked-regex-patterns.json refreshed {sorted(rchanges)}')
     # sanity: curated list must remain a subset of the snapshot
-    assert {norm(e['pattern']) for e in ranked} <= new_norm_all, \
+    assert all(in_snapshot(e['pattern'], new_exact, new_norm_all) for e in ranked), \
         'reviewed list contains a pattern that is neither upstream nor custom'
 
     # 2. active templates
