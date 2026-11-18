@@ -28,7 +28,7 @@ async function fresh(page) {
   const errors = [];
   page.on('pageerror', error => errors.push(error.message));
   page.on('console', message => { if (message.type() === 'error' && !CORS_NOISE.test(message.text())) errors.push(message.text()); });
-  await page.goto('/?cb-e2e=1');
+  await page.goto('/');
   await page.evaluate(() => { localStorage.clear(); localStorage.setItem('cb_tut_seen', '1'); });
   await page.reload();
   await page.waitForTimeout(950);
@@ -88,7 +88,7 @@ test('Express door is the first splash route and opens the one-click lane', asyn
   await expect(door).toBeVisible();
   await door.click();
   await expect(page.locator('#expressLaneModal')).toBeVisible();
-  await expect(page.locator('#expressLaneModal')).toContainText('Generate & Deploy Build');
+  await expect(page.locator('#expressLaneModal')).toContainText('Install in ~30 seconds');
   // Defaults: TorBox selected, Stremio target active with account fields
   await expect(page.locator('[data-express-service="torbox-pro"]')).toHaveClass(/active/);
   await expect(page.locator('#stremioEmailInline')).toBeVisible();
@@ -110,7 +110,7 @@ test('Express free/P2P hides credentials; manifest target hides Stremio fields',
   await expect(page.locator('#expressCreds .fastlane-trust')).toContainText('Your keys go to your AIOStreams host through the Core Builds relay');
   await expect(page.locator('#expressStremio .fastlane-trust')).toContainText('Your other addons stay');
   // Manifest target hides the Stremio block
-  await page.locator('[data-express-mode="manifest"]').click();
+  await page.locator('[data-express-target="manifest"]').click();
   await expect(page.locator('#expressStremio')).toBeHidden();
 });
 
@@ -146,7 +146,7 @@ test('Express Install manifest target skips Stremio and shows the manifest modal
   page.on('dialog', dialog => dialog.accept());
   await page.locator('[data-action="open-express-lane"]').click();
   await page.locator('[data-express-cred="torbox"]').fill('test-torbox-key');
-  await page.locator('[data-express-mode="manifest"]').click();
+  await page.locator('[data-express-target="manifest"]').click();
   await page.locator('#expressGo').click();
   await page.locator('#pwdPrompt .pwd-go').click();
   await expect(page.locator('#manifestModal')).toBeVisible({ timeout: 45000 });
@@ -177,7 +177,7 @@ test('Express profile is a main step, and Fast builds 1080p instant-play-only', 
   await fast.click();
   await expect(page.locator('[data-express-cache="cached"]')).toHaveClass(/active/);
   await expect(page.locator('[data-express-res="1080p"]')).toHaveClass(/active/);
-  await page.locator('[data-express-mode="manifest"]').click();
+  await page.locator('[data-express-target="manifest"]').click();
   await page.locator('#expressGo').click();
   await page.locator('#pwdPrompt .pwd-go').click();
   await expect(page.locator('#manifestModal')).toBeVisible({ timeout: 45000 });
@@ -203,7 +203,7 @@ test.describe('Express language from a Spanish browser', () => {
     await expect(page.locator('#expressLang')).toHaveValue('Spanish');
     await expect(page.locator('#expressSummary')).toContainText('Spanish');
     await page.locator('[data-express-cred="torbox"]').fill('test-torbox-key');
-    await page.locator('[data-express-mode="manifest"]').click();
+    await page.locator('[data-express-target="manifest"]').click();
     await page.locator('#expressGo').click();
     await page.locator('#pwdPrompt .pwd-go').click();
     await expect(page.locator('#manifestModal')).toBeVisible({ timeout: 45000 });
@@ -228,10 +228,10 @@ test.describe('Express language from a Spanish browser', () => {
     await fresh(page);
     page.on('dialog', dialog => dialog.accept());
     await page.locator('[data-action="open-express-lane"]').click();
-    await page.locator('#expressAdvanced > summary').click();
-    await page.locator('#expressLangPills [data-pill-value="Chinese"]').click();
+    await page.locator('details.fastlane-optional summary').click();
+    await page.locator('#expressLang').selectOption('Chinese');
     await page.locator('[data-express-cred="torbox"]').fill('test-torbox-key');
-    await page.locator('[data-express-mode="manifest"]').click();
+    await page.locator('[data-express-target="manifest"]').click();
     await page.locator('#expressGo').click();
     await page.locator('#pwdPrompt .pwd-go').click();
     await expect(page.locator('#manifestModal')).toBeVisible({ timeout: 45000 });
@@ -241,14 +241,12 @@ test.describe('Express language from a Spanish browser', () => {
   });
 });
 
-test('Express lane exposes only verified Stremio and WuPlay targets', async ({ page }) => {
+test('Express lane offers a Chillio (ChillLink) install target', async ({ page }) => {
   await fresh(page);
   await page.locator('[data-action="open-express-lane"]').click();
   const tile = page.locator('[data-express-target="chillio"]');
-  await expect(tile).toHaveCount(0);
-  await expect(page.locator('[data-express-target]')).toHaveCount(2);
-  await expect(page.locator('[data-express-target="app"]')).toBeVisible();
-  await expect(page.locator('[data-express-target="wuplay"]')).toBeVisible();
+  await expect(tile).toBeVisible();
+  await expect(tile).toContainText('Chillio');
 });
 
 test('Chillio target blocks a P2P build before anything is posted (ChillLink drops torrents)', async ({ page }) => {
@@ -257,8 +255,8 @@ test('Chillio target blocks a P2P build before anything is posted (ChillLink dro
   await fresh(page);
   await page.locator('[data-action="open-express-lane"]').click();
   await page.locator('[data-express-service="p2p"]').click();
-  // Retain legacy pipeline coverage without exposing this target in production.
-  await page.evaluate(() => { window.__coreBuilds.legacyExpressInstall({ service: document.querySelector('[data-express-service].active').dataset.expressService, target:'chillio', profile:'balanced', device:'generic', resolution:'4k', creds:{ torbox:'test-torbox-key' } }); });
+  await page.locator('[data-express-target="chillio"]').click();
+  await page.locator('#expressGo').click();
   // The gate fires before the password prompt and the /api/v1/user POST.
   await expect(page.locator('#aioResult')).toContainText("Chillio can't use this setup", { timeout: 15000 });
   await expect(page.locator('#aioResult')).toContainText('P2P');
@@ -266,20 +264,24 @@ test('Chillio target blocks a P2P build before anything is posted (ChillLink dro
   expect(posted).toEqual([]);
 });
 
-test('legacy Chillio pipeline still posts but the result UI offers only verified routes', async ({ page }) => {
+test('Chillio target posts the config and opens the modal on a /chilllink/ URL', async ({ page }) => {
   const posted = [];
   await mockBackend(page, posted);
   await fresh(page);
   page.on('dialog', dialog => dialog.accept());
   await page.locator('[data-action="open-express-lane"]').click();
   await page.locator('[data-express-cred="torbox"]').fill('test-torbox-key');
-  // Retain legacy pipeline coverage without exposing this target in production.
-  await page.evaluate(() => { window.__coreBuilds.legacyExpressInstall({ service: document.querySelector('[data-express-service].active').dataset.expressService, target:'chillio', profile:'balanced', device:'generic', resolution:'4k', creds:{ torbox:'test-torbox-key' } }); });
+  await page.locator('[data-express-target="chillio"]').click();
+  await page.locator('#expressGo').click();
   await page.locator('#pwdPrompt .pwd-go').click();
   await expect(page.locator('#manifestModal')).toBeVisible({ timeout: 45000 });
-  await expect(page.locator('#mUrlVal')).toContainText('/stremio/11111111-2222-4333-8444-555555555555/encrypted-password/manifest.json');
-  await expect(page.locator('#mFmtTabs .fmt-tab', { hasText:'Chillio' })).toHaveCount(0);
-  await expect(page.locator('#mFmtTabs .fmt-tab', { hasText:'Nuvio' })).toHaveCount(0);
+  // The modal opens directly on the Chillio tab, whose URL uses the
+  // authenticated /chilllink/<uuid>/<encryptedPassword> route.
+  await expect(page.locator('#mUrlVal')).toContainText('/chilllink/11111111-2222-4333-8444-555555555555/encrypted-password');
+  const chillioTab = page.locator('#mFmtTabs .fmt-tab', { hasText: 'Chillio' });
+  await expect(chillioTab).toHaveClass(/active/);
+  // Companion links to the official ChillLink tools ship in the help box.
+  await expect(page.locator('#mAppHelpBody a[href*="link.chillio.app/manifest-merger"]')).toBeVisible();
   expect(posted).toHaveLength(1);
 });
 

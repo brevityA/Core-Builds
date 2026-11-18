@@ -152,3 +152,15 @@ html{background:var(--th-bg)}body{font-feature-settings:'cv02','cv03','cv04','cv
 #expressLaneModal .rv-telemetry{padding:14px;border:1px solid var(--th-border);border-radius:12px;background:var(--th-card-alt);min-height:64px}#expressLaneModal .rv-telemetry:has(input:checked){border-color:var(--th-accent-border);background:var(--th-accent-bg)}#expressLaneModal .rv-telemetry:focus-within{outline:2px solid var(--th-accent);outline-offset:3px}
 @media(max-width:599px){#expressLaneModal .ux-pill-grid{grid-template-columns:repeat(2,minmax(0,1fr))}#expressLaneModal .ux-pill-grid .fastlane-choice{width:auto;min-height:52px}#expressLaneModal .ux-pill-grid .fastlane-choice b{font-size:.8rem}#expressLaneModal .ux-toggle-row{padding:14px;gap:12px}}
 @media(prefers-reduced-motion:reduce){#expressLaneModal .ux-pill-grid button,#expressLaneModal .ux-toggle-row{transition:none;animation:none}#expressLaneModal .ux-pill-grid button:hover,#expressLaneModal .ux-pill-grid button:active{transform:none}}
+
+/* Quick install: visible host row, readable on both themes. */
+.ux-host-row{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:12px}.ux-host-label{font-size:.72rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--th-tx3);white-space:nowrap}
+.ux-host-chip{flex-shrink:0;font-size:.68rem;font-weight:800;padding:3px 9px;border-radius:99px;border:1px solid var(--th-border-strong);color:var(--th-tx3);white-space:nowrap}.ux-host-row>select{flex:1 1 220px;min-width:0}
+#expressLaneModal .ux-section h2 .ft-tip{vertical-align:middle}#expressLaneModal .fastlane-trust b,.hybrid-lede strong{color:var(--th-tx)}
+.u-relrow>.input-eye-btn{display:flex;align-items:center;justify-content:center}
+#splashStart .start-quick .start-card-title{padding-right:108px}
+[data-theme='light'] :is(#btn-dl,.fastlane-go,.btn-next,.btn-manifest:not([style]):not(.btn-chillio),#splashStart .start-quick){color:#fff}
+[data-theme='light'] #splashStart .start-quick .start-card-desc{color:rgba(255,255,255,.9)}[data-theme='light'] #splashStart .start-quick :is(.start-card-icon,.start-card-badge){color:#fff;background:rgba(255,255,255,.16)}
+#expressLaneModal .ux-review-summary .fastlane-summary{text-align:left}
+#expressLaneModal .ux-advanced>.ux-toggle-row{width:auto}
+@media(max-width:640px){#expressLaneModal .fastlane-title{font-size:1.3rem}#expressLaneModal .fastlane-head .fastlane-sub{display:none}}

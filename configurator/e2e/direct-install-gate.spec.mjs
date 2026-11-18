@@ -60,7 +60,7 @@ test.describe('Direct Install key gate', () => {
     await page.locator('[data-action="open-express-lane"]').click();
     // TorBox is the default service; leave the key EMPTY, pick the manifest
     // target (it POSTs too) and go.
-    await page.locator('[data-express-mode="manifest"]').click();
+    await page.locator('[data-express-target="manifest"]').click();
     await page.locator('#expressGo').click();
     await expect(page.locator('#aioResult')).toContainText('Direct Install needs a key');
     await expect(page.locator('#aioResult')).toContainText('TorBox API Key');
@@ -76,7 +76,7 @@ test.describe('Direct Install key gate', () => {
     page.on('dialog', dialog => dialog.accept());
     await page.locator('[data-action="open-express-lane"]').click();
     await page.locator('[data-express-cred="torbox"]').fill('test-torbox-key');
-    await page.locator('[data-express-mode="manifest"]').click();
+    await page.locator('[data-express-target="manifest"]').click();
     await page.locator('#expressGo').click();
     await page.locator('#pwdPrompt .pwd-go').click();
     await expect(page.locator('#manifestModal')).toBeVisible({ timeout: 45000 });
@@ -91,7 +91,7 @@ test.describe('Direct Install key gate', () => {
     await page.locator('[data-action="open-express-lane"]').click();
     await page.locator('[data-express-service="easynews"]').click();
     await page.locator('[data-express-cred="easynews"]').fill('just-a-username');
-    await page.locator('[data-express-mode="manifest"]').click();
+    await page.locator('[data-express-target="manifest"]').click();
     await page.locator('#expressGo').click();
     await expect(page.locator('#aioResult')).toContainText('EasyNews Password');
     await page.waitForTimeout(500);
@@ -156,8 +156,7 @@ test.describe('truthful host picker', () => {
     const errors = await fresh(page);
     await page.locator('[data-action="open-express-lane"]').click();
     await page.locator('[data-express-service="p2p"]').click();
-    await page.locator('#expressAdvanced > summary').click();
-    await page.locator('#expressHostPills [data-pill-value=\"elfhosted\"]').click();
+    await page.locator('#expressHost').selectOption('elfhosted');
     await expect(page.locator('#expressHostChip')).toContainText(/does not serve P2P/i);
     expect(errors).toEqual([]);
   });

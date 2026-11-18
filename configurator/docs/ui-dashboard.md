@@ -1,22 +1,26 @@
-# Production configurator dashboard
+# Quick install dashboard
 
-PR #840 keeps the full custom builder and adds a four-section Quick Install dashboard.
+The full custom builder is unchanged. Quick install keeps the four choices most
+people make on its first screen, and keeps everything else under one collapsed
+**Options & defaults** panel.
 
 | Section | Controls | Existing integration |
 | --- | --- | --- |
-| Delivery mode | Direct Install / Manifest URL / Raw JSON | `runExpressInstall`, `simpleInstall`, `generate` |
-| Service & engine targets | Stremio / WuPlay, output profile, search preferences | `OUTPUT_PROFILE_INFO`, `activeOutputProfile`, `applyQuickProfile` |
-| Hardware & providers | Device, resolution, provider credentials, optional settings, review summary, consent | Existing `data-express-*` controls and `applyExpressChoices` |
-| Review & deploy | Primary action and inline result | Existing host selection, compatibility gate, relay save, Stremio verification, manifest modal |
+| 1 · Service | Provider cards, provider keys (paste + show/hide), AIOStreams host with live health chip, additional services | `renderCreds`, `probeExpressHost`, `resolveInstallHost` |
+| 2 · What matters most | Fast / Balanced / Maximum | `applyQuickProfile` |
+| 3 · Streams shown | Mixed / Cached only | `S.cacheMode` |
+| 4 · Install to | Stremio, Nuvio, WuPlay, Chillio, Other app; Stremio sign-in when Stremio is picked | `runExpressInstall`, `simpleInstall` |
+| Options & defaults | Device, resolution, connection speed, template profile, delivery (Direct / Manifest URL / Raw JSON), language, Full stack, Clean reinstall, TMDB, "Defaults we'll use" | `applyExpressChoices`, `OUTPUT_PROFILE_INFO`, `set-bandwidth`, `generate` |
+
+Below the panel: the review summary, the usage-statistics consent and the install button.
 
 ## Invariants
 
-- `saveState()` is unchanged. Provider credentials remain in localStorage; Stremio passwords remain in memory. The unit suite fingerprints the approved function; browser tests exercise both rules.
-- Core Stable remains the clean-session default through the existing output-profile policy. Search preferences (Fast/Balanced/Maximum) are distinct from the template output profile.
-- No template assembly, SEL, regex, share/hash serialization, Cloudflare relay endpoint, CSP or referrer-policy changes.
-- Only Stremio and WuPlay are advertised as deployment ecosystems. Existing legacy engine code is retained. Its compatibility tests use an E2E-only hook, not visible production target tiles.
-- Diagnostics observe actual compilation, host selection, regex compatibility, relay response and account verification. Unavailable regex checks are explicitly marked unverified. Errors never advance to success. Closing diagnostics does not cancel a pending request.
-- No Track 1 selection-quality work is included.
+- `saveState()` is unchanged. Provider keys stay in localStorage; the Stremio password stays in memory. The unit suite fingerprints the function and browser tests exercise both rules.
+- Core Stable stays the clean-session default. Template profile (Stable/Balanced/Advanced/Labs) is separate from "What matters most".
+- No template assembly, SEL, regex, share-link, relay, CSP or referrer-policy changes.
+- Every install target that existed before stays available, including Nuvio and Chillio and the Genie hand-off into them.
+- The deployment dialog ticks a step only after the real operation returns. An unavailable regex check is marked "not independently verified". The last step reads "Install & verify Stremio addons" for Stremio and "Prepare your install link" for every other target. Closing the dialog does not cancel the request.
 
 ## Verification
 
@@ -25,37 +29,7 @@ cd configurator
 npm test
 npm run validate
 npm run build
-npm run test:e2e
-node --check dist/web/assets/app.js
+npx playwright test --trace off
 ```
 
-The browser suite includes desktop (1280px) and mobile (390px) projects. The dedicated `production-dashboard.spec.mjs` covers section structure, verified targets, delivery modes, local export, credential persistence, and an intentionally held relay response to prove that progress cannot finish early. Existing contract/payload assertions and golden fixtures are retained.
-
-The compact offline design sampler is generated from the production styles:
-
-```sh
-python3 configurator/scripts/build-ui-demo.py
-```
-
-`ui-revamp-offline.html` is a reduced design sampler, not the deployment engine. Its JSON output is explicitly non-installable demo data.
-
-## Touch-first controls
-
-The Quick Install dashboard uses responsive pill grids (two columns below 600px,
-four above) for template profile, device, resolution, connection speed, host and
-language. Radio groups expose a single tab stop with arrow/Home/End navigation;
-selected controls have both a check indicator and cyan border. Hidden selects
-preserve existing IDs and change handlers without opening native dropdowns.
-
-Connection-speed presets drive the existing `set-bandwidth` policy; they do not
-introduce a new bitrate algorithm. Auto unsets the manual connection cap. Custom
-opens Advanced Configuration and focuses the numeric field (1–10000 Mbps).
-Boolean controls use full-width label cards so tapping their explanatory text
-also toggles the checkbox. Advanced Configuration is collapsed by default and
-contains host/language, clean reinstall, TMDB, custom bandwidth, cache policy and
-full-builder shortcuts. Device/resolution, provider keys and Full stack stay visible.
-Focus indicators and reduced-motion support retain the brand typography and tokens.
-
-The touch-control browser regression covers keyboard state, tap-target dimensions,
-responsive column count, label-card toggling, disclosure defaults, bandwidth
-persistence/clamping and host value bridging on desktop and mobile.
+`e2e/production-dashboard.spec.mjs` covers the section layout, all five targets, the delivery modes, local JSON export, key persistence, a held relay response (progress cannot finish early), keyboard selection in the pill groups, tap-target sizes and bandwidth clamping, on the desktop (1280px) and mobile (390px) projects.

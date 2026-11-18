@@ -35,10 +35,9 @@ test('host failures are named and rendered (unreachable / outdated / blocks-free
   ['HOST_UNREACHABLE','HOST_OUTDATED','HOST_BLOCKS_FREE'].forEach(t => assert.ok(h[1].includes(t), `hostErrorHtml handles ${t}`));
 });
 
-test('express lane exposes explicit host pills backed by the existing shared value', () => {
-  assert.ok(app.includes("pillSelectHtml('expressHost', 'AIOStreams host'"));
-  assert.match(app, /select id="\$\{id\}" hidden/);
-  assert.match(app, /Auto · fastest healthy/);
+test('express lane exposes an explicit host dropdown prefilled from Advanced', () => {
+  assert.match(app, /id="expressHost"/);
+  assert.match(app, /Auto \(fastest healthy\)/);
   assert.match(app, /S\.instanceHost = hostSel\.value/, 'express Go persists the dropdown choice into shared state');
 });
 

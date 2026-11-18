@@ -64,7 +64,7 @@ test('Express Install creates a raw manifest without TMDB', async ({ page }) => 
   await mockAioStreams(page, posted);
   const errors = await fresh(page);
   await page.locator('[data-action="open-express-lane"]').click();
-  await page.locator('[data-express-mode="manifest"]').click();
+  await page.locator('[data-express-target="manifest"]').click();
   await page.locator('[data-express-cred="torbox"]').fill('test-torbox-key');
   page.on('dialog', dialog => dialog.accept());
   await page.locator('#expressGo').click();

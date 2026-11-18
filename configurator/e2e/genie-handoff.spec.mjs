@@ -22,13 +22,12 @@ test.describe('genie hand-off', () => {
     expect(left).toBeNull();
   });
 
-  test('unverified handoff target falls back to the verified Stremio picker', async ({ page }) => {
+  test('nuvio target seeds the express target picker', async ({ page }) => {
     await page.addInitScript(h => sessionStorage.setItem('cb-genie-handoff-v1', h),
       HANDOFF({ src: 'nuvio-genie', app: 'nuvio' }));
     await page.goto('/');
     await expect(page.locator('#expressLaneModal')).toBeVisible({ timeout: 10000 });
-    await expect(page.locator('#expressLaneModal [data-express-target].active')).toHaveAttribute('data-express-target', 'app');
-    await expect(page.locator('[data-express-target="nuvio"]')).toHaveCount(0);
+    await expect(page.locator('#expressLaneModal [data-express-target].active')).toHaveAttribute('data-express-target', 'nuvio');
   });
 
   test('debridlink routes to the advanced builder (express has no Debrid-Link card)', async ({ page }) => {
