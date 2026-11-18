@@ -2,14 +2,19 @@
   "metadata": {
     "id": "brevity.core-nexus-anime-dub-4k",
     "name": "Core Nexus Anime Dub 4K",
-    "description": "English-dub priority at 4K HDR for anime. SeaDex + AnimeTosho scrapers, DV/HDR10+ preferred, lossless audio support. Optimised for dubbed and dual-audio releases.",
+    "description": "English-dub priority for anime up to 4K. SeaDex + AnimeTosho scrapers, SDR preferred (HDR/DV still allowed, ranked after SDR), lossless audio support. Optimised for dubbed and dual-audio releases.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "0.1.4",
+    "version": "0.1.5",
     "category": "Anime",
     "sourceUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime-dub-4k.json",
     "changelogUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md",
     "changelog": [
+      {
+        "date": "2026-11-15",
+        "version": "0.1.5",
+        "content": "Dolby Vision no longer earns a score on this SDR-first line (it outranked SDR, like the HDR bonus removed in the last version)."
+      },
       {
         "date": "2026-11-14",
         "version": "0.1.4",
@@ -1452,11 +1457,6 @@
       {
         "enabled": true,
         "expression": "/* RSE WEB-DL */ quality(streams,'WEB-DL')",
-        "score": 120
-      },
-      {
-        "enabled": true,
-        "expression": "/* RSE Dolby Vision */ visualTag(streams,'DV','Dolby Vision')",
         "score": 120
       },
       {
