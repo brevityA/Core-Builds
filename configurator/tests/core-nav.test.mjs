@@ -119,3 +119,20 @@ test('npm run dev serves the repo root so ../tools/core-nav.js resolves', () => 
   const pkg = JSON.parse(readFileSync(join(ROOT, 'configurator', 'package.json'), 'utf8'));
   assert.match(pkg.scripts.dev, /http\.server 8080 -d \.\./);
 });
+
+test('same-page menu links work after a hand-off (hashchange is outside the guard)', () => {
+  const guardOpen = app.indexOf('if (!_genieRoute && !_badgeBuilderRoute) {');
+  const guardClose = app.indexOf('\n  }\n', guardOpen);
+  const listener = app.indexOf("window.addEventListener('hashchange'", guardOpen);
+  assert.ok(listener > guardClose, 'hashchange listener sits inside the hand-off guard');
+});
+
+test('the menu hides while a Fastlane dialog is open', () => {
+  const call = app.match(/window\.CoreNav\.mount\(\{([\s\S]*?)\}\);/);
+  assert.match(call[1], /\.fastlane-overlay/);
+});
+
+test('npm run dev listens on localhost only', () => {
+  const pkg = JSON.parse(readFileSync(join(ROOT, 'configurator', 'package.json'), 'utf8'));
+  assert.match(pkg.scripts.dev, /--bind 127\.0\.0\.1/);
+});

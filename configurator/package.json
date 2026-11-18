@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "echo 'Configurator: http://localhost:8080/configurator/src/' && python3 -m http.server 8080 -d ..",
+    "dev": "echo 'Configurator: http://localhost:8080/configurator/src/' && python3 -m http.server 8080 -d .. --bind 127.0.0.1",
     "test": "node --test tests/*.test.mjs",
     "validate": "node scripts/validate.mjs",
     "build": "node scripts/build.mjs",

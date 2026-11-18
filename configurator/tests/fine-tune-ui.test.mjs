@@ -71,3 +71,9 @@ test('stream cards are keyboard-operable and score radios are grouped per picker
 test('Quick install\'s tall hero heading is not pinned over the steps', () => {
   assert.match(css, /#expressLaneModal \.fastlane-head\.ux-hero\{position:relative\}/);
 });
+
+test('a newer section jump cancels the slide-in correction of an older one', () => {
+  const fn = app.slice(app.indexOf('function ftJumpTo('), app.indexOf('function syncFtJump('));
+  assert.match(fn, /const jump = \+\+_ftJumpSeq;/);
+  assert.match(fn, /if \(jump !== _ftJumpSeq\) return;/);
+});

@@ -1905,6 +1905,7 @@ function ftJumpHtml() {
   return `<nav class="ft-jump" aria-label="Fine-Tune sections">${FT_SECTIONS.map(([id, name]) => `<button type="button" class="ft-jump-chip" data-action="ft-jump" data-target="${id}">${name}</button>`).join('')}</nav>`;
 }
 
+let _ftJumpSeq = 0;
 /** Scroll the open Fine-Tune drawer to a section and mark its chip. */
 function ftJumpTo(id, smooth = true) {
   const target = document.querySelector(`#advancedDrawer #${id}`);
@@ -1915,9 +1916,12 @@ function ftJumpTo(id, smooth = true) {
   const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   target.scrollIntoView({ block: 'start', behavior: smooth && !reduced ? 'smooth' : 'auto' });
   syncFtJump(id);
+  const jump = ++_ftJumpSeq;
   // A jump made while the drawer is still sliding in (Quick install, #cards) is
   // measured mid-animation; once it settles, make sure the heading clears the bar.
+  // A newer jump in the meantime wins: this correction is then dropped.
   if (!smooth) setTimeout(() => {
+    if (jump !== _ftJumpSeq) return;
     const panel = target.closest('.advanced-drawer-panel');
     if (!panel || !bar) return;
     const gap = target.getBoundingClientRect().top - bar.getBoundingClientRect().bottom;
@@ -3193,8 +3197,10 @@ document.addEventListener('DOMContentLoaded', () => {
   render();
   if (!_genieRoute && !_badgeBuilderRoute) {
     try { handleDeepLink(location.hash); } catch(e) { logError('deeplink', e.message, { hash: location.hash }); }
-    window.addEventListener('hashchange', () => { try { handleDeepLink(location.hash); } catch(e) { logError('deeplink', e.message, { hash: location.hash }); } });
   }
+  // Listened for on every start-up path: the menu's same-page links (#cards,
+  // #changelog) change the hash after a hand-off too.
+  window.addEventListener('hashchange', () => { try { handleDeepLink(location.hash); } catch(e) { logError('deeplink', e.message, { hash: location.hash }); } });
   // Site menu on every screen but the main page (its rows and All Core Tools
   // cover these routes). It sits at the start of the wizard header and hides
   // while Quick install or a dialog is open. Mounted on every start-up path,
@@ -3204,7 +3210,7 @@ document.addEventListener('DOMContentLoaded', () => {
       root: new URL('../', location.href),
       anchor: document.querySelector('.wrap > .hdr'),
       markCurrent: false,
-      hideOn: () => !!document.querySelector('.hybrid-splash, #expressLaneModal, .modal-overlay'),
+      hideOn: () => !!document.querySelector('.hybrid-splash, #expressLaneModal, .modal-overlay, .fastlane-overlay'),
     });
   } catch(e) { logError('core-nav', e.message); }
   if (_genieRoute) {
