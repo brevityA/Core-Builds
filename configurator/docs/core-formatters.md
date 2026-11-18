@@ -37,3 +37,7 @@ undefined renders `{unknown_propertyName(...)}`, which the real thing never does
 
 Previews in `src/data/core-formatter-previews.js` are generated, never edited;
 a test fails when they no longer match the engine's output.
+
+## Previews for every formatter
+
+`scripts/render-formatter-previews.mjs` renders every built-in formatter (Core styles in each score mode) through the same pinned engine, for the three `COMPARE_SAMPLES` in `tests/fixtures/core-formatter-samples.mjs`, into `src/data/formatter-previews.js`. The cards and the side-by-side compare read it. Run it after changing any formatter in `src/data/formatters.js`; `tests/formatter-compare.test.mjs` fails while it is stale (when the engine is reachable; CI requires it).

@@ -4,6 +4,7 @@ import { CHANGELOG } from '../data/changelog.js';
 import { FORMATTERS, AUDIO_HELP } from '../data/formatters.js';
 import { CORE_SCORE_MODES, DEFAULT_CORE_SCORE_MODE, buildCoreFormatter, isCoreFormatter } from '../data/core-formatters.js';
 import { CORE_FORMATTER_PREVIEWS, CORE_PREVIEW_ENGINE_VERSION } from '../data/core-formatter-previews.js';
+import { FORMATTER_PREVIEWS, FORMATTER_PREVIEW_ENGINE_VERSION, FORMATTER_PREVIEW_SAMPLES } from '../data/formatter-previews.js';
 import { OPTIONAL_SCRAPER_DEFS, presetRole, withPenguplay } from '../data/scrapers.js';
 import { HOST_BASE_URLS, HOST_LABEL_MAP, HOST_META, MIN_AIOSTREAMS_VERSION } from '../data/hosts.js';
 import { DEVICE_AUDIO_DEFAULTS, DEVICE_FORCE_LIMITED_AUDIO, DEVICE_AV1_SAFE, DEVICE_DV_SAFE, POPULAR_DEVICE_IDS, DEVICE_PROFILES } from '../data/devices.js';
@@ -499,7 +500,7 @@ function releaseMigrationFields(fields) {
 function releaseMigrationForControl(action, element) {
   if (action === 'set-output-profile') { S._migrationKeep = null; S._migrationRemove = []; return; }
   const key = element.dataset.key;
-  if (['set-formatter', 'set-simple-fmt', 'fmt-scroll-pick', 'fmt-dropdown-change', 'clear-custom-formatter', 'set-fmt-score'].includes(action)) releaseMigrationFields(['formatter']);
+  if (['set-formatter', 'set-simple-fmt', 'fmt-scroll-pick', 'fmt-compare-use', 'fmt-dropdown-change', 'clear-custom-formatter', 'set-fmt-score'].includes(action)) releaseMigrationFields(['formatter']);
   if (['set-simple-quality', 'set-simple-resfirst', 'set-library-boost'].includes(action)
     || (action === 'toggle-pref' && ['qualityFirst', 'resolutionFirst'].includes(key))) {
     releaseMigrationFields(CONFIG_UPDATE_SECTIONS.find(section => section.key === 'sort').fields);
@@ -1403,7 +1404,7 @@ function corePreview(id) {
   if (!set) return null;
   const p = set[S.fmtScore] || set[DEFAULT_CORE_SCORE_MODE];
   const lines = String(p.n).split('\n');
-  return { n: lines.map(escHtml).join('<br>'), d: p.d.map(escHtml), rendered: true };
+  return { n: lines.map(escHtml).join('<br>'), d: p.d.map(escHtml), rendered: true, core: true };
 }
 
 const SCORE_MODE_LABELS = {
@@ -1433,13 +1434,81 @@ function fmtScoreControlHtml() {
   </fieldset>`;
 }
 
+/**
+ * Any built-in formatter rendered by AIOStreams' engine for one compare sample,
+ * as {n, d[]} with every line escaped. Core styles follow the score display.
+ */
+function enginePreview(id, sample = '4k') {
+  const set = FORMATTER_PREVIEWS[id];
+  if (!set) return null;
+  const mode = set[S.fmtScore] || set.default || set[DEFAULT_CORE_SCORE_MODE];
+  const p = mode && mode[sample];
+  if (!p) return null;
+  return { n: String(p.n).split('\n').map(escHtml).join('<br>'), d: p.d.map(escHtml), rendered: true };
+}
+
+// Side-by-side compare: the same sample stream in up to three formatters, laid
+// out as a phone app or a TV app shows a result. State lives for the session.
+const _fmtCompare = { open: false, slots: [], sample: '4k', device: 'phone' };
+const COMPARE_DEVICES = [['phone', 'Phone'], ['tv', 'TV']];
+
+function compareChoices() {
+  return FORMATTERS.filter(f => FORMATTER_PREVIEWS[f.id]);
+}
+
+function compareSlots() {
+  const ids = new Set(compareChoices().map(f => f.id));
+  if (!_fmtCompare.slots.length) {
+    const first = ids.has(S.formatter) ? S.formatter : 'family-v4';
+    _fmtCompare.slots = [first, first === 'core-compact' ? 'family-v4' : 'core-compact', ''];
+  }
+  _fmtCompare.slots = _fmtCompare.slots.map((id, i) => (id === '' && i > 0) || ids.has(id) ? id : 'family-v4');
+  return _fmtCompare.slots;
+}
+
+function fmtCompareColumn(id, i) {
+  const choices = compareChoices();
+  const options = (i > 0 ? `<option value=""${id === '' ? ' selected' : ''}>Add a formatter…</option>` : '')
+    + choices.map(f => `<option value="${escHtml(f.id)}"${f.id === id ? ' selected' : ''}>${escHtml(f.label)}</option>`).join('');
+  const select = `<select class="fmt-cmp-pick" id="fmtCmpPick${i}" data-action="fmt-compare-slot" data-slot="${i}" aria-label="Formatter ${i + 1}">${options}</select>`;
+  if (!id) return `<div class="fmt-cmp-col fmt-cmp-empty">${select}<div class="fmt-cmp-screen fmt-cmp-blank">Pick a formatter to compare</div></div>`;
+  const p = enginePreview(id, _fmtCompare.sample);
+  const inUse = S.formatter === id && !(S.formatter === 'custom' && S.customFormatter);
+  const body = p
+    ? `<div class="fmt-cmp-row"><div class="fmt-cmp-n">${p.n}</div><div class="fmt-cmp-d">${p.d.map(l => `<div>${l}</div>`).join('')}</div></div>`
+    : '<div class="fmt-cmp-blank">No preview for this formatter</div>';
+  return `<div class="fmt-cmp-col">${select}<div class="fmt-cmp-screen">${body}</div>`
+    + `<button type="button" class="fmt-cmp-use" data-action="fmt-compare-use" data-fmt="${escHtml(id)}"${inUse ? ' disabled' : ''}>${inUse ? 'In use' : 'Use this'}</button></div>`;
+}
+
+function fmtCompareHtml() {
+  if (!_fmtCompare.open) {
+    return `<button type="button" class="fmt-compare-open" data-action="fmt-compare-toggle" aria-expanded="false">${ICO.palette(14,'currentColor')} Compare side by side</button>`;
+  }
+  const seg = (action, items, current, label) => `<div class="fmt-cmp-seg" role="group" aria-label="${label}">${items.map(([v, n]) => `<button type="button" data-action="${action}" data-val="${v}" aria-pressed="${v === current}">${escHtml(n)}</button>`).join('')}</div>`;
+  return `<section class="fmt-compare" aria-label="Compare stream cards">
+    <div class="fmt-compare-head"><b>Compare side by side</b><button type="button" class="fmt-compare-close" data-action="fmt-compare-toggle" aria-expanded="true">Close</button></div>
+    <div class="fmt-compare-controls">
+      ${seg('fmt-compare-sample', FORMATTER_PREVIEW_SAMPLES.map(s => [s.key, s.label]), _fmtCompare.sample, 'Sample stream')}
+      ${seg('fmt-compare-device', COMPARE_DEVICES, _fmtCompare.device, 'Screen')}
+    </div>
+    <div class="fmt-cmp-cols" data-device="${_fmtCompare.device}">${compareSlots().map(fmtCompareColumn).join('')}</div>
+    <p class="fmt-compare-note">The same sample stream in each, rendered by AIOStreams ${escHtml(FORMATTER_PREVIEW_ENGINE_VERSION)}'s formatter engine. Fonts, emoji and line breaks are your app's.</p>
+  </section>`;
+}
+
+function refreshFmtCompare(focusSelector) {
+  document.querySelectorAll('.fmt-compare-wrap').forEach(wrap => { wrap.innerHTML = fmtCompareHtml(); });
+  if (focusSelector) document.querySelector(`.fmt-compare-wrap ${focusSelector}`)?.focus({ preventScroll: true });
+}
+
 function fmtDropdownHtml() {
   const isCustom = S.formatter === 'custom' && S.customFormatter;
   const allFmts = [...FORMATTERS];
   if (S.customFormatter) allFmts.push({ id:'custom', label:S.customFormatter.label||'Custom', badge:'Imported', bc:'#a78bfa', desc:'Your imported formatter' });
   const cards = allFmts.map(f => {
     const active = (isCustom && f.id === 'custom') || (!isCustom && f.id === S.formatter);
-    const p = corePreview(f.id) || FMT_PREVIEWS[f.id] || FMT_PREVIEWS['family-v4'];
+    const p = corePreview(f.id) || enginePreview(f.id) || FMT_PREVIEWS[f.id] || FMT_PREVIEWS['family-v4'];
     return `<div class="fmt-scroll-card" data-active="${active}" data-action="fmt-scroll-pick" data-fmt="${f.id}" role="button" tabindex="0" aria-pressed="${active}">
       <div class="fmt-scroll-head">
         <div class="fmt-scroll-dot" style="background:${f.bc}"></div>
@@ -1454,10 +1523,10 @@ function fmtDropdownHtml() {
           ${p.d.map(l=>`<div class="fmt-live-d">${l}</div>`).join('')}
         </div>
       </div>
-      <div class="fmt-preview-note">${p.rendered ? `Rendered by AIOStreams ${CORE_PREVIEW_ENGINE_VERSION}'s formatter for a sample stream` : 'Illustrative preview'}</div>
+      <div class="fmt-preview-note">${p.rendered ? `Rendered by AIOStreams ${p.core ? CORE_PREVIEW_ENGINE_VERSION : FORMATTER_PREVIEW_ENGINE_VERSION}'s formatter for a sample stream` : 'Illustrative preview'}</div>
     </div>`;
   }).join('');
-  return `<div class="scroll-fade-wrap" data-scroll-start="true" data-scroll-end="false"><div class="fmt-scroll" id="fmtScroll">${cards}</div></div>${fmtScoreControlHtml()}`;
+  return `<div class="scroll-fade-wrap" data-scroll-start="true" data-scroll-end="false"><div class="fmt-scroll" id="fmtScroll">${cards}</div></div>${fmtScoreControlHtml()}<div class="fmt-compare-wrap">${fmtCompareHtml()}</div>`;
 }
 
 function updateFmtFeatured() {
@@ -3273,6 +3342,12 @@ document.addEventListener('DOMContentLoaded', () => {
   // Handle all clicks
   document.addEventListener('change', (e) => {
     if (e.target.dataset.action) releaseMigrationForControl(e.target.dataset.action, e.target);
+    if (e.target.matches('[data-action="fmt-compare-slot"]')) {
+      compareSlots();
+      _fmtCompare.slots[Number(e.target.dataset.slot)] = e.target.value;
+      refreshFmtCompare(`#fmtCmpPick${e.target.dataset.slot}`);
+      return;
+    }
     if (e.target.matches('[data-action="fmt-dropdown-change"]')) {
       S.formatter = e.target.value;
       applyChoiceProfile('formatter');
@@ -3361,11 +3436,32 @@ document.addEventListener('DOMContentLoaded', () => {
     if(!action) return;
     releaseMigrationForControl(action, el);
 
+    if (action === 'fmt-compare-toggle') {
+      _fmtCompare.open = !_fmtCompare.open;
+      refreshFmtCompare(_fmtCompare.open ? '.fmt-compare-close' : '.fmt-compare-open');
+      return;
+    }
+    if (action === 'fmt-compare-sample' || action === 'fmt-compare-device') {
+      _fmtCompare[action === 'fmt-compare-sample' ? 'sample' : 'device'] = el.dataset.val;
+      refreshFmtCompare(`[data-action="${action}"][data-val="${el.dataset.val}"]`);
+      return;
+    }
+    if (action === 'fmt-compare-use') {
+      S.formatter = el.dataset.fmt;
+      applyChoiceProfile('formatter');
+      saveState();
+      updateFmtFeatured();
+      updateFmtReceiptRow();
+      refreshFmtCompare(`[data-action="fmt-compare-use"][data-fmt="${el.dataset.fmt}"]`);
+      showToast(`Stream cards: ${fmtLabelText()}`);
+      return;
+    }
     if (action === 'set-fmt-score') {
       if (!CORE_SCORE_MODES.includes(el.value)) return;
       S.fmtScore = el.value;
       saveState();
       updateCorePreviews();
+      if (_fmtCompare.open) refreshFmtCompare();
       return;
     }
 

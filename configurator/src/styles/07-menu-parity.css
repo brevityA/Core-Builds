@@ -338,3 +338,38 @@ html body:has(.hybrid-splash) #themeToggle{display:none}
    phone rule kept it sticky, so every step slid underneath the wordmark while
    scrolling. It scrolls away with the page instead. */
 #expressLaneModal .fastlane-head.ux-hero{position:relative}
+
+/* Stream cards: side-by-side compare (v3.35). The screens are pictures of an
+   app's results list, so they stay dark in both themes, like the app itself. */
+.fmt-compare-open{appearance:none;font:inherit;display:inline-flex;align-items:center;gap:8px;margin-top:10px;height:38px;padding:0 16px;border-radius:999px;border:1px solid var(--th-accent-border);background:var(--th-accent-bg);color:var(--th-accent);font-size:.8rem;font-weight:700;cursor:pointer}
+.fmt-compare-open:hover{border-color:var(--th-accent)}
+.fmt-compare{margin-top:12px;padding:14px;border:1px solid var(--th-border-strong);border-radius:14px;background:var(--th-card-alt)}
+.fmt-compare-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
+.fmt-compare-head b{font-size:.92rem;color:var(--th-tx)}
+.fmt-compare-close{appearance:none;font:inherit;height:32px;padding:0 12px;border-radius:8px;border:1px solid var(--th-border-strong);background:transparent;color:var(--th-tx2);font-size:.76rem;font-weight:600;cursor:pointer}
+.fmt-compare-controls{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.fmt-cmp-seg{display:flex;flex-wrap:wrap;gap:4px;padding:3px;border-radius:10px;border:1px solid var(--th-border);background:var(--th-input-bg)}
+.fmt-cmp-seg button{appearance:none;font:inherit;min-height:32px;padding:0 10px;border:0;border-radius:7px;background:transparent;color:var(--th-tx2);font-size:.74rem;font-weight:600;cursor:pointer}
+.fmt-cmp-seg button[aria-pressed="true"]{background:var(--th-accent-bg);color:var(--th-accent);box-shadow:inset 0 0 0 1px var(--th-accent-border)}
+.fmt-cmp-cols{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.fmt-cmp-col{min-width:0;display:flex;flex-direction:column;gap:8px}
+.fmt-cmp-pick{width:100%;min-height:36px;padding:0 10px;border-radius:8px;border:1px solid var(--th-input-border);background:var(--th-input-bg);color:var(--th-tx);color-scheme:var(--th-select-scheme);font:inherit;font-size:.78rem;font-weight:600}
+.fmt-cmp-screen{flex:1;min-height:132px;padding:12px;border-radius:12px;background:#0f1216;border:1px solid #232a33;color:#e9edf2;overflow-x:auto}
+.fmt-cmp-row{display:flex;flex-direction:column;gap:6px}
+.fmt-cmp-n{font-size:.78rem;font-weight:700;line-height:1.4;white-space:pre-wrap;overflow-wrap:break-word}
+.fmt-cmp-d{font-size:.72rem;line-height:1.5;color:#aab4bf;overflow-wrap:break-word}
+/* TV: one full-width row per formatter, the way a TV app lists results. */
+.fmt-cmp-cols[data-device="tv"]{grid-template-columns:minmax(0,1fr)}
+.fmt-cmp-cols[data-device="tv"] .fmt-cmp-col{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:'pick use' 'screen screen';align-items:center;gap:8px}
+.fmt-cmp-cols[data-device="tv"] .fmt-cmp-pick{grid-area:pick}.fmt-cmp-cols[data-device="tv"] .fmt-cmp-use{grid-area:use;padding:0 14px}.fmt-cmp-cols[data-device="tv"] .fmt-cmp-screen{grid-area:screen;padding:16px;min-height:110px}
+.fmt-cmp-cols[data-device="tv"] .fmt-cmp-row{display:grid;grid-template-columns:minmax(0,38%) minmax(0,1fr);gap:12px;align-items:start}
+.fmt-cmp-cols[data-device="tv"] .fmt-cmp-n{font-size:.9rem;padding-right:12px;border-right:1px solid #2a323c}
+.fmt-cmp-cols[data-device="tv"] .fmt-cmp-d{font-size:.82rem}
+.fmt-cmp-blank{display:grid;place-items:center;text-align:center;color:#7d8794;font-size:.74rem}
+.fmt-cmp-empty .fmt-cmp-screen{border-style:dashed;background:transparent;border-color:var(--th-border-strong);color:var(--th-tx3)}
+.fmt-cmp-use{appearance:none;font:inherit;min-height:36px;border-radius:8px;border:1px solid var(--th-accent-border);background:var(--th-accent-bg);color:var(--th-accent);font-size:.78rem;font-weight:700;cursor:pointer}
+.fmt-cmp-use:disabled{border-color:var(--th-border);background:transparent;color:var(--th-tx3);cursor:default}
+.fmt-compare-open:focus-visible,.fmt-compare-close:focus-visible,.fmt-cmp-seg button:focus-visible,.fmt-cmp-pick:focus-visible,.fmt-cmp-use:focus-visible{outline:2px solid var(--th-accent);outline-offset:2px}
+.fmt-compare-note{margin:10px 0 0;font-size:.7rem;line-height:1.45;color:var(--th-tx3)}
+/* Phones: keep the columns side by side and let them scroll sideways. */
+@media(max-width:640px){.fmt-cmp-cols[data-device="phone"]{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:4px}.fmt-cmp-cols[data-device="phone"] .fmt-cmp-col{flex:0 0 78%;scroll-snap-align:start}}
