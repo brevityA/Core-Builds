@@ -190,6 +190,14 @@ body{
 .fold>summary::after{content:'＋';margin-left:auto;color:var(--th-accent)}.fold[open]>summary::after{content:'－'}.fold[open]>summary{margin-bottom:10px}
 @media(max-width:640px){.tool-grid.g2,.tool-grid.g3{grid-template-columns:1fr}.hdr-icon{width:72px;height:72px}}
 @media(prefers-reduced-motion:reduce){.hdr-icon{animation:none}}
+
+.cfg-links{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px}
+.cfg-link{display:flex;flex-direction:column;gap:2px;min-height:58px;justify-content:center;padding:10px 14px;border:1px solid var(--th-border);border-radius:14px;background:var(--th-card);color:var(--th-tx);text-decoration:none;transition:border-color .18s}
+.cfg-link b{font-size:.86rem}.cfg-link span{font-size:.72rem;color:var(--th-tx3)}.cfg-link:hover{border-color:var(--th-accent-border)}.cfg-link:focus-visible{outline:2px solid var(--th-accent);outline-offset:2px}
+.hybrid-wall{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:6px}.hybrid-wall figure{flex:0 0 min(420px,86%);margin:0;scroll-snap-align:start}.hybrid-wall img{display:block;width:100%;height:auto;border-radius:10px}
+.hybrid-wall figcaption{display:flex;justify-content:space-between;margin-top:6px;font-size:.74rem;color:var(--th-tx2)}
+@media(prefers-reduced-motion:no-preference){@view-transition{navigation:auto}::view-transition-old(root){animation:cbPageOut .18s ease both}::view-transition-new(root){animation:cbPageIn .26s cubic-bezier(.2,.8,.2,1) both}}
+@keyframes cbPageOut{to{opacity:0;transform:translateY(-6px)}}@keyframes cbPageIn{from{opacity:0;transform:translateY(10px)}}
 </style>
 </head>
 <body>
@@ -212,14 +220,14 @@ body{
       <div class="hdr-sub">Tools &amp; utilities for your AIOStreams setup</div>
     </div>
     <div class="hdr-actions">
-      <a class="hdr-btn" href="../">← Configurator</a>
+      <a class="hdr-btn" href="../configurator/">← Configurator</a>
       <a class="hdr-btn" href="https://github.com/brevityA/Core-Builds" target="_blank" rel="noopener">GitHub</a>
     </div>
   </header>
 
   <!-- Hub layout: the builder first, then tools grouped by what they help with. -->
   <div class="tool-grid g1">
-    <a class="tool-card tool-primary" href="../">
+    <a class="tool-card tool-primary" href="../configurator/">
       <div class="tool-idx">Build</div>
       <div class="tool-icon cyan">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5 12 2"/><line x1="12" y1="22" x2="12" y2="15.5"/><polyline points="22 8.5 12 15.5 2 8.5"/></svg>
@@ -232,6 +240,20 @@ body{
       </div>
     </a>
   </div>
+
+  <div class="section-label">Configurator</div>
+  <nav class="cfg-links" aria-label="Configurator shortcuts">
+    <a class="cfg-link" href="../configurator/#express"><b>Quick install</b><span>Service, device, key, done</span></a>
+    <a class="cfg-link" href="../configurator/#advanced"><b>Custom build</b><span>Every setting, step by step</span></a>
+    <a class="cfg-link" href="../configurator/#guided"><b>Guided setup</b><span>One decision at a time</span></a>
+    <a class="cfg-link" href="../configurator/#update"><b>Update an existing setup</b><span>Rebuild over your current config</span></a>
+    <a class="cfg-link" href="../configurator/#import"><b>Import a config</b><span>Paste a manifest or template</span></a>
+    <a class="cfg-link" href="../configurator/#tour"><b>Take the tour</b><span>Five steps, two minutes</span></a>
+    <a class="cfg-link" href="../configurator/#compare"><b>Compare templates</b><span>Side-by-side differences</span></a>
+    <a class="cfg-link" href="../configurator/#changelog"><b>What's new</b><span>Every configurator release</span></a>
+    <a class="cfg-link" href="../configurator/#report"><b>Report an issue</b><span>A safe diagnostics report</span></a>
+    <a class="cfg-link" href="../configurator/#support"><b>Support Core Builds</b><span>Keep it free and maintained</span></a>
+  </nav>
 
   <div class="section-label">AIOStreams</div>
   <div class="tool-grid g2">
@@ -247,7 +269,7 @@ body{
         <span class="tool-link">Open →</span>
       </div>
     </a>
-    <a class="tool-card" href="../#health-score">
+    <a class="tool-card" href="../configurator/#health-score">
       <div class="tool-idx">Quality</div>
       <div class="tool-icon cyan">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
@@ -259,7 +281,7 @@ body{
         <span class="tool-link">Open Builder →</span>
       </div>
     </a>
-    <a class="tool-card" href="../#troubleshooter">
+    <a class="tool-card" href="../configurator/#troubleshooter">
       <div class="tool-idx">Fix</div>
       <div class="tool-icon yellow">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
@@ -391,6 +413,19 @@ body{
   </div>
 
   <details class="inline-card fold">
+    <summary>Stream card previews</summary>
+    <p style="margin:0 0 10px;color:var(--th-tx2);font-size:.78rem">The real cards AIOStreams draws with each formatter, generated from the same templates the configurator writes.</p>
+    <div class="hybrid-wall" aria-label="Formatter previews">
+      <figure><img src="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/family-v4-preview.svg" width="800" height="334" loading="lazy" alt="Real stream card preview — Family v4 — the default"><figcaption><b>Family v4</b><span>the default</span></figcaption></figure>
+      <figure><img src="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/apex-v2-preview.svg" width="800" height="334" loading="lazy" alt="Real stream card preview — Apex v2 — detail-rich"><figcaption><b>Apex v2</b><span>detail-rich</span></figcaption></figure>
+      <figure><img src="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/ultra-preview.svg" width="800" height="334" loading="lazy" alt="Real stream card preview — Ultra — flagship 3-line"><figcaption><b>Ultra</b><span>flagship 3-line</span></figcaption></figure>
+      <figure><img src="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/minimal-preview.svg" width="800" height="334" loading="lazy" alt="Real stream card preview — Minimal — title only"><figcaption><b>Minimal</b><span>title only</span></figcaption></figure>
+      <figure><img src="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/tv-preview.svg" width="800" height="334" loading="lazy" alt="Real stream card preview — TV — episode-first"><figcaption><b>TV</b><span>episode-first</span></figcaption></figure>
+      <figure><img src="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/core-syntax-v3-preview.svg" width="800" height="334" loading="lazy" alt="Real stream card preview — Core Syntax V3"><figcaption><b>Core Syntax V3</b><span></span></figcaption></figure>
+    </div>
+  </details>
+
+  <details class="inline-card fold">
     <summary>What's new</summary>
     <!-- AUTO:TOOLS_WHATSNEW:BEGIN -->
     <h3>🆕 What's New — v3.33</h3>
@@ -398,9 +433,9 @@ body{
       <div class="news-item"><span class="badge" style="flex-shrink:0;background:rgba(0,212,255,.12);color:var(--th-accent)">↗</span><span style="color:var(--th-tx2)"><a href="https://brevitya.github.io/Core-Builds/configurator/#changelog" style="color:var(--th-accent);text-decoration:none">Full Configurator changelog →</a> &nbsp;·&nbsp; <a href="https://corebuilds-docs.docsalot.dev/changelog" style="color:var(--th-accent);text-decoration:none">suite changelog →</a></span></div>
       <div style="font-size:.72rem;font-weight:800;color:var(--th-accent);letter-spacing:.04em;margin-top:8px">v3.33 · Nov 18 2026</div>
       <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">A one-screen main page — the Core mark, the Core Builds name and the version, then six equal rows: Core Builds (opens Quick install), Template Inspector, Back Up Addons, Nuvio Stack Genie, Core Badge Builder and All Core Tools. Each row has a hexagon icon and a short tag saying what it is.</span></div>
-      <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">One menu for everything else — the ☰ button (bottom-right on a phone, top-right on a computer) holds Custom build, Guided setup, update, import, Setup Genie, the tour, template compare and directory, what’s new, stream card previews, light or dark mode, feedback and Report an issue. The separate Mode and chat buttons are folded into it.</span></div>
+      <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Support and shortcuts — a Support Core Builds button sits under the rows, and Custom build, Guided setup, update, import, the tour, template compare, what’s new and Report an issue are one tap away on All Core Tools. Each also has its own link (for example …/configurator/#advanced), and the links now work while the page is open as well as on first load.</span></div>
+      <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Smooth page changes — moving between the configurator and the tool pages cross-fades instead of flashing white, the main page’s rows rise in, and Quick install glides up. All of it switches off when your device asks for reduced motion.</span></div>
       <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Quick install, redesigned — three labelled steps: where to install, your service, and your preferences. Apps and services are full-width rows with logos from the Core Builds Icon Pack; what matters most and streams shown are one-tap switches. On a computer your build summary and the Install button stay pinned on the right.</span></div>
-      <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Delivery up front — Direct Install, Manifest URL or Raw JSON is the first switch in Quick install, so you can export the template file without signing in to Stremio or contacting a host. Device, resolution, connection speed, template profile, language, Full stack, Clean reinstall and TMDB sit under Options &amp; defaults.</span></div>
       <div style="font-size:.72rem;font-weight:800;color:var(--th-accent);letter-spacing:.04em;margin-top:8px">v3.32 · Oct 31 2026</div>
       <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Truer line about your keys — Quick install said your keys go only to your AIOStreams host. They pass through the Core Builds relay on the way, which forwards them and keeps nothing, and the line now says so. The first screen says Core Builds keeps no copy of your keys.</span></div>
       <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Full stack names Cinebye — the Full stack option now says that Cinebye, a separate service, makes the Cinemeta patch using your Stremio sign-in.</span></div>

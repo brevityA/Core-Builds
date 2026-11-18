@@ -16,43 +16,46 @@ For the template-suite release log, see the [Changelog](https://corebuilds-docs.
   <Card title="A one-screen main page" icon="sparkles">
     the Core mark, the Core Builds name and the version, then six equal rows: Core Builds (opens Quick install), Template Inspector, Back Up Addons, Nuvio Stack Genie, Core Badge Builder and All Core Tools. Each row has a hexagon icon and a short tag saying what it is.
   </Card>
-  <Card title="One menu for everything else" icon="bolt">
-    the ☰ button (bottom-right on a phone, top-right on a computer) holds Custom build, Guided setup, update, import, Setup Genie, the tour, template compare and directory, what’s new, stream card previews, light or dark mode, feedback and Report an issue. The separate Mode and chat buttons are folded into it.
+  <Card title="Support and shortcuts" icon="bolt">
+    a Support Core Builds button sits under the rows, and Custom build, Guided setup, update, import, the tour, template compare, what’s new and Report an issue are one tap away on All Core Tools. Each also has its own link (for example …/configurator/#advanced), and the links now work while the page is open as well as on first load.
   </Card>
-  <Card title="Quick install, redesigned" icon="shield-check">
+  <Card title="Smooth page changes" icon="shield-check">
+    moving between the configurator and the tool pages cross-fades instead of flashing white, the main page’s rows rise in, and Quick install glides up. All of it switches off when your device asks for reduced motion.
+  </Card>
+  <Card title="Quick install, redesigned" icon="sliders">
     three labelled steps: where to install, your service, and your preferences. Apps and services are full-width rows with logos from the Core Builds Icon Pack; what matters most and streams shown are one-tap switches. On a computer your build summary and the Install button stay pinned on the right.
   </Card>
-  <Card title="Delivery up front" icon="sliders">
+  <Card title="Delivery up front" icon="gauge">
     Direct Install, Manifest URL or Raw JSON is the first switch in Quick install, so you can export the template file without signing in to Stremio or contacting a host. Device, resolution, connection speed, template profile, language, Full stack, Clean reinstall and TMDB sit under Options & defaults.
   </Card>
-  <Card title="Every install target kept" icon="gauge">
+  <Card title="Every install target kept" icon="wand">
     Stremio, Nuvio, WuPlay, Chillio and Other app all stay in Quick install, on the Review screen and in the manifest window, and the Nuvio Stack Genie still hands off into Nuvio.
   </Card>
-  <Card title="Install progress you can trust" icon="wand">
+  <Card title="Install progress you can trust" icon="layers">
     a progress window ticks each step (host check, regex check, save, install) only after it finishes, and marks a check it could not run as not verified. The last step names your target: Stremio, or your install link for every other app.
   </Card>
-  <Card title="Paste and show buttons on key fields" icon="layers">
+  <Card title="Paste and show buttons on key fields" icon="bug">
     every provider key, TMDB and manifest field gets a Paste button and a show or hide toggle. Connection speed has 25, 50, 100 and 250 Mbps presets, and the bitrate cap stays at 80% of it.
   </Card>
-  <Card title="A better message form" icon="bug">
+  <Card title="A better message form" icon="sparkles">
     pick Problem, Idea, Question or Thanks and the form says what to include, with a Start with a template button that fills in an outline. Your name is optional, the setup details it attaches are shown with a switch to leave them out (never keys or passwords), and a draft survives closing the panel. If a message cannot be sent you see why, and get Copy message, Discord and GitHub issue buttons so nothing is lost.
   </Card>
-  <Card title="Feedback carries your current setup" icon="sparkles">
+  <Card title="Feedback carries your current setup" icon="bolt">
     the message form attached setup details from your last saved state instead of the build on screen; it now reads the live one.
   </Card>
-  <Card title="All Core Tools, regrouped" icon="bolt">
-    the tools page leads with the Template Builder, then AIOStreams, Genies, Stremio account, and Speed & media, one row per tool. What’s new and the built-in tools list fold away.
+  <Card title="All Core Tools, regrouped" icon="shield-check">
+    the tools page leads with the Template Builder, then configurator shortcuts, AIOStreams, Genies, Stremio account, and Speed & media, one row per tool. Stream card previews, what’s new and the built-in tools list fold away. Its Health Score and Troubleshooter links used to land on the plain main page because the site’s redirect dropped the link’s target; they now open the right screen.
   </Card>
-  <Card title="Usage statistics are opt-in" icon="shield-check">
+  <Card title="Usage statistics are opt-in" icon="sliders">
     page visits and downloads are counted only after you tick the box on Review or in Quick install; it starts unticked and never sends keys, account names or your configuration. (#839)
   </Card>
-  <Card title="H.264 10-bit regex accepted again" icon="sliders">
+  <Card title="H.264 10-bit regex accepted again" icon="gauge">
     restricted hosts such as ElfHosted refused every save because the H.264 10-bit pattern no longer matched their allowlist word for word after Vidhin05 rewrote it; the regex is re-synced from upstream. (#838)
   </Card>
-  <Card title="Samsung TV 4K saves accepted again" icon="gauge">
+  <Card title="Samsung TV 4K saves accepted again" icon="wand">
     the same allowlist drift refused Samsung TV 4K setups on restricted hosts; the regex snapshot is re-pinned to upstream. (#822)
   </Card>
-  <Card title="Generated output unchanged" icon="wand">
+  <Card title="Generated output unchanged" icon="layers">
     this release changes no config compared with the current main branch; the only config changes since 3.32 are the two regex re-syncs above.
   </Card>
 </CardGroup>

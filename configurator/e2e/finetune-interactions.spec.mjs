@@ -9,7 +9,7 @@ async function fresh(page) {
 
 test('Fine-Tune nested clicks survive rerender and persist', async ({ page }) => {
   await fresh(page);
-  await page.locator('#lpMenuBtn').click(); await page.locator('#lpMenu [data-action="custom-start"]').click();
+  await page.evaluate(() => { location.hash = ''; location.hash = '#advanced'; }); // deep link (the main page has no menu)
   await page.locator('label[for="o_torbox-pro"]').click();
   await page.locator('[data-action="open-advanced"]').click();
   await expect(page.locator('#advancedDrawer')).toBeVisible();
@@ -27,7 +27,7 @@ test('Fine-Tune nested clicks survive rerender and persist', async ({ page }) =>
 
 test('Fine-Tune close button restores focus to the trigger', async ({ page }) => {
   await fresh(page);
-  await page.locator('#lpMenuBtn').click(); await page.locator('#lpMenu [data-action="custom-start"]').click();
+  await page.evaluate(() => { location.hash = ''; location.hash = '#advanced'; }); // deep link (the main page has no menu)
   await page.locator('label[for="o_torbox-pro"]').click();
   const trigger = page.locator('[data-action="open-advanced"]');
   await trigger.focus();

@@ -2141,8 +2141,8 @@ function splashHtml() {
         <h1 class="lp-wordmark">Core <span>Builds</span></h1>
         <button type="button" data-action="show-changelog" class="lp-ver">v${CONFIGURATOR_VERSION}</button>
         ${splashUpdateCard()}
-        <!-- One list of equal rows (v3.33). Core Builds is the first tool and opens Quick install;
-             every secondary route lives in the menu (#lpMenu). The tour targets stay on #splashStart. -->
+        <!-- One list of equal rows (v3.33). Core Builds is the first tool and opens Quick install.
+             Other routes are deep links (#advanced, #update, #import, #tour…) listed on All Core Tools. -->
         <nav class="lp-rows" id="splashStart" aria-label="Core Builds tools">
         <button type="button" class="lp-row lp-row-main" data-action="open-express-lane"><span class="lp-row-ico">${BRAND_GLYPHS.corebuilds}</span><b>Core Builds</b><span class="lp-tag">Setup</span></button>
         <a class="lp-row" href="../tools/inspector/"><span class="lp-row-ico">${ICO.search(22,'currentColor')}</span><b>Template Inspector</b><span class="lp-tag">JSON</span></a>
@@ -2151,6 +2151,7 @@ function splashHtml() {
         <a class="lp-row" href="../tools/badges/"><span class="lp-row-ico">${ICO.palette(22,'currentColor')}</span><b>Core Badge Builder</b><span class="lp-tag">Badges</span></a>
         <a class="lp-row" href="../tools/"><span class="lp-row-ico">${ICO.folder(22,'currentColor')}</span><b>All Core Tools</b><span class="lp-tag">All</span></a>
         </nav>
+        <button type="button" class="lp-support" data-action="open-support"><span aria-hidden="true">${ICO.coffee(16,'currentColor')}</span>Support Core Builds</button>
         <div class="splash-stats lp-stats" id="splashStats"></div>
       </div>
       <div class="hybrid-core-stage splash-anim splash-anim-d2">
@@ -2171,38 +2172,6 @@ function splashHtml() {
       </div>
     </div>
     ${hadSavedState ? '' : remoteUpdateBannerHtml()}
-    <button type="button" class="lp-menu-btn" id="lpMenuBtn" data-lp-menu="open" aria-label="Open menu" aria-expanded="false" aria-controls="lpMenu"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
-    <div class="lp-menu-overlay" id="lpMenuOverlay" data-lp-menu="close" hidden></div>
-    <nav class="lp-menu" id="lpMenu" aria-label="More" hidden>
-      <div class="lp-menu-head"><span class="lp-menu-mark">${BRAND_GLYPHS.corebuilds}</span><b>Core Builds</b><button type="button" class="lp-menu-close" data-lp-menu="close" aria-label="Close menu">✕</button></div>
-      <div class="lp-menu-label">Build</div>
-      <button type="button" class="lp-menu-item" data-action="custom-start">Custom build</button>
-      <button type="button" class="lp-menu-item" data-action="easy-start">Guided setup</button>
-      <button type="button" class="lp-menu-item" data-action="update-template">Update an existing setup</button>
-      <button type="button" class="lp-menu-item" data-action="paste-manifest-splash">Import a config</button>
-      <a class="lp-menu-item" href="../tools/genies/">Setup Genie</a>
-      <div class="lp-menu-label">Learn</div>
-      <button type="button" class="lp-menu-item" data-action="open-tutorial">Take the tour</button>
-      <button type="button" class="lp-menu-item" data-action="compare-templates">Compare templates</button>
-      <a class="lp-menu-item" href="https://corebuilds-docs.docsalot.dev/templates/directory" target="_blank" rel="noopener noreferrer">Browse templates</a>
-      <button type="button" class="lp-menu-item" data-action="show-changelog">What's new · v${CONFIGURATOR_VERSION}</button>
-      <details class="lp-menu-preview"><summary class="lp-menu-item">Stream card previews</summary>
-    <div class="hybrid-wall splash-anim splash-anim-d6" aria-label="Formatter previews">
-      <figure><img src="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/family-v4-preview.svg" width="800" height="334" loading="lazy" alt="Real stream card preview — Family v4 — the default"><figcaption><b>Family v4</b><span>the default</span></figcaption></figure>
-      <figure><img src="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/apex-v2-preview.svg" width="800" height="334" loading="lazy" alt="Real stream card preview — Apex v2 — detail-rich"><figcaption><b>Apex v2</b><span>detail-rich</span></figcaption></figure>
-      <figure><img src="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/ultra-preview.svg" width="800" height="334" loading="lazy" alt="Real stream card preview — Ultra — flagship 3-line"><figcaption><b>Ultra</b><span>flagship 3-line</span></figcaption></figure>
-      <figure><img src="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/minimal-preview.svg" width="800" height="334" loading="lazy" alt="Real stream card preview — Minimal — title only"><figcaption><b>Minimal</b><span>title only</span></figcaption></figure>
-      <figure><img src="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/tv-preview.svg" width="800" height="334" loading="lazy" alt="Real stream card preview — TV — episode-first"><figcaption><b>TV</b><span>episode-first</span></figcaption></figure>
-      <figure><img src="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/core-syntax-v3-preview.svg" width="800" height="334" loading="lazy" alt="Real stream card preview — Core Syntax V3"><figcaption><b>Core Syntax V3</b><span></span></figcaption></figure>
-    </div>
-      </details>
-      <div class="lp-menu-label">Help</div>
-      <button type="button" class="lp-menu-item" data-lp="theme">Light / dark mode</button>
-      <button type="button" class="lp-menu-item" data-lp="feedback">Send feedback</button>
-      <button type="button" class="lp-menu-item" data-action="open-diagnostics">Report an issue</button>
-      <div class="lp-menu-links"><a href="https://github.com/brevityA/Core-Builds" target="_blank" rel="noopener noreferrer">GitHub</a><a href="https://www.reddit.com/r/CoreBuilds/" target="_blank" rel="noopener noreferrer">Core Crew</a><a href="https://discord.gg/AwJ49yzbqT" target="_blank" rel="noopener noreferrer">Discord</a></div>
-      <p class="lp-menu-foot">Built by Brevity · Core Builds is not affiliated with TorBox or AIOStreams</p>
-    </nav>
   </div>`;
 }
 function initScrollFades() {
@@ -2777,29 +2746,6 @@ function syncNext() {
   }
 }
 
-/* Landing menu (v3.33): one ☰ button opens every secondary route. */
-function setLpMenu(open) {
-  const m = document.getElementById('lpMenu'), o = document.getElementById('lpMenuOverlay'), b = document.getElementById('lpMenuBtn');
-  if (!m) return;
-  m.hidden = !open; if (o) o.hidden = !open; b?.setAttribute('aria-expanded', String(open));
-  if (open) m.querySelector('.lp-menu-close')?.focus(); else if (b && m.contains(document.activeElement)) b.focus();
-}
-document.addEventListener('click', (e) => {
-  const t = e.target.closest('[data-lp-menu]');
-  if (t) { setLpMenu(t.dataset.lpMenu === 'open'); return; }
-  const lp = e.target.closest('#lpMenu [data-lp]');
-  if (lp?.dataset.lp === 'theme') toggleTheme();
-  if (lp?.dataset.lp === 'feedback') {
-    setLpMenu(false);
-    const contact = document.getElementById('cbContactBtn');
-    // Fallback: if the message widget did not load, Discord is the same inbox.
-    if (contact) contact.click(); else window.open('https://discord.gg/AwJ49yzbqT', '_blank', 'noopener');
-    return;
-  }
-  if (e.target.closest('#lpMenu [data-action], #lpMenu a')) setLpMenu(false);
-});
-document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && document.getElementById('lpMenu')?.hidden === false) setLpMenu(false); });
-
 /* DELEGATED EVENTS */
 { const l = document.getElementById('cb-loader'); if (l) l.addEventListener('animationend', () => l.remove()); }
 // ── Onboarding Tutorial System ──
@@ -2807,7 +2753,7 @@ const TUT_STEPS = [
   { id:'welcome' },
   {
     id:'paths', badge:'Step 1 of 5', title:'Choose the Right Path',
-    desc:'<strong>Core Builds</strong> opens Quick install, the shortest setup: service, device, resolution and key, then Deploy.<br><br><span class="hl">Custom build</span>, Guided setup, update, import and the rest live in the <strong>menu</strong> (☰).',
+    desc:'<strong>Core Builds</strong> opens Quick install, the shortest setup: service, device, resolution and key, then Deploy.<br><br><span class="hl">Custom build</span> is one tap away inside Quick install (Options &amp; defaults → Customize every setting), and on the All Core Tools page with Guided setup, update and import.',
     target:'#splashStart', arrow:'top', nextLabel:'Next'
   },
   {
@@ -3011,11 +2957,12 @@ document.addEventListener('DOMContentLoaded', () => {
   render();
   if (!_genieRoute && !_badgeBuilderRoute) {
     try { handleDeepLink(location.hash); } catch(e) { logError('deeplink', e.message, { hash: location.hash }); }
+    window.addEventListener('hashchange', () => { try { handleDeepLink(location.hash); } catch(e) { logError('deeplink', e.message, { hash: location.hash }); } });
   }
   if (_genieRoute) {
     setTimeout(() => {
       try {
-        if (_genieRoute === 'advanced') document.querySelector('[data-action="custom-start"]')?.click();
+        if (_genieRoute === 'advanced') runDeepAction('custom-start');
         else showExpressLane();
         showToast('Genie hand-off applied — service + device pre-set. Check them before you continue.');
       } catch(e) { logError('genie-handoff', e.message); }
@@ -3024,7 +2971,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (_badgeBuilderRoute) {
     setTimeout(() => {
       try {
-        document.querySelector('[data-action="custom-start"]')?.click();
+        runDeepAction('custom-start');
         showToast('Core Badge Companion applied — review your setup, then generate the full template.');
       } catch(e) { logError('badge-builder-handoff', e.message); }
     }, 350);
@@ -7333,15 +7280,24 @@ function troubleshootHtml() {
   }
   return back + body;
 }
+function runDeepAction(action) {
+  const b = document.createElement('button');
+  b.type = 'button'; b.hidden = true; b.dataset.action = action;
+  document.body.appendChild(b); b.click(); b.remove();
+}
 function handleDeepLink(hash) {
   if (!hash || hash.startsWith('#cfg=')) return;
   if (hash === '#troubleshooter') { setTimeout(showTroubleshooter, 300); return; }
   if (hash === '#health-score') { step = STEPS; pushStep(); render(); window.scrollTo(0, 0); return; }
   // Entry deep-links (used by the Genie pages + tools landing). Splash stays the base view;
   // these call the same handlers the splash doors use, so behavior can't drift apart.
-  if (hash === '#express') { setTimeout(() => document.querySelector('[data-action="open-express-lane"]')?.click(), 250); return; }
-  if (hash === '#advanced') { setTimeout(() => document.querySelector('[data-action="custom-start"]')?.click(), 250); return; }
-  if (hash === '#update') { setTimeout(() => document.querySelector('[data-action="update-template"]')?.click(), 250); return; }
+  // A deep link runs the same delegated handler a button would, without needing that button on screen.
+  const DEEP_ACTIONS = { '#express':'open-express-lane', '#advanced':'custom-start', '#guided':'easy-start', '#update':'update-template', '#import':'paste-manifest-splash', '#tour':'open-tutorial', '#compare':'compare-templates', '#report':'open-diagnostics', '#support':'open-support' };
+  if (DEEP_ACTIONS[hash]) {
+    // Clear the link once it has run, so a reload does not reopen the dialog and the same link works again.
+    try { history.replaceState(history.state, '', location.pathname + location.search); } catch (e) { /* the action still runs */ }
+    setTimeout(() => runDeepAction(DEEP_ACTIONS[hash]), 250); return;
+  }
   if (hash === '#backup') { step = STEPS; pushStep(); render(); window.scrollTo(0, 0); return; } // backup timeline lives on the final/Done screen
   if (hash === '#changelog') { setTimeout(showChangelog, 250); return; } // tools page "Full Configurator changelog" link
 }

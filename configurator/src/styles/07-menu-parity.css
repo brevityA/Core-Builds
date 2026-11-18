@@ -242,7 +242,7 @@ html{background:var(--th-bg)}body{font-feature-settings:'cv02','cv03','cv04','cv
 .hybrid-splash{--lp-grad:linear-gradient(100deg,#22d3ee,#4facfe);--lp-glow:rgba(34,211,238,.2)}
 [data-theme='light'] .hybrid-splash{--lp-grad:linear-gradient(100deg,#0891b2,#2563eb);--lp-glow:rgba(8,145,178,.14)}
 .card.splash.hybrid-splash{background:transparent;border-color:transparent;box-shadow:none;backdrop-filter:none;-webkit-backdrop-filter:none}
-.hybrid-splash>:not(.lp-menu):not(.lp-menu-overlay):not(.lp-menu-btn){max-width:440px;margin-left:auto;margin-right:auto}
+.hybrid-splash>*{max-width:440px;margin-left:auto;margin-right:auto}
 .hybrid-splash .hybrid-hero{display:flex;flex-direction:column;align-items:stretch;gap:0;padding:clamp(16px,6vh,64px) 0 24px;text-align:center}
 .hybrid-splash .hybrid-hero>div:first-child{display:contents}
 .hybrid-splash .hybrid-core-stage{order:-1;min-height:0;padding:0;border:0;background:none;box-shadow:none}
@@ -258,26 +258,10 @@ html{background:var(--th-bg)}body{font-feature-settings:'cv02','cv03','cv04','cv
 .hybrid-splash .lp-row-ico{display:grid;place-items:center;flex:none;width:26px;height:26px;color:var(--th-signal-bright)}.hybrid-splash .lp-row-ico svg{width:24px;height:24px}
 .hybrid-splash .lp-row-main{border-color:transparent;background:linear-gradient(var(--th-card),var(--th-card)) padding-box,var(--lp-grad) border-box;box-shadow:0 0 28px var(--lp-glow)}
 @media(hover:hover){.hybrid-splash .lp-row:hover{border-color:var(--th-accent-border);transform:translateY(-1px)}.hybrid-splash .lp-row-main:hover{border-color:transparent}}
-.hybrid-splash .lp-row:focus-visible,.lp-menu-btn:focus-visible,.lp-menu-item:focus-visible{outline:2px solid var(--th-signal-bright);outline-offset:3px}
-html body:has(.hybrid-splash) :is(#themeToggle,#cbContactBtn){display:none}
-.lp-menu-btn{position:fixed;z-index:9000;right:max(18px,env(safe-area-inset-right,0px));bottom:max(18px,env(safe-area-inset-bottom,0px));display:grid;place-items:center;width:56px;height:56px;border:0;border-radius:50%;background:var(--lp-grad);color:#03151b;box-shadow:0 10px 28px var(--lp-glow);cursor:pointer}
-[data-theme='light'] .lp-menu-btn{color:#fff}
-@media(min-width:600px){.lp-menu-btn{bottom:auto;top:max(18px,env(safe-area-inset-top,0px));width:48px;height:48px;border:1px solid var(--th-border);background:var(--th-card);color:var(--th-tx);box-shadow:none}[data-theme='light'] .lp-menu-btn{color:var(--th-tx)}}
-.lp-menu-overlay{position:fixed;inset:0;z-index:9001;background:rgba(3,8,12,.6);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
-.lp-menu{position:fixed;z-index:9002;top:0;right:0;bottom:0;width:min(340px,86vw);overflow-y:auto;padding:max(18px,env(safe-area-inset-top,0px)) 18px max(18px,env(safe-area-inset-bottom,0px));background:var(--th-card);border-left:1px solid var(--th-border);display:flex;flex-direction:column;gap:4px;text-align:left}
-.lp-menu-head{display:flex;align-items:center;gap:10px;margin-bottom:10px;font-family:var(--font-display);font-size:1.15rem;color:var(--th-tx)}.lp-menu-head b{flex:1}
-.lp-menu-mark{display:grid;width:28px;height:28px}.lp-menu-mark svg{width:28px;height:28px}
-.lp-menu-close{width:40px;height:40px;min-height:0;border:1px solid var(--th-border);border-radius:50%;background:none;color:var(--th-tx2);cursor:pointer}
-.lp-menu-label{margin:14px 6px 4px;font-family:var(--font-mono);font-size:.66rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--th-signal-bright)}
-.lp-menu-item{display:flex;align-items:center;width:100%;min-height:46px;margin:0;padding:0 12px;border:0;border-radius:12px;background:none;color:var(--th-tx);font:inherit;font-size:.92rem;font-weight:500;text-align:left;text-decoration:none;cursor:pointer;list-style:none}
-.lp-menu-item:hover{background:var(--th-accent-bg)}
-.lp-menu-preview>summary::-webkit-details-marker{display:none}.lp-menu-preview>summary::after{content:'＋';margin-left:auto;color:var(--th-signal-bright)}.lp-menu-preview[open]>summary::after{content:'－'}
-.lp-menu-preview .hybrid-wall{display:flex;flex-direction:column;gap:10px;margin:6px 0 8px;overflow:visible}.lp-menu-preview .hybrid-wall figure{flex:none;width:100%;margin:0}
-.lp-menu-links{display:flex;gap:16px;margin:18px 12px 0;font-size:.84rem}.lp-menu-links a{color:var(--th-tx2)}
-.lp-menu-foot{margin:14px 12px 0;font-size:.68rem;line-height:1.5;color:var(--th-tx3)}
+.hybrid-splash .lp-row:focus-visible,.hybrid-splash .lp-support:focus-visible{outline:2px solid var(--th-signal-bright);outline-offset:3px}
+html body:has(.hybrid-splash) #themeToggle{display:none}
 @media(max-width:599px){.hybrid-splash .lp-row{min-height:60px;padding:0 22px}.hybrid-splash .lp-rows{gap:12px}.hybrid-splash .lp-ver{margin-bottom:28px}.hybrid-splash .hybrid-core-stage .splash-icon{width:84px;height:84px}.hybrid-splash h1.lp-wordmark{font-size:2.1rem}}
 @media(prefers-reduced-motion:reduce){.hybrid-splash .lp-row{transition:none;transform:none}}
-.lp-menu[hidden],.lp-menu-overlay[hidden]{display:none}
 .card.splash.hybrid-splash{padding-bottom:8px}
 .hybrid-splash .hybrid-hero{padding:clamp(12px,4vh,44px) 0 12px}
 .hybrid-splash .hybrid-core-stage .splash-icon{width:84px;height:84px}
@@ -306,3 +290,20 @@ html body:has(.hybrid-splash) :is(#themeToggle,#cbContactBtn){display:none}
 @media(prefers-reduced-motion:reduce){.hybrid-splash .lp-row-main{animation:none}}
 .hybrid-splash .lp-stats{display:flex;justify-content:center;gap:10px;min-height:1.2em;margin:16px 0 0;font-family:var(--font-mono);font-size:.68rem;letter-spacing:.06em;color:var(--th-tx3)}.hybrid-splash .lp-stats .stat-val{color:var(--th-signal-bright);font-weight:700}
 .hybrid-splash .lp-stats:empty{display:none}.hybrid-splash .lp-stats{margin-top:12px}@media(max-width:599px){.hybrid-splash .lp-rows{gap:8px}.hybrid-splash .lp-ver{margin:6px 0 18px}.hybrid-splash .lp-kicker{margin-top:10px}}
+/* Support pill under the rows; the floating chat button is the page's only floating control. */
+.hybrid-splash .lp-support{align-self:center;display:inline-flex;align-items:center;gap:8px;min-height:40px;margin:16px 0 0;padding:0 18px;border:1px solid var(--th-border);border-radius:99px;background:none;color:var(--th-tx2);font:inherit;font-size:.84rem;font-weight:600;cursor:pointer}
+.hybrid-splash .lp-support>span{display:grid;color:#f472b6}
+@media(hover:hover){.hybrid-splash .lp-support:hover{border-color:rgba(244,114,182,.5);color:var(--th-tx)}}
+@media(max-width:599px){.hybrid-splash .lp-row{min-height:50px}.hybrid-splash .lp-rows{gap:7px}.hybrid-splash .lp-support{min-height:36px;margin-top:12px}}
+/* Fluid motion: pages cross-fade on navigation (same-origin view transitions), the rows rise in once,
+   and Quick install glides up. All of it is off for reduced motion. */
+@media(prefers-reduced-motion:no-preference){
+@view-transition{navigation:auto}
+::view-transition-old(root){animation:cbPageOut .18s ease both}::view-transition-new(root){animation:cbPageIn .26s cubic-bezier(.2,.8,.2,1) both}
+.hybrid-splash .lp-rows>*{animation:cbRise .42s cubic-bezier(.2,.8,.2,1) both}
+.hybrid-splash .lp-rows>:nth-child(2){animation-delay:.04s}.hybrid-splash .lp-rows>:nth-child(3){animation-delay:.08s}.hybrid-splash .lp-rows>:nth-child(4){animation-delay:.12s}.hybrid-splash .lp-rows>:nth-child(5){animation-delay:.16s}.hybrid-splash .lp-rows>:nth-child(6){animation-delay:.2s}
+#expressLaneModal.fastlane-overlay{animation:cbFade .2s ease both}
+}
+@media(prefers-reduced-motion:no-preference) and (min-width:641px){#expressLaneModal .fastlane-panel{animation:cbRise .32s cubic-bezier(.2,.8,.2,1) both}}
+@keyframes cbPageOut{to{opacity:0;transform:translateY(-6px)}}@keyframes cbPageIn{from{opacity:0;transform:translateY(10px)}}
+@keyframes cbRise{from{opacity:0;transform:translateY(12px)}}@keyframes cbFade{from{opacity:0}}

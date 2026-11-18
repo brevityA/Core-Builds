@@ -25,7 +25,7 @@ async function boot(page, createTemplate = true) {
 }
 
 async function review(page, template) {
-  await page.locator('#lpMenuBtn').click(); await page.locator('#lpMenu [data-action="update-template"]').click();
+  await page.evaluate(() => { location.hash = ''; location.hash = '#update'; }); // deep link (the main page has no menu)
   await page.locator('#updTplInput').fill(JSON.stringify(template));
   await page.locator('#updTplApply').click();
   await expect(page.locator('#diffModal')).toBeVisible();
@@ -168,7 +168,7 @@ test('explicit optional-source edits are honoured after an update', async ({ pag
 
 test('multi-template collections and duplicate source IDs are rejected without opening a preview', async ({ page }) => {
   const original = await boot(page);
-  await page.locator('#lpMenuBtn').click(); await page.locator('#lpMenu [data-action="update-template"]').click();
+  await page.evaluate(() => { location.hash = ''; location.hash = '#update'; }); // deep link (the main page has no menu)
   await page.locator('#updTplInput').fill(JSON.stringify([original, original]));
   await page.locator('#updTplApply').click();
   await expect(page.locator('#updTplErr')).toContainText('Choose one template');

@@ -246,7 +246,7 @@ const CONTACT_CSS = `
 .cb-setup{display:flex;gap:8px;align-items:flex-start;margin:0 0 12px;font-size:.7rem;line-height:1.45;color:var(--th-tx3,#6b7280);cursor:pointer}.cb-setup input{margin-top:2px;accent-color:var(--th-accent,#00d4ff)}
 .cb-setup[hidden],.cb-fallback[hidden]{display:none}
 .cb-fallback{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:10px}
-.cb-fallback>*{padding:7px 12px;border:1px solid var(--th-border,rgba(255,255,255,.12));border-radius:99px;background:none;color:var(--th-tx,#e4e7ed);font:inherit;font-size:.74rem;font-weight:700;text-decoration:none;cursor:pointer}
+.cb-fallback>*{display:inline-flex;align-items:center;min-height:36px;padding:0 14px;border:1px solid var(--th-border,rgba(255,255,255,.12));border-radius:99px;background:none;color:var(--th-tx,#e4e7ed);font:inherit;font-size:.74rem;font-weight:700;text-decoration:none;cursor:pointer}
 @media(max-width:480px){.cb-two{grid-template-columns:1fr}.cb-kinds{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .cb-contact-btn{position:fixed;bottom:20px;right:20px;z-index:9990;width:52px;height:52px;border-radius:50%;border:1.5px solid var(--th-accent-border,rgba(0,212,255,.3));background:var(--th-accent-bg,rgba(0,212,255,.1));color:var(--th-accent,#00d4ff);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;box-shadow:0 4px 20px rgba(0,212,255,.2)}
 .cb-contact-btn:hover{transform:scale(1.08);box-shadow:0 6px 28px rgba(0,212,255,.35)}
