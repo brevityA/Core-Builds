@@ -45,7 +45,7 @@
 [data-theme='light'] .name-input,[data-theme='light'] .th-input,[data-theme='light'] .svc-search input,[data-theme='light'] .td-custom input,[data-theme='light'] #aioHost,[data-theme='light'] #aioPwd,[data-theme='light'] #aioUuid{background:#fff!important;color:#1c252d!important;border-color:#cbd5df!important;-webkit-text-fill-color:#1c252d!important}
 [data-theme='light'] .name-input::placeholder,[data-theme='light'] .th-input::placeholder,[data-theme='light'] .svc-search input::placeholder{color:#89949f!important;opacity:1}
 [data-theme='light'] .fmt-live-preview,[data-theme='light'] .copy-fields-card,[data-theme='light'] .receipt-card{background:#f6f9fc!important;border-color:#d5dde5!important}[data-theme='light'] .fmt-live-n,[data-theme='light'] .receipt-hdr-name,[data-theme='light'] .receipt-row-val{color:#1f2933!important}[data-theme='light'] .fmt-live-d,[data-theme='light'] .receipt-row-lbl{color:#5f6c78!important}
-[data-theme='light'] .fastlane-choice.active{background:#eaf3ff!important;background-image:none!important;color:#15314f!important}[data-theme='light'] .fastlane-choice.active b{color:#075ebd!important}[data-theme='light'] .fastlane-choice.active span{color:#526170!important}
+[data-theme='light'] .fastlane-choice.active:not(.ux-seg>*){background:#eaf3ff!important;background-image:none!important;color:#15314f!important}[data-theme='light'] .fastlane-choice.active:not(.ux-seg>*) b{color:#075ebd!important}[data-theme='light'] .fastlane-choice.active span{color:#526170!important}
 [data-theme='light'] [data-action='set-simple-quality'],[data-theme='light'] [data-action='set-simple-resfirst']{background:#fff!important;border-color:#cfd8e2!important;color:#536170!important}[data-theme='light'] [data-action='set-simple-quality'][data-active='true'],[data-theme='light'] [data-action='set-simple-resfirst'][data-active='true']{background:#e5f1ff!important;border-color:#6aa7e8!important;color:#075ebd!important}
 [data-theme='light'] .fmt-scroll-card>div[style*='border-top']{color:#526170!important;border-color:#d5dde5!important}
 [data-theme='light'] .additional-services-btn{background:#fff!important;background-image:none!important;border-color:#d5dde5!important;color:#1f2933!important}[data-theme='light'] .additional-services-btn span{color:#526170!important}[data-theme='light'] .additional-services-btn b{color:#1f2933!important}
@@ -153,28 +153,68 @@ html{background:var(--th-bg)}body{font-feature-settings:'cv02','cv03','cv04','cv
 @media(max-width:599px){#expressLaneModal .ux-pill-grid{grid-template-columns:repeat(2,minmax(0,1fr))}#expressLaneModal .ux-pill-grid .fastlane-choice{width:auto;min-height:52px}#expressLaneModal .ux-pill-grid .fastlane-choice b{font-size:.8rem}#expressLaneModal .ux-toggle-row{padding:14px;gap:12px}}
 @media(prefers-reduced-motion:reduce){#expressLaneModal .ux-pill-grid button,#expressLaneModal .ux-toggle-row{transition:none;animation:none}#expressLaneModal .ux-pill-grid button:hover,#expressLaneModal .ux-pill-grid button:active{transform:none}}
 
-/* Quick install: visible host row, readable on both themes. */
-.ux-host-row{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:12px}.ux-host-label{font-size:.72rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--th-tx3);white-space:nowrap}
-.ux-host-chip{flex-shrink:0;font-size:.68rem;font-weight:800;padding:3px 9px;border-radius:99px;border:1px solid var(--th-border-strong);color:var(--th-tx3);white-space:nowrap}.ux-host-row>select{flex:1 1 220px;min-width:0}
-#expressLaneModal .ux-section h2 .ft-tip{vertical-align:middle}#expressLaneModal .fastlane-trust b,.hybrid-lede strong{color:var(--th-tx)}
-.u-relrow>.input-eye-btn{display:flex;align-items:center;justify-content:center}
+/* Quick install v2: a calm, single-column flow in Core Builds' signal colours.
+   Each step is a labelled card; choices are logo rows or segmented switches; one glowing Install button. */
 #splashStart .start-quick .start-card-title{padding-right:108px}
 [data-theme='light'] :is(#btn-dl,.fastlane-go,.btn-next,.btn-manifest:not([style]):not(.btn-chillio),#splashStart .start-quick){color:#fff}
 [data-theme='light'] #splashStart .start-quick .start-card-desc{color:rgba(255,255,255,.9)}[data-theme='light'] #splashStart .start-quick :is(.start-card-icon,.start-card-badge){color:#fff;background:rgba(255,255,255,.16)}
-#expressLaneModal .ux-review-summary .fastlane-summary{text-align:left}
+.hybrid-lede strong{color:var(--th-tx)}.u-relrow>.input-eye-btn{display:flex;align-items:center;justify-content:center}
+#expressLaneModal .ux-v2{--qi-glow:rgba(34,211,238,.16);--qi-grad:linear-gradient(100deg,#22d3ee,#4facfe);max-width:580px;padding:0 22px 22px;background:radial-gradient(90% 340px at 50% -60px,var(--qi-glow),transparent 70%),var(--th-card);border:1px solid var(--th-border);border-radius:24px}
+[data-theme='light'] #expressLaneModal .ux-v2{--qi-glow:rgba(8,145,178,.12);--qi-grad:linear-gradient(100deg,#0891b2,#2563eb)}
+#expressLaneModal .ux-hero{display:grid;grid-template-columns:1fr auto;align-items:center;margin:0;padding:16px 0 4px;border:0;background:transparent}
+#expressLaneModal .ux-hero .fastlane-back{grid-column:1;grid-row:1;justify-self:start;white-space:nowrap}#expressLaneModal .ux-hero .fastlane-close{grid-column:2;grid-row:1;justify-self:end}
+#expressLaneModal .ux-hero-copy{grid-column:1/-1;grid-row:2;display:flex;flex-direction:column;align-items:center;text-align:center;gap:4px;min-width:0}
+#expressLaneModal .ux-hero .ux-core-mark{width:40px;height:40px;color:#22d3ee;margin-bottom:4px}
+#expressLaneModal .ux-wordmark{font-family:var(--font-display);font-size:2rem;font-weight:700;letter-spacing:-.035em;line-height:1.1;color:var(--th-tx)}
+#expressLaneModal .ux-wordmark span{background:var(--qi-grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+#expressLaneModal .ux-tagline{margin:2px 0 0;font-size:.9rem;color:var(--th-tx2);text-wrap:balance}
+#expressLaneModal .ux-ver{margin:0;font-family:var(--font-mono);font-size:.68rem;color:var(--th-tx3)}#expressLaneModal .ux-ver a{color:var(--th-tx3);text-decoration:underline;text-underline-offset:2px}
+#expressLaneModal .ux-step{margin:30px 0 0}
+#expressLaneModal .ux-step-label{display:flex;align-items:baseline;gap:10px;margin:0 0 10px 4px;font-family:var(--font-mono);font-size:.7rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--th-signal-bright)}
+#expressLaneModal .ux-step-label b{font-family:var(--font-sans);font-size:.82rem;font-weight:600;letter-spacing:0;text-transform:none;color:var(--th-tx2)}
+#expressLaneModal .ux-card{padding:16px;border:1px solid var(--th-border);border-radius:20px;background:var(--th-card-alt)}
+#expressLaneModal .ux-field-label{display:flex;align-items:center;gap:6px;margin:20px 2px 10px;font-size:.84rem;font-weight:600;color:var(--th-tx2)}#expressLaneModal .ux-card>.ux-field-label:first-child{margin-top:0}
+#expressLaneModal .ux-rows{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:0}
+#expressLaneModal .ux-rows .fastlane-choice{display:flex;align-items:center;gap:14px;min-height:62px;margin:0;padding:12px 16px;border:1px solid var(--th-border);border-radius:16px;background:var(--th-card);box-shadow:none;transform:none;text-align:left}
+#expressLaneModal .ux-rows .fastlane-choice:hover{border-color:var(--th-accent-border);transform:none}
+#expressLaneModal .ux-rows .fl-ico{display:flex;flex:none;width:30px;height:30px;align-items:center;justify-content:center}#expressLaneModal .ux-rows .fl-ico svg{width:30px;height:30px}
+#expressLaneModal .ux-rows .fastlane-choice b{flex:1;min-width:0;font-size:.98rem;font-weight:600;color:var(--th-tx)}
+#expressLaneModal .ux-rows .fastlane-choice>span:not(.fl-ico),#expressLaneModal .ux-rows .fastlane-choice b::after{display:none}
+#expressLaneModal .ux-rows .fastlane-choice.active{border-color:var(--th-signal-bright);background:var(--th-accent-bg);box-shadow:inset 0 0 0 1px var(--th-signal-bright),0 0 26px var(--qi-glow)}
+#expressLaneModal .ux-rows .fastlane-choice::after{content:'';flex:none;width:20px;height:20px;border-radius:50%;border:1.5px solid var(--th-border-strong)}
+#expressLaneModal .ux-rows .fastlane-choice.active::after{border-color:transparent;background:var(--qi-grad);box-shadow:inset 0 0 0 5px var(--th-card)}
+#expressLaneModal .ux-seg{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:4px;margin:0;padding:4px;border:1px solid var(--th-border);border-radius:16px;background:var(--th-bg)}
+#expressLaneModal .ux-seg>button{min-height:46px;margin:0;padding:8px 6px;border:0;border-radius:12px;background:transparent;box-shadow:none;transform:none;color:var(--th-tx2);font-size:.86rem;font-weight:700;text-align:center;cursor:pointer}
+#expressLaneModal .ux-seg>button b{font-weight:700;color:inherit;font-size:inherit}#expressLaneModal .ux-seg>button>span,#expressLaneModal .ux-seg .fastlane-reco,#expressLaneModal .ux-seg b::after{display:none}
+#expressLaneModal .ux-v2 .ux-seg>button:is(.active,[aria-pressed='true']){background:var(--qi-grad);color:#03151b;box-shadow:0 4px 16px var(--qi-glow)}
+[data-theme='light'] #expressLaneModal .ux-v2 .ux-seg>button:is(.active,[aria-pressed='true']){color:#fff}
+#expressLaneModal .ux-seg>button:focus-visible,#expressLaneModal .ux-rows .fastlane-choice:focus-visible{outline:2px solid var(--th-signal-bright);outline-offset:2px}
+#expressLaneModal .ux-hint{min-height:1.2em;margin:8px 4px 0;font-size:.8rem;line-height:1.45;color:var(--th-tx3)}
+#expressLaneModal .fastlane-field{min-height:50px;border-radius:14px;background:var(--th-bg);border:1px solid var(--th-border);color:var(--th-tx)}
+#expressLaneModal .ux-pair{display:flex;flex-direction:column;gap:10px;margin-top:14px}
+#expressLaneModal .ux-text-link{display:block;margin:8px 2px 0 auto;padding:6px 0;min-height:0;border:0;background:none;color:var(--th-signal-bright);font-size:.8rem;font-weight:600;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+#expressLaneModal .ux-card .fastlane-trust{margin:8px 4px 0;font-size:.78rem;line-height:1.5;color:var(--th-tx3)}#expressLaneModal .fastlane-trust b{color:var(--th-tx)}
+#expressLaneModal #expressCreds{margin-top:16px}#expressLaneModal .fastlane-credential-head label{font-size:.84rem;font-weight:600;color:var(--th-tx2)}
+#expressLaneModal .ux-host-row{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:16px}.ux-host-label{font-size:.84rem;font-weight:600;color:var(--th-tx2)}
+.ux-host-chip{margin-left:auto;font-family:var(--font-mono);font-size:.68rem;padding:3px 9px;border-radius:99px;border:1px solid var(--th-border-strong);color:var(--th-tx3);white-space:nowrap}#expressLaneModal .ux-host-row>select{flex:1 1 100%;min-width:0}
+#expressLaneModal .ux-text-row{display:flex;align-items:center;gap:10px;width:100%;margin-top:12px;padding:12px 4px;min-height:44px;border:0;border-top:1px solid var(--th-border);background:none;color:var(--th-tx2);font-size:.86rem;font-weight:600;text-align:left;cursor:pointer}
+#expressLaneModal .ux-text-row #expressExtrasCount{font-family:var(--font-mono);font-size:.7rem;color:var(--th-signal-bright)}
+#expressLaneModal .ux-more{margin:24px 0 0;border:1px solid var(--th-border);border-radius:20px;background:var(--th-card-alt)}
+#expressLaneModal .ux-more>summary{min-height:60px;padding:14px 18px;font-family:var(--font-sans);font-size:.95rem}
+#expressLaneModal .ux-more-title{font-weight:700;color:var(--th-tx)}#expressLaneModal .ux-more .ux-advanced-hint{width:100%;order:3;font-size:.76rem;color:var(--th-tx3);font-family:var(--font-sans)}
 #expressLaneModal .ux-advanced>.ux-toggle-row{width:auto}
-@media(max-width:640px){#expressLaneModal .fastlane-title{font-size:1.3rem}#expressLaneModal .fastlane-head .fastlane-sub{display:none}}
-
-/* Phone layout: each step is a card with its label above it; choices are full-width rows with a logo. */
-#expressLaneModal .fl-ico{display:none}
+#expressLaneModal .ux-review{margin:26px 0 0}#expressLaneModal .ux-sum{display:flex;flex-wrap:wrap;gap:6px;text-align:left}
+#expressLaneModal .ux-chip{padding:5px 11px;border-radius:99px;border:1px solid var(--th-border);background:var(--th-card-alt);font-size:.74rem;color:var(--th-tx2)}
+#expressLaneModal .ux-chip.ok{color:var(--th-green);border-color:currentColor}#expressLaneModal .ux-chip.warn{color:#d97706;border-color:currentColor}
+#expressLaneModal .ux-review .rv-telemetry{margin:12px 0 0;padding:8px 2px;min-height:0;border:0;background:none;font-size:.76rem}
+#expressLaneModal .ux-v2 .fastlane-foot{margin-top:22px;padding-top:0;border:0}
+#expressLaneModal .ux-v2 .fastlane-go{min-height:58px;border:0;border-radius:18px;background:var(--qi-grad);color:#03151b;font-size:1.04rem;font-weight:800;letter-spacing:-.01em;box-shadow:0 12px 32px var(--qi-glow)}
+[data-theme='light'] #expressLaneModal .ux-v2 .fastlane-go{color:#fff}
 @media(max-width:640px){
-#expressLaneModal .ux-section{position:relative;margin:34px 0 0;padding:16px;border:1px solid var(--th-border);border-radius:16px;background:var(--th-card-alt)}
-#expressLaneModal .ux-section h2{position:absolute;top:-24px;left:2px;margin:0;font-family:var(--font-mono);font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--th-signal-bright)}
-#expressLaneModal .ux-section-heading nav{display:none}
-#expressLaneModal .fastlane-grid.services:not(.ux-pill-grid){grid-template-columns:1fr;gap:10px}
-#expressLaneModal .fastlane-choice:has(.fl-ico){display:grid;grid-template-columns:32px 1fr;column-gap:14px;align-items:center;min-height:64px;padding:12px 14px}
-#expressLaneModal .fastlane-choice .fl-ico{display:flex;grid-row:1/3;width:32px;height:32px;align-items:center;justify-content:center}#expressLaneModal .fl-ico svg{width:32px;height:32px}
-#expressLaneModal .fastlane-choice:has(.fl-ico)>b{align-self:end}#expressLaneModal .fastlane-choice:has(.fl-ico)>span:not(.fl-ico){align-self:start}
-#expressLaneModal .ux-advanced{margin-top:24px}#expressLaneModal .ux-review-summary{margin-top:24px;padding:16px;border:1px solid var(--th-border);border-radius:16px;background:var(--th-card-alt)}
+#expressLaneModal .ux-v2{padding:0 16px;border:0;border-radius:0}
+#expressLaneModal .ux-hero{padding-top:max(8px,env(safe-area-inset-top))}
+#expressLaneModal .ux-wordmark{font-size:1.7rem}#expressLaneModal .ux-hero .ux-core-mark{width:34px;height:34px}
+#expressLaneModal .ux-rows{grid-template-columns:1fr}
+#expressLaneModal .ux-v2 .fastlane-foot{background:linear-gradient(transparent,var(--th-card) 28%);padding-top:18px}
 }
-@media(max-width:640px){#expressLaneModal .fastlane-head{margin-inline:0;padding:12px 2px}}
+@media(prefers-reduced-motion:reduce){#expressLaneModal .ux-seg>button,#expressLaneModal .ux-rows .fastlane-choice{transition:none}}

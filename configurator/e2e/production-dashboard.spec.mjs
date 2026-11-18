@@ -15,9 +15,10 @@ async function boot(page) {
   return errors;
 }
 
-test('Quick install keeps the four basics up front, every install target, and working delivery modes', async ({ page }) => {
+test('Quick install shows three steps up front, every install target, and working delivery modes', async ({ page }) => {
   const errors = await boot(page);
-  await expect(page.locator('#expressLaneModal section.ux-section')).toHaveCount(4);
+  await expect(page.locator('#expressLaneModal section.ux-step')).toHaveCount(3);
+  await expect(page.locator('[data-express-mode="direct"]')).toBeVisible();
   for (const id of ['#expressHost', '[data-express-profile="balanced"]', '[data-express-cache="mixed"]', '[data-express-target="app"]']) await expect(page.locator(id)).toBeVisible();
   await expect(page.locator('#expressAdvanced')).not.toHaveAttribute('open', '');
   await expect(page.locator('#expressOutputProfile')).toHaveValue('stable');

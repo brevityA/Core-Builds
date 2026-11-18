@@ -1,10 +1,10 @@
 export const CHANGELOG = [
   { v:'3.33', date:'Nov 18 2026', items:[
-    'Quick install, redesigned — a darker, calmer panel with clear section headings, bigger tap targets and full keyboard support (arrow keys move between choices). The four choices most people make stay on the first screen: service, what matters most, streams shown and where to install.',
-    'Options & defaults — device, resolution, connection speed, template profile, delivery, language, Full stack, Clean reinstall and TMDB now sit together in one collapsed panel.',
+    'Quick install, redesigned — three steps, each a labelled card: where to install, your service, and your preferences. Apps and services are full-width rows with their logo; what matters most and streams shown are one-tap switches. Bigger tap targets and full keyboard support throughout.',
+    'Delivery up front — Direct Install, Manifest URL or Raw JSON is the first switch in step 1. Device, resolution, connection speed, template profile, language, Full stack, Clean reinstall and TMDB sit together under Options & defaults.',
     'Connection speed presets — pick 25, 50, 100 or 250 Mbps, or type your own; the bitrate cap is set to 80% of it, as before.',
     'Paste and show buttons on key fields — every provider key, TMDB and manifest field gets a Paste button and a show/hide toggle.',
-    'Raw JSON from Quick install — under Delivery, export the template file without signing in to Stremio or contacting a host.',
+    'Raw JSON from Quick install — export the template file without signing in to Stremio or contacting a host.',
     'Install progress you can trust — a progress dialog ticks each step (host check, regex check, save, install) only after it really finishes, and marks a check it could not run as not verified.',
     'Every install target kept — Stremio, Nuvio, WuPlay, Chillio and Other app all stay in Quick install and on the Review screen.',
     'Generated output unchanged — every config the configurator and the CLI build is byte-for-byte what 3.32 produced apart from the version stamp; only the interface changed.',

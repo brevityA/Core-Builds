@@ -1,18 +1,16 @@
 # Quick install dashboard
 
-The full custom builder is unchanged. Quick install keeps the four choices most
-people make on its first screen, and keeps everything else under one collapsed
-**Options & defaults** panel.
+The full custom builder is unchanged. Quick install is three labelled steps (install to, service, preferences) with
+everything else under one collapsed **Options & defaults** panel.
 
-| Section | Controls | Existing integration |
+| Step | Controls | Existing integration |
 | --- | --- | --- |
-| 1 · Service | Provider cards, provider keys (paste + show/hide), AIOStreams host with live health chip, additional services | `renderCreds`, `probeExpressHost`, `resolveInstallHost` |
-| 2 · What matters most | Fast / Balanced / Maximum | `applyQuickProfile` |
-| 3 · Streams shown | Mixed / Cached only | `S.cacheMode` |
-| 4 · Install to | Stremio, Nuvio, WuPlay, Chillio, Other app; Stremio sign-in when Stremio is picked | `runExpressInstall`, `simpleInstall` |
-| Options & defaults | Device, resolution, connection speed, template profile, delivery (Direct / Manifest URL / Raw JSON), language, Full stack, Clean reinstall, TMDB, "Defaults we'll use" | `applyExpressChoices`, `OUTPUT_PROFILE_INFO`, `set-bandwidth`, `generate` |
+| 1 · Install to | Delivery switch (Direct Install / Manifest URL / Raw JSON); Stremio, Nuvio, WuPlay, Chillio, Other app as logo rows; Stremio sign-in when Stremio + Direct | `runExpressInstall`, `simpleInstall`, `generate` |
+| 2 · Service | Provider rows with logos, keys (paste + show/hide), AIOStreams host with live health chip, additional services | `renderCreds`, `probeExpressHost`, `resolveInstallHost` |
+| 3 · Preferences | What matters most (Fast / Balanced / Maximum) and Streams shown (Mixed / Cached only) as segmented switches with a one-line hint | `applyQuickProfile`, `S.cacheMode` |
+| Options & defaults | Device, resolution, connection speed, template profile, language, Full stack, Clean reinstall, TMDB, "Defaults we'll use" | `applyExpressChoices`, `OUTPUT_PROFILE_INFO`, `set-bandwidth` |
 
-Below the panel: the review summary, the usage-statistics consent and the install button.
+Below the panel: the build summary as chips, the usage-statistics consent and the install button.
 
 ## Invariants
 
