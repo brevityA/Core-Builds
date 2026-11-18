@@ -33,7 +33,7 @@ tests/
 
 ```bash
 npm ci
-npm run dev          # Local server on :8080 serving src/
+npm run dev          # Local server on :8080 at /configurator/src/ (serves the repo root, so ../tools/ resolves)
 npm test             # Unit tests
 npm run validate     # Static validation
 npm run build        # Full standalone + web build

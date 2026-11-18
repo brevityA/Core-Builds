@@ -5,7 +5,7 @@
 // it with <script src="…/core-nav.js" defer> and it mounts itself, resolving
 // links from its own location. The configurator bundles it and calls
 // window.CoreNav.mount() itself; it hides on the configurator's main page,
-// which lists these routes already.
+// whose rows and All Core Tools cover these routes.
 //
 // Wrapped in an IIFE so none of its names reach a page's global scope.
 // No dependencies; styles are injected once, and every page's CSP
@@ -179,7 +179,11 @@ function mountCoreNav({ root, hideOn, anchor, markCurrent = true } = {}) {
   drawer.querySelector('.cbn-close').addEventListener('click', () => close());
   // A link to another hash on this page (the configurator's #advanced, #tour…)
   // does not unload it, so close the drawer before the action runs.
-  drawer.addEventListener('click', (e) => { if (e.target.closest('a')) close(false); });
+  drawer.addEventListener('click', (e) => {
+    const link = e.target.closest('a');
+    // A new-tab link leaves this page open, so hand focus back to the Menu button.
+    if (link) close(link.target === '_blank');
+  });
   document.addEventListener('keydown', (e) => {
     if (!isOpen()) return;
     if (e.key === 'Escape') { e.preventDefault(); close(); return; }

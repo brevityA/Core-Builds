@@ -3125,18 +3125,19 @@ document.addEventListener('DOMContentLoaded', () => {
   if (!_genieRoute && !_badgeBuilderRoute) {
     try { handleDeepLink(location.hash); } catch(e) { logError('deeplink', e.message, { hash: location.hash }); }
     window.addEventListener('hashchange', () => { try { handleDeepLink(location.hash); } catch(e) { logError('deeplink', e.message, { hash: location.hash }); } });
-    // Site menu on every screen but the main page, which lists the same routes.
-    // It sits at the start of the wizard header, and hides while Quick install
-    // or a dialog is open. Same file the tool pages load (tools/core-nav.js).
-    try {
-      window.CoreNav.mount({
-        root: new URL('../', location.href),
-        anchor: document.querySelector('.wrap > .hdr'),
-        markCurrent: false,
-        hideOn: () => !!document.querySelector('.hybrid-splash, #expressLaneModal, .modal-overlay'),
-      });
-    } catch(e) { logError('core-nav', e.message); }
   }
+  // Site menu on every screen but the main page (its rows and All Core Tools
+  // cover these routes). It sits at the start of the wizard header and hides
+  // while Quick install or a dialog is open. Mounted on every start-up path,
+  // Genie and Badge Builder hand-offs included. Same file the tool pages load.
+  try {
+    window.CoreNav.mount({
+      root: new URL('../', location.href),
+      anchor: document.querySelector('.wrap > .hdr'),
+      markCurrent: false,
+      hideOn: () => !!document.querySelector('.hybrid-splash, #expressLaneModal, .modal-overlay'),
+    });
+  } catch(e) { logError('core-nav', e.message); }
   if (_genieRoute) {
     setTimeout(() => {
       try {
@@ -3186,6 +3187,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Keyboard shortcuts: Enter = next, Escape = back, Arrows = navigate options, Ctrl+/ = help
   document.addEventListener('keydown', (e) => {
+    // The site menu handles its own keys: Enter on its button or a link must not
+    // advance the wizard, and Escape that closes it must not also go Back.
+    if (document.documentElement.classList.contains('cbn-open') || (e.target && e.target.closest && e.target.closest('.cbn-btn, .cbn-drawer'))) return;
     if ((e.ctrlKey || e.metaKey) && (e.key === '/' || e.key === '?' || e.code === 'Slash')) { e.preventDefault(); showShortcutsModal(); return; }
     if (_tutStep >= 0) { if (e.key === 'Escape') tutClose(); else if (e.key === 'ArrowRight' || e.key === 'Enter') document.getElementById('tutNext')?.click(); else if (e.key === 'ArrowLeft') document.getElementById('tutBack')?.click(); return; }
 

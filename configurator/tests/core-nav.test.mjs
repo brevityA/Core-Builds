@@ -94,3 +94,28 @@ test('it is a classic script that leaks nothing but window.CoreNav', () => {
     assert.equal(vm.runInContext(`typeof ${name}`, context), 'undefined', `${name} reached the global scope`);
   }
 });
+
+test('wizard shortcuts leave the menu alone (Enter on Menu, Escape that closes it)', () => {
+  const start = app.indexOf("document.addEventListener('keydown', (e) => {\n    // The site menu handles its own keys");
+  assert.ok(start >= 0, 'wizard keydown guard missing');
+  const guard = app.slice(start, start + 400);
+  assert.match(guard, /classList\.contains\('cbn-open'\)/);
+  assert.match(guard, /closest\('\.cbn-btn, \.cbn-drawer'\)/);
+});
+
+test('the configurator mounts the menu on every start-up path, hand-offs included', () => {
+  const guardOpen = app.indexOf('if (!_genieRoute && !_badgeBuilderRoute) {');
+  const guardClose = app.indexOf('\n  }\n', guardOpen);
+  const mount = app.indexOf('window.CoreNav.mount({');
+  assert.ok(guardOpen >= 0 && mount >= 0);
+  assert.ok(mount > guardClose, 'mount sits inside the deep-link guard');
+});
+
+test('a new-tab link hands focus back to the Menu button', () => {
+  assert.match(nav, /if \(link\) close\(link\.target === '_blank'\);/);
+});
+
+test('npm run dev serves the repo root so ../tools/core-nav.js resolves', () => {
+  const pkg = JSON.parse(readFileSync(join(ROOT, 'configurator', 'package.json'), 'utf8'));
+  assert.match(pkg.scripts.dev, /http\.server 8080 -d \.\./);
+});
