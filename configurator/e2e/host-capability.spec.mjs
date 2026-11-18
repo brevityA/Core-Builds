@@ -62,7 +62,7 @@ test.describe('host capability gate', () => {
     await page.evaluate(() => { localStorage.clear(); localStorage.setItem('cb_tut_seen', '1'); });
     await page.reload();
     await page.waitForTimeout(950);
-    await page.locator('[data-action="custom-start"]').click();
+    await page.evaluate(() => { location.hash = ''; location.hash = '#advanced'; }); // deep link (the main page has no menu)
 
     for (const id of ['p2p', 'http']) {
       const card = page.locator(`.opt-scraper-card[data-svc-id="${id}"]`);

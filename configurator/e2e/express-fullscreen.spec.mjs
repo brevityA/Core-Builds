@@ -52,7 +52,8 @@ test('on a phone the lane fills the screen with Back and a pinned Install button
   expect(go.y + go.height).toBeLessThanOrEqual(vp.height);
   const row = await page.locator('[data-express-service="torbox-pro"]').boundingBox();
   expect(row.height).toBeGreaterThanOrEqual(60);
-  expect(row.width).toBeGreaterThan(vp.width - 40);
+  // Rows fill their step card (16px page gutter + 16px card padding each side).
+  expect(row.width).toBeGreaterThan(vp.width - 72);
 });
 
 test('on desktop the lane stays a centred panel with its close button', async ({ page }, testInfo) => {
@@ -84,6 +85,7 @@ test('a Defaults row opens Custom build with the Quick picks kept', async ({ pag
   await page.locator('#splashStart [data-action="open-express-lane"]').click();
   await page.locator('[data-express-service="realdebrid"]').click();
   await page.locator('[data-express-cred="realdebrid"]').fill('rd-test-key');
+  await page.locator('#expressAdvanced > summary').click();
   await page.locator('[data-express-customize="ft-layout"]').click();
 
   await expect(page.locator('#expressLaneModal')).toHaveCount(0);
@@ -105,6 +107,7 @@ test('a Defaults row opens Custom build with the Quick picks kept', async ({ pag
 test('Customize every setting opens Fine-Tune at the top', async ({ page }) => {
   await fresh(page);
   await page.locator('#splashStart [data-action="open-express-lane"]').click();
+  await page.locator('#expressAdvanced > summary').click();
   await page.locator('#expressLaneModal .fastlane-customize').click();
   await expect(page.locator('#advancedDrawer')).toBeVisible();
   await expect(page.locator('#advancedDrawer [data-action="close-advanced"]')).toBeInViewport();
