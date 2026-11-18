@@ -1846,6 +1846,15 @@ function ftJumpTo(id, smooth = true) {
   const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   target.scrollIntoView({ block: 'start', behavior: smooth && !reduced ? 'smooth' : 'auto' });
   syncFtJump(id);
+  // A jump made while the drawer is still sliding in (Quick install, #cards) is
+  // measured mid-animation; once it settles, make sure the heading clears the bar.
+  if (!smooth) setTimeout(() => {
+    const panel = target.closest('.advanced-drawer-panel');
+    if (!panel || !bar) return;
+    const gap = target.getBoundingClientRect().top - bar.getBoundingClientRect().bottom;
+    if (gap < 8) panel.scrollTop -= 8 - gap;
+    syncFtJump(id);
+  }, 220);
   return true;
 }
 
@@ -8149,8 +8158,9 @@ function showExpressLane() {
       try { history.replaceState({ step }, ''); } catch(err) {}
       saveState(); render(); window.scrollTo(0, 0);
       openAdvancedDrawer(document.querySelector('[data-action="open-advanced"]'));
-      const target = customizeBtn.dataset.expressCustomize && document.getElementById(customizeBtn.dataset.expressCustomize);
-      if (target) requestAnimationFrame(() => target.scrollIntoView({ block: 'start' }));
+      // Same landing as the section chips: just under the pinned header and bar.
+      const sectionId = customizeBtn.dataset.expressCustomize;
+      if (sectionId) requestAnimationFrame(() => ftJumpTo(sectionId, false));
       showToast('Your Quick install choices are kept — change anything, then install from Review');
       return;
     }
