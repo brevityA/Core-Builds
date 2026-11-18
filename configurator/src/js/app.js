@@ -1,4 +1,5 @@
 import { ICO } from '../data/icons.js';
+import { BRAND_GLYPHS } from '../data/brand-glyphs.js';
 import { CHANGELOG } from '../data/changelog.js';
 import { FORMATTERS, AUDIO_HELP } from '../data/formatters.js';
 import { OPTIONAL_SCRAPER_DEFS, presetRole, withPenguplay } from '../data/scrapers.js';
@@ -7655,9 +7656,13 @@ const EXPRESS_PROFILES = [
   ['maximum', 'Maximum', 'Best picture · widest search · any file size'],
 ];
 // Logos for the phone layout's list rows (hidden on wider screens).
+// Core Builds Icon Pack glyphs where the pack has one; the configurator's own icons otherwise.
+const EXPRESS_GLYPH = { app:'stremio', nuvio:'nuvio', wuplay:'wuplay', chillio:'chillio', 'torbox-pro':'torbox', realdebrid:'realdebrid', alldebrid:'alldebrid', premiumize:'premiumize' };
 function expressIcon(kind, v) {
+  const g = BRAND_GLYPHS[EXPRESS_GLYPH[v]];
+  if (g) return `<span class="fl-ico fl-glyph" aria-hidden="true">${g}</span>`;
   if (kind === 'target') {
-    const t = { app: ICO.tv(28, '#8b5cf6'), nuvio: ICO.nuvio(28), wuplay: ICO.wuplay(28, '#a78bfa'), chillio: ICO.chillio(28, '#fb923c'), manifest: ICO.link(28, 'currentColor') }[v];
+    const t = { manifest: ICO.link(28, 'currentColor') }[v];
     return t ? `<span class="fl-ico" aria-hidden="true">${t}</span>` : '';
   }
   const opt = DEFS.find(d => d.key === 'service')?.opts.find(o => o.v === v);
@@ -7754,8 +7759,9 @@ function showExpressLane() {
   overlay.className = 'fastlane-overlay';
   overlay.innerHTML = `<div class="fastlane-panel fastlane-express ux-v2" role="dialog" aria-modal="true" aria-labelledby="expressTitle">
     <div class="fastlane-head ux-hero"><button class="fastlane-back" type="button" data-express-back aria-label="Back">&larr; Back</button>
-      <div class="ux-hero-copy"><svg class="ux-core-mark" viewBox="0 0 44 44" aria-hidden="true"><defs><linearGradient id="uxCoreGradient" x2="1" y2="1"><stop stop-color="#4facfe"/><stop offset=".5" stop-color="#8a4890"/><stop offset="1" stop-color="#c03a20"/></linearGradient></defs><path d="M22 3 39 13v18L22 41 5 31V13Z" fill="none" stroke="currentColor" stroke-width="2"/><path d="m22 12 10 10-10 10-10-10Z" fill="url(#uxCoreGradient)"/></svg><div class="ux-wordmark" id="expressTitle">Core <span>Builds</span></div><p class="ux-tagline">Quick install · working streams in about 30 seconds</p><p class="ux-ver">v${CONFIGURATOR_VERSION} · <a href="https://core-builds.mintlify.app/" target="_blank" rel="noopener noreferrer">Docs</a></p></div>
+      <div class="ux-hero-copy"><span class="ux-core-mark">${BRAND_GLYPHS.corebuilds}</span><div class="ux-wordmark" id="expressTitle">Core <span>Builds</span></div><p class="ux-tagline">Quick install · working streams in about 30 seconds</p><p class="ux-ver">v${CONFIGURATOR_VERSION} · <a href="https://core-builds.mintlify.app/" target="_blank" rel="noopener noreferrer">Docs</a></p></div>
       <button class="fastlane-close" id="expressClose" aria-label="Close">✕</button></div>
+    <div class="ux-body"><div class="ux-main">
     <section class="ux-step" id="ux-target" aria-labelledby="ux-target-title"><h2 class="ux-step-label" id="ux-target-title">Step 1 <b>Install to</b></h2>
       <div class="ux-card">
         <div class="ux-seg" role="group" aria-label="Delivery mode">${[['direct','Direct Install'],['manifest','Manifest URL'],['json','Raw JSON']].map(([v,n]) => `<button type="button" data-express-mode="${v}" aria-pressed="${state.mode===v}">${n}</button>`).join('')}</div><p class="ux-hint" id="expressModeHelp"></p>
@@ -7823,9 +7829,11 @@ function showExpressLane() {
       <button type="button" class="fastlane-customize" data-express-customize="">Customize every setting →</button>
       </div>
     </details>
+    </div><aside class="ux-aside">
     <section class="ux-review" aria-labelledby="ux-review-title"><h3 class="ux-step-label" id="ux-review-title">Your build</h3><div id="expressSummary" class="fastlane-summary ux-sum"></div>${telemetryHtml()}</section>
     <div class="fastlane-foot">
       <button class="fastlane-go" id="expressGo" style="width:100%">Install in ~30 seconds</button><div class="u-mt10" id="aioResult"></div><button id="btnAutoCreate" style="display:none" aria-hidden="true"></button></div>
+    </aside></div>
   </div>`;
   document.body.appendChild(overlay);
   try { history.pushState({ ...(history.state || {}), expressLane: true }, ''); } catch(e) {}

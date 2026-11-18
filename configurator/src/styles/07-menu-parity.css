@@ -155,7 +155,7 @@ html{background:var(--th-bg)}body{font-feature-settings:'cv02','cv03','cv04','cv
 
 /* Quick install v2: a calm, single-column flow in Core Builds' signal colours.
    Each step is a labelled card; choices are logo rows or segmented switches; one glowing Install button. */
-#splashStart .start-quick .start-card-title{padding-right:108px}
+#splashStart .start-card-badge{position:static;grid-column:2;justify-self:start;margin:0 0 2px}
 [data-theme='light'] :is(#btn-dl,.fastlane-go,.btn-next,.btn-manifest:not([style]):not(.btn-chillio),#splashStart .start-quick){color:#fff}
 [data-theme='light'] #splashStart .start-quick .start-card-desc{color:rgba(255,255,255,.9)}[data-theme='light'] #splashStart .start-quick :is(.start-card-icon,.start-card-badge){color:#fff;background:rgba(255,255,255,.16)}
 .hybrid-lede strong{color:var(--th-tx)}.u-relrow>.input-eye-btn{display:flex;align-items:center;justify-content:center}
@@ -218,3 +218,20 @@ html{background:var(--th-bg)}body{font-feature-settings:'cv02','cv03','cv04','cv
 #expressLaneModal .ux-v2 .fastlane-foot{background:linear-gradient(transparent,var(--th-card) 28%);padding-top:18px}
 }
 @media(prefers-reduced-motion:reduce){#expressLaneModal .ux-seg>button,#expressLaneModal .ux-rows .fastlane-choice{transition:none}}
+/* Icon Pack glyphs + a desktop layout: steps on the left, the build and Install pinned on the right. */
+#expressLaneModal .ux-core-mark{display:flex}#expressLaneModal .ux-core-mark svg,#expressLaneModal .fl-glyph svg{width:100%;height:100%}
+#expressLaneModal .ux-rows .fl-glyph{width:28px;height:28px}
+@media(min-width:1024px){
+#expressLaneModal .ux-v2{width:min(1120px,100%);max-width:1120px;padding:0 32px 28px}
+#expressLaneModal .ux-hero{grid-template-columns:1fr auto;padding:24px 0 6px}
+#expressLaneModal .ux-hero-copy{grid-column:1;grid-row:1;flex-direction:row;flex-wrap:wrap;align-items:center;justify-content:flex-start;gap:4px 14px;text-align:left}
+#expressLaneModal .ux-hero .ux-core-mark{width:38px;height:38px;margin:0}#expressLaneModal .ux-wordmark{font-size:1.75rem}
+#expressLaneModal .ux-tagline{margin:0;padding-left:14px;border-left:1px solid var(--th-border)}#expressLaneModal .ux-ver{margin-left:auto}
+#expressLaneModal .ux-body{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:32px;align-items:start}
+#expressLaneModal .ux-rows{grid-template-columns:repeat(3,minmax(0,1fr))}
+#expressLaneModal .ux-aside{position:sticky;top:20px;margin-top:30px;padding:20px;border:1px solid var(--th-border);border-radius:20px;background:var(--th-card-alt)}
+#expressLaneModal .ux-aside .ux-review{margin:0}#expressLaneModal .ux-aside .ux-step-label{margin-left:0}
+#expressLaneModal .ux-v2 .ux-aside .fastlane-foot{position:static;margin-top:18px;padding:0;background:none;box-shadow:none}
+}
+#expressLaneModal .ux-field-label .ft-info{min-height:0;width:18px;height:18px;padding:0;display:inline-grid;place-items:center;border-radius:50%;font-size:.66rem;line-height:1}
+@media(max-width:1023px){#expressLaneModal :is(.ux-body,.ux-main,.ux-aside){display:contents}}
