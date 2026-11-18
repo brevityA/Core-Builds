@@ -5,7 +5,7 @@
     "description": "Self-hosted variant of the 4K Apex flagship. Identical ESE/PSE/ISE stack. Uses synced ranked regex URL instead of inline patterns — auto-updates, 27 KB lighter. Requires Core Builds regex URL whitelisted on instance.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "0.1.2",
+    "version": "0.1.3",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -17,6 +17,11 @@
       "v232Action": "remove legacy preset; configure the separate Newznab endpoint only after validation"
     },
     "changelog": [
+      {
+        "date": "2026-11-15",
+        "version": "0.1.3",
+        "content": "SD and untagged releases now fill in when fewer than five cached HD results exist, instead of being removed outright (older shows such as Arthur returned nothing); episode size floor is 30 MB for SD and untagged files and 150 MB at 720p; 1080p and above keep the old 1024 MB floor; per-add-on caps (Comet 5→10, Meteor 5→3) apply only once 10 cached results exist; ranked expressions score resolution, source, audio and release group, and the favourite-groups entry is rewritten so it matches; 720p episode floor lowered to 150 MB, as the size-floor change intended; the Comet cap now applies to the Comet RD and Comet TB instances too."
+      },
       {
         "date": "2026-10-23",
         "version": "0.1.2",
@@ -38,14 +43,10 @@
     ],
     "excludedResolutions": [
       "144p",
-      "240p",
-      "360p"
+      "240p"
     ],
     "includedResolutions": [],
-    "requiredResolutions": [
-      "2160p",
-      "1080p"
-    ],
+    "requiredResolutions": [],
     "preferredResolutions": [
       "2160p",
       "1440p",
@@ -226,7 +227,7 @@
     "excludeUncachedFromStreamTypes": [],
     "excludedStreamExpressions": [
       {
-        "expression": "/*Per-Addon Flood Guard*/ merge(slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Meteor'),5),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Comet RD'),5),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'MediaFusion'),4),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Torrent Galaxy'),1),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'EZTV'),3),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Knaben'),1),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'HdHub'),3),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'TorrentsDB'),1))",
+        "expression": "/*Per-Addon Flood Guard*/ count(cached(streams)) >= 10 ? merge(slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Meteor'),3),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Comet RD'),10),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'MediaFusion'),4),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Torrent Galaxy'),1),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'EZTV'),3),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'Knaben'),1),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'HdHub'),3),slice(addon(negate(merge(library(streams),seadex(streams)),cached(streams)),'TorrentsDB'),1)) : []",
         "enabled": true
       },
       {
@@ -308,6 +309,10 @@
       {
         "expression": "/* CB | Hard External Kill */ type(streams, 'external')",
         "enabled": true
+      },
+      {
+        "enabled": true,
+        "expression": "/* CB | SD Fallback — SD and untagged releases only when fewer than 5 cached 2160p/1080p remain */ count(cached(resolution(streams,'2160p','1080p'))) >= 5 ? negate(merge(library(streams),seadex(streams)),resolution(streams,'1440p','720p','576p','480p','360p','Unknown')) : []"
       },
       {
         "enabled": true,
@@ -422,7 +427,88 @@
         "enabled": true
       }
     ],
-    "rankedStreamExpressions": [],
+    "rankedStreamExpressions": [
+      {
+        "enabled": true,
+        "expression": "/* RSE 2160p */ resolution(streams,'2160p')",
+        "score": 330
+      },
+      {
+        "enabled": true,
+        "expression": "/* RSE 1080p */ resolution(streams,'1080p')",
+        "score": 80
+      },
+      {
+        "enabled": true,
+        "expression": "/* RSE Bluray REMUX */ quality(streams,'Bluray REMUX')",
+        "score": 300
+      },
+      {
+        "enabled": true,
+        "expression": "/* RSE Bluray */ quality(streams,'Bluray')",
+        "score": 180
+      },
+      {
+        "enabled": true,
+        "expression": "/* RSE WEB-DL */ quality(streams,'WEB-DL')",
+        "score": 120
+      },
+      {
+        "enabled": true,
+        "expression": "/* RSE Dolby Vision */ visualTag(streams,'DV','Dolby Vision')",
+        "score": 120
+      },
+      {
+        "enabled": true,
+        "expression": "/* RSE HDR */ visualTag(streams,'HDR10+','HDR10','HDR')",
+        "score": 80
+      },
+      {
+        "enabled": true,
+        "expression": "/* RSE Atmos */ audioTag(streams,'Atmos','Dolby Atmos')",
+        "score": 150
+      },
+      {
+        "enabled": true,
+        "expression": "/* RSE Lossless Audio */ audioTag(streams,'TrueHD','DTS-HD MA','DTS:X')",
+        "score": 150
+      },
+      {
+        "enabled": true,
+        "expression": "/* RSE DD+ */ audioTag(streams,'DD+','DDP')",
+        "score": 50
+      },
+      {
+        "enabled": true,
+        "expression": "/* RSE Elite Remux Groups */ releaseGroup(streams,'FraMeSToR','BLURANiUM','BiZKiT','PmP','ZQ','CiNEPHiLES','ABBIE','AJP69','APEX','BLUTONiUM','NTb','NTG','RAWR','SiC','TEPES','FLUX','Kitsune','W4NK3R','HiFi')",
+        "score": 250
+      },
+      {
+        "enabled": true,
+        "expression": "/* RSE Web T1 Groups */ releaseGroup(streams,'dB','Flights','MiU','monkee','MZABI','PHOENiX','playWEB','SbR','SMURF','TOMMY','XEBEC')",
+        "score": 200
+      },
+      {
+        "enabled": true,
+        "expression": "/* RSE Web T2 Groups */ releaseGroup(streams,'BLOOM','Dooky','GNOMiSSiON','HHWEB','NINJACENTRAL','NPMS','ROCCaT','SiGMA','SLiGNOME','SwAgLaNdEr')",
+        "score": 150
+      },
+      {
+        "enabled": true,
+        "expression": "/* RSE SeaDex */ seadex(streams)",
+        "score": 200
+      },
+      {
+        "enabled": true,
+        "expression": "/* RSE LQ Groups */ releaseGroup(streams,'YIFY','RARBG','EVO','YTS','PSA','MeGusta','Tigole')",
+        "score": -150
+      },
+      {
+        "enabled": true,
+        "expression": "/* RSE Upscaled */ keyword(streams,'all','upscale','upscaled','ai upscale')",
+        "score": -200
+      }
+    ],
     "rankedRegexPatterns": [],
     "regexOverrides": [
       {
@@ -723,6 +809,10 @@
           "direction": "desc"
         },
         {
+          "key": "streamExpressionScore",
+          "direction": "desc"
+        },
+        {
           "key": "seadex",
           "direction": "desc"
         },
@@ -785,6 +875,10 @@
           "direction": "desc"
         },
         {
+          "key": "streamExpressionScore",
+          "direction": "desc"
+        },
+        {
           "key": "seadex",
           "direction": "desc"
         },
@@ -844,6 +938,10 @@
         },
         {
           "key": "streamExpressionMatched",
+          "direction": "desc"
+        },
+        {
+          "key": "streamExpressionScore",
           "direction": "desc"
         },
         {
@@ -913,6 +1011,10 @@
           "direction": "desc"
         },
         {
+          "key": "streamExpressionScore",
+          "direction": "desc"
+        },
+        {
           "key": "library",
           "direction": "desc"
         },
@@ -968,6 +1070,10 @@
         },
         {
           "key": "streamExpressionMatched",
+          "direction": "desc"
+        },
+        {
+          "key": "streamExpressionScore",
           "direction": "desc"
         },
         {
@@ -1033,6 +1139,10 @@
           "direction": "desc"
         },
         {
+          "key": "streamExpressionScore",
+          "direction": "desc"
+        },
+        {
           "key": "seadex",
           "direction": "desc"
         },
@@ -1092,6 +1202,10 @@
         },
         {
           "key": "streamExpressionMatched",
+          "direction": "desc"
+        },
+        {
+          "key": "streamExpressionScore",
           "direction": "desc"
         },
         {
@@ -1176,7 +1290,7 @@
           150000000000
         ],
         "series": [
-          1073741824,
+          31457280,
           80000000000
         ]
       },
@@ -1207,8 +1321,14 @@
             12000000000
           ],
           "series": [
-            268435456,
+            157286400,
             8000000000
+          ]
+        },
+        "1440p": {
+          "series": [
+            1073741824,
+            80000000000
           ]
         }
       }

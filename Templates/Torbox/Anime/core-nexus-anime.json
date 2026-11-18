@@ -5,11 +5,16 @@
     "description": "Dedicated anime template. SeaDex best releases · Dual audio · Nyaa-sourced · Sub + Dub aware. TorBox Essential.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "2.8.21",
+    "version": "2.8.22",
     "category": "Anime",
     "sourceUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime.json",
     "changelogUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md",
     "changelog": [
+      {
+        "date": "2026-11-15",
+        "version": "2.8.22",
+        "content": "Dolby Vision no longer earns a score on this SDR-first line (it outranked SDR, like the HDR bonus removed in the last version)."
+      },
       {
         "date": "2026-11-14",
         "version": "2.8.21",
@@ -1438,11 +1443,6 @@
       {
         "enabled": true,
         "expression": "/* RSE WEB-DL */ quality(streams,'WEB-DL')",
-        "score": 120
-      },
-      {
-        "enabled": true,
-        "expression": "/* RSE Dolby Vision */ visualTag(streams,'DV','Dolby Vision')",
         "score": 120
       },
       {
