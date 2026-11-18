@@ -221,7 +221,9 @@ html{background:var(--th-bg)}body{font-feature-settings:'cv02','cv03','cv04','cv
 /* Icon Pack glyphs + a desktop layout: steps on the left, the build and Install pinned on the right. */
 #expressLaneModal .ux-core-mark{display:flex}#expressLaneModal .ux-core-mark svg,#expressLaneModal .fl-glyph svg{width:100%;height:100%}
 #expressLaneModal .ux-rows .fl-glyph{width:28px;height:28px}
-@media(min-width:1024px){
+#expressLaneModal :is(.ux-body,.ux-main,.ux-aside){display:contents}
+@media(min-width:1000px){
+#expressLaneModal .ux-main,#expressLaneModal .ux-aside{display:block}
 #expressLaneModal .ux-v2{width:min(1120px,100%);max-width:1120px;padding:0 32px 28px}
 #expressLaneModal .ux-hero{grid-template-columns:1fr auto;padding:24px 0 6px}
 #expressLaneModal .ux-hero-copy{grid-column:1;grid-row:1;flex-direction:row;flex-wrap:wrap;align-items:center;justify-content:flex-start;gap:4px 14px;text-align:left}
@@ -234,4 +236,45 @@ html{background:var(--th-bg)}body{font-feature-settings:'cv02','cv03','cv04','cv
 #expressLaneModal .ux-v2 .ux-aside .fastlane-foot{position:static;margin-top:18px;padding:0;background:none;box-shadow:none}
 }
 #expressLaneModal .ux-field-label .ft-info{min-height:0;width:18px;height:18px;padding:0;display:inline-grid;place-items:center;border-radius:50%;font-size:.66rem;line-height:1}
-@media(max-width:1023px){#expressLaneModal :is(.ux-body,.ux-main,.ux-aside){display:contents}}
+
+/* Landing v2: one calm list language for every way in (Duck Tools-style rows on phones),
+   in Core Builds' signal colours. Structure, ids and data-actions are unchanged. */
+.hybrid-splash{--lp-grad:linear-gradient(100deg,#22d3ee,#4facfe);--lp-glow:rgba(34,211,238,.18)}
+[data-theme='light'] .hybrid-splash{--lp-grad:linear-gradient(100deg,#0891b2,#2563eb);--lp-glow:rgba(8,145,178,.14)}
+.hybrid-splash .hybrid-core-stage{border:0;background:radial-gradient(circle at 50% 42%,var(--lp-glow),transparent 62%);box-shadow:none}
+.hybrid-splash .hybrid-core-stage::before{display:none}
+.hybrid-splash .hybrid-core-caption{position:static;text-align:center;padding:0 24px;line-height:1.7}
+.hybrid-splash #splashStart .start-quick{background:var(--lp-grad);border-color:transparent;box-shadow:0 12px 30px var(--lp-glow)}
+.hybrid-splash .splash-from-note{line-height:1.6}.hybrid-splash .splash-from-link{min-height:0;padding:0;vertical-align:baseline}
+.hybrid-splash .splash-presets{grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+.hybrid-splash .splash-preset-card{border-radius:16px}
+.hybrid-splash .splash-preset-detail{color:var(--th-tx3)}
+@media(max-width:599px){
+.hybrid-splash .hybrid-toplinks a{display:none}.hybrid-splash .hybrid-toplinks{-webkit-mask-image:none;mask-image:none;padding-right:0}
+.hybrid-splash .hybrid-hero{display:flex;flex-direction:column;align-items:stretch;gap:0;padding-top:18px;text-align:center}
+.hybrid-splash .hybrid-core-stage{order:-1;min-height:0;padding:6px 0 0}
+.hybrid-splash .hybrid-core-stage .splash-icon{width:92px;height:92px}
+.hybrid-splash .hybrid-core-caption,.hybrid-splash .hybrid-eyebrow,.hybrid-splash .hybrid-subnote{display:none}
+.hybrid-splash .hybrid-hero h1{font-size:2.15rem;line-height:1.05;margin:10px 0 12px;text-wrap:balance}
+.hybrid-splash .hybrid-lede{margin:0 auto;max-width:34ch;font-size:.9rem}
+.hybrid-splash .splash-start{gap:10px;margin-top:22px}
+.hybrid-splash .start-card{grid-template-columns:auto 1fr auto;align-items:center;min-height:72px;padding:14px 16px;border-radius:18px;text-align:left}
+.hybrid-splash .start-card::after{content:'→';grid-column:3;grid-row:1/span 3;align-self:center;font-size:1.1rem;opacity:.7}
+.hybrid-splash .start-card-icon{grid-row:1/span 3}.hybrid-splash .start-card-desc{font-size:.76rem}
+.hybrid-splash #splashStart .start-card-badge{display:none}
+.hybrid-splash #splashAltRoutes{display:flex;flex-direction:column;align-items:stretch;gap:10px;border-top:0;padding:4px 0 0;margin-top:18px}
+.hybrid-splash #splashAltRoutes .splash-alt-lead{margin:6px 4px 2px;text-align:left;font-family:var(--font-mono);font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:var(--th-signal-bright)}
+.hybrid-splash #splashAltRoutes .splash-tertiary-btn{display:flex;align-items:center;justify-content:space-between;min-height:56px;padding:0 18px;border:1px solid var(--th-border);border-radius:18px;background:var(--th-card);color:var(--th-tx);font-size:.92rem;font-weight:600;text-decoration:none;text-align:left}
+.hybrid-splash #splashAltRoutes .splash-tertiary-btn::after{content:'→';opacity:.6}
+.hybrid-splash .splash-from-note{margin:18px 4px 0;font-size:.78rem;color:var(--th-tx3)}
+.hybrid-splash .hybrid-trust{justify-content:center;flex-wrap:wrap;gap:6px 12px;margin-top:12px}
+.hybrid-splash .splash-presets{grid-template-columns:1fr;gap:10px}
+.hybrid-splash .splash-preset-card{display:grid;grid-template-columns:auto 1fr auto;column-gap:14px;align-items:center;min-height:64px;padding:12px 16px;text-align:left}
+.hybrid-splash .splash-preset-card::after{content:'→';grid-column:3;grid-row:1/span 2;opacity:.6}
+.hybrid-splash .splash-preset-icon{grid-row:1/span 2;margin:0}.hybrid-splash .splash-preset-name{margin:0}
+.hybrid-splash .splash-door{display:flex;align-items:center;gap:14px;min-height:64px;padding:12px 16px;border-radius:18px}
+.hybrid-splash .splash-door-icon{width:32px;height:32px;margin:0;flex:none}.hybrid-splash .splash-door-desc{display:none}
+.hybrid-splash .splash-door-title{font-size:.92rem}.hybrid-splash .splash-door-tag{display:none}
+.hybrid-splash #splashStart .start-card{min-height:72px;height:auto}
+.hybrid-splash .hybrid-section-head p:not(.hybrid-section-index){display:none}
+}

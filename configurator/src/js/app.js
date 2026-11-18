@@ -7759,7 +7759,7 @@ function showExpressLane() {
   overlay.className = 'fastlane-overlay';
   overlay.innerHTML = `<div class="fastlane-panel fastlane-express ux-v2" role="dialog" aria-modal="true" aria-labelledby="expressTitle">
     <div class="fastlane-head ux-hero"><button class="fastlane-back" type="button" data-express-back aria-label="Back">&larr; Back</button>
-      <div class="ux-hero-copy"><span class="ux-core-mark">${BRAND_GLYPHS.corebuilds}</span><div class="ux-wordmark" id="expressTitle">Core <span>Builds</span></div><p class="ux-tagline">Quick install · working streams in about 30 seconds</p><p class="ux-ver">v${CONFIGURATOR_VERSION} · <a href="https://core-builds.mintlify.app/" target="_blank" rel="noopener noreferrer">Docs</a></p></div>
+      <div class="ux-hero-copy"><span class="ux-core-mark">${BRAND_GLYPHS.corebuilds}</span><div class="ux-wordmark" id="expressTitle">Core <span>Builds</span></div><p class="ux-tagline">Quick install · working streams in about 30 seconds</p><p class="ux-ver">v${CONFIGURATOR_VERSION} · <a href="https://corebuilds-docs.docsalot.dev/" target="_blank" rel="noopener noreferrer">Docs</a></p></div>
       <button class="fastlane-close" id="expressClose" aria-label="Close">✕</button></div>
     <div class="ux-body"><div class="ux-main">
     <section class="ux-step" id="ux-target" aria-labelledby="ux-target-title"><h2 class="ux-step-label" id="ux-target-title">Step 1 <b>Install to</b></h2>

@@ -6,6 +6,8 @@ export const CHANGELOG = [
     'Paste and show buttons on key fields — every provider key, TMDB and manifest field gets a Paste button and a show/hide toggle.',
     'Raw JSON from Quick install — export the template file without signing in to Stremio or contacting a host.',
     'Install progress you can trust — a progress dialog ticks each step (host check, regex check, save, install) only after it really finishes, and marks a check it could not run as not verified.',
+    'A calmer main page — on a phone the Core mark and headline sit at the top, and every way in (Quick install, Custom build, update, import, tour, Genie, ready-made setups, tools) is one big row with an arrow. On desktop the ready-made setups sit four across and the core illustration loses its frame.',
+    'Core Builds Icon Pack glyphs — Stremio, Nuvio, WuPlay, Chillio, TorBox, Real-Debrid, AllDebrid and Premiumize use the Icon Pack’s own line icons in Quick install.',
     'Every install target kept — Stremio, Nuvio, WuPlay, Chillio and Other app all stay in Quick install and on the Review screen.',
     'Generated output unchanged — every config the configurator and the CLI build is byte-for-byte what 3.32 produced apart from the version stamp; only the interface changed.',
   ]},
