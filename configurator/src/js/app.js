@@ -2127,17 +2127,6 @@ function splashPresetsHtml(svc) {
 function splashHtml() {
   const _splashSvc = S.service || (hadSavedState ? 'torbox' : (localStorage.getItem('coreBuildLastSvc') || 'torbox'));
   return `<div class="card splash hybrid-splash">
-    <div class="hybrid-topbar splash-anim splash-anim-d1">
-      <div class="hybrid-mini-brand">CORE <b>BUILDS</b></div>
-      <div class="hybrid-toplinks">
-        <a href="https://corebuilds-docs.docsalot.dev/templates/directory" target="_blank" rel="noopener noreferrer">Templates</a>
-        <a href="https://github.com/brevityA/Core-Builds" target="_blank" rel="noopener noreferrer">GitHub</a>
-        <a href="https://www.reddit.com/r/CoreBuilds/" target="_blank" rel="noopener noreferrer">Core Crew</a>
-        <a href="https://discord.gg/AwJ49yzbqT" target="_blank" rel="noopener noreferrer">Discord</a>
-        <button data-action="show-changelog" class="hybrid-version">v${CONFIGURATOR_VERSION}</button>
-      </div>
-    </div>
-
     <!-- A saved build is resumed from the first screen (v3.20): above the hero, not below the fold. -->
     ${hadSavedState && _savedStep > 0 ? `<div class="hybrid-session continue-banner">
       ${versionBannerHtml()}
@@ -2148,36 +2137,21 @@ function splashHtml() {
     </div>` : ''}
     <div class="hybrid-hero">
       <div class="splash-anim splash-anim-d2">
-        <div class="hybrid-eyebrow">AIOStreams template configurator</div>
-        <h1>Build streams<br>with intent.</h1>
-        <div class="hybrid-lede">Pick your service and device — Core Builds writes a checked <strong>AIOStreams setup</strong> and can install it <strong>straight into your Stremio account</strong>. No JSON editing.</div>
-        <!-- Two equal ways in (v3.20 redesign). Quick install opens the Express lane;
-             Custom build opens the full builder. Same data-actions as before, so the
-             #express / #advanced deep links, the tour and every spec keep working. -->
+        <p class="lp-kicker">AIOStreams toolkit</p>
+        <h1 class="lp-wordmark">Core <span>Builds</span></h1>
+        <button type="button" data-action="show-changelog" class="lp-ver">v${CONFIGURATOR_VERSION}</button>
         ${splashUpdateCard()}
-        <div class="splash-start" id="splashStart" role="group" aria-label="Start a build">
-          <button type="button" class="start-card start-quick" data-action="open-express-lane">
-            <span class="start-card-icon">${ICO.bolt(20,'currentColor')}</span>
-            <span class="start-card-title">Quick install</span><span class="start-card-badge">~30 seconds</span>
-            <span class="start-card-desc">Service &rarr; device &rarr; resolution &rarr; key &rarr; Deploy. Working streams in about 30 seconds.</span>
-          </button>
-          <button type="button" class="start-card start-custom" data-action="custom-start">
-            <span class="start-card-icon">${ICO.gear(20,'currentColor')}</span>
-            <span class="start-card-title">Custom build</span>
-            <span class="start-card-desc">Every setting: audio, languages, subtitles, filters, ranking and stream cards.</span>
-          </button>
-        </div>
-        <div class="splash-start-more" id="splashAltRoutes">
-          <span class="splash-alt-lead">Already have a setup?</span>
-          <button data-action="update-template" class="splash-tertiary-btn">Update an existing setup</button>
-          <button data-action="paste-manifest-splash" class="splash-tertiary-btn">Import a config</button>
-          <button data-action="open-tutorial" class="splash-tertiary-btn">Take the tour</button>
-          <a href="../tools/genies/" class="splash-tertiary-btn">Setup Genie</a>
-        </div>
-        <p class="splash-from-note">Coming from QuackStart? <button type="button" data-action="open-quick-install" class="splash-from-link">Quick install</button> does the same one-click setup: AIOStreams with AIOMetadata and the Cinemeta patch, or just a manifest URL for any app.</p>
-        <div class="hybrid-trust"><span><i></i> Runs locally</span><span><i></i> Open source · MIT</span><span><i></i> Build without a login — or push it in one click</span></div>
-        <div class="splash-stats" id="splashStats"></div>
-        <div class="hybrid-subnote">Core Stable by default · 6s addon timeout · Provider keys stay in this browser and are sent to your chosen host on deploy</div>
+        <!-- One list of equal rows (v3.33). Core Builds is the first tool and opens Quick install;
+             every secondary route lives in the menu (#lpMenu). The tour targets stay on #splashStart. -->
+        <nav class="lp-rows" id="splashStart" aria-label="Core Builds tools">
+        <button type="button" class="lp-row lp-row-main" data-action="open-express-lane"><span class="lp-row-ico">${BRAND_GLYPHS.corebuilds}</span><b>Core Builds</b><span class="lp-tag">Setup</span></button>
+        <a class="lp-row" href="../tools/inspector/"><span class="lp-row-ico">${ICO.search(22,'currentColor')}</span><b>Template Inspector</b><span class="lp-tag">JSON</span></a>
+        <a class="lp-row" href="../account-tools/" target="_blank" rel="noopener noreferrer"><span class="lp-row-ico">${ICO.download(22,'currentColor')}</span><b>Back Up Addons</b><span class="lp-tag">Backup</span></a>
+        <a class="lp-row" href="../tools/genies/nuvio-stacks.html"><span class="lp-row-ico">${BRAND_GLYPHS.nuvio}</span><b>Nuvio Stack Genie</b><span class="lp-tag">Nuvio</span></a>
+        <a class="lp-row" href="../tools/badges/"><span class="lp-row-ico">${ICO.palette(22,'currentColor')}</span><b>Core Badge Builder</b><span class="lp-tag">Badges</span></a>
+        <a class="lp-row" href="../tools/"><span class="lp-row-ico">${ICO.folder(22,'currentColor')}</span><b>All Core Tools</b><span class="lp-tag">All</span></a>
+        </nav>
+        <div class="splash-stats lp-stats" id="splashStats"></div>
       </div>
       <div class="hybrid-core-stage splash-anim splash-anim-d2">
         <button type="button" class="core-support-mark" data-action="open-support" aria-label="Support Core Builds" title="Support Core Builds">
@@ -2194,32 +2168,25 @@ function splashHtml() {
             <circle class="core-click-ring" cx="256" cy="256" r="86"/>
           </svg>
         </button>
-        <div class="hybrid-core-caption">One install writes: AIOStreams · AIOMetadata 74-of-91 catalogs · Cinemeta patch · subtitles<br><span class="u-dim">tap the core to support the project</span></div>
       </div>
     </div>
-
-
-    <div class="hybrid-services splash-anim splash-anim-d3">
-      <div class="hybrid-services-label">Your service</div>
-      <div class="splash-chips" role="radiogroup" aria-label="Select your service">
-        <span class="splash-chip${_splashSvc==='torbox'?' active':''}" data-svc="torbox" role="radio" aria-checked="${_splashSvc==='torbox'}" tabindex="0"><span class="splash-chip-icon">${ICO.bolt(14,'#fbbf24')}</span> TorBox</span>
-        <span class="splash-chip${_splashSvc==='alldebrid'?' active':''}" data-svc="alldebrid" role="radio" aria-checked="${_splashSvc==='alldebrid'}" tabindex="0"><span class="splash-chip-icon">${ICO.diamond(14,'#60a5fa')}</span> AllDebrid</span>
-        <span class="splash-chip${_splashSvc==='realdebrid'?' active':''}" data-svc="realdebrid" role="radio" aria-checked="${_splashSvc==='realdebrid'}" tabindex="0"><span class="splash-chip-icon">${ICO.circle(14,'#4ade80')}</span> Real-Debrid</span>
-        <span class="splash-chip${_splashSvc==='easynews'?' active':''}" data-svc="easynews" role="radio" aria-checked="${_splashSvc==='easynews'}" tabindex="0"><span class="splash-chip-icon">${ICO.newspaper(14,'#94a3b8')}</span> EasyNews</span>
-        <span class="splash-chip${_splashSvc==='free'?' active':''}" data-svc="free" role="radio" aria-checked="${_splashSvc==='free'}" tabindex="0"><span class="splash-chip-icon">${ICO.free(14,'#34d399')}</span> Free</span>
-      </div>
-    </div>
-    ${hadSavedState ? '' : `<div class="hybrid-services hybrid-presets"><div class="hybrid-services-label">Preset</div><div class="splash-chips" role="radiogroup" aria-label="Quick profile — tunes the dials, never trims your services">
-        <span class="splash-chip${S.quickProfile==='fast'?' active':''}" data-qp="fast" role="radio" aria-checked="${S.quickProfile==='fast'}" tabindex="0"><span class="splash-chip-icon">${ICO.bolt(14,'#67e8f9')}</span> Lean · 1080p cached-first</span>
-        <span class="splash-chip${S.quickProfile==='balanced'?' active':''}" data-qp="balanced" role="radio" aria-checked="${S.quickProfile==='balanced'}" tabindex="0"><span class="splash-chip-icon">${ICO.diamond(14,'#10b981')}</span> Standard · recommended</span>
-        <span class="splash-chip${S.quickProfile==='maximum'?' active':''}" data-qp="maximum" role="radio" aria-checked="${S.quickProfile==='maximum'}" tabindex="0"><span class="splash-chip-icon">${ICO.circle(14,'#fbbf24')}</span> Maximum · 4K quality-first</span>
-      </div></div>`}
-
     ${hadSavedState ? '' : remoteUpdateBannerHtml()}
-    <div class="hybrid-section-head splash-anim splash-anim-d5"><div><h2>Ready-Made Setups</h2><p>Opinionated presets for common setups.</p></div><p class="hybrid-section-index">01 / Presets</p></div>
-    <div class="splash-presets splash-anim splash-anim-d5" id="splashPresets">${splashPresetsHtml(_splashSvc)}</div>
-
-    <div class="hybrid-section-head splash-anim splash-anim-d6"><div><h2>What the streams will look like</h2><p>Not adjectives — these are the real cards AIOStreams draws with each formatter, generated from the same templates this configurator writes.</p></div><p class="hybrid-section-index">02 / Preview</p></div>
+    <button type="button" class="lp-menu-btn" id="lpMenuBtn" data-lp-menu="open" aria-label="Open menu" aria-expanded="false" aria-controls="lpMenu"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+    <div class="lp-menu-overlay" id="lpMenuOverlay" data-lp-menu="close" hidden></div>
+    <nav class="lp-menu" id="lpMenu" aria-label="More" hidden>
+      <div class="lp-menu-head"><span class="lp-menu-mark">${BRAND_GLYPHS.corebuilds}</span><b>Core Builds</b><button type="button" class="lp-menu-close" data-lp-menu="close" aria-label="Close menu">✕</button></div>
+      <div class="lp-menu-label">Build</div>
+      <button type="button" class="lp-menu-item" data-action="custom-start">Custom build</button>
+      <button type="button" class="lp-menu-item" data-action="easy-start">Guided setup</button>
+      <button type="button" class="lp-menu-item" data-action="update-template">Update an existing setup</button>
+      <button type="button" class="lp-menu-item" data-action="paste-manifest-splash">Import a config</button>
+      <a class="lp-menu-item" href="../tools/genies/">Setup Genie</a>
+      <div class="lp-menu-label">Learn</div>
+      <button type="button" class="lp-menu-item" data-action="open-tutorial">Take the tour</button>
+      <button type="button" class="lp-menu-item" data-action="compare-templates">Compare templates</button>
+      <a class="lp-menu-item" href="https://corebuilds-docs.docsalot.dev/templates/directory" target="_blank" rel="noopener noreferrer">Browse templates</a>
+      <button type="button" class="lp-menu-item" data-action="show-changelog">What's new · v${CONFIGURATOR_VERSION}</button>
+      <details class="lp-menu-preview"><summary class="lp-menu-item">Stream card previews</summary>
     <div class="hybrid-wall splash-anim splash-anim-d6" aria-label="Formatter previews">
       <figure><img src="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/family-v4-preview.svg" width="800" height="334" loading="lazy" alt="Real stream card preview — Family v4 — the default"><figcaption><b>Family v4</b><span>the default</span></figcaption></figure>
       <figure><img src="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/apex-v2-preview.svg" width="800" height="334" loading="lazy" alt="Real stream card preview — Apex v2 — detail-rich"><figcaption><b>Apex v2</b><span>detail-rich</span></figcaption></figure>
@@ -2228,28 +2195,14 @@ function splashHtml() {
       <figure><img src="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/tv-preview.svg" width="800" height="334" loading="lazy" alt="Real stream card preview — TV — episode-first"><figcaption><b>TV</b><span>episode-first</span></figcaption></figure>
       <figure><img src="https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/Formatters/core-syntax-v3-preview.svg" width="800" height="334" loading="lazy" alt="Real stream card preview — Core Syntax V3"><figcaption><b>Core Syntax V3</b><span></span></figcaption></figure>
     </div>
-
-    <div class="hybrid-section-head splash-anim splash-anim-d6"><div><h2>Utilities</h2><p>Back up or explore the Core tool suite.</p></div><p class="hybrid-section-index">03 / Tools</p></div>
-    <div class="splash-doors splash-anim splash-anim-d6">
-      <a class="splash-door core-tool-door" href="../account-tools/" target="_blank" rel="noopener noreferrer"><div class="splash-door-icon">${ICO.download(22,'#34d399')}</div><div class="splash-door-text"><div class="splash-door-title">Back Up Addons <span class="splash-door-tag" style="background:rgba(52,211,153,.1);color:#34d399;border:1px solid rgba(52,211,153,.2)">Read-only</span></div><div class="splash-door-desc">View and download your current Stremio addon setup. Nothing is changed.</div></div></a>
-      <a class="splash-door core-tool-door" href="../tools/genies/nuvio-stacks.html"><div class="splash-door-icon"><span style="font-size:20px;line-height:1" aria-hidden="true">🧞</span></div><div class="splash-door-text"><div class="splash-door-title">Nuvio Stack Genie <span class="splash-door-tag" style="background:rgba(168,85,247,.12);color:#c4b5fd;border:1px solid rgba(168,85,247,.28)">Cross-app</span></div><div class="splash-door-desc">Guided profiles &amp; add-ons for Nuvio — pick a stack, get install links.</div></div></a>
-      <a class="splash-door core-tool-door" href="../tools/speedtest/"><div class="splash-door-icon"><span style="font-size:20px;line-height:1" aria-hidden="true">⚡</span></div><div class="splash-door-text"><div class="splash-door-title">CoreSpeed <span class="splash-door-tag" style="background:rgba(0,212,255,.1);color:#67e8f9;border:1px solid rgba(0,212,255,.22)">Speedtest</span></div><div class="splash-door-desc">Race every TorBox CDN at once — ping, multi-stream speed, live map, and the best node for your setup.</div></div></a>
-      <a class="splash-door core-tool-door" href="../tools/badges/"><div class="splash-door-icon"><span style="font-size:20px;line-height:1" aria-hidden="true">🏷️</span></div><div class="splash-door-text"><div class="splash-door-title">Core Badge Builder <span class="splash-door-tag" style="background:rgba(168,85,247,.12);color:#c4b5fd;border:1px solid rgba(168,85,247,.28)">No regex</span></div><div class="splash-door-desc">Design Nuvio stream badges visually, preview them, and hand the matching formatter back here.</div></div></a>
-      <a class="splash-door core-tool-door" href="../tools/banner-studio/"><div class="splash-door-icon"><span style="font-size:20px;line-height:1" aria-hidden="true">🎬</span></div><div class="splash-door-text"><div class="splash-door-title">Banner Studio <span class="splash-door-tag" style="background:rgba(248,113,113,.12);color:#fca5a5;border:1px solid rgba(248,113,113,.3)">17 brands</span></div><div class="splash-door-desc">Netflix-style streaming banners for any major streamer — render &amp; export locally.</div></div></a>
-      <a class="splash-door core-tool-door" href="../tools/"><div class="splash-door-icon">${ICO.folder(22,'#a78bfa')}</div><div class="splash-door-text"><div class="splash-door-title">All Core Tools</div><div class="splash-door-desc">Builder, backup, and upcoming inspection utilities.</div></div></a>
-    </div>
-
-    <div class="splash-tertiary splash-anim splash-anim-d6">
-      <button data-action="easy-start" class="splash-tertiary-btn">Guided Setup</button>
-      <a href="https://corebuilds-docs.docsalot.dev/templates/directory" target="_blank" rel="noopener noreferrer" class="splash-tertiary-btn">Browse Templates</a>
-      <button data-action="compare-templates" class="splash-tertiary-btn">Compare</button>
-      <a href="https://github.com/brevityA/Core-Builds" target="_blank" rel="noopener noreferrer" class="splash-tertiary-btn">GitHub</a>
-      <a href="https://www.reddit.com/r/CoreBuilds/" target="_blank" rel="noopener noreferrer" class="splash-tertiary-btn">Core Crew</a>
-      <a href="https://discord.gg/AwJ49yzbqT" target="_blank" rel="noopener noreferrer" class="splash-tertiary-btn">Discord</a>
-      <button data-action="show-changelog" class="splash-tertiary-btn">What's new · v${CONFIGURATOR_VERSION}</button>
-      <button data-action="open-diagnostics" class="splash-tertiary-btn">Report Issue</button>
-    </div>
-    <div class="splash-footer">Built by Brevity · Core Builds is not affiliated with TorBox or AIOStreams</div>
+      </details>
+      <div class="lp-menu-label">Help</div>
+      <button type="button" class="lp-menu-item" data-lp="theme">Light / dark mode</button>
+      <button type="button" class="lp-menu-item" data-lp="feedback">Send feedback</button>
+      <button type="button" class="lp-menu-item" data-action="open-diagnostics">Report an issue</button>
+      <div class="lp-menu-links"><a href="https://github.com/brevityA/Core-Builds" target="_blank" rel="noopener noreferrer">GitHub</a><a href="https://www.reddit.com/r/CoreBuilds/" target="_blank" rel="noopener noreferrer">Core Crew</a><a href="https://discord.gg/AwJ49yzbqT" target="_blank" rel="noopener noreferrer">Discord</a></div>
+      <p class="lp-menu-foot">Built by Brevity · Core Builds is not affiliated with TorBox or AIOStreams</p>
+    </nav>
   </div>`;
 }
 function initScrollFades() {
@@ -2824,43 +2777,56 @@ function syncNext() {
   }
 }
 
+/* Landing menu (v3.33): one ☰ button opens every secondary route. */
+function setLpMenu(open) {
+  const m = document.getElementById('lpMenu'), o = document.getElementById('lpMenuOverlay'), b = document.getElementById('lpMenuBtn');
+  if (!m) return;
+  m.hidden = !open; if (o) o.hidden = !open; b?.setAttribute('aria-expanded', String(open));
+  if (open) m.querySelector('.lp-menu-close')?.focus(); else if (b && m.contains(document.activeElement)) b.focus();
+}
+document.addEventListener('click', (e) => {
+  const t = e.target.closest('[data-lp-menu]');
+  if (t) { setLpMenu(t.dataset.lpMenu === 'open'); return; }
+  const lp = e.target.closest('#lpMenu [data-lp]');
+  if (lp?.dataset.lp === 'theme') toggleTheme();
+  if (lp?.dataset.lp === 'feedback') {
+    setLpMenu(false);
+    const contact = document.getElementById('cbContactBtn');
+    // Fallback: if the message widget did not load, Discord is the same inbox.
+    if (contact) contact.click(); else window.open('https://discord.gg/AwJ49yzbqT', '_blank', 'noopener');
+    return;
+  }
+  if (e.target.closest('#lpMenu [data-action], #lpMenu a')) setLpMenu(false);
+});
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && document.getElementById('lpMenu')?.hidden === false) setLpMenu(false); });
+
 /* DELEGATED EVENTS */
 { const l = document.getElementById('cb-loader'); if (l) l.addEventListener('animationend', () => l.remove()); }
 // ── Onboarding Tutorial System ──
 const TUT_STEPS = [
   { id:'welcome' },
   {
-    id:'paths', badge:'Step 1 of 7', title:'Choose the Right Path',
-    desc:'<strong>Quick install</strong> is the shortest setup: service, device, resolution and key, then Deploy.<br><br><span class="hl">Custom build</span> exposes every filter and stream card. <span class="gold">Update an existing setup</span> brings an older template up to date, and <strong>Import a config</strong> starts from one you already have.',
+    id:'paths', badge:'Step 1 of 5', title:'Choose the Right Path',
+    desc:'<strong>Core Builds</strong> opens Quick install, the shortest setup: service, device, resolution and key, then Deploy.<br><br><span class="hl">Custom build</span>, Guided setup, update, import and the rest live in the <strong>menu</strong> (☰).',
     target:'#splashStart', arrow:'top', nextLabel:'Next'
   },
   {
-    id:'sources', badge:'Step 2 of 7', title:'Choose One or More Providers',
-    desc:'Select every provider you actually use. Multi-select is supported for debrid and Usenet services.<br><br>Optional P2P, HTTP, Debridio, NZBGeek, StreamNZB, and extra indexers live under <strong>Additional services & scrapers</strong> so the main list stays simple.',
-    target:'.hybrid-services', arrow:'top', nextLabel:'Next'
-  },
-  {
-    id:'presets', badge:'Step 3 of 7', title:'Ready-Made Setups',
-    desc:'These presets apply sensible device, quality, cache, and sorting choices for common use cases. They are the fastest route when one of the descriptions already matches what you want.',
-    target:'#splashPresets', arrow:'top', nextLabel:'Next'
-  },
-  {
-    id:'quick', badge:'Step 4 of 7', title:'Quick Install',
+    id:'quick', badge:'Step 2 of 5', title:'Quick Install',
     desc:'Quick Install asks only what is required. Choose Stremio, Nuvio, WuPlay, or another app; select multiple providers; then pick <strong>Fast & Light</strong>, <strong>Balanced</strong>, or <strong>Maximum Quality</strong>.<br><br>Credential fields appear only for selected providers.',
     target:'#splashStart [data-action="open-express-lane"]', arrow:'top', nextLabel:'Next'
   },
   {
-    id:'guided', badge:'Step 5 of 7', title:'Guided Setup and Custom build',
+    id:'guided', badge:'Step 3 of 5', title:'Guided Setup and Custom build',
     desc:'<strong>Guided Setup</strong> walks through Sources, Device, Video Quality, Content Preferences, Accounts & Keys, and Review & Install.<br><br><span class="hl">Custom build</span> adds detailed audio, video, formatter, subtitles, catalogs, proxy, matching, and filtering controls. Safe defaults are used when you skip an option.',
     center:true, nextLabel:'Next'
   },
   {
-    id:'install', badge:'Step 6 of 7', title:'Review, Validate, and Install',
+    id:'install', badge:'Step 4 of 5', title:'Review, Validate, and Install',
     desc:'Before installation, Core Builds runs credential, template, device, and host checks. The final screen prioritises the install action, then manifest recovery, exports, diagnostics, and the detailed configuration summary.<br><br>Direct Install sends the generated configuration to the selected AIOStreams host. Export JSON keeps the generated file local until you import it yourself.',
     center:true, nextLabel:'Next'
   },
   {
-    id:'start', badge:'Step 7 of 7', title:'Ready to Build',
+    id:'start', badge:'Step 5 of 5', title:'Ready to Build',
     desc:'For most people, start with <strong>Quick install</strong>. Choose Guided Setup if you want help with each decision, or Custom build when you already know the exact formats and filters you need.',
     target:'#splashStart [data-action="open-express-lane"]', arrow:'top', nextLabel:'Open Quick install'
   },

@@ -9,7 +9,7 @@ async function fresh(page) {
 
 async function openDeviceStep(page) {
   await fresh(page);
-  await page.locator('[data-action="custom-start"]').click();
+  await page.locator('#lpMenuBtn').click(); await page.locator('#lpMenu [data-action="custom-start"]').click();
   await page.locator('label[for="o_torbox-pro"]').click();
   await page.locator('#btnNext').click();
   await expect(page.getByText('Your Device', { exact: true })).toBeVisible();

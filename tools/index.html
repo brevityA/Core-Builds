@@ -162,6 +162,34 @@ body{
   .hdr-title{font-size:1.8rem}
 }
 @media(prefers-reduced-motion:reduce){.tool-card{transition:none}}
+
+/* Hub layout (v3.33): one centred column of rows, Core Builds' signal colours, the mark breathing gently. */
+.wrap{max-width:860px}
+.hdr-banner{flex-direction:column;text-align:center;gap:10px;background:none;border:0;padding:26px 0 8px;margin-bottom:6px;overflow:visible}
+.hdr-banner::before,.hdr-divider,.hdr-underline{display:none}
+.hdr-icon{width:84px;height:84px;filter:drop-shadow(0 0 18px rgba(34,211,238,.45));animation:hubBreathe 4.5s ease-in-out infinite}
+@keyframes hubBreathe{0%,100%{filter:drop-shadow(0 0 12px rgba(34,211,238,.3));transform:scale(1)}50%{filter:drop-shadow(0 0 26px rgba(34,211,238,.6));transform:scale(1.03)}}
+.hdr-text{align-items:center}.hdr-title{font-family:Georgia,'Times New Roman',serif;font-size:2.1rem;letter-spacing:-.035em}
+.hdr-builds{background:linear-gradient(100deg,#22d3ee,#4facfe);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hdr-actions{margin:6px 0 0;justify-content:center}.hdr-btn{border-radius:99px}
+.section-label{margin:28px 4px 10px;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:.7rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--th-accent)}
+.section-label::after{display:none}
+.tool-grid{gap:10px}.tool-grid.g1{grid-template-columns:1fr;margin-top:18px}.tool-grid.g3{grid-template-columns:1fr 1fr}
+.tool-card{display:grid;grid-template-columns:40px minmax(0,1fr) auto;column-gap:14px;row-gap:2px;align-items:center;min-height:72px;padding:14px 18px;border-radius:18px}
+.tool-card::after{content:'→';grid-column:3;grid-row:1/span 2;align-self:center;opacity:.55;font-size:1.05rem}
+.tool-idx,.tool-link{display:none}
+.tool-card .tool-icon{grid-column:1;grid-row:1/span 3;margin:0;width:40px;height:40px;border-radius:12px}
+.tool-card .tool-name{grid-column:2;margin:0;font-size:.95rem}
+.tool-card .tool-desc{grid-column:2;margin:0;font-size:.76rem;line-height:1.45;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.tool-card .tool-foot{grid-column:2;margin:4px 0 0;padding:0;border:0;justify-content:flex-start}
+.tool-card .tool-foot .badge{font-size:.6rem}
+.tool-card.tool-primary{background:linear-gradient(100deg,#22d3ee,#4facfe);border-color:transparent;color:#03151b;box-shadow:0 12px 30px rgba(34,211,238,.18)}
+.tool-card.tool-primary .tool-name,.tool-card.tool-primary .tool-desc{color:#03151b}.tool-card.tool-primary .tool-icon{background:rgba(255,255,255,.22);color:#03151b}.tool-card.tool-primary .tool-foot{display:none}
+[data-theme="light"] .tool-card.tool-primary{background:linear-gradient(100deg,#0891b2,#2563eb)}[data-theme="light"] .tool-card.tool-primary :is(.tool-name,.tool-desc,.tool-icon){color:#fff}
+.fold{margin-top:14px}.fold>summary{cursor:pointer;list-style:none;display:flex;align-items:center;font-weight:700;font-size:.85rem}.fold>summary::-webkit-details-marker{display:none}
+.fold>summary::after{content:'＋';margin-left:auto;color:var(--th-accent)}.fold[open]>summary::after{content:'－'}.fold[open]>summary{margin-bottom:10px}
+@media(max-width:640px){.tool-grid.g2,.tool-grid.g3{grid-template-columns:1fr}.hdr-icon{width:72px;height:72px}}
+@media(prefers-reduced-motion:reduce){.hdr-icon{animation:none}}
 </style>
 </head>
 <body>
@@ -171,7 +199,7 @@ body{
 
   <!-- Header (identical to configurator) -->
   <header class="hdr-banner">
-    <svg class="hdr-icon" width="46" height="46" viewBox="0 0 64 64" fill="none">
+    <svg class="hdr-icon" width="46" height="46" viewBox="0 0 64 64" fill="none" aria-hidden="true">
       <path d="M32 4 56 18v28L32 60 8 46V18L32 4Z" stroke="url(#hg1)" stroke-width="2.5"/>
       <path d="m32 20 12 12-12 12-12-12 12-12Z" fill="url(#hg1)" opacity=".9"/>
       <defs><linearGradient id="hg1" x1="9" y1="8" x2="55" y2="57"><stop stop-color="#00e5ff"/><stop offset=".55" stop-color="#a78bfa"/><stop offset="1" stop-color="#ff7043"/></linearGradient></defs>
@@ -189,10 +217,9 @@ body{
     </div>
   </header>
 
-  <!-- Section 1: Core Tools -->
-  <div class="section-label">01 · Core tools</div>
-  <div class="tool-grid g2">
-    <a class="tool-card" href="../">
+  <!-- Hub layout: the builder first, then tools grouped by what they help with. -->
+  <div class="tool-grid g1">
+    <a class="tool-card tool-primary" href="../">
       <div class="tool-idx">Build</div>
       <div class="tool-icon cyan">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5 12 2"/><line x1="12" y1="22" x2="12" y2="15.5"/><polyline points="22 8.5 12 15.5 2 8.5"/></svg>
@@ -204,59 +231,10 @@ body{
         <span class="tool-link">Launch →</span>
       </div>
     </a>
-    <a class="tool-card" href="../account-tools/">
-      <div class="tool-idx">Safety</div>
-      <div class="tool-icon green">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-      </div>
-      <div class="tool-name">Addon Backup</div>
-      <p class="tool-desc">Read and download your current Stremio addon collection. No account changes. Nothing is modified.</p>
-      <div class="tool-foot">
-        <span class="badge badge-green">✓ Read-only</span>
-        <span class="tool-link">Open →</span>
-      </div>
-    </a>
-    <a class="tool-card" href="./speedtest/">
-      <div class="tool-idx">Speed</div>
-      <div class="tool-icon cyan">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-      </div>
-      <div class="tool-name">CoreSpeed — CDN Speed Test</div>
-      <p class="tool-desc">Race every TorBox Hyperdrive CDN node at once — ping, multi-stream throughput, live world map, run history, and a streaming verdict per region. No API key.</p>
-      <div class="tool-foot">
-        <span class="badge badge-green">✓ Live</span>
-        <span class="tool-link">Test →</span>
-      </div>
-    </a>
-    <a class="tool-card" href="./badges/">
-      <div class="tool-idx">Nuvio</div>
-      <div class="tool-icon purple">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.6 13.4 11 23l-9-9V2h12l6.6 6.6a3.4 3.4 0 0 1 0 4.8Z"/><circle cx="7.5" cy="7.5" r="1.5"/></svg>
-      </div>
-      <div class="tool-name">Core Badge Builder</div>
-      <p class="tool-desc">Choose and style Nuvio Fusion stream badges without touching regex or JSON. Includes Universal and AIO Enhanced modes, live preview, import URL, backup, and Configurator handoff.</p>
-      <div class="tool-foot">
-        <span class="badge badge-green">✓ Live</span>
-        <span class="tool-link">Build badges →</span>
-      </div>
-    </a>
-    <a class="tool-card" href="./banner-studio/">
-      <div class="tool-idx">Media</div>
-      <div class="tool-icon red">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><polygon points="10 9 15 12 10 15 10 9"/></svg>
-      </div>
-      <div class="tool-name">Banner Studio</div>
-      <p class="tool-desc">Netflix-style streaming banners for any major streamer — Netflix, Tubi, Crunchyroll, MGM+, STARZ, AMC+, BritBox, Plex, Roku Channel &amp; more. Custom background, tagline &amp; badge, undo/redo, copy-to-clipboard, randomise, PNG/JPG export and share links. Renders 100% locally.</p>
-      <div class="tool-foot">
-        <span class="badge badge-green">✓ Live</span>
-        <span class="tool-link">Design →</span>
-      </div>
-    </a>
   </div>
 
-  <!-- Section 2: Verification & Debug -->
-  <div class="section-label">02 · Verify &amp; debug</div>
-  <div class="tool-grid g3">
+  <div class="section-label">AIOStreams</div>
+  <div class="tool-grid g2">
     <a class="tool-card" href="./inspector/">
       <div class="tool-idx">Schema</div>
       <div class="tool-icon purple">
@@ -293,18 +271,6 @@ body{
         <span class="tool-link">Open Builder →</span>
       </div>
     </a>
-  </div>
-
-  <!-- Section 3: New tools -->
-  <div class="section-label">03 · New tools</div>
-  <div class="tool-grid g3">
-    <a class="tool-card" href="../account-tools/">
-      <div class="tool-idx">Account</div>
-      <div class="tool-icon yellow"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
-      <div class="tool-name">Account Manager</div>
-      <p class="tool-desc">Reorder, remove, restore, and undo addon changes. A backup is created before every account change.</p>
-      <div class="tool-foot"><span class="badge badge-green">&check; Available</span><span class="tool-link">Open &rarr;</span></div>
-    </a>
     <a class="tool-card" href="https://www.npmjs.com/package/core-builds" target="_blank" rel="noopener">
       <div class="tool-idx">CLI</div>
       <div class="tool-icon red"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg></div>
@@ -312,18 +278,10 @@ body{
       <p class="tool-desc">Generate, validate, and diff templates from the command line. <code>npx core-builds generate</code></p>
       <div class="tool-foot"><span class="badge badge-green">&check; Available</span><span class="tool-link">npm &rarr;</span></div>
     </a>
-    <a class="tool-card" href="https://stremio-addons.net/" target="_blank" rel="noopener">
-      <div class="tool-idx">Discover</div>
-      <div class="tool-icon cyan"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div>
-      <div class="tool-name">Community Addon Directory</div>
-      <p class="tool-desc">Browse the community-moderated stremio-addons.net catalog: categories, star ratings, manifest health and public AIOStreams instances. External and unaffiliated — includes adult addons.</p>
-      <div class="tool-foot"><span class="badge badge-cyan">External</span><span class="tool-link">stremio-addons.net &rarr;</span></div>
-    </a>
   </div>
 
-  <!-- Genies: guided setup companions -->
-  <div class="section-label">04 · ✨ Genies — guided setup companions</div>
-  <div class="tool-grid g3">
+  <div class="section-label">✨ Genies — guided setup companions</div>
+  <div class="tool-grid g2">
     <a class="tool-card" href="./genies/">
       <div class="tool-idx">Install</div>
       <div class="tool-icon cyan">
@@ -334,18 +292,6 @@ body{
       <div class="tool-foot">
         <span class="badge badge-cyan">BETA — works today</span>
         <span class="tool-link">Try it →</span>
-      </div>
-    </a>
-    <a class="tool-card" href="./genies/wuplay-catalogs.html">
-      <div class="tool-idx">WuPlay</div>
-      <div class="tool-icon purple">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M17 2l-5 5-5-5"/></svg>
-      </div>
-      <div class="tool-name">WuPlay Catalog Genie</div>
-      <p class="tool-desc">Designs your WuPlay home: Home/Discover rows, hubs (services · genres · studios · collections), kids-safe screens — then hands you a tap-by-tap guide + an import-ready .json. Read-only by design.</p>
-      <div class="tool-foot">
-        <span class="badge" style="background:rgba(167,139,250,.12);color:#a78bfa">BETA — early access · pending dev sign-off</span>
-        <span class="tool-link">Explore →</span>
       </div>
     </a>
     <a class="tool-card" href="./genies/nuvio-stacks.html">
@@ -360,19 +306,101 @@ body{
         <span class="tool-link">Explore →</span>
       </div>
     </a>
+    <a class="tool-card" href="./genies/wuplay-catalogs.html">
+      <div class="tool-idx">WuPlay</div>
+      <div class="tool-icon purple">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M17 2l-5 5-5-5"/></svg>
+      </div>
+      <div class="tool-name">WuPlay Catalog Genie</div>
+      <p class="tool-desc">Designs your WuPlay home: Home/Discover rows, hubs (services · genres · studios · collections), kids-safe screens — then hands you a tap-by-tap guide + an import-ready .json. Read-only by design.</p>
+      <div class="tool-foot">
+        <span class="badge" style="background:rgba(167,139,250,.12);color:#a78bfa">BETA — early access · pending dev sign-off</span>
+        <span class="tool-link">Explore →</span>
+      </div>
+    </a>
+    <a class="tool-card" href="./badges/">
+      <div class="tool-idx">Nuvio</div>
+      <div class="tool-icon purple">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.6 13.4 11 23l-9-9V2h12l6.6 6.6a3.4 3.4 0 0 1 0 4.8Z"/><circle cx="7.5" cy="7.5" r="1.5"/></svg>
+      </div>
+      <div class="tool-name">Core Badge Builder</div>
+      <p class="tool-desc">Choose and style Nuvio Fusion stream badges without touching regex or JSON. Includes Universal and AIO Enhanced modes, live preview, import URL, backup, and Configurator handoff.</p>
+      <div class="tool-foot">
+        <span class="badge badge-green">✓ Live</span>
+        <span class="tool-link">Build badges →</span>
+      </div>
+    </a>
   </div>
 
-  <!-- What's New -->
-  <div class="inline-card" style="margin-top:16px">
+  <div class="section-label">Stremio account</div>
+  <div class="tool-grid g2">
+    <a class="tool-card" href="../account-tools/">
+      <div class="tool-idx">Safety</div>
+      <div class="tool-icon green">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+      </div>
+      <div class="tool-name">Addon Backup</div>
+      <p class="tool-desc">Read and download your current Stremio addon collection. No account changes. Nothing is modified.</p>
+      <div class="tool-foot">
+        <span class="badge badge-green">✓ Read-only</span>
+        <span class="tool-link">Open →</span>
+      </div>
+    </a>
+    <a class="tool-card" href="../account-tools/">
+      <div class="tool-idx">Account</div>
+      <div class="tool-icon yellow"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+      <div class="tool-name">Account Manager</div>
+      <p class="tool-desc">Reorder, remove, restore, and undo addon changes. A backup is created before every account change.</p>
+      <div class="tool-foot"><span class="badge badge-green">&check; Available</span><span class="tool-link">Open &rarr;</span></div>
+    </a>
+    <a class="tool-card" href="https://stremio-addons.net/" target="_blank" rel="noopener">
+      <div class="tool-idx">Discover</div>
+      <div class="tool-icon cyan"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div>
+      <div class="tool-name">Community Addon Directory</div>
+      <p class="tool-desc">Browse the community-moderated stremio-addons.net catalog: categories, star ratings, manifest health and public AIOStreams instances. External and unaffiliated — includes adult addons.</p>
+      <div class="tool-foot"><span class="badge badge-cyan">External</span><span class="tool-link">stremio-addons.net &rarr;</span></div>
+    </a>
+  </div>
+
+  <div class="section-label">Speed &amp; media</div>
+  <div class="tool-grid g2">
+    <a class="tool-card" href="./speedtest/">
+      <div class="tool-idx">Speed</div>
+      <div class="tool-icon cyan">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+      </div>
+      <div class="tool-name">CoreSpeed — CDN Speed Test</div>
+      <p class="tool-desc">Race every TorBox Hyperdrive CDN node at once — ping, multi-stream throughput, live world map, run history, and a streaming verdict per region. No API key.</p>
+      <div class="tool-foot">
+        <span class="badge badge-green">✓ Live</span>
+        <span class="tool-link">Test →</span>
+      </div>
+    </a>
+    <a class="tool-card" href="./banner-studio/">
+      <div class="tool-idx">Media</div>
+      <div class="tool-icon red">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><polygon points="10 9 15 12 10 15 10 9"/></svg>
+      </div>
+      <div class="tool-name">Banner Studio</div>
+      <p class="tool-desc">Netflix-style streaming banners for any major streamer — Netflix, Tubi, Crunchyroll, MGM+, STARZ, AMC+, BritBox, Plex, Roku Channel &amp; more. Custom background, tagline &amp; badge, undo/redo, copy-to-clipboard, randomise, PNG/JPG export and share links. Renders 100% locally.</p>
+      <div class="tool-foot">
+        <span class="badge badge-green">✓ Live</span>
+        <span class="tool-link">Design →</span>
+      </div>
+    </a>
+  </div>
+
+  <details class="inline-card fold">
+    <summary>What's new</summary>
     <!-- AUTO:TOOLS_WHATSNEW:BEGIN -->
     <h3>🆕 What's New — v3.33</h3>
     <div style="margin-top:8px;display:flex;flex-direction:column;gap:4px">
       <div class="news-item"><span class="badge" style="flex-shrink:0;background:rgba(0,212,255,.12);color:var(--th-accent)">↗</span><span style="color:var(--th-tx2)"><a href="https://brevitya.github.io/Core-Builds/configurator/#changelog" style="color:var(--th-accent);text-decoration:none">Full Configurator changelog →</a> &nbsp;·&nbsp; <a href="https://corebuilds-docs.docsalot.dev/changelog" style="color:var(--th-accent);text-decoration:none">suite changelog →</a></span></div>
       <div style="font-size:.72rem;font-weight:800;color:var(--th-accent);letter-spacing:.04em;margin-top:8px">v3.33 · Nov 18 2026</div>
-      <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Quick install, redesigned — three steps, each a labelled card: where to install, your service, and your preferences. Apps and services are full-width rows with their logo; what matters most and streams shown are one-tap switches. Bigger tap targets and full keyboard support throughout.</span></div>
-      <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Delivery up front — Direct Install, Manifest URL or Raw JSON is the first switch in step 1. Device, resolution, connection speed, template profile, language, Full stack, Clean reinstall and TMDB sit together under Options &amp; defaults.</span></div>
-      <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Connection speed presets — pick 25, 50, 100 or 250 Mbps, or type your own; the bitrate cap is set to 80% of it, as before.</span></div>
-      <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Paste and show buttons on key fields — every provider key, TMDB and manifest field gets a Paste button and a show/hide toggle.</span></div>
+      <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">A one-screen main page — the Core mark, the Core Builds name and the version, then six equal rows: Core Builds (opens Quick install), Template Inspector, Back Up Addons, Nuvio Stack Genie, Core Badge Builder and All Core Tools. Each row has a hexagon icon and a short tag saying what it is.</span></div>
+      <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">One menu for everything else — the ☰ button (bottom-right on a phone, top-right on a computer) holds Custom build, Guided setup, update, import, Setup Genie, the tour, template compare and directory, what’s new, stream card previews, light or dark mode, feedback and Report an issue. The separate Mode and chat buttons are folded into it.</span></div>
+      <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Quick install, redesigned — three labelled steps: where to install, your service, and your preferences. Apps and services are full-width rows with logos from the Core Builds Icon Pack; what matters most and streams shown are one-tap switches. On a computer your build summary and the Install button stay pinned on the right.</span></div>
+      <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Delivery up front — Direct Install, Manifest URL or Raw JSON is the first switch in Quick install, so you can export the template file without signing in to Stremio or contacting a host. Device, resolution, connection speed, template profile, language, Full stack, Clean reinstall and TMDB sit under Options &amp; defaults.</span></div>
       <div style="font-size:.72rem;font-weight:800;color:var(--th-accent);letter-spacing:.04em;margin-top:8px">v3.32 · Oct 31 2026</div>
       <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Truer line about your keys — Quick install said your keys go only to your AIOStreams host. They pass through the Core Builds relay on the way, which forwards them and keeps nothing, and the line now says so. The first screen says Core Builds keeps no copy of your keys.</span></div>
       <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Full stack names Cinebye — the Full stack option now says that Cinebye, a separate service, makes the Cinemeta patch using your Stremio sign-in.</span></div>
@@ -389,11 +417,10 @@ body{
       <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Generated output unchanged — every config the configurator and the CLI build is byte-for-byte what 3.29 produced apart from the version stamp; only the way an existing setup is updated changed.</span></div>
     </div>
 <!-- AUTO:TOOLS_WHATSNEW:END -->
-  </div>
+  </details>
 
-  <!-- Built-in tools reference -->
-  <div class="inline-card" style="margin-top:12px">
-    <h3>🔧 Built-in tools (inside the Builder)</h3>
+  <details class="inline-card fold">
+    <summary>🔧 Built-in tools (inside the Builder)</summary>
     <p style="margin-bottom:8px">These tools live inside the Template Builder. Open the Builder to use them:</p>
     <div style="display:flex;flex-direction:column;gap:6px">
       <div style="display:flex;align-items:center;gap:8px;font-size:.74rem"><span style="color:var(--th-accent);font-weight:700;min-width:100px">Health Score</span><span style="color:var(--th-tx2)">Review step — 0–100 score with 11 checks and letter grade</span></div>
@@ -405,7 +432,7 @@ body{
       <div style="display:flex;align-items:center;gap:8px;font-size:.74rem"><span style="color:var(--th-accent);font-weight:700;min-width:100px">Host Compat</span><span style="color:var(--th-tx2)">Review step — checks elfhosted/fortheweak/self-hosted compatibility</span></div>
       <div style="display:flex;align-items:center;gap:8px;font-size:.74rem"><span style="color:var(--th-accent);font-weight:700;min-width:100px">Preflight</span><span style="color:var(--th-tx2)">Install step — checks credentials, device mismatches, missing guards before deploy</span></div>
     </div>
-  </div>
+  </details>
 
   <div class="rule"></div>
   <footer class="foot">

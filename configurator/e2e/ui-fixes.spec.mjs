@@ -15,7 +15,7 @@ async function fresh(page) {
 }
 
 async function openDrawer(page) {
-  await page.locator('[data-action="custom-start"]').click();
+  await page.locator('#lpMenuBtn').click(); await page.locator('#lpMenu [data-action="custom-start"]').click();
   await page.locator('[data-action="open-advanced"]').click();
   await expect(page.locator('#advancedDrawer')).toBeVisible();
 }
@@ -77,9 +77,10 @@ test('feedback / contact widget mounts and opens (v2.83 wiring restored)', async
   await page.goto('/');
   await page.evaluate(() => { localStorage.clear(); localStorage.setItem('cb_tut_seen', '1'); });
   await page.reload();
-  const btn = page.locator('#cbContactBtn');
-  await expect(btn).toBeVisible();                 // proves initContactWidget() ran (module is wired)
-  await btn.click();
+  // The landing hides the floating button (v3.33): its menu opens the same widget.
+  await expect(page.locator('#cbContactBtn')).toHaveCount(1); // proves initContactWidget() ran (module is wired)
+  await page.locator('#lpMenuBtn').click();
+  await page.locator('#lpMenu [data-lp="feedback"]').click();
   await expect(page.locator('#cbContactPanel, .cb-contact-panel').first()).toBeVisible();
   await expect(page.locator('#cbContactForm')).toBeVisible();
 });

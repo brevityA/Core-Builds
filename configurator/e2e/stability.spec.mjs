@@ -84,7 +84,7 @@ test('Express Install creates a raw manifest without TMDB', async ({ page }) => 
 
 test('Fine-Tune drawer preserves the wizard and Next button', async ({ page }) => {
   const errors = await fresh(page);
-  await page.locator('[data-action="custom-start"]').click();
+  await page.locator('#lpMenuBtn').click(); await page.locator('#lpMenu [data-action="custom-start"]').click();
   await page.locator('label[for="o_torbox-pro"]').click();
   await expect(page.locator('#btnNext')).toBeEnabled();
   await page.locator('[data-action="open-advanced"]').click();
@@ -101,7 +101,7 @@ test('Fine-Tune drawer preserves the wizard and Next button', async ({ page }) =
 
 test('Advanced extras carousel is multi-select while short routes stay compact', async ({ page, context }) => {
   const errors = await fresh(page);
-  await page.locator('[data-action="custom-start"]').click();
+  await page.locator('#lpMenuBtn').click(); await page.locator('#lpMenu [data-action="custom-start"]').click();
   await page.locator('label[for="o_torbox-pro"]').click();
   // Carousel grew from 20 to 37 as optional scrapers were added (knaben, zilean, etc. + easynewsPlus).
   // Assert at least 20 so the test survives future additions.
@@ -123,7 +123,7 @@ test('Advanced extras carousel is multi-select while short routes stay compact',
 
   const guided = await context.newPage();
   await fresh(guided);
-  await guided.locator('[data-action="easy-start"]').click();
+  await guided.locator('#lpMenuBtn').click(); await guided.locator('#lpMenu [data-action="easy-start"]').click();
   await expect(guided.locator('.opt-scraper-scroll')).toHaveCount(0);
   await expect(guided.locator('[data-action="open-additional-services"]')).toHaveCount(1);
   expect(errors).toEqual([]);

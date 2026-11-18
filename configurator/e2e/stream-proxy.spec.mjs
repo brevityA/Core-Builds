@@ -17,7 +17,7 @@ test('the stream proxy switches on only when complete, and the build carries it'
   const errors = [];
   page.on('pageerror', error => errors.push(error.message));
   await fresh(page);
-  await page.locator('[data-action="custom-start"]').click();
+  await page.locator('#lpMenuBtn').click(); await page.locator('#lpMenu [data-action="custom-start"]').click();
   await page.locator('label[for="o_torbox-pro"]').click();
   await page.locator('[data-action="open-advanced"]').click();
 
