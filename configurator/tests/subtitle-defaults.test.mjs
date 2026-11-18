@@ -27,13 +27,18 @@ test('SubDL is only emitted with its API key, and never leaves a build without s
   assert.match(app, /if \(addons\.includes\('subdl'\) && S\.creds\.subdl\)/);
 });
 
-test('saved sessions on the old AIOSubtitle-only default move to OpenSubtitles v3+', () => {
+test('saved sessions leave AIOSubtitle for OpenSubtitles v3+', () => {
+  // 3.16 moved the untouched AIOSubtitle-only default (schema 5). AIOStreams 2.36.0 then
+  // removed the preset and refuses any config carrying it, so 3.18 takes it out of every
+  // saved mix (schema 6), keeping the user's other choices.
   const src = app.match(/const STATE_SCHEMA = \d+;\nfunction migrateState\(input\) \{[\s\S]*?\n\}/)[0];
   const migrate = new Function('DEVICE_FORCE_LIMITED_AUDIO', 'DEVICE_AUDIO_DEFAULTS', 'OUTPUT_PROFILES', 'AIOSTREAMS_COMPATIBILITY_TARGETS', 'DEFAULT_AIOSTREAMS_VERSION',
-    `${src}\nreturn migrateState;`)(new Set(), {}, [], ['2.35.7'], '2.35.7');
+    `${src}\nreturn migrateState;`)(new Set(), {}, [], ['2.36.0'], '2.36.0');
   assert.deepEqual(migrate({ _schema: 4, subtitleAddons: ['aiosubtitle'] }).subtitleAddons, ['opensubtitles-v3-plus']);
-  assert.deepEqual(migrate({ _schema: 4, subtitleAddons: ['aiosubtitle', 'subdl'] }).subtitleAddons, ['aiosubtitle', 'subdl'], 'an explicit mix is the user\'s choice');
-  assert.deepEqual(migrate({ _schema: 5, subtitleAddons: ['aiosubtitle'] }).subtitleAddons, ['aiosubtitle'], 'runs once');
+  assert.deepEqual(migrate({ _schema: 4, subtitleAddons: ['aiosubtitle', 'subdl'] }).subtitleAddons, ['subdl'], 'other choices are kept');
+  assert.deepEqual(migrate({ _schema: 5, subtitleAddons: ['aiosubtitle'] }).subtitleAddons, ['opensubtitles-v3-plus'], 'never left with no subtitles');
+  assert.deepEqual(migrate({ _schema: 6, subtitleAddons: ['subdl'] }).subtitleAddons, ['subdl'], 'runs once');
+  assert.doesNotMatch(app, /\['aiosubtitle','AIOSubtitle'/, 'no longer offered in Fine-Tune');
 });
 
 test('an imported keyless SubDL is switched off; an entered key is written into it', async () => {

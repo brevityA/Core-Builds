@@ -1,0 +1,3197 @@
+{
+  "metadata": {
+    "id": "core-builds",
+    "name": "Core Builds",
+    "description": "One Core Builds setup for any device and service. Answer a few questions (device, picture, what matters most, language) and pick your service; you get the same config the Core Builds configurator would build.",
+    "author": "Brevity",
+    "version": "1.0.0",
+    "category": "Debrid",
+    "services": [
+      "torbox",
+      "realdebrid",
+      "alldebrid",
+      "premiumize",
+      "debridlink",
+      "offcloud",
+      "easydebrid",
+      "pikpak",
+      "seedr",
+      "debrider",
+      "easynews"
+    ],
+    "serviceRequired": false,
+    "setToSaveInstallMenu": true,
+    "sourceUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Smart/core-builds.json",
+    "changelogUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md",
+    "inputs": [
+      {
+        "id": "device",
+        "name": "What do you watch on?",
+        "description": "Sets the video and audio formats Core Builds prefers or avoids, such as Dolby Vision, AV1 and lossless audio.",
+        "type": "select",
+        "required": true,
+        "default": "generic",
+        "options": [
+          {
+            "value": "generic",
+            "label": "Standard / Not sure"
+          },
+          {
+            "value": "samsung",
+            "label": "Samsung TV"
+          },
+          {
+            "value": "samsung-tizen",
+            "label": "Samsung Tizen TV"
+          },
+          {
+            "value": "lgtv",
+            "label": "LG TV webOS"
+          },
+          {
+            "value": "lg-webos",
+            "label": "LG webOS TV"
+          },
+          {
+            "value": "sony",
+            "label": "Sony Bravia"
+          },
+          {
+            "value": "sony-google-tv",
+            "label": "Sony / Google TV"
+          },
+          {
+            "value": "tcl-google-tv",
+            "label": "TCL Google TV"
+          },
+          {
+            "value": "hisense",
+            "label": "Hisense TV"
+          },
+          {
+            "value": "generic-4k-hdr-tv",
+            "label": "Generic 4K HDR TV"
+          },
+          {
+            "value": "appletv-old",
+            "label": "Apple TV 4K Gen 1–2"
+          },
+          {
+            "value": "appletv-new",
+            "label": "Apple TV 4K Gen 3"
+          },
+          {
+            "value": "firestick-hd",
+            "label": "Fire Stick HD"
+          },
+          {
+            "value": "firestick-4kmax",
+            "label": "Fire Stick 4K Max"
+          },
+          {
+            "value": "shield",
+            "label": "Nvidia Shield"
+          },
+          {
+            "value": "googletv",
+            "label": "Google TV Streamer"
+          },
+          {
+            "value": "chromecast",
+            "label": "Chromecast with Google TV"
+          },
+          {
+            "value": "android-tv",
+            "label": "Android TV / Google TV"
+          },
+          {
+            "value": "onn",
+            "label": "onn 4K box"
+          },
+          {
+            "value": "xiaomi",
+            "label": "Xiaomi Mi Box S (2nd Gen)"
+          },
+          {
+            "value": "xiaomi-3rd",
+            "label": "Xiaomi Mi Box S (3rd Gen)"
+          },
+          {
+            "value": "roku",
+            "label": "Roku"
+          },
+          {
+            "value": "windows",
+            "label": "Windows PC"
+          },
+          {
+            "value": "android-mobile",
+            "label": "Android phone / tablet"
+          },
+          {
+            "value": "ipad",
+            "label": "iPad / iPhone"
+          },
+          {
+            "value": "projector",
+            "label": "Projector"
+          }
+        ]
+      },
+      {
+        "id": "resolution",
+        "name": "Picture",
+        "description": "4K shows 2160p first with 1080p behind it. 1080p leaves 4K out. Mixed has no hard limit.",
+        "type": "select",
+        "required": true,
+        "default": "4k",
+        "options": [
+          {
+            "value": "4k",
+            "label": "4K"
+          },
+          {
+            "value": "1080p",
+            "label": "1080p"
+          },
+          {
+            "value": "mixed",
+            "label": "Mixed"
+          }
+        ]
+      },
+      {
+        "id": "profile",
+        "name": "What matters most",
+        "description": "Fast keeps files small, Balanced suits most people, Maximum searches widest with no size limit.",
+        "type": "select",
+        "required": true,
+        "default": "balanced",
+        "options": [
+          {
+            "value": "balanced",
+            "label": "Balanced (recommended)"
+          },
+          {
+            "value": "fast",
+            "label": "Fast"
+          },
+          {
+            "value": "maximum",
+            "label": "Maximum"
+          }
+        ]
+      },
+      {
+        "id": "cachedOnly",
+        "name": "Only streams that play straight away",
+        "description": "Hides anything your service would still have to download first.",
+        "type": "boolean",
+        "default": false
+      },
+      {
+        "id": "language",
+        "name": "Language you watch in",
+        "description": "Releases in this language come first when everything else is equal. English and original-audio releases still show.",
+        "type": "select",
+        "required": true,
+        "default": "English",
+        "options": [
+          {
+            "value": "English",
+            "label": "English"
+          },
+          {
+            "value": "Spanish",
+            "label": "Spanish"
+          },
+          {
+            "value": "French",
+            "label": "French"
+          },
+          {
+            "value": "German",
+            "label": "German"
+          },
+          {
+            "value": "Italian",
+            "label": "Italian"
+          },
+          {
+            "value": "Portuguese",
+            "label": "Portuguese"
+          },
+          {
+            "value": "Japanese",
+            "label": "Japanese"
+          },
+          {
+            "value": "Korean",
+            "label": "Korean"
+          },
+          {
+            "value": "Chinese",
+            "label": "Chinese"
+          },
+          {
+            "value": "Arabic",
+            "label": "Arabic"
+          },
+          {
+            "value": "Hindi",
+            "label": "Hindi"
+          },
+          {
+            "value": "Russian",
+            "label": "Russian"
+          },
+          {
+            "value": "Dutch",
+            "label": "Dutch"
+          },
+          {
+            "value": "Polish",
+            "label": "Polish"
+          },
+          {
+            "value": "Turkish",
+            "label": "Turkish"
+          }
+        ]
+      },
+      {
+        "id": "anime",
+        "name": "Mostly anime",
+        "description": "Adds anime sources such as Anime Tosho.",
+        "type": "boolean",
+        "default": false
+      }
+    ]
+  },
+  "config": {
+    "trusted": false,
+    "showChanges": true,
+    "addonName": {
+      "__switch": "services",
+      "cases": {
+        "": {
+          "__switch": "inputs.resolution",
+          "cases": {
+            "1080p": {
+              "__switch": "inputs.device",
+              "cases": {
+                "samsung": "Core Nexus · Samsung TV — P2P",
+                "lgtv": "Core Nexus · LG TV — P2P",
+                "sony": "Core Nexus · Sony TV — P2P",
+                "appletv-old": "Core Nexus · Apple TV — P2P",
+                "appletv-new": "Core Nexus · Apple TV — P2P",
+                "firestick-hd": "Core Nexus · Fire Stick — P2P",
+                "firestick-4kmax": "Core Nexus · Fire Stick 4K — P2P",
+                "shield": "Core Nexus · Shield — P2P",
+                "googletv": "Core Nexus · Google TV — P2P",
+                "chromecast": "Core Nexus · Chromecast — P2P",
+                "onn": "Core Nexus · ONN — P2P",
+                "xiaomi": "Core Nexus · Xiaomi — P2P",
+                "xiaomi-3rd": "Core Nexus · Xiaomi — P2P",
+                "roku": "Core Nexus · Roku — P2P",
+                "ipad": "Core Nexus · iPad — P2P",
+                "projector": "Core Nexus · Projector — P2P"
+              },
+              "default": "Core Nexus — P2P"
+            },
+            "mixed": {
+              "__switch": "inputs.device",
+              "cases": {
+                "samsung": "Core Nexus Mixed · Samsung TV — P2P",
+                "lgtv": "Core Nexus Mixed · LG TV — P2P",
+                "sony": "Core Nexus Mixed · Sony TV — P2P",
+                "appletv-old": "Core Nexus Mixed · Apple TV — P2P",
+                "appletv-new": "Core Nexus Mixed · Apple TV — P2P",
+                "firestick-hd": "Core Nexus Mixed · Fire Stick — P2P",
+                "firestick-4kmax": "Core Nexus Mixed · Fire Stick 4K — P2P",
+                "shield": "Core Nexus Mixed · Shield — P2P",
+                "googletv": "Core Nexus Mixed · Google TV — P2P",
+                "chromecast": "Core Nexus Mixed · Chromecast — P2P",
+                "onn": "Core Nexus Mixed · ONN — P2P",
+                "xiaomi": "Core Nexus Mixed · Xiaomi — P2P",
+                "xiaomi-3rd": "Core Nexus Mixed · Xiaomi — P2P",
+                "roku": "Core Nexus Mixed · Roku — P2P",
+                "ipad": "Core Nexus Mixed · iPad — P2P",
+                "projector": "Core Nexus Mixed · Projector — P2P"
+              },
+              "default": "Core Nexus Mixed — P2P"
+            }
+          },
+          "default": {
+            "__switch": "inputs.device",
+            "cases": {
+              "samsung": "Core Nexus 4K · Samsung TV — P2P",
+              "lgtv": "Core Nexus 4K · LG TV — P2P",
+              "sony": "Core Nexus 4K · Sony TV — P2P",
+              "appletv-old": "Core Nexus 4K · Apple TV — P2P",
+              "appletv-new": "Core Nexus 4K · Apple TV — P2P",
+              "firestick-hd": "Core Nexus 4K · Fire Stick — P2P",
+              "firestick-4kmax": "Core Nexus 4K · Fire Stick 4K — P2P",
+              "shield": "Core Nexus 4K · Shield — P2P",
+              "googletv": "Core Nexus 4K · Google TV — P2P",
+              "chromecast": "Core Nexus 4K · Chromecast — P2P",
+              "onn": "Core Nexus 4K · ONN — P2P",
+              "xiaomi": "Core Nexus 4K · Xiaomi — P2P",
+              "xiaomi-3rd": "Core Nexus 4K · Xiaomi — P2P",
+              "roku": "Core Nexus 4K · Roku — P2P",
+              "ipad": "Core Nexus 4K · iPad — P2P",
+              "projector": "Core Nexus 4K · Projector — P2P"
+            },
+            "default": "Core Nexus 4K — P2P"
+          }
+        },
+        "torbox": {
+          "__switch": "inputs.resolution",
+          "cases": {
+            "1080p": {
+              "__switch": "inputs.device",
+              "cases": {
+                "samsung": "Core Nexus · Samsung TV — TorBox",
+                "lgtv": "Core Nexus · LG TV — TorBox",
+                "sony": "Core Nexus · Sony TV — TorBox",
+                "appletv-old": "Core Nexus · Apple TV — TorBox",
+                "appletv-new": "Core Nexus · Apple TV — TorBox",
+                "firestick-hd": "Core Nexus · Fire Stick — TorBox",
+                "firestick-4kmax": "Core Nexus · Fire Stick 4K — TorBox",
+                "shield": "Core Nexus · Shield — TorBox",
+                "googletv": "Core Nexus · Google TV — TorBox",
+                "chromecast": "Core Nexus · Chromecast — TorBox",
+                "onn": "Core Nexus · ONN — TorBox",
+                "xiaomi": "Core Nexus · Xiaomi — TorBox",
+                "xiaomi-3rd": "Core Nexus · Xiaomi — TorBox",
+                "roku": "Core Nexus · Roku — TorBox",
+                "ipad": "Core Nexus · iPad — TorBox",
+                "projector": "Core Nexus · Projector — TorBox"
+              },
+              "default": "Core Nexus — TorBox"
+            },
+            "mixed": {
+              "__switch": "inputs.device",
+              "cases": {
+                "samsung": "Core Nexus Mixed · Samsung TV — TorBox",
+                "lgtv": "Core Nexus Mixed · LG TV — TorBox",
+                "sony": "Core Nexus Mixed · Sony TV — TorBox",
+                "appletv-old": "Core Nexus Mixed · Apple TV — TorBox",
+                "appletv-new": "Core Nexus Mixed · Apple TV — TorBox",
+                "firestick-hd": "Core Nexus Mixed · Fire Stick — TorBox",
+                "firestick-4kmax": "Core Nexus Mixed · Fire Stick 4K — TorBox",
+                "shield": "Core Nexus Mixed · Shield — TorBox",
+                "googletv": "Core Nexus Mixed · Google TV — TorBox",
+                "chromecast": "Core Nexus Mixed · Chromecast — TorBox",
+                "onn": "Core Nexus Mixed · ONN — TorBox",
+                "xiaomi": "Core Nexus Mixed · Xiaomi — TorBox",
+                "xiaomi-3rd": "Core Nexus Mixed · Xiaomi — TorBox",
+                "roku": "Core Nexus Mixed · Roku — TorBox",
+                "ipad": "Core Nexus Mixed · iPad — TorBox",
+                "projector": "Core Nexus Mixed · Projector — TorBox"
+              },
+              "default": "Core Nexus Mixed — TorBox"
+            }
+          },
+          "default": {
+            "__switch": "inputs.device",
+            "cases": {
+              "samsung": "Core Nexus 4K · Samsung TV — TorBox",
+              "lgtv": "Core Nexus 4K · LG TV — TorBox",
+              "sony": "Core Nexus 4K · Sony TV — TorBox",
+              "appletv-old": "Core Nexus 4K · Apple TV — TorBox",
+              "appletv-new": "Core Nexus 4K · Apple TV — TorBox",
+              "firestick-hd": "Core Nexus 4K · Fire Stick — TorBox",
+              "firestick-4kmax": "Core Nexus 4K · Fire Stick 4K — TorBox",
+              "shield": "Core Nexus 4K · Shield — TorBox",
+              "googletv": "Core Nexus 4K · Google TV — TorBox",
+              "chromecast": "Core Nexus 4K · Chromecast — TorBox",
+              "onn": "Core Nexus 4K · ONN — TorBox",
+              "xiaomi": "Core Nexus 4K · Xiaomi — TorBox",
+              "xiaomi-3rd": "Core Nexus 4K · Xiaomi — TorBox",
+              "roku": "Core Nexus 4K · Roku — TorBox",
+              "ipad": "Core Nexus 4K · iPad — TorBox",
+              "projector": "Core Nexus 4K · Projector — TorBox"
+            },
+            "default": "Core Nexus 4K — TorBox"
+          }
+        },
+        "realdebrid": {
+          "__switch": "inputs.resolution",
+          "cases": {
+            "1080p": {
+              "__switch": "inputs.device",
+              "cases": {
+                "samsung": "Core Nexus · Samsung TV — Real-Debrid",
+                "lgtv": "Core Nexus · LG TV — Real-Debrid",
+                "sony": "Core Nexus · Sony TV — Real-Debrid",
+                "appletv-old": "Core Nexus · Apple TV — Real-Debrid",
+                "appletv-new": "Core Nexus · Apple TV — Real-Debrid",
+                "firestick-hd": "Core Nexus · Fire Stick — Real-Debrid",
+                "firestick-4kmax": "Core Nexus · Fire Stick 4K — Real-Debrid",
+                "shield": "Core Nexus · Shield — Real-Debrid",
+                "googletv": "Core Nexus · Google TV — Real-Debrid",
+                "chromecast": "Core Nexus · Chromecast — Real-Debrid",
+                "onn": "Core Nexus · ONN — Real-Debrid",
+                "xiaomi": "Core Nexus · Xiaomi — Real-Debrid",
+                "xiaomi-3rd": "Core Nexus · Xiaomi — Real-Debrid",
+                "roku": "Core Nexus · Roku — Real-Debrid",
+                "ipad": "Core Nexus · iPad — Real-Debrid",
+                "projector": "Core Nexus · Projector — Real-Debrid"
+              },
+              "default": "Core Nexus — Real-Debrid"
+            },
+            "mixed": {
+              "__switch": "inputs.device",
+              "cases": {
+                "samsung": "Core Nexus Mixed · Samsung TV — Real-Debrid",
+                "lgtv": "Core Nexus Mixed · LG TV — Real-Debrid",
+                "sony": "Core Nexus Mixed · Sony TV — Real-Debrid",
+                "appletv-old": "Core Nexus Mixed · Apple TV — Real-Debrid",
+                "appletv-new": "Core Nexus Mixed · Apple TV — Real-Debrid",
+                "firestick-hd": "Core Nexus Mixed · Fire Stick — Real-Debrid",
+                "firestick-4kmax": "Core Nexus Mixed · Fire Stick 4K — Real-Debrid",
+                "shield": "Core Nexus Mixed · Shield — Real-Debrid",
+                "googletv": "Core Nexus Mixed · Google TV — Real-Debrid",
+                "chromecast": "Core Nexus Mixed · Chromecast — Real-Debrid",
+                "onn": "Core Nexus Mixed · ONN — Real-Debrid",
+                "xiaomi": "Core Nexus Mixed · Xiaomi — Real-Debrid",
+                "xiaomi-3rd": "Core Nexus Mixed · Xiaomi — Real-Debrid",
+                "roku": "Core Nexus Mixed · Roku — Real-Debrid",
+                "ipad": "Core Nexus Mixed · iPad — Real-Debrid",
+                "projector": "Core Nexus Mixed · Projector — Real-Debrid"
+              },
+              "default": "Core Nexus Mixed — Real-Debrid"
+            }
+          },
+          "default": {
+            "__switch": "inputs.device",
+            "cases": {
+              "samsung": "Core Nexus 4K · Samsung TV — Real-Debrid",
+              "lgtv": "Core Nexus 4K · LG TV — Real-Debrid",
+              "sony": "Core Nexus 4K · Sony TV — Real-Debrid",
+              "appletv-old": "Core Nexus 4K · Apple TV — Real-Debrid",
+              "appletv-new": "Core Nexus 4K · Apple TV — Real-Debrid",
+              "firestick-hd": "Core Nexus 4K · Fire Stick — Real-Debrid",
+              "firestick-4kmax": "Core Nexus 4K · Fire Stick 4K — Real-Debrid",
+              "shield": "Core Nexus 4K · Shield — Real-Debrid",
+              "googletv": "Core Nexus 4K · Google TV — Real-Debrid",
+              "chromecast": "Core Nexus 4K · Chromecast — Real-Debrid",
+              "onn": "Core Nexus 4K · ONN — Real-Debrid",
+              "xiaomi": "Core Nexus 4K · Xiaomi — Real-Debrid",
+              "xiaomi-3rd": "Core Nexus 4K · Xiaomi — Real-Debrid",
+              "roku": "Core Nexus 4K · Roku — Real-Debrid",
+              "ipad": "Core Nexus 4K · iPad — Real-Debrid",
+              "projector": "Core Nexus 4K · Projector — Real-Debrid"
+            },
+            "default": "Core Nexus 4K — Real-Debrid"
+          }
+        },
+        "alldebrid": {
+          "__switch": "inputs.resolution",
+          "cases": {
+            "1080p": {
+              "__switch": "inputs.device",
+              "cases": {
+                "samsung": "Core Nexus · Samsung TV — AllDebrid",
+                "lgtv": "Core Nexus · LG TV — AllDebrid",
+                "sony": "Core Nexus · Sony TV — AllDebrid",
+                "appletv-old": "Core Nexus · Apple TV — AllDebrid",
+                "appletv-new": "Core Nexus · Apple TV — AllDebrid",
+                "firestick-hd": "Core Nexus · Fire Stick — AllDebrid",
+                "firestick-4kmax": "Core Nexus · Fire Stick 4K — AllDebrid",
+                "shield": "Core Nexus · Shield — AllDebrid",
+                "googletv": "Core Nexus · Google TV — AllDebrid",
+                "chromecast": "Core Nexus · Chromecast — AllDebrid",
+                "onn": "Core Nexus · ONN — AllDebrid",
+                "xiaomi": "Core Nexus · Xiaomi — AllDebrid",
+                "xiaomi-3rd": "Core Nexus · Xiaomi — AllDebrid",
+                "roku": "Core Nexus · Roku — AllDebrid",
+                "ipad": "Core Nexus · iPad — AllDebrid",
+                "projector": "Core Nexus · Projector — AllDebrid"
+              },
+              "default": "Core Nexus — AllDebrid"
+            },
+            "mixed": {
+              "__switch": "inputs.device",
+              "cases": {
+                "samsung": "Core Nexus Mixed · Samsung TV — AllDebrid",
+                "lgtv": "Core Nexus Mixed · LG TV — AllDebrid",
+                "sony": "Core Nexus Mixed · Sony TV — AllDebrid",
+                "appletv-old": "Core Nexus Mixed · Apple TV — AllDebrid",
+                "appletv-new": "Core Nexus Mixed · Apple TV — AllDebrid",
+                "firestick-hd": "Core Nexus Mixed · Fire Stick — AllDebrid",
+                "firestick-4kmax": "Core Nexus Mixed · Fire Stick 4K — AllDebrid",
+                "shield": "Core Nexus Mixed · Shield — AllDebrid",
+                "googletv": "Core Nexus Mixed · Google TV — AllDebrid",
+                "chromecast": "Core Nexus Mixed · Chromecast — AllDebrid",
+                "onn": "Core Nexus Mixed · ONN — AllDebrid",
+                "xiaomi": "Core Nexus Mixed · Xiaomi — AllDebrid",
+                "xiaomi-3rd": "Core Nexus Mixed · Xiaomi — AllDebrid",
+                "roku": "Core Nexus Mixed · Roku — AllDebrid",
+                "ipad": "Core Nexus Mixed · iPad — AllDebrid",
+                "projector": "Core Nexus Mixed · Projector — AllDebrid"
+              },
+              "default": "Core Nexus Mixed — AllDebrid"
+            }
+          },
+          "default": {
+            "__switch": "inputs.device",
+            "cases": {
+              "samsung": "Core Nexus 4K · Samsung TV — AllDebrid",
+              "lgtv": "Core Nexus 4K · LG TV — AllDebrid",
+              "sony": "Core Nexus 4K · Sony TV — AllDebrid",
+              "appletv-old": "Core Nexus 4K · Apple TV — AllDebrid",
+              "appletv-new": "Core Nexus 4K · Apple TV — AllDebrid",
+              "firestick-hd": "Core Nexus 4K · Fire Stick — AllDebrid",
+              "firestick-4kmax": "Core Nexus 4K · Fire Stick 4K — AllDebrid",
+              "shield": "Core Nexus 4K · Shield — AllDebrid",
+              "googletv": "Core Nexus 4K · Google TV — AllDebrid",
+              "chromecast": "Core Nexus 4K · Chromecast — AllDebrid",
+              "onn": "Core Nexus 4K · ONN — AllDebrid",
+              "xiaomi": "Core Nexus 4K · Xiaomi — AllDebrid",
+              "xiaomi-3rd": "Core Nexus 4K · Xiaomi — AllDebrid",
+              "roku": "Core Nexus 4K · Roku — AllDebrid",
+              "ipad": "Core Nexus 4K · iPad — AllDebrid",
+              "projector": "Core Nexus 4K · Projector — AllDebrid"
+            },
+            "default": "Core Nexus 4K — AllDebrid"
+          }
+        },
+        "premiumize": {
+          "__switch": "inputs.resolution",
+          "cases": {
+            "1080p": {
+              "__switch": "inputs.device",
+              "cases": {
+                "samsung": "Core Nexus · Samsung TV — Premiumize",
+                "lgtv": "Core Nexus · LG TV — Premiumize",
+                "sony": "Core Nexus · Sony TV — Premiumize",
+                "appletv-old": "Core Nexus · Apple TV — Premiumize",
+                "appletv-new": "Core Nexus · Apple TV — Premiumize",
+                "firestick-hd": "Core Nexus · Fire Stick — Premiumize",
+                "firestick-4kmax": "Core Nexus · Fire Stick 4K — Premiumize",
+                "shield": "Core Nexus · Shield — Premiumize",
+                "googletv": "Core Nexus · Google TV — Premiumize",
+                "chromecast": "Core Nexus · Chromecast — Premiumize",
+                "onn": "Core Nexus · ONN — Premiumize",
+                "xiaomi": "Core Nexus · Xiaomi — Premiumize",
+                "xiaomi-3rd": "Core Nexus · Xiaomi — Premiumize",
+                "roku": "Core Nexus · Roku — Premiumize",
+                "ipad": "Core Nexus · iPad — Premiumize",
+                "projector": "Core Nexus · Projector — Premiumize"
+              },
+              "default": "Core Nexus — Premiumize"
+            },
+            "mixed": {
+              "__switch": "inputs.device",
+              "cases": {
+                "samsung": "Core Nexus Mixed · Samsung TV — Premiumize",
+                "lgtv": "Core Nexus Mixed · LG TV — Premiumize",
+                "sony": "Core Nexus Mixed · Sony TV — Premiumize",
+                "appletv-old": "Core Nexus Mixed · Apple TV — Premiumize",
+                "appletv-new": "Core Nexus Mixed · Apple TV — Premiumize",
+                "firestick-hd": "Core Nexus Mixed · Fire Stick — Premiumize",
+                "firestick-4kmax": "Core Nexus Mixed · Fire Stick 4K — Premiumize",
+                "shield": "Core Nexus Mixed · Shield — Premiumize",
+                "googletv": "Core Nexus Mixed · Google TV — Premiumize",
+                "chromecast": "Core Nexus Mixed · Chromecast — Premiumize",
+                "onn": "Core Nexus Mixed · ONN — Premiumize",
+                "xiaomi": "Core Nexus Mixed · Xiaomi — Premiumize",
+                "xiaomi-3rd": "Core Nexus Mixed · Xiaomi — Premiumize",
+                "roku": "Core Nexus Mixed · Roku — Premiumize",
+                "ipad": "Core Nexus Mixed · iPad — Premiumize",
+                "projector": "Core Nexus Mixed · Projector — Premiumize"
+              },
+              "default": "Core Nexus Mixed — Premiumize"
+            }
+          },
+          "default": {
+            "__switch": "inputs.device",
+            "cases": {
+              "samsung": "Core Nexus 4K · Samsung TV — Premiumize",
+              "lgtv": "Core Nexus 4K · LG TV — Premiumize",
+              "sony": "Core Nexus 4K · Sony TV — Premiumize",
+              "appletv-old": "Core Nexus 4K · Apple TV — Premiumize",
+              "appletv-new": "Core Nexus 4K · Apple TV — Premiumize",
+              "firestick-hd": "Core Nexus 4K · Fire Stick — Premiumize",
+              "firestick-4kmax": "Core Nexus 4K · Fire Stick 4K — Premiumize",
+              "shield": "Core Nexus 4K · Shield — Premiumize",
+              "googletv": "Core Nexus 4K · Google TV — Premiumize",
+              "chromecast": "Core Nexus 4K · Chromecast — Premiumize",
+              "onn": "Core Nexus 4K · ONN — Premiumize",
+              "xiaomi": "Core Nexus 4K · Xiaomi — Premiumize",
+              "xiaomi-3rd": "Core Nexus 4K · Xiaomi — Premiumize",
+              "roku": "Core Nexus 4K · Roku — Premiumize",
+              "ipad": "Core Nexus 4K · iPad — Premiumize",
+              "projector": "Core Nexus 4K · Projector — Premiumize"
+            },
+            "default": "Core Nexus 4K — Premiumize"
+          }
+        },
+        "debridlink": {
+          "__switch": "inputs.resolution",
+          "cases": {
+            "1080p": {
+              "__switch": "inputs.device",
+              "cases": {
+                "samsung": "Core Nexus · Samsung TV — Debrid-Link",
+                "lgtv": "Core Nexus · LG TV — Debrid-Link",
+                "sony": "Core Nexus · Sony TV — Debrid-Link",
+                "appletv-old": "Core Nexus · Apple TV — Debrid-Link",
+                "appletv-new": "Core Nexus · Apple TV — Debrid-Link",
+                "firestick-hd": "Core Nexus · Fire Stick — Debrid-Link",
+                "firestick-4kmax": "Core Nexus · Fire Stick 4K — Debrid-Link",
+                "shield": "Core Nexus · Shield — Debrid-Link",
+                "googletv": "Core Nexus · Google TV — Debrid-Link",
+                "chromecast": "Core Nexus · Chromecast — Debrid-Link",
+                "onn": "Core Nexus · ONN — Debrid-Link",
+                "xiaomi": "Core Nexus · Xiaomi — Debrid-Link",
+                "xiaomi-3rd": "Core Nexus · Xiaomi — Debrid-Link",
+                "roku": "Core Nexus · Roku — Debrid-Link",
+                "ipad": "Core Nexus · iPad — Debrid-Link",
+                "projector": "Core Nexus · Projector — Debrid-Link"
+              },
+              "default": "Core Nexus — Debrid-Link"
+            },
+            "mixed": {
+              "__switch": "inputs.device",
+              "cases": {
+                "samsung": "Core Nexus Mixed · Samsung TV — Debrid-Link",
+                "lgtv": "Core Nexus Mixed · LG TV — Debrid-Link",
+                "sony": "Core Nexus Mixed · Sony TV — Debrid-Link",
+                "appletv-old": "Core Nexus Mixed · Apple TV — Debrid-Link",
+                "appletv-new": "Core Nexus Mixed · Apple TV — Debrid-Link",
+                "firestick-hd": "Core Nexus Mixed · Fire Stick — Debrid-Link",
+                "firestick-4kmax": "Core Nexus Mixed · Fire Stick 4K — Debrid-Link",
+                "shield": "Core Nexus Mixed · Shield — Debrid-Link",
+                "googletv": "Core Nexus Mixed · Google TV — Debrid-Link",
+                "chromecast": "Core Nexus Mixed · Chromecast — Debrid-Link",
+                "onn": "Core Nexus Mixed · ONN — Debrid-Link",
+                "xiaomi": "Core Nexus Mixed · Xiaomi — Debrid-Link",
+                "xiaomi-3rd": "Core Nexus Mixed · Xiaomi — Debrid-Link",
+                "roku": "Core Nexus Mixed · Roku — Debrid-Link",
+                "ipad": "Core Nexus Mixed · iPad — Debrid-Link",
+                "projector": "Core Nexus Mixed · Projector — Debrid-Link"
+              },
+              "default": "Core Nexus Mixed — Debrid-Link"
+            }
+          },
+          "default": {
+            "__switch": "inputs.device",
+            "cases": {
+              "samsung": "Core Nexus 4K · Samsung TV — Debrid-Link",
+              "lgtv": "Core Nexus 4K · LG TV — Debrid-Link",
+              "sony": "Core Nexus 4K · Sony TV — Debrid-Link",
+              "appletv-old": "Core Nexus 4K · Apple TV — Debrid-Link",
+              "appletv-new": "Core Nexus 4K · Apple TV — Debrid-Link",
+              "firestick-hd": "Core Nexus 4K · Fire Stick — Debrid-Link",
+              "firestick-4kmax": "Core Nexus 4K · Fire Stick 4K — Debrid-Link",
+              "shield": "Core Nexus 4K · Shield — Debrid-Link",
+              "googletv": "Core Nexus 4K · Google TV — Debrid-Link",
+              "chromecast": "Core Nexus 4K · Chromecast — Debrid-Link",
+              "onn": "Core Nexus 4K · ONN — Debrid-Link",
+              "xiaomi": "Core Nexus 4K · Xiaomi — Debrid-Link",
+              "xiaomi-3rd": "Core Nexus 4K · Xiaomi — Debrid-Link",
+              "roku": "Core Nexus 4K · Roku — Debrid-Link",
+              "ipad": "Core Nexus 4K · iPad — Debrid-Link",
+              "projector": "Core Nexus 4K · Projector — Debrid-Link"
+            },
+            "default": "Core Nexus 4K — Debrid-Link"
+          }
+        },
+        "offcloud": {
+          "__switch": "inputs.resolution",
+          "cases": {
+            "1080p": {
+              "__switch": "inputs.device",
+              "cases": {
+                "samsung": "Core Nexus · Samsung TV — Offcloud",
+                "lgtv": "Core Nexus · LG TV — Offcloud",
+                "sony": "Core Nexus · Sony TV — Offcloud",
+                "appletv-old": "Core Nexus · Apple TV — Offcloud",
+                "appletv-new": "Core Nexus · Apple TV — Offcloud",
+                "firestick-hd": "Core Nexus · Fire Stick — Offcloud",
+                "firestick-4kmax": "Core Nexus · Fire Stick 4K — Offcloud",
+                "shield": "Core Nexus · Shield — Offcloud",
+                "googletv": "Core Nexus · Google TV — Offcloud",
+                "chromecast": "Core Nexus · Chromecast — Offcloud",
+                "onn": "Core Nexus · ONN — Offcloud",
+                "xiaomi": "Core Nexus · Xiaomi — Offcloud",
+                "xiaomi-3rd": "Core Nexus · Xiaomi — Offcloud",
+                "roku": "Core Nexus · Roku — Offcloud",
+                "ipad": "Core Nexus · iPad — Offcloud",
+                "projector": "Core Nexus · Projector — Offcloud"
+              },
+              "default": "Core Nexus — Offcloud"
+            },
+            "mixed": {
+              "__switch": "inputs.device",
+              "cases": {
+                "samsung": "Core Nexus Mixed · Samsung TV — Offcloud",
+                "lgtv": "Core Nexus Mixed · LG TV — Offcloud",
+                "sony": "Core Nexus Mixed · Sony TV — Offcloud",
+                "appletv-old": "Core Nexus Mixed · Apple TV — Offcloud",
+                "appletv-new": "Core Nexus Mixed · Apple TV — Offcloud",
+                "firestick-hd": "Core Nexus Mixed · Fire Stick — Offcloud",
+                "firestick-4kmax": "Core Nexus Mixed · Fire Stick 4K — Offcloud",
+                "shield": "Core Nexus Mixed · Shield — Offcloud",
+                "googletv": "Core Nexus Mixed · Google TV — Offcloud",
+                "chromecast": "Core Nexus Mixed · Chromecast — Offcloud",
+                "onn": "Core Nexus Mixed · ONN — Offcloud",
+                "xiaomi": "Core Nexus Mixed · Xiaomi — Offcloud",
+                "xiaomi-3rd": "Core Nexus Mixed · Xiaomi — Offcloud",
+                "roku": "Core Nexus Mixed · Roku — Offcloud",
+                "ipad": "Core Nexus Mixed · iPad — Offcloud",
+                "projector": "Core Nexus Mixed · Projector — Offcloud"
+              },
+              "default": "Core Nexus Mixed — Offcloud"
+            }
+          },
+          "default": {
+            "__switch": "inputs.device",
+            "cases": {
+              "samsung": "Core Nexus 4K · Samsung TV — Offcloud",
+              "lgtv": "Core Nexus 4K · LG TV — Offcloud",
+              "sony": "Core Nexus 4K · Sony TV — Offcloud",
+              "appletv-old": "Core Nexus 4K · Apple TV — Offcloud",
+              "appletv-new": "Core Nexus 4K · Apple TV — Offcloud",
+              "firestick-hd": "Core Nexus 4K · Fire Stick — Offcloud",
+              "firestick-4kmax": "Core Nexus 4K · Fire Stick 4K — Offcloud",
+              "shield": "Core Nexus 4K · Shield — Offcloud",
+              "googletv": "Core Nexus 4K · Google TV — Offcloud",
+              "chromecast": "Core Nexus 4K · Chromecast — Offcloud",
+              "onn": "Core Nexus 4K · ONN — Offcloud",
+              "xiaomi": "Core Nexus 4K · Xiaomi — Offcloud",
+              "xiaomi-3rd": "Core Nexus 4K · Xiaomi — Offcloud",
+              "roku": "Core Nexus 4K · Roku — Offcloud",
+              "ipad": "Core Nexus 4K · iPad — Offcloud",
+              "projector": "Core Nexus 4K · Projector — Offcloud"
+            },
+            "default": "Core Nexus 4K — Offcloud"
+          }
+        },
+        "debrider": {
+          "__switch": "inputs.resolution",
+          "cases": {
+            "1080p": {
+              "__switch": "inputs.device",
+              "cases": {
+                "samsung": "Core Nexus · Samsung TV — Debrider",
+                "lgtv": "Core Nexus · LG TV — Debrider",
+                "sony": "Core Nexus · Sony TV — Debrider",
+                "appletv-old": "Core Nexus · Apple TV — Debrider",
+                "appletv-new": "Core Nexus · Apple TV — Debrider",
+                "firestick-hd": "Core Nexus · Fire Stick — Debrider",
+                "firestick-4kmax": "Core Nexus · Fire Stick 4K — Debrider",
+                "shield": "Core Nexus · Shield — Debrider",
+                "googletv": "Core Nexus · Google TV — Debrider",
+                "chromecast": "Core Nexus · Chromecast — Debrider",
+                "onn": "Core Nexus · ONN — Debrider",
+                "xiaomi": "Core Nexus · Xiaomi — Debrider",
+                "xiaomi-3rd": "Core Nexus · Xiaomi — Debrider",
+                "roku": "Core Nexus · Roku — Debrider",
+                "ipad": "Core Nexus · iPad — Debrider",
+                "projector": "Core Nexus · Projector — Debrider"
+              },
+              "default": "Core Nexus — Debrider"
+            },
+            "mixed": {
+              "__switch": "inputs.device",
+              "cases": {
+                "samsung": "Core Nexus Mixed · Samsung TV — Debrider",
+                "lgtv": "Core Nexus Mixed · LG TV — Debrider",
+                "sony": "Core Nexus Mixed · Sony TV — Debrider",
+                "appletv-old": "Core Nexus Mixed · Apple TV — Debrider",
+                "appletv-new": "Core Nexus Mixed · Apple TV — Debrider",
+                "firestick-hd": "Core Nexus Mixed · Fire Stick — Debrider",
+                "firestick-4kmax": "Core Nexus Mixed · Fire Stick 4K — Debrider",
+                "shield": "Core Nexus Mixed · Shield — Debrider",
+                "googletv": "Core Nexus Mixed · Google TV — Debrider",
+                "chromecast": "Core Nexus Mixed · Chromecast — Debrider",
+                "onn": "Core Nexus Mixed · ONN — Debrider",
+                "xiaomi": "Core Nexus Mixed · Xiaomi — Debrider",
+                "xiaomi-3rd": "Core Nexus Mixed · Xiaomi — Debrider",
+                "roku": "Core Nexus Mixed · Roku — Debrider",
+                "ipad": "Core Nexus Mixed · iPad — Debrider",
+                "projector": "Core Nexus Mixed · Projector — Debrider"
+              },
+              "default": "Core Nexus Mixed — Debrider"
+            }
+          },
+          "default": {
+            "__switch": "inputs.device",
+            "cases": {
+              "samsung": "Core Nexus 4K · Samsung TV — Debrider",
+              "lgtv": "Core Nexus 4K · LG TV — Debrider",
+              "sony": "Core Nexus 4K · Sony TV — Debrider",
+              "appletv-old": "Core Nexus 4K · Apple TV — Debrider",
+              "appletv-new": "Core Nexus 4K · Apple TV — Debrider",
+              "firestick-hd": "Core Nexus 4K · Fire Stick — Debrider",
+              "firestick-4kmax": "Core Nexus 4K · Fire Stick 4K — Debrider",
+              "shield": "Core Nexus 4K · Shield — Debrider",
+              "googletv": "Core Nexus 4K · Google TV — Debrider",
+              "chromecast": "Core Nexus 4K · Chromecast — Debrider",
+              "onn": "Core Nexus 4K · ONN — Debrider",
+              "xiaomi": "Core Nexus 4K · Xiaomi — Debrider",
+              "xiaomi-3rd": "Core Nexus 4K · Xiaomi — Debrider",
+              "roku": "Core Nexus 4K · Roku — Debrider",
+              "ipad": "Core Nexus 4K · iPad — Debrider",
+              "projector": "Core Nexus 4K · Projector — Debrider"
+            },
+            "default": "Core Nexus 4K — Debrider"
+          }
+        },
+        "easynews": {
+          "__switch": "inputs.resolution",
+          "cases": {
+            "1080p": {
+              "__switch": "inputs.device",
+              "cases": {
+                "samsung": "Core Nexus · Samsung TV — EasyNews",
+                "lgtv": "Core Nexus · LG TV — EasyNews",
+                "sony": "Core Nexus · Sony TV — EasyNews",
+                "appletv-old": "Core Nexus · Apple TV — EasyNews",
+                "appletv-new": "Core Nexus · Apple TV — EasyNews",
+                "firestick-hd": "Core Nexus · Fire Stick — EasyNews",
+                "firestick-4kmax": "Core Nexus · Fire Stick 4K — EasyNews",
+                "shield": "Core Nexus · Shield — EasyNews",
+                "googletv": "Core Nexus · Google TV — EasyNews",
+                "chromecast": "Core Nexus · Chromecast — EasyNews",
+                "onn": "Core Nexus · ONN — EasyNews",
+                "xiaomi": "Core Nexus · Xiaomi — EasyNews",
+                "xiaomi-3rd": "Core Nexus · Xiaomi — EasyNews",
+                "roku": "Core Nexus · Roku — EasyNews",
+                "ipad": "Core Nexus · iPad — EasyNews",
+                "projector": "Core Nexus · Projector — EasyNews"
+              },
+              "default": "Core Nexus — EasyNews"
+            },
+            "mixed": {
+              "__switch": "inputs.device",
+              "cases": {
+                "samsung": "Core Nexus Mixed · Samsung TV — EasyNews",
+                "lgtv": "Core Nexus Mixed · LG TV — EasyNews",
+                "sony": "Core Nexus Mixed · Sony TV — EasyNews",
+                "appletv-old": "Core Nexus Mixed · Apple TV — EasyNews",
+                "appletv-new": "Core Nexus Mixed · Apple TV — EasyNews",
+                "firestick-hd": "Core Nexus Mixed · Fire Stick — EasyNews",
+                "firestick-4kmax": "Core Nexus Mixed · Fire Stick 4K — EasyNews",
+                "shield": "Core Nexus Mixed · Shield — EasyNews",
+                "googletv": "Core Nexus Mixed · Google TV — EasyNews",
+                "chromecast": "Core Nexus Mixed · Chromecast — EasyNews",
+                "onn": "Core Nexus Mixed · ONN — EasyNews",
+                "xiaomi": "Core Nexus Mixed · Xiaomi — EasyNews",
+                "xiaomi-3rd": "Core Nexus Mixed · Xiaomi — EasyNews",
+                "roku": "Core Nexus Mixed · Roku — EasyNews",
+                "ipad": "Core Nexus Mixed · iPad — EasyNews",
+                "projector": "Core Nexus Mixed · Projector — EasyNews"
+              },
+              "default": "Core Nexus Mixed — EasyNews"
+            }
+          },
+          "default": {
+            "__switch": "inputs.device",
+            "cases": {
+              "samsung": "Core Nexus 4K · Samsung TV — EasyNews",
+              "lgtv": "Core Nexus 4K · LG TV — EasyNews",
+              "sony": "Core Nexus 4K · Sony TV — EasyNews",
+              "appletv-old": "Core Nexus 4K · Apple TV — EasyNews",
+              "appletv-new": "Core Nexus 4K · Apple TV — EasyNews",
+              "firestick-hd": "Core Nexus 4K · Fire Stick — EasyNews",
+              "firestick-4kmax": "Core Nexus 4K · Fire Stick 4K — EasyNews",
+              "shield": "Core Nexus 4K · Shield — EasyNews",
+              "googletv": "Core Nexus 4K · Google TV — EasyNews",
+              "chromecast": "Core Nexus 4K · Chromecast — EasyNews",
+              "onn": "Core Nexus 4K · ONN — EasyNews",
+              "xiaomi": "Core Nexus 4K · Xiaomi — EasyNews",
+              "xiaomi-3rd": "Core Nexus 4K · Xiaomi — EasyNews",
+              "roku": "Core Nexus 4K · Roku — EasyNews",
+              "ipad": "Core Nexus 4K · iPad — EasyNews",
+              "projector": "Core Nexus 4K · Projector — EasyNews"
+            },
+            "default": "Core Nexus 4K — EasyNews"
+          }
+        }
+      },
+      "default": {
+        "__switch": "inputs.resolution",
+        "cases": {
+          "1080p": {
+            "__switch": "inputs.device",
+            "cases": {
+              "samsung": "Core Nexus · Samsung TV",
+              "lgtv": "Core Nexus · LG TV",
+              "sony": "Core Nexus · Sony TV",
+              "appletv-old": "Core Nexus · Apple TV",
+              "appletv-new": "Core Nexus · Apple TV",
+              "firestick-hd": "Core Nexus · Fire Stick",
+              "firestick-4kmax": "Core Nexus · Fire Stick 4K",
+              "shield": "Core Nexus · Shield",
+              "googletv": "Core Nexus · Google TV",
+              "chromecast": "Core Nexus · Chromecast",
+              "onn": "Core Nexus · ONN",
+              "xiaomi": "Core Nexus · Xiaomi",
+              "xiaomi-3rd": "Core Nexus · Xiaomi",
+              "roku": "Core Nexus · Roku",
+              "ipad": "Core Nexus · iPad",
+              "projector": "Core Nexus · Projector"
+            },
+            "default": "Core Nexus"
+          },
+          "mixed": {
+            "__switch": "inputs.device",
+            "cases": {
+              "samsung": "Core Nexus Mixed · Samsung TV",
+              "lgtv": "Core Nexus Mixed · LG TV",
+              "sony": "Core Nexus Mixed · Sony TV",
+              "appletv-old": "Core Nexus Mixed · Apple TV",
+              "appletv-new": "Core Nexus Mixed · Apple TV",
+              "firestick-hd": "Core Nexus Mixed · Fire Stick",
+              "firestick-4kmax": "Core Nexus Mixed · Fire Stick 4K",
+              "shield": "Core Nexus Mixed · Shield",
+              "googletv": "Core Nexus Mixed · Google TV",
+              "chromecast": "Core Nexus Mixed · Chromecast",
+              "onn": "Core Nexus Mixed · ONN",
+              "xiaomi": "Core Nexus Mixed · Xiaomi",
+              "xiaomi-3rd": "Core Nexus Mixed · Xiaomi",
+              "roku": "Core Nexus Mixed · Roku",
+              "ipad": "Core Nexus Mixed · iPad",
+              "projector": "Core Nexus Mixed · Projector"
+            },
+            "default": "Core Nexus Mixed"
+          }
+        },
+        "default": {
+          "__switch": "inputs.device",
+          "cases": {
+            "samsung": "Core Nexus 4K · Samsung TV",
+            "lgtv": "Core Nexus 4K · LG TV",
+            "sony": "Core Nexus 4K · Sony TV",
+            "appletv-old": "Core Nexus 4K · Apple TV",
+            "appletv-new": "Core Nexus 4K · Apple TV",
+            "firestick-hd": "Core Nexus 4K · Fire Stick",
+            "firestick-4kmax": "Core Nexus 4K · Fire Stick 4K",
+            "shield": "Core Nexus 4K · Shield",
+            "googletv": "Core Nexus 4K · Google TV",
+            "chromecast": "Core Nexus 4K · Chromecast",
+            "onn": "Core Nexus 4K · ONN",
+            "xiaomi": "Core Nexus 4K · Xiaomi",
+            "xiaomi-3rd": "Core Nexus 4K · Xiaomi",
+            "roku": "Core Nexus 4K · Roku",
+            "ipad": "Core Nexus 4K · iPad",
+            "projector": "Core Nexus 4K · Projector"
+          },
+          "default": "Core Nexus 4K"
+        }
+      }
+    },
+    "addonLogo": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Assets/core_icon.svg",
+    "addonDescription": {
+      "__switch": "services",
+      "cases": {
+        "": {
+          "__switch": "inputs.resolution",
+          "cases": {
+            "1080p": {
+              "__switch": "inputs.device",
+              "cases": {
+                "samsung": "Core Nexus · Samsung TV — P2P",
+                "lgtv": "Core Nexus · LG TV — P2P",
+                "sony": "Core Nexus · Sony TV — P2P",
+                "appletv-old": "Core Nexus · Apple TV — P2P",
+                "appletv-new": "Core Nexus · Apple TV — P2P",
+                "firestick-hd": "Core Nexus · Fire Stick — P2P",
+                "firestick-4kmax": "Core Nexus · Fire Stick 4K — P2P",
+                "shield": "Core Nexus · Shield — P2P",
+                "googletv": "Core Nexus · Google TV — P2P",
+                "chromecast": "Core Nexus · Chromecast — P2P",
+                "onn": "Core Nexus · ONN — P2P",
+                "xiaomi": "Core Nexus · Xiaomi — P2P",
+                "xiaomi-3rd": "Core Nexus · Xiaomi — P2P",
+                "roku": "Core Nexus · Roku — P2P",
+                "ipad": "Core Nexus · iPad — P2P",
+                "projector": "Core Nexus · Projector — P2P"
+              },
+              "default": "Core Nexus — P2P"
+            },
+            "mixed": {
+              "__switch": "inputs.device",
+              "cases": {
+                "samsung": "Core Nexus Mixed · Samsung TV — P2P",
+                "lgtv": "Core Nexus Mixed · LG TV — P2P",
+                "sony": "Core Nexus Mixed · Sony TV — P2P",
+                "appletv-old": "Core Nexus Mixed · Apple TV — P2P",
+                "appletv-new": "Core Nexus Mixed · Apple TV — P2P",
+                "firestick-hd": "Core Nexus Mixed · Fire Stick — P2P",
+                "firestick-4kmax": "Core Nexus Mixed · Fire Stick 4K — P2P",
+                "shield": "Core Nexus Mixed · Shield — P2P",
+                "googletv": "Core Nexus Mixed · Google TV — P2P",
+                "chromecast": "Core Nexus Mixed · Chromecast — P2P",
+                "onn": "Core Nexus Mixed · ONN — P2P",
+                "xiaomi": "Core Nexus Mixed · Xiaomi — P2P",
+                "xiaomi-3rd": "Core Nexus Mixed · Xiaomi — P2P",
+                "roku": "Core Nexus Mixed · Roku — P2P",
+                "ipad": "Core Nexus Mixed · iPad — P2P",
+                "projector": "Core Nexus Mixed · Projector — P2P"
+              },
+              "default": "Core Nexus Mixed — P2P"
+            }
+          },
+          "default": {
+            "__switch": "inputs.device",
+            "cases": {
+              "samsung": "Core Nexus 4K · Samsung TV — P2P",
+              "lgtv": "Core Nexus 4K · LG TV — P2P",
+              "sony": "Core Nexus 4K · Sony TV — P2P",
+              "appletv-old": "Core Nexus 4K · Apple TV — P2P",
+              "appletv-new": "Core Nexus 4K · Apple TV — P2P",
+              "firestick-hd": "Core Nexus 4K · Fire Stick — P2P",
+              "firestick-4kmax": "Core Nexus 4K · Fire Stick 4K — P2P",
+              "shield": "Core Nexus 4K · Shield — P2P",
+              "googletv": "Core Nexus 4K · Google TV — P2P",
+              "chromecast": "Core Nexus 4K · Chromecast — P2P",
+              "onn": "Core Nexus 4K · ONN — P2P",
+              "xiaomi": "Core Nexus 4K · Xiaomi — P2P",
+              "xiaomi-3rd": "Core Nexus 4K · Xiaomi — P2P",
+              "roku": "Core Nexus 4K · Roku — P2P",
+              "ipad": "Core Nexus 4K · iPad — P2P",
+              "projector": "Core Nexus 4K · Projector — P2P"
+            },
+            "default": "Core Nexus 4K — P2P"
+          }
+        },
+        "torbox": {
+          "__switch": "inputs.resolution",
+          "cases": {
+            "1080p": {
+              "__switch": "inputs.device",
+              "cases": {
+                "samsung": "Core Nexus · Samsung TV — TorBox",
+                "lgtv": "Core Nexus · LG TV — TorBox",
+                "sony": "Core Nexus · Sony TV — TorBox",
+                "appletv-old": "Core Nexus · Apple TV — TorBox",
+                "appletv-new": "Core Nexus · Apple TV — TorBox",
+                "firestick-hd": "Core Nexus · Fire Stick — TorBox",
+                "firestick-4kmax": "Core Nexus · Fire Stick 4K — TorBox",
+                "shield": "Core Nexus · Shield — TorBox",
+                "googletv": "Core Nexus · Google TV — TorBox",
+                "chromecast": "Core Nexus · Chromecast — TorBox",
+                "onn": "Core Nexus · ONN — TorBox",
+                "xiaomi": "Core Nexus · Xiaomi — TorBox",
+                "xiaomi-3rd": "Core Nexus · Xiaomi — TorBox",
+                "roku": "Core Nexus · Roku — TorBox",
+                "ipad": "Core Nexus · iPad — TorBox",
+                "projector": "Core Nexus · Projector — TorBox"
+              },
+              "default": "Core Nexus — TorBox"
+            },
+            "mixed": {
+              "__switch": "inputs.device",
+              "cases": {
+                "samsung": "Core Nexus Mixed · Samsung TV — TorBox",
+                "lgtv": "Core Nexus Mixed · LG TV — TorBox",
+                "sony": "Core Nexus Mixed · Sony TV — TorBox",
+                "appletv-old": "Core Nexus Mixed · Apple TV — TorBox",
+                "appletv-new": "Core Nexus Mixed · Apple TV — TorBox",
+                "firestick-hd": "Core Nexus Mixed · Fire Stick — TorBox",
+                "firestick-4kmax": "Core Nexus Mixed · Fire Stick 4K — TorBox",
+                "shield": "Core Nexus Mixed · Shield — TorBox",
+                "googletv": "Core Nexus Mixed · Google TV — TorBox",
+                "chromecast": "Core Nexus Mixed · Chromecast — TorBox",
+                "onn": "Core Nexus Mixed · ONN — TorBox",
+                "xiaomi": "Core Nexus Mixed · Xiaomi — TorBox",
+                "xiaomi-3rd": "Core Nexus Mixed · Xiaomi — TorBox",
+                "roku": "Core Nexus Mixed · Roku — TorBox",
+                "ipad": "Core Nexus Mixed · iPad — TorBox",
+                "projector": "Core Nexus Mixed · Projector — TorBox"
+              },
+              "default": "Core Nexus Mixed — TorBox"
+            }
+          },
+          "default": {
+            "__switch": "inputs.device",
+            "cases": {
+              "samsung": "Core Nexus 4K · Samsung TV — TorBox",
+              "lgtv": "Core Nexus 4K · LG TV — TorBox",
+              "sony": "Core Nexus 4K · Sony TV — TorBox",
+              "appletv-old": "Core Nexus 4K · Apple TV — TorBox",
+              "appletv-new": "Core Nexus 4K · Apple TV — TorBox",
+              "firestick-hd": "Core Nexus 4K · Fire Stick — TorBox",
+              "firestick-4kmax": "Core Nexus 4K · Fire Stick 4K — TorBox",
+              "shield": "Core Nexus 4K · Shield — TorBox",
+              "googletv": "Core Nexus 4K · Google TV — TorBox",
+              "chromecast": "Core Nexus 4K · Chromecast — TorBox",
+              "onn": "Core Nexus 4K · ONN — TorBox",
+              "xiaomi": "Core Nexus 4K · Xiaomi — TorBox",
+              "xiaomi-3rd": "Core Nexus 4K · Xiaomi — TorBox",
+              "roku": "Core Nexus 4K · Roku — TorBox",
+              "ipad": "Core Nexus 4K · iPad — TorBox",
+              "projector": "Core Nexus 4K · Projector — TorBox"
+            },
+            "default": "Core Nexus 4K — TorBox"
+          }
+        },
+        "realdebrid": {
+          "__switch": "inputs.resolution",
+          "cases": {
+            "1080p": {
+              "__switch": "inputs.device",
+              "cases": {
+                "samsung": "Core Nexus · Samsung TV — Real-Debrid",
+                "lgtv": "Core Nexus · LG TV — Real-Debrid",
+                "sony": "Core Nexus · Sony TV — Real-Debrid",
+                "appletv-old": "Core Nexus · Apple TV — Real-Debrid",
+                "appletv-new": "Core Nexus · Apple TV — Real-Debrid",
+                "firestick-hd": "Core Nexus · Fire Stick — Real-Debrid",
+                "firestick-4kmax": "Core Nexus · Fire Stick 4K — Real-Debrid",
+                "shield": "Core Nexus · Shield — Real-Debrid",
+                "googletv": "Core Nexus · Google TV — Real-Debrid",
+                "chromecast": "Core Nexus · Chromecast — Real-Debrid",
+                "onn": "Core Nexus · ONN — Real-Debrid",
+                "xiaomi": "Core Nexus · Xiaomi — Real-Debrid",
+                "xiaomi-3rd": "Core Nexus · Xiaomi — Real-Debrid",
+                "roku": "Core Nexus · Roku — Real-Debrid",
+                "ipad": "Core Nexus · iPad — Real-Debrid",
+                "projector": "Core Nexus · Projector — Real-Debrid"
+              },
+              "default": "Core Nexus — Real-Debrid"
+            },
+            "mixed": {
+              "__switch": "inputs.device",
+              "cases": {
+                "samsung": "Core Nexus Mixed · Samsung TV — Real-Debrid",
+                "lgtv": "Core Nexus Mixed · LG TV — Real-Debrid",
+                "sony": "Core Nexus Mixed · Sony TV — Real-Debrid",
+                "appletv-old": "Core Nexus Mixed · Apple TV — Real-Debrid",
+                "appletv-new": "Core Nexus Mixed · Apple TV — Real-Debrid",
+                "firestick-hd": "Core Nexus Mixed · Fire Stick — Real-Debrid",
+                "firestick-4kmax": "Core Nexus Mixed · Fire Stick 4K — Real-Debrid",
+                "shield": "Core Nexus Mixed · Shield — Real-Debrid",
+                "googletv": "Core Nexus Mixed · Google TV — Real-Debrid",
+                "chromecast": "Core Nexus Mixed · Chromecast — Real-Debrid",
+                "onn": "Core Nexus Mixed · ONN — Real-Debrid",
+                "xiaomi": "Core Nexus Mixed · Xiaomi — Real-Debrid",
+                "xiaomi-3rd": "Core Nexus Mixed · Xiaomi — Real-Debrid",
+                "roku": "Core Nexus Mixed · Roku — Real-Debrid",
+                "ipad": "Core Nexus Mixed · iPad — Real-Debrid",
+                "projector": "Core Nexus Mixed · Projector — Real-Debrid"
+              },
+              "default": "Core Nexus Mixed — Real-Debrid"
+            }
+          },
+          "default": {
+            "__switch": "inputs.device",
+            "cases": {
+              "samsung": "Core Nexus 4K · Samsung TV — Real-Debrid",
+              "lgtv": "Core Nexus 4K · LG TV — Real-Debrid",
+              "sony": "Core Nexus 4K · Sony TV — Real-Debrid",
+              "appletv-old": "Core Nexus 4K · Apple TV — Real-Debrid",
+              "appletv-new": "Core Nexus 4K · Apple TV — Real-Debrid",
+              "firestick-hd": "Core Nexus 4K · Fire Stick — Real-Debrid",
+              "firestick-4kmax": "Core Nexus 4K · Fire Stick 4K — Real-Debrid",
+              "shield": "Core Nexus 4K · Shield — Real-Debrid",
+              "googletv": "Core Nexus 4K · Google TV — Real-Debrid",
+              "chromecast": "Core Nexus 4K · Chromecast — Real-Debrid",
+              "onn": "Core Nexus 4K · ONN — Real-Debrid",
+              "xiaomi": "Core Nexus 4K · Xiaomi — Real-Debrid",
+              "xiaomi-3rd": "Core Nexus 4K · Xiaomi — Real-Debrid",
+              "roku": "Core Nexus 4K · Roku — Real-Debrid",
+              "ipad": "Core Nexus 4K · iPad — Real-Debrid",
+              "projector": "Core Nexus 4K · Projector — Real-Debrid"
+            },
+            "default": "Core Nexus 4K — Real-Debrid"
+          }
+        },
+        "alldebrid": {
+          "__switch": "inputs.resolution",
+          "cases": {
+            "1080p": {
+              "__switch": "inputs.device",
+              "cases": {
+                "samsung": "Core Nexus · Samsung TV — AllDebrid",
+                "lgtv": "Core Nexus · LG TV — AllDebrid",
+                "sony": "Core Nexus · Sony TV — AllDebrid",
+                "appletv-old": "Core Nexus · Apple TV — AllDebrid",
+                "appletv-new": "Core Nexus · Apple TV — AllDebrid",
+                "firestick-hd": "Core Nexus · Fire Stick — AllDebrid",
+                "firestick-4kmax": "Core Nexus · Fire Stick 4K — AllDebrid",
+                "shield": "Core Nexus · Shield — AllDebrid",
+                "googletv": "Core Nexus · Google TV — AllDebrid",
+                "chromecast": "Core Nexus · Chromecast — AllDebrid",
+                "onn": "Core Nexus · ONN — AllDebrid",
+                "xiaomi": "Core Nexus · Xiaomi — AllDebrid",
+                "xiaomi-3rd": "Core Nexus · Xiaomi — AllDebrid",
+                "roku": "Core Nexus · Roku — AllDebrid",
+                "ipad": "Core Nexus · iPad — AllDebrid",
+                "projector": "Core Nexus · Projector — AllDebrid"
+              },
+              "default": "Core Nexus — AllDebrid"
+            },
+            "mixed": {
+              "__switch": "inputs.device",
+              "cases": {
+                "samsung": "Core Nexus Mixed · Samsung TV — AllDebrid",
+                "lgtv": "Core Nexus Mixed · LG TV — AllDebrid",
+                "sony": "Core Nexus Mixed · Sony TV — AllDebrid",
+                "appletv-old": "Core Nexus Mixed · Apple TV — AllDebrid",
+                "appletv-new": "Core Nexus Mixed · Apple TV — AllDebrid",
+                "firestick-hd": "Core Nexus Mixed · Fire Stick — AllDebrid",
+                "firestick-4kmax": "Core Nexus Mixed · Fire Stick 4K — AllDebrid",
+                "shield": "Core Nexus Mixed · Shield — AllDebrid",
+                "googletv": "Core Nexus Mixed · Google TV — AllDebrid",
+                "chromecast": "Core Nexus Mixed · Chromecast — AllDebrid",
+                "onn": "Core Nexus Mixed · ONN — AllDebrid",
+                "xiaomi": "Core Nexus Mixed · Xiaomi — AllDebrid",
+                "xiaomi-3rd": "Core Nexus Mixed · Xiaomi — AllDebrid",
+                "roku": "Core Nexus Mixed · Roku — AllDebrid",
+                "ipad": "Core Nexus Mixed · iPad — AllDebrid",
+                "projector": "Core Nexus Mixed · Projector — AllDebrid"
+              },
+              "default": "Core Nexus Mixed — AllDebrid"
+            }
+          },
+          "default": {
+            "__switch": "inputs.device",
+            "cases": {
+              "samsung": "Core Nexus 4K · Samsung TV — AllDebrid",
+              "lgtv": "Core Nexus 4K · LG TV — AllDebrid",
+              "sony": "Core Nexus 4K · Sony TV — AllDebrid",
+              "appletv-old": "Core Nexus 4K · Apple TV — AllDebrid",
+              "appletv-new": "Core Nexus 4K · Apple TV — AllDebrid",
+              "firestick-hd": "Core Nexus 4K · Fire Stick — AllDebrid",
+              "firestick-4kmax": "Core Nexus 4K · Fire Stick 4K — AllDebrid",
+              "shield": "Core Nexus 4K · Shield — AllDebrid",
+              "googletv": "Core Nexus 4K · Google TV — AllDebrid",
+              "chromecast": "Core Nexus 4K · Chromecast — AllDebrid",
+              "onn": "Core Nexus 4K · ONN — AllDebrid",
+              "xiaomi": "Core Nexus 4K · Xiaomi — AllDebrid",
+              "xiaomi-3rd": "Core Nexus 4K · Xiaomi — AllDebrid",
+              "roku": "Core Nexus 4K · Roku — AllDebrid",
+              "ipad": "Core Nexus 4K · iPad — AllDebrid",
+              "projector": "Core Nexus 4K · Projector — AllDebrid"
+            },
+            "default": "Core Nexus 4K — AllDebrid"
+          }
+        },
+        "premiumize": {
+          "__switch": "inputs.resolution",
+          "cases": {
+            "1080p": {
+              "__switch": "inputs.device",
+              "cases": {
+                "samsung": "Core Nexus · Samsung TV — Premiumize",
+                "lgtv": "Core Nexus · LG TV — Premiumize",
+                "sony": "Core Nexus · Sony TV — Premiumize",
+                "appletv-old": "Core Nexus · Apple TV — Premiumize",
+                "appletv-new": "Core Nexus · Apple TV — Premiumize",
+                "firestick-hd": "Core Nexus · Fire Stick — Premiumize",
+                "firestick-4kmax": "Core Nexus · Fire Stick 4K — Premiumize",
+                "shield": "Core Nexus · Shield — Premiumize",
+                "googletv": "Core Nexus · Google TV — Premiumize",
+                "chromecast": "Core Nexus · Chromecast — Premiumize",
+                "onn": "Core Nexus · ONN — Premiumize",
+                "xiaomi": "Core Nexus · Xiaomi — Premiumize",
+                "xiaomi-3rd": "Core Nexus · Xiaomi — Premiumize",
+                "roku": "Core Nexus · Roku — Premiumize",
+                "ipad": "Core Nexus · iPad — Premiumize",
+                "projector": "Core Nexus · Projector — Premiumize"
+              },
+              "default": "Core Nexus — Premiumize"
+            },
+            "mixed": {
+              "__switch": "inputs.device",
+              "cases": {
+                "samsung": "Core Nexus Mixed · Samsung TV — Premiumize",
+                "lgtv": "Core Nexus Mixed · LG TV — Premiumize",
+                "sony": "Core Nexus Mixed · Sony TV — Premiumize",
+                "appletv-old": "Core Nexus Mixed · Apple TV — Premiumize",
+                "appletv-new": "Core Nexus Mixed · Apple TV — Premiumize",
+                "firestick-hd": "Core Nexus Mixed · Fire Stick — Premiumize",
+                "firestick-4kmax": "Core Nexus Mixed · Fire Stick 4K — Premiumize",
+                "shield": "Core Nexus Mixed · Shield — Premiumize",
+                "googletv": "Core Nexus Mixed · Google TV — Premiumize",
+                "chromecast": "Core Nexus Mixed · Chromecast — Premiumize",
+                "onn": "Core Nexus Mixed · ONN — Premiumize",
+                "xiaomi": "Core Nexus Mixed · Xiaomi — Premiumize",
+                "xiaomi-3rd": "Core Nexus Mixed · Xiaomi — Premiumize",
+                "roku": "Core Nexus Mixed · Roku — Premiumize",
+                "ipad": "Core Nexus Mixed · iPad — Premiumize",
+                "projector": "Core Nexus Mixed · Projector — Premiumize"
+              },
+              "default": "Core Nexus Mixed — Premiumize"
+            }
+          },
+          "default": {
+            "__switch": "inputs.device",
+            "cases": {
+              "samsung": "Core Nexus 4K · Samsung TV — Premiumize",
+              "lgtv": "Core Nexus 4K · LG TV — Premiumize",
+              "sony": "Core Nexus 4K · Sony TV — Premiumize",
+              "appletv-old": "Core Nexus 4K · Apple TV — Premiumize",
+              "appletv-new": "Core Nexus 4K · Apple TV — Premiumize",
+              "firestick-hd": "Core Nexus 4K · Fire Stick — Premiumize",
+              "firestick-4kmax": "Core Nexus 4K · Fire Stick 4K — Premiumize",
+              "shield": "Core Nexus 4K · Shield — Premiumize",
+              "googletv": "Core Nexus 4K · Google TV — Premiumize",
+              "chromecast": "Core Nexus 4K · Chromecast — Premiumize",
+              "onn": "Core Nexus 4K · ONN — Premiumize",
+              "xiaomi": "Core Nexus 4K · Xiaomi — Premiumize",
+              "xiaomi-3rd": "Core Nexus 4K · Xiaomi — Premiumize",
+              "roku": "Core Nexus 4K · Roku — Premiumize",
+              "ipad": "Core Nexus 4K · iPad — Premiumize",
+              "projector": "Core Nexus 4K · Projector — Premiumize"
+            },
+            "default": "Core Nexus 4K — Premiumize"
+          }
+        },
+        "debridlink": {
+          "__switch": "inputs.resolution",
+          "cases": {
+            "1080p": {
+              "__switch": "inputs.device",
+              "cases": {
+                "samsung": "Core Nexus · Samsung TV — Debrid-Link",
+                "lgtv": "Core Nexus · LG TV — Debrid-Link",
+                "sony": "Core Nexus · Sony TV — Debrid-Link",
+                "appletv-old": "Core Nexus · Apple TV — Debrid-Link",
+                "appletv-new": "Core Nexus · Apple TV — Debrid-Link",
+                "firestick-hd": "Core Nexus · Fire Stick — Debrid-Link",
+                "firestick-4kmax": "Core Nexus · Fire Stick 4K — Debrid-Link",
+                "shield": "Core Nexus · Shield — Debrid-Link",
+                "googletv": "Core Nexus · Google TV — Debrid-Link",
+                "chromecast": "Core Nexus · Chromecast — Debrid-Link",
+                "onn": "Core Nexus · ONN — Debrid-Link",
+                "xiaomi": "Core Nexus · Xiaomi — Debrid-Link",
+                "xiaomi-3rd": "Core Nexus · Xiaomi — Debrid-Link",
+                "roku": "Core Nexus · Roku — Debrid-Link",
+                "ipad": "Core Nexus · iPad — Debrid-Link",
+                "projector": "Core Nexus · Projector — Debrid-Link"
+              },
+              "default": "Core Nexus — Debrid-Link"
+            },
+            "mixed": {
+              "__switch": "inputs.device",
+              "cases": {
+                "samsung": "Core Nexus Mixed · Samsung TV — Debrid-Link",
+                "lgtv": "Core Nexus Mixed · LG TV — Debrid-Link",
+                "sony": "Core Nexus Mixed · Sony TV — Debrid-Link",
+                "appletv-old": "Core Nexus Mixed · Apple TV — Debrid-Link",
+                "appletv-new": "Core Nexus Mixed · Apple TV — Debrid-Link",
+                "firestick-hd": "Core Nexus Mixed · Fire Stick — Debrid-Link",
+                "firestick-4kmax": "Core Nexus Mixed · Fire Stick 4K — Debrid-Link",
+                "shield": "Core Nexus Mixed · Shield — Debrid-Link",
+                "googletv": "Core Nexus Mixed · Google TV — Debrid-Link",
+                "chromecast": "Core Nexus Mixed · Chromecast — Debrid-Link",
+                "onn": "Core Nexus Mixed · ONN — Debrid-Link",
+                "xiaomi": "Core Nexus Mixed · Xiaomi — Debrid-Link",
+                "xiaomi-3rd": "Core Nexus Mixed · Xiaomi — Debrid-Link",
+                "roku": "Core Nexus Mixed · Roku — Debrid-Link",
+                "ipad": "Core Nexus Mixed · iPad — Debrid-Link",
+                "projector": "Core Nexus Mixed · Projector — Debrid-Link"
+              },
+              "default": "Core Nexus Mixed — Debrid-Link"
+            }
+          },
+          "default": {
+            "__switch": "inputs.device",
+            "cases": {
+              "samsung": "Core Nexus 4K · Samsung TV — Debrid-Link",
+              "lgtv": "Core Nexus 4K · LG TV — Debrid-Link",
+              "sony": "Core Nexus 4K · Sony TV — Debrid-Link",
+              "appletv-old": "Core Nexus 4K · Apple TV — Debrid-Link",
+              "appletv-new": "Core Nexus 4K · Apple TV — Debrid-Link",
+              "firestick-hd": "Core Nexus 4K · Fire Stick — Debrid-Link",
+              "firestick-4kmax": "Core Nexus 4K · Fire Stick 4K — Debrid-Link",
+              "shield": "Core Nexus 4K · Shield — Debrid-Link",
+              "googletv": "Core Nexus 4K · Google TV — Debrid-Link",
+              "chromecast": "Core Nexus 4K · Chromecast — Debrid-Link",
+              "onn": "Core Nexus 4K · ONN — Debrid-Link",
+              "xiaomi": "Core Nexus 4K · Xiaomi — Debrid-Link",
+              "xiaomi-3rd": "Core Nexus 4K · Xiaomi — Debrid-Link",
+              "roku": "Core Nexus 4K · Roku — Debrid-Link",
+              "ipad": "Core Nexus 4K · iPad — Debrid-Link",
+              "projector": "Core Nexus 4K · Projector — Debrid-Link"
+            },
+            "default": "Core Nexus 4K — Debrid-Link"
+          }
+        },
+        "offcloud": {
+          "__switch": "inputs.resolution",
+          "cases": {
+            "1080p": {
+              "__switch": "inputs.device",
+              "cases": {
+                "samsung": "Core Nexus · Samsung TV — Offcloud",
+                "lgtv": "Core Nexus · LG TV — Offcloud",
+                "sony": "Core Nexus · Sony TV — Offcloud",
+                "appletv-old": "Core Nexus · Apple TV — Offcloud",
+                "appletv-new": "Core Nexus · Apple TV — Offcloud",
+                "firestick-hd": "Core Nexus · Fire Stick — Offcloud",
+                "firestick-4kmax": "Core Nexus · Fire Stick 4K — Offcloud",
+                "shield": "Core Nexus · Shield — Offcloud",
+                "googletv": "Core Nexus · Google TV — Offcloud",
+                "chromecast": "Core Nexus · Chromecast — Offcloud",
+                "onn": "Core Nexus · ONN — Offcloud",
+                "xiaomi": "Core Nexus · Xiaomi — Offcloud",
+                "xiaomi-3rd": "Core Nexus · Xiaomi — Offcloud",
+                "roku": "Core Nexus · Roku — Offcloud",
+                "ipad": "Core Nexus · iPad — Offcloud",
+                "projector": "Core Nexus · Projector — Offcloud"
+              },
+              "default": "Core Nexus — Offcloud"
+            },
+            "mixed": {
+              "__switch": "inputs.device",
+              "cases": {
+                "samsung": "Core Nexus Mixed · Samsung TV — Offcloud",
+                "lgtv": "Core Nexus Mixed · LG TV — Offcloud",
+                "sony": "Core Nexus Mixed · Sony TV — Offcloud",
+                "appletv-old": "Core Nexus Mixed · Apple TV — Offcloud",
+                "appletv-new": "Core Nexus Mixed · Apple TV — Offcloud",
+                "firestick-hd": "Core Nexus Mixed · Fire Stick — Offcloud",
+                "firestick-4kmax": "Core Nexus Mixed · Fire Stick 4K — Offcloud",
+                "shield": "Core Nexus Mixed · Shield — Offcloud",
+                "googletv": "Core Nexus Mixed · Google TV — Offcloud",
+                "chromecast": "Core Nexus Mixed · Chromecast — Offcloud",
+                "onn": "Core Nexus Mixed · ONN — Offcloud",
+                "xiaomi": "Core Nexus Mixed · Xiaomi — Offcloud",
+                "xiaomi-3rd": "Core Nexus Mixed · Xiaomi — Offcloud",
+                "roku": "Core Nexus Mixed · Roku — Offcloud",
+                "ipad": "Core Nexus Mixed · iPad — Offcloud",
+                "projector": "Core Nexus Mixed · Projector — Offcloud"
+              },
+              "default": "Core Nexus Mixed — Offcloud"
+            }
+          },
+          "default": {
+            "__switch": "inputs.device",
+            "cases": {
+              "samsung": "Core Nexus 4K · Samsung TV — Offcloud",
+              "lgtv": "Core Nexus 4K · LG TV — Offcloud",
+              "sony": "Core Nexus 4K · Sony TV — Offcloud",
+              "appletv-old": "Core Nexus 4K · Apple TV — Offcloud",
+              "appletv-new": "Core Nexus 4K · Apple TV — Offcloud",
+              "firestick-hd": "Core Nexus 4K · Fire Stick — Offcloud",
+              "firestick-4kmax": "Core Nexus 4K · Fire Stick 4K — Offcloud",
+              "shield": "Core Nexus 4K · Shield — Offcloud",
+              "googletv": "Core Nexus 4K · Google TV — Offcloud",
+              "chromecast": "Core Nexus 4K · Chromecast — Offcloud",
+              "onn": "Core Nexus 4K · ONN — Offcloud",
+              "xiaomi": "Core Nexus 4K · Xiaomi — Offcloud",
+              "xiaomi-3rd": "Core Nexus 4K · Xiaomi — Offcloud",
+              "roku": "Core Nexus 4K · Roku — Offcloud",
+              "ipad": "Core Nexus 4K · iPad — Offcloud",
+              "projector": "Core Nexus 4K · Projector — Offcloud"
+            },
+            "default": "Core Nexus 4K — Offcloud"
+          }
+        },
+        "debrider": {
+          "__switch": "inputs.resolution",
+          "cases": {
+            "1080p": {
+              "__switch": "inputs.device",
+              "cases": {
+                "samsung": "Core Nexus · Samsung TV — Debrider",
+                "lgtv": "Core Nexus · LG TV — Debrider",
+                "sony": "Core Nexus · Sony TV — Debrider",
+                "appletv-old": "Core Nexus · Apple TV — Debrider",
+                "appletv-new": "Core Nexus · Apple TV — Debrider",
+                "firestick-hd": "Core Nexus · Fire Stick — Debrider",
+                "firestick-4kmax": "Core Nexus · Fire Stick 4K — Debrider",
+                "shield": "Core Nexus · Shield — Debrider",
+                "googletv": "Core Nexus · Google TV — Debrider",
+                "chromecast": "Core Nexus · Chromecast — Debrider",
+                "onn": "Core Nexus · ONN — Debrider",
+                "xiaomi": "Core Nexus · Xiaomi — Debrider",
+                "xiaomi-3rd": "Core Nexus · Xiaomi — Debrider",
+                "roku": "Core Nexus · Roku — Debrider",
+                "ipad": "Core Nexus · iPad — Debrider",
+                "projector": "Core Nexus · Projector — Debrider"
+              },
+              "default": "Core Nexus — Debrider"
+            },
+            "mixed": {
+              "__switch": "inputs.device",
+              "cases": {
+                "samsung": "Core Nexus Mixed · Samsung TV — Debrider",
+                "lgtv": "Core Nexus Mixed · LG TV — Debrider",
+                "sony": "Core Nexus Mixed · Sony TV — Debrider",
+                "appletv-old": "Core Nexus Mixed · Apple TV — Debrider",
+                "appletv-new": "Core Nexus Mixed · Apple TV — Debrider",
+                "firestick-hd": "Core Nexus Mixed · Fire Stick — Debrider",
+                "firestick-4kmax": "Core Nexus Mixed · Fire Stick 4K — Debrider",
+                "shield": "Core Nexus Mixed · Shield — Debrider",
+                "googletv": "Core Nexus Mixed · Google TV — Debrider",
+                "chromecast": "Core Nexus Mixed · Chromecast — Debrider",
+                "onn": "Core Nexus Mixed · ONN — Debrider",
+                "xiaomi": "Core Nexus Mixed · Xiaomi — Debrider",
+                "xiaomi-3rd": "Core Nexus Mixed · Xiaomi — Debrider",
+                "roku": "Core Nexus Mixed · Roku — Debrider",
+                "ipad": "Core Nexus Mixed · iPad — Debrider",
+                "projector": "Core Nexus Mixed · Projector — Debrider"
+              },
+              "default": "Core Nexus Mixed — Debrider"
+            }
+          },
+          "default": {
+            "__switch": "inputs.device",
+            "cases": {
+              "samsung": "Core Nexus 4K · Samsung TV — Debrider",
+              "lgtv": "Core Nexus 4K · LG TV — Debrider",
+              "sony": "Core Nexus 4K · Sony TV — Debrider",
+              "appletv-old": "Core Nexus 4K · Apple TV — Debrider",
+              "appletv-new": "Core Nexus 4K · Apple TV — Debrider",
+              "firestick-hd": "Core Nexus 4K · Fire Stick — Debrider",
+              "firestick-4kmax": "Core Nexus 4K · Fire Stick 4K — Debrider",
+              "shield": "Core Nexus 4K · Shield — Debrider",
+              "googletv": "Core Nexus 4K · Google TV — Debrider",
+              "chromecast": "Core Nexus 4K · Chromecast — Debrider",
+              "onn": "Core Nexus 4K · ONN — Debrider",
+              "xiaomi": "Core Nexus 4K · Xiaomi — Debrider",
+              "xiaomi-3rd": "Core Nexus 4K · Xiaomi — Debrider",
+              "roku": "Core Nexus 4K · Roku — Debrider",
+              "ipad": "Core Nexus 4K · iPad — Debrider",
+              "projector": "Core Nexus 4K · Projector — Debrider"
+            },
+            "default": "Core Nexus 4K — Debrider"
+          }
+        },
+        "easynews": {
+          "__switch": "inputs.resolution",
+          "cases": {
+            "1080p": {
+              "__switch": "inputs.device",
+              "cases": {
+                "samsung": "Core Nexus · Samsung TV — EasyNews",
+                "lgtv": "Core Nexus · LG TV — EasyNews",
+                "sony": "Core Nexus · Sony TV — EasyNews",
+                "appletv-old": "Core Nexus · Apple TV — EasyNews",
+                "appletv-new": "Core Nexus · Apple TV — EasyNews",
+                "firestick-hd": "Core Nexus · Fire Stick — EasyNews",
+                "firestick-4kmax": "Core Nexus · Fire Stick 4K — EasyNews",
+                "shield": "Core Nexus · Shield — EasyNews",
+                "googletv": "Core Nexus · Google TV — EasyNews",
+                "chromecast": "Core Nexus · Chromecast — EasyNews",
+                "onn": "Core Nexus · ONN — EasyNews",
+                "xiaomi": "Core Nexus · Xiaomi — EasyNews",
+                "xiaomi-3rd": "Core Nexus · Xiaomi — EasyNews",
+                "roku": "Core Nexus · Roku — EasyNews",
+                "ipad": "Core Nexus · iPad — EasyNews",
+                "projector": "Core Nexus · Projector — EasyNews"
+              },
+              "default": "Core Nexus — EasyNews"
+            },
+            "mixed": {
+              "__switch": "inputs.device",
+              "cases": {
+                "samsung": "Core Nexus Mixed · Samsung TV — EasyNews",
+                "lgtv": "Core Nexus Mixed · LG TV — EasyNews",
+                "sony": "Core Nexus Mixed · Sony TV — EasyNews",
+                "appletv-old": "Core Nexus Mixed · Apple TV — EasyNews",
+                "appletv-new": "Core Nexus Mixed · Apple TV — EasyNews",
+                "firestick-hd": "Core Nexus Mixed · Fire Stick — EasyNews",
+                "firestick-4kmax": "Core Nexus Mixed · Fire Stick 4K — EasyNews",
+                "shield": "Core Nexus Mixed · Shield — EasyNews",
+                "googletv": "Core Nexus Mixed · Google TV — EasyNews",
+                "chromecast": "Core Nexus Mixed · Chromecast — EasyNews",
+                "onn": "Core Nexus Mixed · ONN — EasyNews",
+                "xiaomi": "Core Nexus Mixed · Xiaomi — EasyNews",
+                "xiaomi-3rd": "Core Nexus Mixed · Xiaomi — EasyNews",
+                "roku": "Core Nexus Mixed · Roku — EasyNews",
+                "ipad": "Core Nexus Mixed · iPad — EasyNews",
+                "projector": "Core Nexus Mixed · Projector — EasyNews"
+              },
+              "default": "Core Nexus Mixed — EasyNews"
+            }
+          },
+          "default": {
+            "__switch": "inputs.device",
+            "cases": {
+              "samsung": "Core Nexus 4K · Samsung TV — EasyNews",
+              "lgtv": "Core Nexus 4K · LG TV — EasyNews",
+              "sony": "Core Nexus 4K · Sony TV — EasyNews",
+              "appletv-old": "Core Nexus 4K · Apple TV — EasyNews",
+              "appletv-new": "Core Nexus 4K · Apple TV — EasyNews",
+              "firestick-hd": "Core Nexus 4K · Fire Stick — EasyNews",
+              "firestick-4kmax": "Core Nexus 4K · Fire Stick 4K — EasyNews",
+              "shield": "Core Nexus 4K · Shield — EasyNews",
+              "googletv": "Core Nexus 4K · Google TV — EasyNews",
+              "chromecast": "Core Nexus 4K · Chromecast — EasyNews",
+              "onn": "Core Nexus 4K · ONN — EasyNews",
+              "xiaomi": "Core Nexus 4K · Xiaomi — EasyNews",
+              "xiaomi-3rd": "Core Nexus 4K · Xiaomi — EasyNews",
+              "roku": "Core Nexus 4K · Roku — EasyNews",
+              "ipad": "Core Nexus 4K · iPad — EasyNews",
+              "projector": "Core Nexus 4K · Projector — EasyNews"
+            },
+            "default": "Core Nexus 4K — EasyNews"
+          }
+        }
+      },
+      "default": {
+        "__switch": "inputs.resolution",
+        "cases": {
+          "1080p": {
+            "__switch": "inputs.device",
+            "cases": {
+              "samsung": "Core Nexus · Samsung TV",
+              "lgtv": "Core Nexus · LG TV",
+              "sony": "Core Nexus · Sony TV",
+              "appletv-old": "Core Nexus · Apple TV",
+              "appletv-new": "Core Nexus · Apple TV",
+              "firestick-hd": "Core Nexus · Fire Stick",
+              "firestick-4kmax": "Core Nexus · Fire Stick 4K",
+              "shield": "Core Nexus · Shield",
+              "googletv": "Core Nexus · Google TV",
+              "chromecast": "Core Nexus · Chromecast",
+              "onn": "Core Nexus · ONN",
+              "xiaomi": "Core Nexus · Xiaomi",
+              "xiaomi-3rd": "Core Nexus · Xiaomi",
+              "roku": "Core Nexus · Roku",
+              "ipad": "Core Nexus · iPad",
+              "projector": "Core Nexus · Projector"
+            },
+            "default": "Core Nexus"
+          },
+          "mixed": {
+            "__switch": "inputs.device",
+            "cases": {
+              "samsung": "Core Nexus Mixed · Samsung TV",
+              "lgtv": "Core Nexus Mixed · LG TV",
+              "sony": "Core Nexus Mixed · Sony TV",
+              "appletv-old": "Core Nexus Mixed · Apple TV",
+              "appletv-new": "Core Nexus Mixed · Apple TV",
+              "firestick-hd": "Core Nexus Mixed · Fire Stick",
+              "firestick-4kmax": "Core Nexus Mixed · Fire Stick 4K",
+              "shield": "Core Nexus Mixed · Shield",
+              "googletv": "Core Nexus Mixed · Google TV",
+              "chromecast": "Core Nexus Mixed · Chromecast",
+              "onn": "Core Nexus Mixed · ONN",
+              "xiaomi": "Core Nexus Mixed · Xiaomi",
+              "xiaomi-3rd": "Core Nexus Mixed · Xiaomi",
+              "roku": "Core Nexus Mixed · Roku",
+              "ipad": "Core Nexus Mixed · iPad",
+              "projector": "Core Nexus Mixed · Projector"
+            },
+            "default": "Core Nexus Mixed"
+          }
+        },
+        "default": {
+          "__switch": "inputs.device",
+          "cases": {
+            "samsung": "Core Nexus 4K · Samsung TV",
+            "lgtv": "Core Nexus 4K · LG TV",
+            "sony": "Core Nexus 4K · Sony TV",
+            "appletv-old": "Core Nexus 4K · Apple TV",
+            "appletv-new": "Core Nexus 4K · Apple TV",
+            "firestick-hd": "Core Nexus 4K · Fire Stick",
+            "firestick-4kmax": "Core Nexus 4K · Fire Stick 4K",
+            "shield": "Core Nexus 4K · Shield",
+            "googletv": "Core Nexus 4K · Google TV",
+            "chromecast": "Core Nexus 4K · Chromecast",
+            "onn": "Core Nexus 4K · ONN",
+            "xiaomi": "Core Nexus 4K · Xiaomi",
+            "xiaomi-3rd": "Core Nexus 4K · Xiaomi",
+            "roku": "Core Nexus 4K · Roku",
+            "ipad": "Core Nexus 4K · iPad",
+            "projector": "Core Nexus 4K · Projector"
+          },
+          "default": "Core Nexus 4K"
+        }
+      }
+    },
+    "preferredQualities": [
+      "BluRay REMUX",
+      "BluRay",
+      "WEB-DL",
+      "WEBRip",
+      "HDRip",
+      "HDTV"
+    ],
+    "excludedLanguages": [],
+    "includedLanguages": [],
+    "requiredLanguages": [],
+    "preferredLanguages": {
+      "__switch": "inputs.language",
+      "cases": {
+        "Spanish": [
+          "Spanish",
+          "English",
+          "Original",
+          "Dual Audio",
+          "Multi",
+          "Dubbed",
+          "Unknown"
+        ],
+        "French": [
+          "French",
+          "English",
+          "Original",
+          "Dual Audio",
+          "Multi",
+          "Dubbed",
+          "Unknown"
+        ],
+        "German": [
+          "German",
+          "English",
+          "Original",
+          "Dual Audio",
+          "Multi",
+          "Dubbed",
+          "Unknown"
+        ],
+        "Italian": [
+          "Italian",
+          "English",
+          "Original",
+          "Dual Audio",
+          "Multi",
+          "Dubbed",
+          "Unknown"
+        ],
+        "Portuguese": [
+          "Portuguese",
+          "English",
+          "Original",
+          "Dual Audio",
+          "Multi",
+          "Dubbed",
+          "Unknown"
+        ],
+        "Japanese": [
+          "Japanese",
+          "English",
+          "Original",
+          "Dual Audio",
+          "Multi",
+          "Dubbed",
+          "Unknown"
+        ],
+        "Korean": [
+          "Korean",
+          "English",
+          "Original",
+          "Dual Audio",
+          "Multi",
+          "Dubbed",
+          "Unknown"
+        ],
+        "Chinese": [
+          "Chinese",
+          "English",
+          "Original",
+          "Dual Audio",
+          "Multi",
+          "Dubbed",
+          "Unknown"
+        ],
+        "Arabic": [
+          "Arabic",
+          "English",
+          "Original",
+          "Dual Audio",
+          "Multi",
+          "Dubbed",
+          "Unknown"
+        ],
+        "Hindi": [
+          "Hindi",
+          "English",
+          "Original",
+          "Dual Audio",
+          "Multi",
+          "Dubbed",
+          "Unknown"
+        ],
+        "Russian": [
+          "Russian",
+          "English",
+          "Original",
+          "Dual Audio",
+          "Multi",
+          "Dubbed",
+          "Unknown"
+        ],
+        "Dutch": [
+          "Dutch",
+          "English",
+          "Original",
+          "Dual Audio",
+          "Multi",
+          "Dubbed",
+          "Unknown"
+        ],
+        "Polish": [
+          "Polish",
+          "English",
+          "Original",
+          "Dual Audio",
+          "Multi",
+          "Dubbed",
+          "Unknown"
+        ],
+        "Turkish": [
+          "Turkish",
+          "English",
+          "Original",
+          "Dual Audio",
+          "Multi",
+          "Dubbed",
+          "Unknown"
+        ]
+      },
+      "default": [
+        "English",
+        "Original",
+        "Dual Audio",
+        "Multi",
+        "Dubbed",
+        "Unknown"
+      ]
+    },
+    "preferredAudioTags": {
+      "__switch": "inputs.device",
+      "cases": {
+        "firestick-4kmax": [
+          "TrueHD",
+          "Atmos",
+          "DTS-HD MA",
+          "DTS:X",
+          "FLAC",
+          "DTS-HD",
+          "DD+",
+          "AAC",
+          "DTS",
+          "DD"
+        ],
+        "shield": [
+          "TrueHD",
+          "Atmos",
+          "DTS-HD MA",
+          "DTS:X",
+          "FLAC",
+          "DTS-HD",
+          "DD+",
+          "AAC",
+          "DTS",
+          "DD"
+        ],
+        "xiaomi": [
+          "TrueHD",
+          "Atmos",
+          "DTS-HD MA",
+          "DTS:X",
+          "FLAC",
+          "DTS-HD",
+          "DD+",
+          "AAC",
+          "DTS",
+          "DD"
+        ],
+        "xiaomi-3rd": [
+          "TrueHD",
+          "Atmos",
+          "DTS-HD MA",
+          "DTS:X",
+          "FLAC",
+          "DTS-HD",
+          "DD+",
+          "AAC",
+          "DTS",
+          "DD"
+        ],
+        "windows": [
+          "TrueHD",
+          "Atmos",
+          "DTS-HD MA",
+          "DTS:X",
+          "FLAC",
+          "DTS-HD",
+          "DD+",
+          "AAC",
+          "DTS",
+          "DD"
+        ]
+      },
+      "default": [
+        "Atmos",
+        "DD+",
+        "AAC",
+        "DD",
+        "DTS"
+      ]
+    },
+    "syncedRankedRegexUrls": [],
+    "rankedRegexPatterns": [],
+    "excludedRegexPatterns": [],
+    "addonCategoryColors": {
+      "Mix": "indigo",
+      "Debrid": "emerald",
+      "Usenet": "lime",
+      "HTTP": "cyan",
+      "P2P": "orange",
+      "Subs": "purple"
+    },
+    "mergedCatalogs": [],
+    "posterService": "none",
+    "sortCriteria": {
+      "global": {
+        "__switch": "services",
+        "cases": {
+          "": [
+            {
+              "key": "resolution",
+              "direction": "desc"
+            },
+            {
+              "key": "quality",
+              "direction": "desc"
+            },
+            {
+              "key": "seeders",
+              "direction": "desc"
+            },
+            {
+              "key": "language",
+              "direction": "desc"
+            },
+            {
+              "key": "encode",
+              "direction": "desc"
+            },
+            {
+              "key": "size",
+              "direction": "desc"
+            }
+          ]
+        },
+        "default": {
+          "__switch": "inputs.profile",
+          "cases": {
+            "maximum": [
+              {
+                "key": "cached",
+                "direction": "desc"
+              },
+              {
+                "key": "resolution",
+                "direction": "desc"
+              },
+              {
+                "key": "quality",
+                "direction": "desc"
+              },
+              {
+                "key": "visualTag",
+                "direction": "desc"
+              },
+              {
+                "key": "audioTag",
+                "direction": "desc"
+              },
+              {
+                "key": "language",
+                "direction": "desc"
+              },
+              {
+                "key": "encode",
+                "direction": "desc"
+              },
+              {
+                "key": "size",
+                "direction": "desc"
+              }
+            ]
+          },
+          "default": [
+            {
+              "key": "resolution",
+              "direction": "desc"
+            },
+            {
+              "key": "cached",
+              "direction": "desc"
+            },
+            {
+              "key": "quality",
+              "direction": "desc"
+            },
+            {
+              "key": "visualTag",
+              "direction": "desc"
+            },
+            {
+              "key": "audioTag",
+              "direction": "desc"
+            },
+            {
+              "key": "language",
+              "direction": "desc"
+            },
+            {
+              "key": "encode",
+              "direction": "desc"
+            },
+            {
+              "key": "size",
+              "direction": "desc"
+            }
+          ]
+        }
+      },
+      "movies": [],
+      "series": [],
+      "anime": [],
+      "cached": [],
+      "uncached": [],
+      "cachedMovies": [],
+      "uncachedMovies": [],
+      "cachedSeries": [],
+      "uncachedSeries": [],
+      "cachedAnime": [],
+      "uncachedAnime": []
+    },
+    "deduplicator": {
+      "enabled": true,
+      "excludeAddons": [],
+      "multiGroupBehaviour": "aggressive",
+      "keys": [
+        "filename",
+        "infoHash",
+        "smartDetect"
+      ],
+      "cached": {
+        "__switch": "services",
+        "cases": {
+          "": "disabled"
+        },
+        "default": "single_result"
+      },
+      "uncached": {
+        "__switch": "services",
+        "cases": {
+          "": "disabled"
+        },
+        "default": "per_service"
+      },
+      "p2p": "per_addon",
+      "smartDetectAttributes": [
+        "size",
+        "resolution",
+        "quality",
+        "visualTags",
+        "audioTags",
+        "audioChannels",
+        "languages",
+        "encode",
+        "edition",
+        "network",
+        "remastered",
+        "bitrate",
+        "releaseGroup"
+      ],
+      "smartDetectRounding": 10,
+      "libraryBehaviour": {
+        "__switch": "services",
+        "cases": {
+          "": "ignore"
+        },
+        "default": "prefer"
+      },
+      "tiebreakers": [
+        {
+          "type": "torrent_seeders",
+          "position": "before_addon"
+        },
+        {
+          "type": "usenet_age",
+          "position": "before_addon"
+        }
+      ]
+    },
+    "formatter": {
+      "id": "tamtaro",
+      "definitions": {
+        "overrides": {
+          "tamtaro": {
+            "name": "{service.cached::istrue[\"⚡ \"||\"\"]}{stream.resolution::exists[\"{stream.resolution} \"||\"\"]}{stream.title::exists[\"{stream.title}\"||\"\"]}",
+            "description": "{stream.quality::exists[\"{stream.quality}\"||\"\"]}{stream.encode::exists[\" · {stream.encode}\"||\"\"]}{stream.size::exists[\" · {stream.size::sbytes}\"||\"\"]}\n{service.id} · {stream.type}{stream.languages::exists[\" · {stream.languageEmojis::join(' ')}\"||\"\"]}"
+          }
+        }
+      }
+    },
+    "proxy": {
+      "id": "mediaflow",
+      "proxiedAddons": [],
+      "proxiedServices": []
+    },
+    "resultLimits": {
+      "global": {
+        "__switch": "inputs.resolution",
+        "cases": {
+          "1080p": 10
+        },
+        "default": 12
+      },
+      "resolution": 3,
+      "mode": "independent"
+    },
+    "size": {
+      "__switch": "inputs.resolution",
+      "cases": {
+        "1080p": {
+          "__switch": "inputs.profile",
+          "cases": {
+            "fast": {
+              "global": {
+                "movies": [
+                  0,
+                  20000000000
+                ],
+                "series": [
+                  0,
+                  20000000000
+                ]
+              },
+              "resolution": {
+                "1080p": {
+                  "movies": [
+                    0,
+                    20000000000
+                  ],
+                  "series": [
+                    0,
+                    20000000000
+                  ]
+                },
+                "720p": {
+                  "movies": [
+                    0,
+                    12000000000
+                  ],
+                  "series": [
+                    0,
+                    8000000000
+                  ]
+                }
+              }
+            },
+            "maximum": {
+              "__remove": true
+            }
+          },
+          "default": {
+            "global": {
+              "movies": [
+                0,
+                30000000000
+              ],
+              "series": [
+                0,
+                30000000000
+              ]
+            },
+            "resolution": {
+              "1080p": {
+                "movies": [
+                  0,
+                  30000000000
+                ],
+                "series": [
+                  0,
+                  20000000000
+                ]
+              },
+              "720p": {
+                "movies": [
+                  0,
+                  12000000000
+                ],
+                "series": [
+                  0,
+                  8000000000
+                ]
+              }
+            }
+          }
+        }
+      },
+      "default": {
+        "__switch": "inputs.profile",
+        "cases": {
+          "fast": {
+            "global": {
+              "movies": [
+                0,
+                20000000000
+              ],
+              "series": [
+                0,
+                20000000000
+              ]
+            },
+            "resolution": {
+              "2160p": {
+                "movies": [
+                  0,
+                  20000000000
+                ],
+                "series": [
+                  0,
+                  20000000000
+                ]
+              },
+              "1080p": {
+                "movies": [
+                  0,
+                  20000000000
+                ],
+                "series": [
+                  0,
+                  20000000000
+                ]
+              },
+              "720p": {
+                "movies": [
+                  0,
+                  12000000000
+                ],
+                "series": [
+                  0,
+                  8000000000
+                ]
+              }
+            }
+          },
+          "maximum": {
+            "__remove": true
+          }
+        },
+        "default": {
+          "global": {
+            "movies": [
+              0,
+              30000000000
+            ],
+            "series": [
+              0,
+              30000000000
+            ]
+          },
+          "resolution": {
+            "2160p": {
+              "movies": [
+                0,
+                30000000000
+              ],
+              "series": [
+                0,
+                30000000000
+              ]
+            },
+            "1080p": {
+              "movies": [
+                0,
+                30000000000
+              ],
+              "series": [
+                0,
+                20000000000
+              ]
+            },
+            "720p": {
+              "movies": [
+                0,
+                12000000000
+              ],
+              "series": [
+                0,
+                8000000000
+              ]
+            }
+          }
+        }
+      }
+    },
+    "hideErrors": false,
+    "hideErrorsForResources": [
+      "addon_catalog",
+      "catalog",
+      "subtitles"
+    ],
+    "digitalReleaseFilter": {
+      "enabled": false,
+      "tolerance": 7,
+      "requestTypes": [
+        "movie",
+        "series",
+        "anime"
+      ],
+      "addons": []
+    },
+    "autoPlay": {
+      "enabled": false,
+      "method": "matchingFile",
+      "attributes": [
+        "resolution",
+        "quality",
+        "audioTags"
+      ]
+    },
+    "precacheNextEpisode": false,
+    "preloadStreams": {
+      "enabled": false
+    },
+    "cacheAndPlay": {
+      "enabled": false,
+      "streamTypes": []
+    },
+    "failover": {
+      "enabled": false
+    },
+    "areYouStillThere": {
+      "enabled": false
+    },
+    "checkOwned": false,
+    "externalDownloads": false,
+    "autoRemoveDownloads": false,
+    "presets": [
+      {
+        "__if": "!services",
+        "type": "torrentio",
+        "instanceId": "tio-p2p-1",
+        "enabled": true,
+        "options": {
+          "name": "Torrentio",
+          "timeout": 6000,
+          "useMultipleInstances": false,
+          "resources": [
+            "stream"
+          ]
+        }
+      },
+      {
+        "__if": "services.torbox or services.realdebrid or services.alldebrid or services.premiumize or services.debridlink or services.offcloud or services.easydebrid or services.pikpak or services.debrider",
+        "type": "library",
+        "instanceId": "lib-1",
+        "enabled": true,
+        "options": {
+          "name": "Library",
+          "timeout": 6000,
+          "resources": [
+            "stream",
+            "catalog",
+            "meta"
+          ],
+          "mediaTypes": [],
+          "showRefreshActions": [
+            "catalog"
+          ],
+          "skipProcessing": false,
+          "hideStreams": false,
+          "useMultipleInstances": false
+        }
+      },
+      {
+        "__if": "services.torbox or services.realdebrid or services.alldebrid or services.premiumize or services.debridlink or services.offcloud or services.easydebrid or services.pikpak or services.debrider",
+        "type": "seadex",
+        "instanceId": "tam-seadex",
+        "enabled": true,
+        "options": {
+          "name": "SeaDex",
+          "timeout": 6000,
+          "mediaTypes": [
+            "anime"
+          ]
+        }
+      },
+      {
+        "__if": "services.torbox or services.debrider",
+        "type": "stremthruTorz",
+        "instanceId": "67c",
+        "enabled": true,
+        "options": {
+          "name": "StremThru Torz",
+          "timeout": 6000,
+          "includeP2P": false,
+          "useMultipleInstances": false
+        }
+      },
+      {
+        "__if": "services.realdebrid or services.alldebrid or services.premiumize or services.debridlink or services.offcloud or services.easydebrid or services.pikpak",
+        "type": "stremthruStore",
+        "instanceId": "68a",
+        "enabled": true,
+        "options": {
+          "name": {
+            "__switch": "services",
+            "cases": {
+              "alldebrid": "StremThru AllDebrid",
+              "premiumize": "StremThru Premiumize",
+              "debridlink": "StremThru Debrid-Link",
+              "offcloud": "StremThru Offcloud",
+              "easydebrid": "StremThru EasyDebrid",
+              "pikpak": "StremThru PikPak"
+            },
+            "default": "StremThru RD"
+          },
+          "timeout": 6000,
+          "resources": [
+            "stream"
+          ]
+        }
+      },
+      {
+        "__if": "services.easynews",
+        "type": "easynewsPlusPlus",
+        "instanceId": "en-ppp-1",
+        "enabled": true,
+        "options": {
+          "name": "EasyNews++",
+          "timeout": 6000,
+          "strictTitleMatching": true
+        }
+      },
+      {
+        "__if": "services.easynews",
+        "type": "easynews-search",
+        "instanceId": "en-srch-1",
+        "enabled": true,
+        "options": {
+          "name": "EasyNews Search",
+          "timeout": 6000,
+          "apiVersion": "3.0",
+          "services": [
+            "easynews"
+          ]
+        }
+      },
+      {
+        "type": "meteor",
+        "instanceId": "nx-fix-02",
+        "enabled": true,
+        "options": {
+          "name": "Meteor",
+          "timeout": 6000,
+          "yourMedia": {
+            "sources": [
+              "torrent",
+              "webdl",
+              "usenet"
+            ],
+            "showStreams": true,
+            "enabled": true
+          },
+          "usenet": {
+            "enabled": true,
+            "customSearchEngines": true
+          },
+          "url": "https://meteorfortheweebs.midnightignite.me",
+          "resources": [
+            "stream"
+          ]
+        }
+      },
+      {
+        "type": "comet",
+        "instanceId": "nx-fix-01",
+        "enabled": true,
+        "options": {
+          "name": "Comet",
+          "timeout": 6000,
+          "resources": [
+            "stream"
+          ],
+          "mediaTypes": [
+            "movie",
+            "series",
+            "anime"
+          ],
+          "scrapeDebridAccountTorrents": true
+        }
+      },
+      {
+        "__if": "!services",
+        "type": "hdhub",
+        "instanceId": "hdhub-1",
+        "enabled": true,
+        "options": {
+          "name": "HdHub",
+          "timeout": 6000,
+          "resources": [
+            "stream"
+          ],
+          "mediaTypes": [
+            "movie",
+            "series",
+            "anime"
+          ]
+        }
+      },
+      {
+        "__if": "!services",
+        "type": "peerflix",
+        "instanceId": "pflx-1",
+        "enabled": true,
+        "options": {
+          "name": "Peerflix",
+          "timeout": 6000,
+          "showTorrentLinks": false,
+          "useMultipleInstances": false,
+          "resources": [
+            "stream"
+          ]
+        }
+      },
+      {
+        "__if": "services.torbox and inputs.anime or services.realdebrid and inputs.anime or services.alldebrid and inputs.anime or services.premiumize and inputs.anime or services.debridlink and inputs.anime or services.offcloud and inputs.anime or services.easydebrid and inputs.anime or services.pikpak and inputs.anime or services.debrider and inputs.anime",
+        "type": "anime-tosho-new",
+        "instanceId": "nx-at-01",
+        "enabled": true,
+        "options": {
+          "name": "Anime Tosho",
+          "timeout": 6000,
+          "mediaTypes": [
+            "anime"
+          ]
+        }
+      },
+      {
+        "__if": "services.seedr",
+        "type": "mediafusion",
+        "instanceId": "nx-mf-01",
+        "enabled": true,
+        "options": {
+          "name": "MediaFusion",
+          "timeout": 6000,
+          "resources": [
+            "stream"
+          ],
+          "mediaTypes": [
+            "movie",
+            "series",
+            "anime"
+          ]
+        }
+      },
+      {
+        "type": "opensubtitles-v3-plus",
+        "instanceId": "osub-v3-1",
+        "enabled": true,
+        "options": {
+          "name": "OpenSubtitles v3+",
+          "timeout": 6000,
+          "language": [
+            "en"
+          ],
+          "sources": "all",
+          "includeAiTranslated": false,
+          "movieHashPlusAutoAdjustment": false
+        }
+      },
+      {
+        "type": "tmdb-addon",
+        "instanceId": "tmdb-cat-1",
+        "enabled": true,
+        "options": {
+          "name": "TMDB",
+          "timeout": 6000
+        },
+        "category": "meta_catalogs"
+      }
+    ],
+    "excludedResolutions": {
+      "__switch": "inputs.resolution",
+      "cases": {
+        "1080p": [
+          "144p",
+          "240p",
+          "360p",
+          "2160p",
+          "1440p"
+        ],
+        "mixed": [
+          "144p",
+          "240p",
+          "360p"
+        ]
+      },
+      "default": [
+        "144p",
+        "240p",
+        "360p",
+        "480p",
+        "576p"
+      ]
+    },
+    "includedResolutions": [],
+    "requiredResolutions": [],
+    "preferredResolutions": {
+      "__switch": "inputs.resolution",
+      "cases": {
+        "1080p": [
+          "1080p",
+          "720p",
+          "Unknown"
+        ],
+        "mixed": [
+          "2160p",
+          "1080p",
+          "1440p",
+          "720p",
+          "576p",
+          "480p",
+          "Unknown"
+        ]
+      },
+      "default": [
+        "2160p",
+        "1440p",
+        "1080p",
+        "720p",
+        "Unknown"
+      ]
+    },
+    "excludedQualities": [
+      "CAM",
+      "SCR",
+      "TS",
+      "TC",
+      "HC HD-Rip"
+    ],
+    "includedQualities": [],
+    "requiredQualities": [],
+    "excludedEncodes": {
+      "__switch": "inputs.device",
+      "cases": {
+        "firestick-4kmax": [
+          "VC-1"
+        ],
+        "shield": [
+          "AV1"
+        ],
+        "googletv": [
+          "VC-1"
+        ],
+        "onn": [
+          "VC-1"
+        ],
+        "xiaomi": [
+          "VC-1"
+        ],
+        "xiaomi-3rd": [
+          "VC-1"
+        ],
+        "windows": []
+      },
+      "default": [
+        "AV1",
+        "VC-1"
+      ]
+    },
+    "preferredEncodes": {
+      "__switch": "inputs.device",
+      "cases": {
+        "firestick-4kmax": [
+          "HEVC",
+          "AV1",
+          "AVC",
+          "Unknown"
+        ],
+        "googletv": [
+          "HEVC",
+          "AV1",
+          "AVC",
+          "Unknown"
+        ],
+        "onn": [
+          "HEVC",
+          "AV1",
+          "AVC",
+          "Unknown"
+        ],
+        "xiaomi": [
+          "HEVC",
+          "AV1",
+          "AVC",
+          "Unknown"
+        ],
+        "xiaomi-3rd": [
+          "HEVC",
+          "AV1",
+          "AVC",
+          "Unknown"
+        ],
+        "windows": [
+          "HEVC",
+          "AV1",
+          "AVC",
+          "Unknown"
+        ]
+      },
+      "default": [
+        "HEVC",
+        "AVC",
+        "Unknown"
+      ]
+    },
+    "excludedAudioTags": {
+      "__switch": "inputs.device",
+      "cases": {
+        "firestick-4kmax": [],
+        "shield": [],
+        "xiaomi": [],
+        "xiaomi-3rd": [],
+        "windows": []
+      },
+      "default": [
+        "TrueHD",
+        "DTS-HD MA",
+        "DTS:X",
+        "FLAC"
+      ]
+    },
+    "preferredAudioChannels": {
+      "__switch": "inputs.device",
+      "cases": {
+        "shield": [
+          "7.1",
+          "5.1",
+          "2.0"
+        ],
+        "windows": [
+          "7.1",
+          "5.1",
+          "2.0"
+        ]
+      },
+      "default": [
+        "5.1",
+        "2.0"
+      ]
+    },
+    "preferredVisualTags": {
+      "__switch": "inputs.resolution",
+      "cases": {
+        "1080p": {
+          "__switch": "inputs.device",
+          "cases": {
+            "samsung": [
+              "HDR10+",
+              "HDR10",
+              "HDR",
+              "HLG",
+              "10bit",
+              "SDR",
+              "IMAX"
+            ],
+            "lgtv": [
+              "DV",
+              "HDR+DV",
+              "HDR10",
+              "HDR",
+              "HLG",
+              "10bit",
+              "SDR",
+              "IMAX"
+            ],
+            "sony": [
+              "DV",
+              "HDR+DV",
+              "HDR10",
+              "HDR",
+              "HLG",
+              "10bit",
+              "SDR",
+              "IMAX"
+            ],
+            "appletv-old": [
+              "DV",
+              "HDR+DV",
+              "HDR10",
+              "HDR",
+              "HLG",
+              "10bit",
+              "SDR",
+              "IMAX"
+            ],
+            "appletv-new": [
+              "DV",
+              "HDR+DV",
+              "HDR10+",
+              "HDR10",
+              "HDR",
+              "HLG",
+              "10bit",
+              "SDR",
+              "IMAX"
+            ],
+            "firestick-hd": [
+              "HDR10",
+              "HDR",
+              "HLG",
+              "SDR"
+            ],
+            "firestick-4kmax": [
+              "DV",
+              "HDR10+",
+              "HDR10",
+              "HDR",
+              "HLG",
+              "10bit",
+              "SDR",
+              "IMAX"
+            ],
+            "shield": [
+              "DV",
+              "HDR+DV",
+              "HDR10",
+              "HDR",
+              "10bit",
+              "SDR",
+              "IMAX"
+            ],
+            "googletv": [
+              "DV",
+              "HDR10+",
+              "HDR10",
+              "HDR",
+              "HLG",
+              "10bit",
+              "SDR",
+              "IMAX"
+            ],
+            "chromecast": [
+              "DV",
+              "HDR10+",
+              "HDR10",
+              "HDR",
+              "HLG",
+              "10bit",
+              "SDR",
+              "IMAX"
+            ],
+            "onn": [
+              "HDR10+",
+              "HDR10",
+              "HDR",
+              "HLG",
+              "10bit",
+              "SDR",
+              "IMAX"
+            ],
+            "xiaomi": [
+              "DV",
+              "HDR10+",
+              "HDR10",
+              "HDR",
+              "HLG",
+              "10bit",
+              "SDR",
+              "IMAX"
+            ],
+            "xiaomi-3rd": [
+              "DV",
+              "HDR10+",
+              "HDR10",
+              "HDR",
+              "HLG",
+              "10bit",
+              "SDR",
+              "IMAX"
+            ],
+            "windows": [
+              "HDR+DV",
+              "DV",
+              "HDR10+",
+              "HDR10",
+              "HDR",
+              "HLG",
+              "10bit",
+              "SDR",
+              "IMAX"
+            ],
+            "ipad": [
+              "DV",
+              "HDR+DV",
+              "HDR10",
+              "HDR",
+              "10bit",
+              "SDR"
+            ]
+          },
+          "default": [
+            "HDR10",
+            "HDR",
+            "HLG",
+            "10bit",
+            "SDR",
+            "IMAX"
+          ]
+        }
+      },
+      "default": {
+        "__switch": "inputs.device",
+        "cases": {
+          "generic": [
+            "HDR10",
+            "HDR",
+            "HLG",
+            "10bit",
+            "SDR",
+            "IMAX"
+          ],
+          "samsung": [
+            "HDR10+",
+            "HDR10",
+            "HDR",
+            "HLG",
+            "10bit",
+            "SDR",
+            "IMAX"
+          ],
+          "lgtv": [
+            "DV",
+            "HDR+DV",
+            "HDR10",
+            "HDR",
+            "HLG",
+            "10bit",
+            "SDR",
+            "IMAX"
+          ],
+          "sony": [
+            "DV",
+            "HDR+DV",
+            "HDR10",
+            "HDR",
+            "HLG",
+            "10bit",
+            "SDR",
+            "IMAX"
+          ],
+          "appletv-old": [
+            "DV",
+            "HDR+DV",
+            "HDR10",
+            "HDR",
+            "HLG",
+            "10bit",
+            "SDR",
+            "IMAX"
+          ],
+          "appletv-new": [
+            "DV",
+            "HDR+DV",
+            "HDR10+",
+            "HDR10",
+            "HDR",
+            "HLG",
+            "10bit",
+            "SDR",
+            "IMAX"
+          ],
+          "firestick-hd": [
+            "HDR10",
+            "HDR",
+            "HLG",
+            "SDR"
+          ],
+          "firestick-4kmax": [
+            "DV",
+            "HDR10+",
+            "HDR10",
+            "HDR",
+            "HLG",
+            "10bit",
+            "SDR",
+            "IMAX"
+          ],
+          "shield": [
+            "DV",
+            "HDR+DV",
+            "HDR10",
+            "HDR",
+            "10bit",
+            "SDR",
+            "IMAX"
+          ],
+          "googletv": [
+            "DV",
+            "HDR10+",
+            "HDR10",
+            "HDR",
+            "HLG",
+            "10bit",
+            "SDR",
+            "IMAX"
+          ],
+          "chromecast": [
+            "DV",
+            "HDR10+",
+            "HDR10",
+            "HDR",
+            "HLG",
+            "10bit",
+            "SDR",
+            "IMAX"
+          ],
+          "onn": [
+            "HDR10+",
+            "HDR10",
+            "HDR",
+            "HLG",
+            "10bit",
+            "SDR",
+            "IMAX"
+          ],
+          "xiaomi": [
+            "DV",
+            "HDR10+",
+            "HDR10",
+            "HDR",
+            "HLG",
+            "10bit",
+            "SDR",
+            "IMAX"
+          ],
+          "xiaomi-3rd": [
+            "DV",
+            "HDR10+",
+            "HDR10",
+            "HDR",
+            "HLG",
+            "10bit",
+            "SDR",
+            "IMAX"
+          ],
+          "roku": [
+            "HDR10",
+            "HDR",
+            "HLG",
+            "10bit",
+            "SDR",
+            "IMAX"
+          ],
+          "ipad": [
+            "DV",
+            "HDR+DV",
+            "HDR10",
+            "HDR",
+            "10bit",
+            "SDR"
+          ],
+          "projector": [
+            "HDR10",
+            "HDR",
+            "HLG",
+            "10bit",
+            "SDR",
+            "IMAX"
+          ]
+        },
+        "default": [
+          "HDR+DV",
+          "DV",
+          "HDR10+",
+          "HDR10",
+          "HDR",
+          "HLG",
+          "10bit",
+          "SDR",
+          "IMAX"
+        ]
+      }
+    },
+    "enableSeadex": true,
+    "excludeCached": false,
+    "excludeCachedFromAddons": [],
+    "excludeCachedFromServices": [],
+    "excludeCachedFromStreamTypes": [],
+    "excludeUncached": {
+      "__switch": "services",
+      "cases": {
+        "": false
+      },
+      "default": {
+        "__switch": "inputs.cachedOnly",
+        "cases": {
+          "true": true
+        },
+        "default": false
+      }
+    },
+    "excludeUncachedFromAddons": [],
+    "excludeUncachedFromServices": [],
+    "excludeUncachedFromStreamTypes": [],
+    "excludeUncachedMode": "or",
+    "preferredRegexPatterns": [],
+    "excludedStreamExpressions": [
+      {
+        "enabled": true,
+        "expression": "/* Core Stable | External stream kill */ type(streams,'youtube','external')"
+      }
+    ],
+    "includedStreamExpressions": [],
+    "preferredStreamExpressions": [],
+    "rankedStreamExpressions": [],
+    "dynamicAddonFetching": {
+      "enabled": false
+    },
+    "titleMatching": {
+      "enabled": false,
+      "mode": "contains",
+      "similarityThreshold": 0.75,
+      "requestTypes": [],
+      "addons": []
+    },
+    "yearMatching": {
+      "enabled": false,
+      "strict": false,
+      "useInitialAirDate": true,
+      "tolerance": 2,
+      "requestTypes": [],
+      "addons": []
+    },
+    "seasonEpisodeMatching": {
+      "enabled": true,
+      "strict": false,
+      "requestTypes": [],
+      "addons": []
+    },
+    "groups": {
+      "enabled": false,
+      "groupings": []
+    },
+    "syncedExcludedStreamExpressionUrls": [],
+    "syncedIncludedStreamExpressionUrls": [],
+    "syncedPreferredStreamExpressionUrls": [],
+    "syncedRankedStreamExpressionUrls": [],
+    "syncedExcludedRegexUrls": [],
+    "regexOverrides": [],
+    "selOverrides": [],
+    "excludedVisualTags": [
+      "3D",
+      "H-OU",
+      "H-SBS"
+    ],
+    "excludedStreamTypes": [
+      "youtube"
+    ],
+    "requiredStreamExpressions": [],
+    "statistics": {
+      "enabled": false,
+      "position": "bottom",
+      "statsToShow": [
+        "addon",
+        "filter",
+        "timing"
+      ],
+      "showFilterStatsOnNoStreams": true
+    },
+    "services": []
+  }
+}

@@ -160,7 +160,7 @@ export const SEL_POLICY_DATA = {
       },
       {
         "enabled": true,
-        "expression": "/* Elite 1080p REMUX Pin */ pin(releaseGroup(quality(resolution(streams,'BluRay REMUX'),'1080p'),'NTb','FLUX','KiNGS','NTG','BHDStudio','FraMeSToR','SiC','126811'),'top')"
+        "expression": "/* Elite 1080p REMUX Pin */ pin(releaseGroup(resolution(quality(streams,'BluRay REMUX'),'1080p'),'NTb','FLUX','KiNGS','NTG','BHDStudio','FraMeSToR','SiC','126811'),'top')"
       },
       {
         "enabled": true,
@@ -292,7 +292,7 @@ export const SEL_POLICY_DATA = {
       },
       {
         "enabled": true,
-        "expression": "/*Bad 1080P Bluray*/ (queryType=='movie') and count(quality(resolution(streams,'2160p'),'Bluray REMUX'))==0 and (count(quality(resolution(streams,'1080p'),'Bluray REMUX'))==0) and count(seadex(resolution(streams,'1080p')))==0 ? negate(merge(seadex(streams),library(streams)),quality(resolution(streams,'1080p'),'Bluray')) : []"
+        "expression": "/*Bad 1080P Bluray*/ (queryType=='movie') and (daysSinceRelease >= 0 and daysSinceRelease < 90) and count(quality(resolution(streams,'2160p'),'Bluray REMUX'))==0 and (count(quality(resolution(streams,'1080p'),'Bluray REMUX'))==0) and count(seadex(resolution(streams,'1080p')))==0 ? negate(merge(seadex(streams),library(streams)),quality(resolution(streams,'1080p'),'Bluray')) : []"
       },
       {
         "enabled": true,
@@ -320,7 +320,7 @@ export const SEL_POLICY_DATA = {
       },
       {
         "enabled": true,
-        "expression": "/* DV-Only Kill */ negate(visualTag(streams,'DV'),merge(visualTag(streams,'HDR10+'),visualTag(streams,'HDR10'),visualTag(streams,'HDR'),visualTag(streams,'HLG'),visualTag(streams,'SDR')))"
+        "expression": "/* DV-Only Kill */ negate(merge(visualTag(streams,'HDR10+'),visualTag(streams,'HDR10'),visualTag(streams,'HDR'),visualTag(streams,'HLG'),visualTag(streams,'SDR')),visualTag(streams,'DV'))"
       },
       {
         "enabled": true,
@@ -374,11 +374,11 @@ export const SEL_POLICY_DATA = {
       },
       {
         "enabled": true,
-        "expression": "/* Elite 4K REMUX Pin */ pin(releaseGroup(quality(resolution(streams,'BluRay REMUX'),'2160p'),'FraMeSToR','DON','FLUX','HIFI','playBD','BMF','QxR','EPSiLON','BLURANiUM','PmP'),'top')"
+        "expression": "/* Elite 4K REMUX Pin */ pin(releaseGroup(resolution(quality(streams,'BluRay REMUX'),'2160p'),'FraMeSToR','DON','FLUX','HIFI','playBD','BMF','QxR','EPSiLON','BLURANiUM','PmP'),'top')"
       },
       {
         "enabled": true,
-        "expression": "/* Elite 1080p REMUX Pin */ pin(releaseGroup(quality(resolution(streams,'BluRay REMUX'),'1080p'),'NTb','FLUX','KiNGS','NTG','BHDStudio','FraMeSToR','SiC','126811'),'top')"
+        "expression": "/* Elite 1080p REMUX Pin */ pin(releaseGroup(resolution(quality(streams,'BluRay REMUX'),'1080p'),'NTb','FLUX','KiNGS','NTG','BHDStudio','FraMeSToR','SiC','126811'),'top')"
       },
       {
         "enabled": true,
@@ -522,7 +522,7 @@ export const SEL_POLICY_DATA = {
       },
       {
         "enabled": true,
-        "expression": "/*Bad 1080P Bluray*/ (queryType=='movie') and count(quality(resolution(streams,'2160p'),'Bluray REMUX'))==0 and (count(quality(resolution(streams,'1080p'),'Bluray REMUX'))==0) and count(seadex(resolution(streams,'1080p')))==0 ? negate(merge(seadex(streams),library(streams)),quality(resolution(streams,'1080p'),'Bluray')) : []"
+        "expression": "/*Bad 1080P Bluray*/ (queryType=='movie') and (daysSinceRelease >= 0 and daysSinceRelease < 90) and count(quality(resolution(streams,'2160p'),'Bluray REMUX'))==0 and (count(quality(resolution(streams,'1080p'),'Bluray REMUX'))==0) and count(seadex(resolution(streams,'1080p')))==0 ? negate(merge(seadex(streams),library(streams)),quality(resolution(streams,'1080p'),'Bluray')) : []"
       },
       {
         "enabled": true,
@@ -546,7 +546,7 @@ export const SEL_POLICY_DATA = {
       },
       {
         "enabled": true,
-        "expression": "/* DV-Only Kill */ negate(visualTag(streams,'DV'),merge(visualTag(streams,'HDR10+'),visualTag(streams,'HDR10'),visualTag(streams,'HDR'),visualTag(streams,'HLG'),visualTag(streams,'SDR')))"
+        "expression": "/* DV-Only Kill */ negate(merge(visualTag(streams,'HDR10+'),visualTag(streams,'HDR10'),visualTag(streams,'HDR'),visualTag(streams,'HLG'),visualTag(streams,'SDR')),visualTag(streams,'DV'))"
       },
       {
         "enabled": true,
@@ -600,11 +600,11 @@ export const SEL_POLICY_DATA = {
       },
       {
         "enabled": true,
-        "expression": "/* Elite 4K REMUX Pin */ pin(releaseGroup(quality(resolution(streams,'BluRay REMUX'),'2160p'),'FraMeSToR','DON','FLUX','HIFI','playBD','BMF','QxR','EPSiLON','BLURANiUM','PmP'),'top')"
+        "expression": "/* Elite 4K REMUX Pin */ pin(releaseGroup(resolution(quality(streams,'BluRay REMUX'),'2160p'),'FraMeSToR','DON','FLUX','HIFI','playBD','BMF','QxR','EPSiLON','BLURANiUM','PmP'),'top')"
       },
       {
         "enabled": true,
-        "expression": "/* Elite 1080p REMUX Pin */ pin(releaseGroup(quality(resolution(streams,'BluRay REMUX'),'1080p'),'NTb','FLUX','KiNGS','NTG','BHDStudio','FraMeSToR','SiC','126811'),'top')"
+        "expression": "/* Elite 1080p REMUX Pin */ pin(releaseGroup(resolution(quality(streams,'BluRay REMUX'),'1080p'),'NTb','FLUX','KiNGS','NTG','BHDStudio','FraMeSToR','SiC','126811'),'top')"
       },
       {
         "enabled": true,
@@ -764,7 +764,7 @@ export const SEL_POLICY_DATA = {
       },
       {
         "enabled": true,
-        "expression": "/*Bad 1080P Bluray*/ (queryType=='movie') and count(quality(resolution(streams,'2160p'),'Bluray REMUX'))==0 and (count(quality(resolution(streams,'1080p'),'Bluray REMUX'))==0) and count(seadex(resolution(streams,'1080p')))==0 ? negate(merge(seadex(streams),library(streams)),quality(resolution(streams,'1080p'),'Bluray')) : []"
+        "expression": "/*Bad 1080P Bluray*/ (queryType=='movie') and (daysSinceRelease >= 0 and daysSinceRelease < 90) and count(quality(resolution(streams,'2160p'),'Bluray REMUX'))==0 and (count(quality(resolution(streams,'1080p'),'Bluray REMUX'))==0) and count(seadex(resolution(streams,'1080p')))==0 ? negate(merge(seadex(streams),library(streams)),quality(resolution(streams,'1080p'),'Bluray')) : []"
       },
       {
         "enabled": true,
@@ -788,7 +788,7 @@ export const SEL_POLICY_DATA = {
       },
       {
         "enabled": true,
-        "expression": "/* DV-Only Kill */ negate(visualTag(streams,'DV'),merge(visualTag(streams,'HDR10+'),visualTag(streams,'HDR10'),visualTag(streams,'HDR'),visualTag(streams,'HLG'),visualTag(streams,'SDR')))"
+        "expression": "/* DV-Only Kill */ negate(merge(visualTag(streams,'HDR10+'),visualTag(streams,'HDR10'),visualTag(streams,'HDR'),visualTag(streams,'HLG'),visualTag(streams,'SDR')),visualTag(streams,'DV'))"
       },
       {
         "enabled": true,
@@ -1058,7 +1058,7 @@ export const SEL_POLICY_DATA = {
       },
       {
         "enabled": true,
-        "expression": "/*Bad 1080P Bluray*/ (queryType=='movie') and count(quality(resolution(streams,'2160p'),'Bluray REMUX'))==0 and (count(quality(resolution(streams,'1080p'),'Bluray REMUX'))==0) and count(seadex(resolution(streams,'1080p')))==0 ? negate(merge(seadex(streams),library(streams)),quality(resolution(streams,'1080p'),'Bluray')) : []"
+        "expression": "/*Bad 1080P Bluray*/ (queryType=='movie') and (daysSinceRelease >= 0 and daysSinceRelease < 90) and count(quality(resolution(streams,'2160p'),'Bluray REMUX'))==0 and (count(quality(resolution(streams,'1080p'),'Bluray REMUX'))==0) and count(seadex(resolution(streams,'1080p')))==0 ? negate(merge(seadex(streams),library(streams)),quality(resolution(streams,'1080p'),'Bluray')) : []"
       },
       {
         "enabled": true,
@@ -1082,7 +1082,7 @@ export const SEL_POLICY_DATA = {
       },
       {
         "enabled": true,
-        "expression": "/* DV-Only Kill */ negate(visualTag(streams,'DV'),merge(visualTag(streams,'HDR10+'),visualTag(streams,'HDR10'),visualTag(streams,'HDR'),visualTag(streams,'HLG'),visualTag(streams,'SDR')))"
+        "expression": "/* DV-Only Kill */ negate(merge(visualTag(streams,'HDR10+'),visualTag(streams,'HDR10'),visualTag(streams,'HDR'),visualTag(streams,'HLG'),visualTag(streams,'SDR')),visualTag(streams,'DV'))"
       },
       {
         "enabled": true,
@@ -1288,7 +1288,7 @@ export const SEL_POLICY_DATA = {
       },
       {
         "enabled": true,
-        "expression": "/*Bad 1080P Bluray*/ (queryType=='movie') and count(quality(resolution(streams,'2160p'),'Bluray REMUX'))==0 and (count(quality(resolution(streams,'1080p'),'Bluray REMUX'))==0) and count(seadex(resolution(streams,'1080p')))==0 ? negate(merge(seadex(streams),library(streams)),quality(resolution(streams,'1080p'),'Bluray')) : []"
+        "expression": "/*Bad 1080P Bluray*/ (queryType=='movie') and (daysSinceRelease >= 0 and daysSinceRelease < 90) and count(quality(resolution(streams,'2160p'),'Bluray REMUX'))==0 and (count(quality(resolution(streams,'1080p'),'Bluray REMUX'))==0) and count(seadex(resolution(streams,'1080p')))==0 ? negate(merge(seadex(streams),library(streams)),quality(resolution(streams,'1080p'),'Bluray')) : []"
       },
       {
         "enabled": true,
@@ -1312,7 +1312,7 @@ export const SEL_POLICY_DATA = {
       },
       {
         "enabled": true,
-        "expression": "/* DV-Only Kill */ negate(visualTag(streams,'DV'),merge(visualTag(streams,'HDR10+'),visualTag(streams,'HDR10'),visualTag(streams,'HDR'),visualTag(streams,'HLG'),visualTag(streams,'SDR')))"
+        "expression": "/* DV-Only Kill */ negate(merge(visualTag(streams,'HDR10+'),visualTag(streams,'HDR10'),visualTag(streams,'HDR'),visualTag(streams,'HLG'),visualTag(streams,'SDR')),visualTag(streams,'DV'))"
       },
       {
         "enabled": true,
@@ -1582,7 +1582,7 @@ export const SEL_POLICY_DATA = {
       },
       {
         "enabled": true,
-        "expression": "/*Bad 1080P Bluray*/ (queryType=='movie') and count(quality(resolution(streams,'2160p'),'Bluray REMUX'))==0 and (count(quality(resolution(streams,'1080p'),'Bluray REMUX'))==0) and count(seadex(resolution(streams,'1080p')))==0 ? negate(merge(seadex(streams),library(streams)),quality(resolution(streams,'1080p'),'Bluray')) : []"
+        "expression": "/*Bad 1080P Bluray*/ (queryType=='movie') and (daysSinceRelease >= 0 and daysSinceRelease < 90) and count(quality(resolution(streams,'2160p'),'Bluray REMUX'))==0 and (count(quality(resolution(streams,'1080p'),'Bluray REMUX'))==0) and count(seadex(resolution(streams,'1080p')))==0 ? negate(merge(seadex(streams),library(streams)),quality(resolution(streams,'1080p'),'Bluray')) : []"
       },
       {
         "enabled": true,
@@ -1606,7 +1606,7 @@ export const SEL_POLICY_DATA = {
       },
       {
         "enabled": true,
-        "expression": "/* DV-Only Kill */ negate(visualTag(streams,'DV'),merge(visualTag(streams,'HDR10+'),visualTag(streams,'HDR10'),visualTag(streams,'HDR'),visualTag(streams,'HLG'),visualTag(streams,'SDR')))"
+        "expression": "/* DV-Only Kill */ negate(merge(visualTag(streams,'HDR10+'),visualTag(streams,'HDR10'),visualTag(streams,'HDR'),visualTag(streams,'HLG'),visualTag(streams,'SDR')),visualTag(streams,'DV'))"
       },
       {
         "enabled": true,

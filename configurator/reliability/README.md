@@ -1,7 +1,8 @@
 # Reliable Configurator — Runtime Gates
 
-This directory contains deterministic, credential-free reliability gates for the
-parallel Reliable Configurator V3 candidate.
+This directory contains deterministic, credential-free reliability gates. They were
+written for the Reliable Configurator V3 prototype (removed in v3.18, never linked
+from the site); the Configurator's own contract tests still run these fixtures.
 
 ## What is tested here
 

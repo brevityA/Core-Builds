@@ -6,7 +6,7 @@
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { BADGES, GROUPS } from '../catalog.mjs';
+import { BADGE_ASSET_BASE, BADGES, GROUPS } from '../catalog.mjs';
 import { buildBadgePack, serialiseJson, validateBadgePack } from '../core.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -45,3 +45,25 @@ for (const pack of packs) {
 }
 
 console.log(`essential groups: ${GROUPS.filter((g) => g.essential).map((g) => g.id).join(', ')}`);
+
+// The artwork index: every badge image, for formatter and pack authors who
+// want the art without the Badge Builder. Generated from the catalog; the
+// licence and attribution travel with it.
+const index = {
+  name: 'Core Builds badge artwork',
+  license: 'CC-BY-4.0',
+  licenseUrl: 'https://creativecommons.org/licenses/by/4.0/',
+  attribution: 'Badge artwork: Core Builds (brevityA/Core-Builds), CC BY 4.0',
+  source: 'https://github.com/brevityA/Core-Builds/tree/main/tools/badges/assets',
+  groups: GROUPS.map(({ id, name, description }) => ({ id, name, description })),
+  badges: BADGES.map(({ id, name, groupId, assetLabel }) => ({
+    id,
+    name,
+    group: groupId,
+    label: assetLabel,
+    png: `${BADGE_ASSET_BASE}/${id}.png`,
+    svg: `${BADGE_ASSET_BASE}/${id}.svg`,
+  })),
+};
+writeFileSync(join(outDir, 'badges.json'), `${JSON.stringify(index, null, 2)}\n`);
+console.log(`wrote badges.json · ${index.badges.length} badges · ${index.groups.length} groups`);

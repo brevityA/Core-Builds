@@ -12,8 +12,29 @@ const MAX_MESSAGE_LENGTH = 2000;
 let _lastSendTime = 0;
 let _widgetOpen = false;
 let _previousFocus = null;
+let _getSetupContext = null;
+const DRAFT_KEY = 'cbContactDraft';
+const DISCORD_URL = 'https://discord.gg/AwJ49yzbqT';
+const ISSUES_URL = 'https://github.com/brevityA/Core-Builds/issues/new';
+
+// What to say: one short prompt and a fill-in outline per kind of message (v3.33).
+const KINDS = {
+  Bug: { label: 'Problem', hint: 'Say what you did, what you expected, and what happened instead. The app and a title you tried help most.',
+    placeholder: 'e.g. Quick install finished, but Stremio shows no streams for The Office S02E01 on my Google TV.',
+    outline: 'What I did:\nWhat I expected:\nWhat happened instead:\nApp (Stremio, Nuvio, WuPlay…):\nA title I tried:' },
+  Feature: { label: 'Idea', hint: 'Describe what you would like and the problem it solves for you.',
+    placeholder: 'e.g. Let me pick a different formatter in Quick install without opening Custom build.',
+    outline: 'I would like Core Builds to:\nIt would help because:' },
+  Question: { label: 'Question', hint: 'Say what you are trying to do and what you have tried so far.',
+    placeholder: 'e.g. Which template should I use for a Fire Stick 4K Max on a 50 Mbps connection?',
+    outline: 'I am trying to:\nWhat I have tried:' },
+  Feedback: { label: 'Thanks', hint: 'Tell Brevity what works for you, or what could be better.',
+    placeholder: 'e.g. Setup took two minutes and everything plays. The new menu is easier to find things in.',
+    outline: 'What I liked:\nWhat could be better:' },
+};
 
 export function initContactWidget(getSetupContext = null) {
+  _getSetupContext = getSetupContext;
   if (document.getElementById('cbContactWidget')) return; // idempotent — safe if bootstrap runs twice
   const style = document.createElement('style');
   style.textContent = CONTACT_CSS;
@@ -29,6 +50,15 @@ export function initContactWidget(getSetupContext = null) {
   document.getElementById('cbContactForm').addEventListener('submit', handleSubmit);
   document.getElementById('cbContactMessage').addEventListener('input', updateCharCount);
   document.getElementById('cbContactPanel').addEventListener('keydown', handlePanelKeydown);
+  document.getElementById('cbContactKinds').addEventListener('click', (e) => {
+    const chip = e.target.closest('[data-kind]');
+    if (chip) setKind(chip.dataset.kind);
+  });
+  document.getElementById('cbContactOutline').addEventListener('click', insertOutline);
+  document.getElementById('cbContactCopy').addEventListener('click', copyMessage);
+  document.getElementById('cbContactMessage').addEventListener('input', saveDraft);
+  setKind('Feedback');
+  restoreDraft();
   document.getElementById('cbContactOverlay').addEventListener('click', (e) => {
     if (e.target.id === 'cbContactOverlay') closeWidget();
   });
@@ -44,7 +74,8 @@ function openWidget() {
   document.getElementById('cbContactOverlay').classList.add('open');
   document.getElementById('cbContactPanel').classList.add('open');
   document.getElementById('cbContactBtn').classList.add('active');
-  setTimeout(() => document.getElementById('cbContactName')?.focus(), 200);
+  renderSetupPreview();
+  setTimeout(() => document.getElementById('cbContactMessage')?.focus(), 200);
 }
 function closeWidget() {
   _widgetOpen = false;
@@ -73,16 +104,72 @@ function updateCharCount() {
   counter.className = 'cb-contact-count' + (length > 1900 ? ' count-danger' : length > 1600 ? ' count-warn' : '');
 }
 
+function setKind(kind) {
+  const k = KINDS[kind] ? kind : 'Feedback';
+  document.getElementById('cbContactCategory').value = k;
+  document.querySelectorAll('#cbContactKinds [data-kind]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.kind === k)));
+  document.getElementById('cbContactHint').textContent = KINDS[k].hint;
+  document.getElementById('cbContactMessage').placeholder = KINDS[k].placeholder;
+}
+function insertOutline() {
+  const input = document.getElementById('cbContactMessage');
+  const outline = KINDS[document.getElementById('cbContactCategory').value]?.outline || '';
+  if (!input.value.trim()) input.value = outline;
+  else if (!input.value.includes(outline)) input.value = input.value.trimEnd() + '\n\n' + outline;
+  input.focus(); input.setSelectionRange(input.value.indexOf(':') + 1, input.value.indexOf(':') + 1);
+  updateCharCount(); saveDraft();
+}
+function saveDraft() {
+  try { sessionStorage.setItem(DRAFT_KEY, JSON.stringify({ kind: document.getElementById('cbContactCategory').value, message: document.getElementById('cbContactMessage').value })); } catch (e) { /* storage blocked: the draft lives only in the field */ }
+}
+function restoreDraft() {
+  try {
+    const d = JSON.parse(sessionStorage.getItem(DRAFT_KEY) || 'null');
+    if (d && typeof d.message === 'string') { setKind(d.kind); document.getElementById('cbContactMessage').value = d.message.slice(0, MAX_MESSAGE_LENGTH); updateCharCount(); }
+  } catch (e) { /* no draft */ }
+}
+function setupLine() {
+  try {
+    const state = typeof _getSetupContext === 'function'
+      ? (_getSetupContext() || {})
+      : JSON.parse(localStorage.getItem('coreBuild') || '{}');
+    const labels = state.labels || {};
+    return [
+      state.service ? `Service: ${labels.service || state.service}` : '',
+      state.device ? `Device: ${labels.device || state.device}` : '',
+      state.resolution ? `Resolution: ${labels.resolution || state.resolution}` : '',
+      state.pseArch ? `Architecture: ${labels.pseArch || state.pseArch}` : '',
+      state.formatter ? `Formatter: ${labels.formatter || state.formatter}` : '',
+      state.configuratorVersion ? `Configurator: ${state.configuratorVersion}` : '',
+    ].filter(Boolean).join(' · ').slice(0, 1000);
+  } catch (e) { return ''; }
+}
+function renderSetupPreview() {
+  const line = setupLine();
+  const row = document.getElementById('cbContactSetupRow');
+  if (!row) return;
+  row.hidden = !line;
+  document.getElementById('cbContactSetupText').textContent = line || '';
+}
+function showFallback(show) {
+  const el = document.getElementById('cbContactFallback');
+  if (el) el.hidden = !show;
+}
+async function copyMessage() {
+  const text = document.getElementById('cbContactMessage').value;
+  try { await navigator.clipboard.writeText(text); showStatus('Copied. Paste it into Discord or a GitHub issue.', 'ok'); }
+  catch (e) { const input = document.getElementById('cbContactMessage'); input.focus(); input.select(); showStatus('Select all and copy, then paste it into Discord or a GitHub issue.', 'warn'); }
+}
+
 async function handleSubmit(e) {
   e.preventDefault();
-  const name = document.getElementById('cbContactName').value.trim();
+  const name = document.getElementById('cbContactName').value.trim() || 'Anonymous';
   const email = document.getElementById('cbContactEmail').value.trim();
   const category = document.getElementById('cbContactCategory').value;
   const message = document.getElementById('cbContactMessage').value.trim();
   const honeypot = document.getElementById('cbContactHp').value;
 
-  if (!name) { showStatus('Please enter your name', 'err'); return; }
-  if (!message) { showStatus('Please enter a message', 'err'); return; }
+  if (!message) { showStatus('Write a message first. "Start with a template" gives you an outline.', 'err'); return; }
   if (message.length > MAX_MESSAGE_LENGTH) { showStatus(`Message too long (${message.length}/${MAX_MESSAGE_LENGTH})`, 'err'); return; }
   if (honeypot) { showStatus('Message sent!', 'ok'); return; }
 
@@ -93,23 +180,8 @@ async function handleSubmit(e) {
     return;
   }
 
-  // Build a sanitized live setup context. Fall back to saved state for
-  // bootstrap/legacy callers, but prefer the current in-memory Configurator state.
-  let setup = '';
-  try {
-    const state = typeof getSetupContext === 'function'
-      ? (getSetupContext() || {})
-      : JSON.parse(localStorage.getItem('coreBuild') || '{}');
-    const labels = state.labels || {};
-    setup = [
-      state.service ? `Service: ${labels.service || state.service}` : '',
-      state.device ? `Device: ${labels.device || state.device}` : '',
-      state.resolution ? `Resolution: ${labels.resolution || state.resolution}` : '',
-      state.pseArch ? `Architecture: ${labels.pseArch || state.pseArch}` : '',
-      state.formatter ? `Formatter: ${labels.formatter || state.formatter}` : '',
-      state.configuratorVersion ? `Configurator: ${state.configuratorVersion}` : '',
-    ].filter(Boolean).join(' · ').slice(0, 1000);
-  } catch(e) {}
+  // Sanitized setup context (never keys), only when the person leaves it switched on.
+  const setup = document.getElementById('cbContactSetup')?.checked === false ? '' : setupLine();
 
   const btn = document.getElementById('cbContactSubmit');
   btn.disabled = true;
@@ -131,17 +203,23 @@ async function handleSubmit(e) {
 
     if (res.ok) {
       _lastSendTime = Date.now();
-      showStatus('Sent successfully — Brevity will see it on Discord.', 'ok');
+      showStatus('Sent. Brevity reads every message on Discord; add an email above if you want a reply.', 'ok');
       document.getElementById('cbContactForm').reset();
-      updateCharCount();
+      try { sessionStorage.removeItem(DRAFT_KEY); } catch (e) { /* nothing stored */ }
+      setKind('Feedback'); updateCharCount(); showFallback(false);
     } else {
-      showStatus('Failed to send — try again later', 'err');
+      const why = res.status === 429 ? 'Too many messages from this connection in the last hour.'
+        : res.status === 403 ? 'This copy of Core Builds cannot send messages.'
+        : 'The message service did not accept it.';
+      showStatus(`Not sent: ${why} Your message is kept below; copy it or post it on Discord.`, 'err');
+      showFallback(true);
     }
   } catch (err) {
-    showStatus('Network error — check your connection', 'err');
+    showStatus('Not sent: no connection to the message service. Your message is kept; copy it or post it on Discord.', 'err');
+    showFallback(true);
   } finally {
     btn.disabled = false;
-    btn.textContent = 'Send Message';
+    btn.textContent = 'Send message';
   }
 }
 
@@ -157,6 +235,19 @@ function showStatus(msg, type) {
 }
 
 const CONTACT_CSS = `
+.cb-field-label{display:block;font-size:.72rem;font-weight:700;color:var(--th-tx2,#8b949e);text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px}
+.cb-kinds{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+.cb-kind{min-height:38px;padding:6px 4px;border:1.5px solid var(--th-border,rgba(255,255,255,.1));border-radius:10px;background:var(--th-card-alt,#111720);color:var(--th-tx2,#8b949e);font:inherit;font-size:.78rem;font-weight:700;cursor:pointer}
+.cb-kind[aria-pressed='true']{border-color:var(--th-accent,#00d4ff);background:var(--th-accent-bg,rgba(0,212,255,.1));color:var(--th-tx,#e4e7ed)}
+.cb-kind:focus-visible,.cb-outline:focus-visible,.cb-fallback>*:focus-visible{outline:2px solid var(--th-accent,#00d4ff);outline-offset:2px}
+.cb-hint{margin:8px 2px 0;font-size:.74rem;line-height:1.45;color:var(--th-tx3,#6b7280)}
+.cb-outline{margin-top:6px;padding:4px 0;border:0;background:none;color:var(--th-accent,#00d4ff);font:inherit;font-size:.74rem;font-weight:700;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+.cb-two{display:grid;grid-template-columns:1fr 1fr;gap:8px}.cb-opt{font-weight:400;text-transform:none;color:var(--th-tx4,#4b5563)}
+.cb-setup{display:flex;gap:8px;align-items:flex-start;margin:0 0 12px;font-size:.7rem;line-height:1.45;color:var(--th-tx3,#6b7280);cursor:pointer}.cb-setup input{margin-top:2px;accent-color:var(--th-accent,#00d4ff)}
+.cb-setup[hidden],.cb-fallback[hidden]{display:none}
+.cb-fallback{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:10px}
+.cb-fallback>*{display:inline-flex;align-items:center;min-height:36px;padding:0 14px;border:1px solid var(--th-border,rgba(255,255,255,.12));border-radius:99px;background:none;color:var(--th-tx,#e4e7ed);font:inherit;font-size:.74rem;font-weight:700;text-decoration:none;cursor:pointer}
+@media(max-width:480px){.cb-two{grid-template-columns:1fr}.cb-kinds{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .cb-contact-btn{position:fixed;bottom:20px;right:20px;z-index:9990;width:52px;height:52px;border-radius:50%;border:1.5px solid var(--th-accent-border,rgba(0,212,255,.3));background:var(--th-accent-bg,rgba(0,212,255,.1));color:var(--th-accent,#00d4ff);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;box-shadow:0 4px 20px rgba(0,212,255,.2)}
 .cb-contact-btn:hover{transform:scale(1.08);box-shadow:0 6px 28px rgba(0,212,255,.35)}
 .cb-contact-btn.active{background:var(--th-accent,#00d4ff);color:var(--th-bg,#0d1117);border-color:var(--th-accent,#00d4ff)}
@@ -193,19 +284,20 @@ const CONTACT_HTML = `
 <div class="cb-contact-overlay" id="cbContactOverlay"></div>
 <div class="cb-contact-panel" id="cbContactPanel" role="dialog" aria-modal="true" aria-labelledby="cbContactTitle">
   <div class="cb-contact-header">
-    <h3 id="cbContactTitle">💬 Message Brevity</h3>
+    <h3 id="cbContactTitle">Message Brevity</h3>
     <button class="cb-contact-close" id="cbContactClose" aria-label="Close">✕</button>
   </div>
   <div class="cb-contact-body">
     <form id="cbContactForm">
-      <div class="cb-field"><label for="cbContactName">Name</label><input type="text" id="cbContactName" placeholder="Your name" autocomplete="name" required></div>
-      <div class="cb-field"><label for="cbContactEmail">Email <span style="font-weight:400;text-transform:none;color:var(--th-tx4,#4b5563)">(optional — for reply)</span></label><input type="email" id="cbContactEmail" placeholder="you@example.com" autocomplete="email"></div>
-      <div class="cb-field"><label for="cbContactCategory">Category</label><select id="cbContactCategory"><option value="Bug">🐛 Bug Report</option><option value="Feature">💡 Feature Request</option><option value="Question">❓ Question</option><option value="Feedback" selected>💬 Feedback</option></select></div>
-      <div class="cb-field"><div class="cb-field-row"><label for="cbContactMessage">Message</label><span id="cbContactCount" class="cb-contact-count" aria-live="polite">0 / 2000</span></div><textarea id="cbContactMessage" maxlength="2000" placeholder="What's on your mind?" required></textarea></div>
+      <div class="cb-field"><span class="cb-field-label" id="cbContactKindsLabel">What is it about?</span><div class="cb-kinds" id="cbContactKinds" role="group" aria-labelledby="cbContactKindsLabel">${Object.entries(KINDS).map(([k, v]) => `<button type="button" class="cb-kind" data-kind="${k}" aria-pressed="false">${v.label}</button>`).join('')}</div><input type="hidden" id="cbContactCategory" value="Feedback"><p class="cb-hint" id="cbContactHint"></p></div>
+      <div class="cb-field"><div class="cb-field-row"><label for="cbContactMessage">Message</label><span id="cbContactCount" class="cb-contact-count" aria-live="polite">0 / 2000</span></div><textarea id="cbContactMessage" maxlength="2000" required></textarea><button type="button" class="cb-outline" id="cbContactOutline">Start with a template</button></div>
+      <div class="cb-field cb-two"><div><label for="cbContactName">Name <span class="cb-opt">(optional)</span></label><input type="text" id="cbContactName" placeholder="Anonymous" autocomplete="name" maxlength="100"></div><div><label for="cbContactEmail">Email <span class="cb-opt">(for a reply)</span></label><input type="email" id="cbContactEmail" placeholder="you@example.com" autocomplete="email"></div></div>
+      <label class="cb-setup" id="cbContactSetupRow" hidden><input type="checkbox" id="cbContactSetup" checked><span>Include my setup: <span id="cbContactSetupText"></span>. No keys or passwords.</span></label>
       <div class="cb-hp"><input type="text" id="cbContactHp" tabindex="-1" autocomplete="off"></div>
-      <button type="submit" class="cb-contact-submit" id="cbContactSubmit">Send Message</button>
+      <button type="submit" class="cb-contact-submit" id="cbContactSubmit">Send message</button>
       <div class="cb-contact-status" id="cbContactStatus"></div>
-      <div class="cb-contact-info">Message goes directly to Brevity on Discord.<br>Your setup info is included automatically for context.</div>
+      <div class="cb-fallback" id="cbContactFallback" hidden><button type="button" id="cbContactCopy">Copy message</button><a href="${DISCORD_URL}" target="_blank" rel="noopener noreferrer">Post on Discord</a><a href="${ISSUES_URL}" target="_blank" rel="noopener noreferrer">Open a GitHub issue</a></div>
+      <div class="cb-contact-info">Goes straight to Brevity on Discord. A real person reads it.</div>
     </form>
   </div>
 </div>

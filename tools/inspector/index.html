@@ -54,6 +54,7 @@
   .spinner{display:inline-block;width:20px;height:20px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .6s linear infinite;margin-right:8px;vertical-align:middle}
   @keyframes spin{to{transform:rotate(360deg)}}
 </style>
+<style>/* Core Builds page transitions: cross-fade between same-site pages. */@media(prefers-reduced-motion:no-preference){@view-transition{navigation:auto}}</style>
 </head>
 <body>
 <div class="container">
@@ -240,13 +241,6 @@ function checkHostCompat(config) {
     hosts.fortheweak.status = 'err';
   }
 
-  const allExprs = [...(cfg.excludedStreamExpressions||[]),...(cfg.includedStreamExpressions||[]),...(cfg.preferredStreamExpressions||[])];
-  if (allExprs.some(e => e.expression && /\bnot\s*\(/.test(e.expression))) {
-    hosts.elfhosted.issues.push('SEL uses not() — must use negate()');
-    hosts.elfhosted.status = 'err';
-    hosts.fortheweak.issues.push('SEL uses not() — must use negate()');
-    hosts.fortheweak.status = 'err';
-  }
 
   return hosts;
 }

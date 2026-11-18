@@ -25,7 +25,7 @@ async function boot(page, createTemplate = true) {
 }
 
 async function review(page, template) {
-  await page.locator('[data-action="update-template"]').click();
+  await page.evaluate(() => { location.hash = ''; location.hash = '#update'; }); // deep link (the main page has no menu)
   await page.locator('#updTplInput').fill(JSON.stringify(template));
   await page.locator('#updTplApply').click();
   await expect(page.locator('#diffModal')).toBeVisible();
@@ -50,8 +50,10 @@ test('update preserves keyed scrapers, multiple indexers, options and instance I
   // Options are compared but credential values must not be rendered in the diff.
   await expect(page.locator('#diffModal')).not.toContainText('SYNTHETIC-');
   const updated = await apply(page);
+  // Preserved as AIOStreams stores them: its PresetSchema strips a top-level `resources`.
+  const asSaved = ({ resources, ...preset }) => preset;
   for (const source of sources) {
-    expect(updated.config.presets.find(p => p.instanceId === source.instanceId)).toEqual(source);
+    expect(updated.config.presets.find(p => p.instanceId === source.instanceId)).toEqual(asSaved(source));
   }
   const ids = updated.config.presets.map(p => p.instanceId);
   expect(new Set(ids).size).toBe(ids.length);
@@ -61,7 +63,7 @@ test('update preserves keyed scrapers, multiple indexers, options and instance I
   await page.reload();
   await page.waitForFunction(() => Boolean(window.__coreBuilds));
   const reloaded = await page.evaluate(() => window.__coreBuilds.generate());
-  for (const source of sources) expect(reloaded.config.presets.find(p => p.instanceId === source.instanceId)).toEqual(source);
+  for (const source of sources) expect(reloaded.config.presets.find(p => p.instanceId === source.instanceId)).toEqual(asSaved(source));
   const backups = await page.evaluate(() => localStorage.getItem('coreBuildBackups') || '');
   expect(backups).not.toContain('SYNTHETIC-');
 });
@@ -166,7 +168,7 @@ test('explicit optional-source edits are honoured after an update', async ({ pag
 
 test('multi-template collections and duplicate source IDs are rejected without opening a preview', async ({ page }) => {
   const original = await boot(page);
-  await page.locator('[data-action="update-template"]').click();
+  await page.evaluate(() => { location.hash = ''; location.hash = '#update'; }); // deep link (the main page has no menu)
   await page.locator('#updTplInput').fill(JSON.stringify([original, original]));
   await page.locator('#updTplApply').click();
   await expect(page.locator('#updTplErr')).toContainText('Choose one template');
@@ -266,10 +268,13 @@ test('manual subtitle edits release kept sources, respect language dialects and 
   // providers' independently imported languages or release their kept values.
   await page.locator('#advancedDrawer [data-action="toggle-sub-lang"][data-val="en"]').click();
   const unchanged = await page.evaluate(() => window.__coreBuilds.generate());
-  for (const source of subtitles) expect(unchanged.config.presets.find(p => p.instanceId === source.instanceId)).toEqual(source);
+  const asSaved = ({ resources, ...preset }) => preset;   // AIOStreams strips a top-level `resources`
+  // AIOStreams 2.36.0 removed AIOSubtitle and refuses a config carrying it, so the
+  // kept source is dropped from the export; the other two survive untouched.
+  expect(unchanged.config.presets.some(p => p.instanceId === 'my-aiosubs')).toBe(false);
+  for (const source of subtitles.filter(s => s.type !== 'aiosubtitle')) expect(unchanged.config.presets.find(p => p.instanceId === source.instanceId)).toEqual(asSaved(source));
   await page.locator('#advancedDrawer [data-action="toggle-sub-lang"][data-val="fr"]').click();
   const updated = await page.evaluate(() => window.__coreBuilds.generate());
-  expect(updated.config.presets.find(p => p.instanceId === 'my-aiosubs').options.languages).toEqual(['en', 'fr']);
   expect(updated.config.presets.find(p => p.instanceId === 'my-opensubs').options.language).toEqual(['en', 'fr']);
   expect(updated.config.presets.find(p => p.instanceId === 'my-subdl').options.language).toEqual(['EN', 'FR']);
   expect(updated.config.presets.find(p => p.instanceId === 'my-subdl').options.subDlApiKey).toBe('SYNTHETIC-SUBDL');
@@ -287,7 +292,7 @@ test('manual subtitle edits release kept sources, respect language dialects and 
   await page.locator('#advancedDrawer [data-action="toggle-sub-addon"][data-val="opensubtitles-v3-plus"]').click();
   const deselected = await page.evaluate(() => window.__coreBuilds.generate());
   expect(deselected.config.presets.some(p => p.instanceId === 'my-opensubs' && p.enabled !== false)).toBe(false);
-  expect(deselected.config.presets.find(p => p.instanceId === 'my-aiosubs').options.timeout).toBe(7000);
+  expect(deselected.config.presets.find(p => p.instanceId === 'my-subdl').options.timeout).toBe(7000);
 
   // SubDL-only exports use uppercase codes; the wizard must display them as
   // selected and remove French rather than append a duplicate FR entry.

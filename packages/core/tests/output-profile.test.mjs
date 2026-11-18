@@ -31,14 +31,14 @@ test('shared generator maps Simple and Quick flows to Core Stable', () => {
 });
 
 
-test('shared generator maps the ordinary auto flow to Balanced', () => {
+test('shared generator maps the ordinary auto flow to Core Stable', () => {
   const template = generateTemplate({
     service:'torbox-pro', device:'generic', resolution:'1080p', architecture:'standard',
   });
-  assert.equal(template.metadata.coreBuildsProfile, 'balanced');
+  assert.equal(template.metadata.coreBuildsProfile, 'stable');
   assert.equal(template.config.groups.enabled, false);
   assert.equal(template.config.dynamicAddonFetching.enabled, false);
-  assert.equal(template.config.syncedRankedRegexUrls.length, 0);
+  assert.equal((template.config.syncedRankedRegexUrls || []).length, 0);
   assert.equal(template.config.presets.some(preset => preset.type === 'torbox-search'), false);
 });
 

@@ -54,7 +54,10 @@ test('all golden configurations use late pack fallbacks as their final ESEs', as
         `${name} contains legacy destructive pack ESE: ${marker}`,
       );
     }
-    if (!['http-1080p'].includes(name)) {
+    if (template.metadata?.coreBuildsProfile === 'stable') {
+      // Core Stable (the default since v3.17) carries no pack rule at all, so nothing is hidden.
+      assert.deepEqual(labels(expressions), ['Core Stable | External stream kill'], `${name}: Stable has no pack rule`);
+    } else if (!['http-1080p'].includes(name)) {
       assert.deepEqual(labels(expressions), LATE_PACK_LABELS, `${name} must end with late pack fallbacks`);
       for (const expression of expressions.slice(-2).map(entry => entry.expression)) {
         assert.ok(expression.includes(PLAYABLE_SINGLES_THRESHOLD), `${name} must count only standalone playable singles`);

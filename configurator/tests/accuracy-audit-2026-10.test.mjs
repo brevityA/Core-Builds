@@ -13,7 +13,6 @@ import { OPTIONAL_SCRAPER_DEFS } from '../src/data/scrapers.js';
 import { PROVIDER_CREDENTIALS, SERVICE_CREDENTIAL_FIELDS, serviceCredentials, serviceCredentialKeys } from '../src/data/credentials.js';
 import { UPSTREAM_REMOVED_PRESET_IDS } from '../src/data/host-capabilities.js';
 import { parseHostStatus, resolveHostCapabilities, knownHostKeys } from '../src/core/host-capability-policy.js';
-import { generateAgeRatingESE } from '../src/data/agerating.js';
 import { generateTemplate } from '../../packages/core/src/generate-template.js';
 import { applyOutputProfile } from '../src/core/output-profile-policy.js';
 
@@ -81,9 +80,13 @@ test('a Seedr-only build emits no StremThru preset (StremThru cannot use Seedr)'
   assert.ok(types.includes('mediafusion'), 'MediaFusion is the one preset that supports Seedr');
 });
 
-test('the age-rating filter emits nothing: AIOStreams SEL has no certification()', () => {
-  for (const rating of ['G', 'PG', 'PG-13', 'R', 'NC-17', 'none']) assert.equal(generateAgeRatingESE(rating), null, rating);
-  assert.doesNotMatch(app, /data-action="set-age-limit"/, 'the Age Rating control must not be offered');
+test('no age-rating filter is emitted or offered: AIOStreams SEL has no certification()', () => {
+  // The always-null stub and the ageLimit state were removed in v3.17.
+  assert.doesNotMatch(app, /data-action="set-age-limit"|ageLimit|certification\(/, 'no Age Rating control or filter');
+  for (const ageLimit of ['G', 'PG', 'R']) {
+    const eses = generateTemplate({ service: 'torbox-pro', ageLimit }, {}).config.excludedStreamExpressions || [];
+    assert.ok(!eses.some(e => /certification\(/.test(e.expression || '')), ageLimit);
+  }
 });
 
 test('the Recommended Stack modal no longer repeats the false claims', () => {
@@ -101,16 +104,18 @@ test('troubleshooter and Stream Pool numbers come from the build, not stale copy
 
 test('Anime content gets AnimeTosho on the default profile, only with a torrent debrid service', () => {
   // AnimeTosho is a Torznab built-in: with no StremThru-capable service it fails the
-  // whole save, so P2P / EasyNews anime builds must not carry it enabled.
+  // whole save, so P2P / EasyNews anime builds must not carry it enabled. The generators
+  // emit its community continuation (anime-tosho-new); the archived feed goes dark in Oct 2026.
   const types = (input) => generateTemplate(input, {}).config.presets.filter(p => p.enabled !== false).map(p => p.type);
-  assert.ok(types({ service: 'torbox-pro', content: 'anime' }).includes('animetosho'));
-  assert.ok(types({ service: 'torbox-pro', content: 'mixed' }).includes('animetosho'));
-  assert.ok(!types({ service: 'torbox-pro', content: 'all' }).includes('animetosho'));
-  assert.ok(!types({ service: 'p2p', content: 'anime' }).includes('animetosho'));
-  assert.ok(!types({ service: 'easynews', content: 'anime' }).includes('animetosho'));
-  const ctx = { service: 'torbox-pro', resolution: '1080p', langs: ['English'], langExclusive: false, sizeLimit: 'unlimited', bandwidthMbps: 0, multiServices: ['torbox-pro'], optionalScrapers: [] };
+  assert.ok(types({ service: 'torbox-pro', content: 'anime' }).includes('anime-tosho-new'));
+  assert.ok(types({ service: 'torbox-pro', content: 'mixed' }).includes('anime-tosho-new'));
+  assert.ok(!types({ service: 'torbox-pro', content: 'all' }).includes('anime-tosho-new'));
+  assert.ok(!types({ service: 'p2p', content: 'anime' }).includes('anime-tosho-new'));
+  assert.ok(!types({ service: 'easynews', content: 'anime' }).includes('anime-tosho-new'));
+  assert.ok(!types({ service: 'torbox-pro', content: 'anime' }).includes('animetosho'), 'the archived preset is not emitted for the pinned target');
+  const ctx = { service: 'torbox-pro', resolution: '1080p', langs: ['English'], langExclusive: false, sizeLimit: 'unlimited', bandwidthMbps: 0, multiServices: ['torbox-pro'], optionalScrapers: [], aiostreamsVersion: '2.36.0' };
   const balanced = applyOutputProfile(generateTemplate({ service: 'torbox-pro', content: 'anime' }, {}), 'balanced', ctx);
-  assert.ok(balanced.config.presets.some(p => p.type === 'animetosho'), 'Balanced must keep AnimeTosho');
+  assert.ok(balanced.config.presets.some(p => p.type === 'anime-tosho-new'), 'Balanced must keep AnimeTosho');
 });
 
 test('Brazuca (P2P-only) is gated on HTTP builds and allowed on P2P', () => {

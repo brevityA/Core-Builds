@@ -1,106 +1,127 @@
 ---
-title: "What's New — Configurator v3.16"
+title: "What's New — Configurator v3.33"
 sidebarTitle: "What's New"
-description: "Latest Core Builds Configurator releases (v3.16 and earlier), auto-generated from the in-app changelog."
+description: "Latest Core Builds Configurator releases (v3.33 and earlier), auto-generated from the in-app changelog."
 ---
 
 # What's New in the Configurator
 
-This page is regenerated from `configurator/src/data/changelog.js` by `scripts/sync-docs.py`, so it always reflects the latest shipped configurator version (currently **v3.16**).
+This page is regenerated from `configurator/src/data/changelog.js` by `scripts/sync-docs.py`, so it always reflects the latest shipped configurator version (currently **v3.33**).
 
 For the template-suite release log, see the [Changelog](https://corebuilds-docs.docsalot.dev/changelog).
 
-## Configurator v3.16 (Oct 3 2026)
+## Configurator v3.33 (Nov 18 2026)
 
 <CardGroup cols={2}>
-  <Card title="Builds save again: subtitles now default to OpenSubtitles v3+" icon="sparkles">
-    AIOSubtitle, the subtitle source every build used by default, now takes about 12 seconds to answer. AIOStreams loads every add-on before it saves, so hosts refused the whole save with 'Failed to fetch manifest for AIOSubtitle: 502 - Bad Gateway'. New builds use OpenSubtitles v3+, which answers in under a second, and saved sessions still on the old default move over automatically. AIOSubtitle stays available, labelled as slow.
+  <Card title="A one-screen main page" icon="sparkles">
+    the Core mark, the Core Builds name and the version, then six equal rows: Core Builds (opens Quick install), Template Inspector, Back Up Addons, Nuvio Stack Genie, Core Badge Builder and All Core Tools. Each row has a hexagon icon and a short tag saying what it is.
   </Card>
-  <Card title="SubDL without a key no longer blocks the save" icon="bolt">
-    AIOStreams requires a SubDL API key, but the configurator included SubDL even when the key field was empty, and the save was refused. SubDL is now only added once a key is entered; until then the build uses OpenSubtitles v3+, so it always has subtitles.
+  <Card title="Support and shortcuts" icon="bolt">
+    a Support Core Builds button sits under the rows, and Custom build, Guided setup, update, import, the tour, template compare, what’s new and Report an issue are one tap away on All Core Tools. Each also has its own link (for example …/configurator/#advanced), and the links now work while the page is open as well as on first load.
+  </Card>
+  <Card title="Smooth page changes" icon="shield-check">
+    moving between the configurator and the tool pages cross-fades instead of flashing white, the main page’s rows rise in, and Quick install glides up. All of it switches off when your device asks for reduced motion.
+  </Card>
+  <Card title="Quick install, redesigned" icon="sliders">
+    three labelled steps: where to install, your service, and your preferences. Apps and services are full-width rows with logos from the Core Builds Icon Pack; what matters most and streams shown are one-tap switches. On a computer your build summary and the Install button stay pinned on the right.
+  </Card>
+  <Card title="Delivery up front" icon="gauge">
+    Direct Install, Manifest URL or Raw JSON is the first switch in Quick install, so you can export the template file without signing in to Stremio or contacting a host. Device, resolution, connection speed, template profile, language, Full stack, Clean reinstall and TMDB sit under Options & defaults.
+  </Card>
+  <Card title="Every install target kept" icon="wand">
+    Stremio, Nuvio, WuPlay, Chillio and Other app all stay in Quick install, on the Review screen and in the manifest window, and the Nuvio Stack Genie still hands off into Nuvio.
+  </Card>
+  <Card title="Install progress you can trust" icon="layers">
+    a progress window ticks each step (host check, regex check, save, install) only after it finishes, and marks a check it could not run as not verified. The last step names your target: Stremio, or your install link for every other app.
+  </Card>
+  <Card title="Paste and show buttons on key fields" icon="bug">
+    every provider key, TMDB and manifest field gets a Paste button and a show or hide toggle. Connection speed has 25, 50, 100 and 250 Mbps presets, and the bitrate cap stays at 80% of it.
+  </Card>
+  <Card title="A better message form" icon="sparkles">
+    pick Problem, Idea, Question or Thanks and the form says what to include, with a Start with a template button that fills in an outline. Your name is optional, the setup details it attaches are shown with a switch to leave them out (never keys or passwords), and a draft survives closing the panel. If a message cannot be sent you see why, and get Copy message, Discord and GitHub issue buttons so nothing is lost.
+  </Card>
+  <Card title="Feedback carries your current setup" icon="bolt">
+    the message form attached setup details from your last saved state instead of the build on screen; it now reads the live one.
+  </Card>
+  <Card title="All Core Tools, regrouped" icon="shield-check">
+    the tools page leads with the Template Builder, then configurator shortcuts, AIOStreams, Genies, Stremio account, and Speed & media, one row per tool. Stream card previews, what’s new and the built-in tools list fold away. Its Health Score and Troubleshooter links used to land on the plain main page because the site’s redirect dropped the link’s target; they now open the right screen.
+  </Card>
+  <Card title="Usage statistics are opt-in" icon="sliders">
+    page visits and downloads are counted only after you tick the box on Review or in Quick install; it starts unticked and never sends keys, account names or your configuration. (#839)
+  </Card>
+  <Card title="H.264 10-bit regex accepted again" icon="gauge">
+    restricted hosts such as ElfHosted refused every save because the H.264 10-bit pattern no longer matched their allowlist word for word after Vidhin05 rewrote it; the regex is re-synced from upstream. (#838)
+  </Card>
+  <Card title="Samsung TV 4K saves accepted again" icon="wand">
+    the same allowlist drift refused Samsung TV 4K setups on restricted hosts; the regex snapshot is re-pinned to upstream. (#822)
+  </Card>
+  <Card title="DV-Only Kill removes only Dolby Vision-only releases" icon="layers">
+    on Samsung, Fire Stick HD, Roku, projectors and other devices without Dolby Vision, the rule had its arguments reversed and removed the HDR10, HDR10+, HLG and SDR streams that lacked DV. It now removes only DV-only releases, and runs before the rules that count streams. (#841)
+  </Card>
+  <Card title="Elite REMUX pins work again" icon="bug">
+    the 4K and 1080p elite REMUX pins asked for the wrong field in each filter and matched nothing; FraMeSToR-class REMUXes are pinned to the top again. (#841)
+  </Card>
+  <Card title="Bad 1080P Bluray limited to new movies" icon="sparkles">
+    the rule now applies only in a movie’s first 90 days, so older movies keep the 1080p Bluray encodes it used to remove. Other quality filters are unchanged. (#841)
+  </Card>
+  <Card title="Titles named “AI” are no longer filtered out" icon="bolt">
+    the AI-upscale exclusion now needs an upscale word such as Upscaled or Enhanced. Restricted hosts accept only the original allowlisted pattern, so there the original is swapped in rather than dropped. (#841)
+  </Card>
+  <Card title="Generated output unchanged" icon="shield-check">
+    this release adds no config change of its own; the config changes since 3.32 are the four stream-selection fixes and two regex re-syncs listed above, already on the main branch.
   </Card>
 </CardGroup>
 
 ---
 
-## Configurator v3.15 (Oct 3 2026)
+## Configurator v3.32 (Oct 31 2026)
 
 <CardGroup cols={2}>
-  <Card title="Built against AIOStreams 2.35.7" icon="sparkles">
-    the configurator’s schema was still read from AIOStreams 2.34.1, while every public host had moved to 2.35.4 or later. It is now read from the 2.35.7 release, which is also the new default compatibility target. Upstream only added things between the two (two new add-ons, five new settings), so no setting the configurator writes changed meaning. 2.35.4 and 2.35.5, which Wizaardd, ATBP and Omni’s run, have the same schema as 2.35.7.
+  <Card title="Truer line about your keys" icon="sparkles">
+    Quick install said your keys go only to your AIOStreams host. They pass through the Core Builds relay on the way, which forwards them and keeps nothing, and the line now says so. The first screen says Core Builds keeps no copy of your keys.
   </Card>
-  <Card title="Generated configs now say they target 2.35.7" icon="bolt">
-    besides the usual version stamp (coreBuildsVersion 3.14 to 3.15), the only change in generated output is the compatibility-target stamp in the template metadata (coreBuildsAIOStreamsTarget), which moves from 2.34.1 to 2.35.7. Filters, sorting, scrapers and formatting are byte-for-byte the same, so re-importing changes nothing AIOStreams acts on. Saved sessions that picked a target keep it.
+  <Card title="Full stack names Cinebye" icon="bolt">
+    the Full stack option now says that Cinebye, a separate service, makes the Cinemeta patch using your Stremio sign-in.
   </Card>
-  <Card title="Names and settings from links can no longer inject page markup" icon="shield-check">
-    a template name, a custom formatter label, an unrecognised setting from a shared link or imported config, and entries in the local backup history were written into the page as HTML. A crafted link could have run script in the configurator. They are now escaped wherever they are shown, and help tooltips keep their text out of the page attributes. Found by CodeQL; all 11 of its 'DOM text reinterpreted as HTML' alerts are fixed.
+  <Card title="Your language choice sticks" icon="shield-check">
+    Quick install filled the language from your browser even after you had chosen one, so picking English in a Spanish browser reverted to Spanish next time. A language you chose in Quick install or Custom build now wins over the browser.
   </Card>
-  <Card title="Upstream watch re-pinned" icon="sliders">
-    the AIOStreams contract watcher had flagged additive drift since September 26 (#770). It is re-pinned, and its source extraction no longer depends on GitHub’s API, which some networks refuse.
+  <Card title="Generated output unchanged" icon="sliders">
+    every config the configurator and the CLI build is byte-for-byte what 3.31 produced apart from the version stamp; only wording and the language prefill changed.
   </Card>
 </CardGroup>
 
 ---
 
-## Configurator v3.14 (Oct 2 2026)
+## Configurator v3.31 (Oct 31 2026)
 
 <CardGroup cols={2}>
-  <Card title="Default builds get their scrapers back" icon="sparkles">
-    the Balanced profile, which every standard build has used since August, kept only a fixed short list of sources: a TorBox build shipped three torrent scrapers (StremThru Torz, Meteor, Comet) where an Advanced build ships eight. AIOStreams applies a template by replacing the whole addon list, so every update also deleted MediaFusion, EZTV, Torrent Galaxy, Zilean and Knaben from configs that had them. All five are back in Balanced; on P2P and EasyNews-only builds the four that need a debrid service are left out (see below). Simple Mode and Quick Install keep the short Stable list on purpose. The Knaben and Zilean toggle cards are gone: every build with a torrent debrid service already includes both, and neither can run without one, so the cards could not change anything.
+  <Card title="One Core Builds template inside AIOStreams" icon="sparkles">
+    a single template asks what you watch on (26 devices), the picture you want, what matters most, whether to show only streams that play straight away, your language and whether you mostly watch anime, then uses the service you pick in AIOStreams (none gives the free P2P setup). It builds the same config Quick install would for those answers. It is first in the template directory, with Import buttons for every host.
   </Card>
-  <Card title="Default builds get their release filtering back" icon="bolt">
-    Balanced was meant to drop remote scoring and instead deleted every regex list, including the inline ones copied verbatim from host allowlists. Default users lost release-group ranking and the exclusions for upscaled, BR-DISK, extras and retagged releases, while the sort order kept a regexScore step that had nothing left to score. The inline lists return; synced regex URLs stay off, so nothing new depends on a remote file or a host allowlisting a URL.
+  <Card title="Proven against AIOStreams itself" icon="bolt">
+    a test runs the template through AIOStreams’ own template code, fetched at the pinned release, for every answer and service, and fails on any difference from the configurator’s output; a browser test checks that output against what Quick install builds for every service and device. Picking two services at once gives one config with both, and those combinations are saved in a real AIOStreams on every pull request.
   </Card>
-  <Card title="P2P and EasyNews-only builds save again" icon="shield-check">
-    EZTV, Torrent Galaxy, Knaben and Zilean are AIOStreams built-ins that need a torrent debrid service, and AIOStreams validates a config by building every enabled addon: one of them with no such service refuses the whole save, not just that addon. Advanced builds without debrid shipped all four switched on. They are now left out of builds with no debrid service and stay in everywhere else, so the save succeeds; rebuild after adding a debrid service to get them.
+  <Card title="Smaller operator collection" icon="shield-check">
+    the collection hosts add to TEMPLATE_URLS now holds just this template (94 KB instead of 3.4 MB) and no longer includes personal templates. It still carries every regex pattern and synced address the other templates use, so instances that trusted them keep trusting them.
   </Card>
-  <Card title="4K builds rank cached results first again" icon="sliders">
-    4K builds sort every 2160p above every 1080p, but the same step also put quality above cache status, so an uncached 4K REMUX outranked a cached 4K WEB-DL. On a debrid account the top result could start a download instead of playing — the likely cause of reports that sorting sometimes misbehaves. Cached now comes straight after resolution in every 4K sort list, including Simple Mode and Quick Install builds: 4K still beats 1080p, and inside each resolution cached beats uncached. 1080p series also gain the separate cached/uncached ordering movies and anime always had, so uncached episodes now rank by seeders the way uncached movies do.
-  </Card>
-  <Card title="Sort steps that do nothing are removed" icon="gauge">
-    regexScore is now dropped whenever a config carries no ranked regex, and audioChannel is dropped from generated configs because AIOStreams has no sorter case for it: it compares every stream as equal. It returns once upstream handles it. Checked-in templates keep it unchanged.
-  </Card>
-  <Card title="Offline mode retired, and the stale cache it could leave" icon="wand">
-    the configurator registered a service worker that served the whole app from cache without ever checking for updates, under a cache name unchanged since v3.10. It never ran on the main configurator page, but it did install for anyone who opened the copy under /configurator/dist/, and those browsers kept running the v3.10 build. The page no longer registers one, removes any it finds, and the worker file is replaced by one that clears its cache, unregisters itself and reloads onto the current build.
-  </Card>
-  <Card title="Offcloud, PikPak and Seedr builds save again" icon="layers">
-    the configurator asked each for a single API key, but AIOStreams requires Offcloud's API key plus account email and password, PikPak's email and password, and a Seedr encoded token issued by MediaFusion; a direct install with any of them was refused. The forms now ask for exactly those fields. Seedr builds also stop adding StremThru, which cannot use Seedr and failed the save on its own: MediaFusion is the one AIOStreams source that supports it.
-  </Card>
-  <Card title="EasyNews, Usenet, Seedr and Debridio builds save again" icon="bug">
-    every one of these was refused by AIOStreams, and it is already the case on the live site. Found by saving 462 generated configs into a real AIOStreams 2.35.7: SeaDex, like EZTV and Knaben, only runs with a torrent debrid service but was added to every build except P2P; EasyNews Search on the Usenet route asked for an AIOStreams Auth setting unless told to use only EasyNews; and Debridio, NekoBT, Jackett, Prowlarr, Jackettio and the Newznab indexers were emitted on builds with no service able to back them. Each is now added only when something can run it, the EasyNews add-on cards ask for EasyNews as a service first, and the debrid-only cards are greyed out on builds without a torrent debrid service.
-  </Card>
-  <Card title="Retired add-ons can no longer break a save" icon="sparkles">
-    TorBox (addon), USA TV and Debridio Watchtower were offered as toggles, but AIOStreams marks all three removed and refuses any config containing one, on every host. They are gone from the list and stripped from older saved setups. Bitmagnet stays, but only works on hosts that configure it, so it is now stripped on ElfHosted, ATBP, Omni's and Wizaardd; the live host check also reads each host's own disabled-add-on list, which is how it now catches Viren's nightly blocking Torrentio.
-  </Card>
-  <Card title="Anime builds get an anime scraper on the default profile" icon="bolt">
-    choosing Anime or Movies + Anime added AnimeTosho only on Advanced; the default Balanced profile stripped it, so the choice changed nothing. It now ships on both whenever a torrent debrid service is set. Like EZTV and Knaben, AnimeTosho cannot run without one, and an Advanced anime build on P2P or EasyNews carried it anyway, which refused the save; those builds now leave it out.
-  </Card>
-  <Card title="Age Rating Limit removed" icon="shield-check">
-    the filter wrote a certification() rule, but AIOStreams has no such function: on Advanced and Labs the host refused the whole config, and on Stable and Balanced the rule was silently dropped, so the control did nothing while saying it filtered. The control is gone until AIOStreams ships a rating filter; saved setups that chose a rating keep loading.
-  </Card>
-  <Card title="Descriptions checked against AIOStreams and the live hosts" icon="sliders">
-    every host now shows the version it actually runs (2.35.4 to 2.35.7; the picker still said 2.34.1, and Omni's is no longer behind, so it drops 'legacy'). The Recommended Stack panel is rewritten: it called StremThru Torz and Knaben usenet sources, recommended Torrentio, and listed developer notes. Also corrected: Brazuca Torrents is P2P, not debrid (and is now selectable on P2P builds); EasyDebrid is a debrid service, not an aggregator; Samsung TVs gained AV1 in 2020; the Fire TV Stick HD plays HDR10 and HLG; the Anime option keeps dual-audio releases rather than filtering to SeaDex only; the troubleshooter quoted 8 excluded and 107 ranked patterns where Balanced ships 3 and about 80; and Stream Pool showed two contradictory sets of counts and now shows the stop count the build uses, saying plainly that Stable and Balanced ignore it.
-  </Card>
-  <Card title="Updating keeps your setup" icon="gauge">
-    applying a template update rebuilt every source from defaults, so scrapers you had added, custom endpoints, per-instance keys and timeouts disappeared, and sections you chose to keep were overwritten. Updates now merge into what you have: imported sources, IDs, endpoints, credentials and timeouts are kept, declined changes stay declined, and the preview compares the actual output you would install. Preview and Cancel change nothing, Undo restores the previous setup, and the update screen says plainly that confirming here does not change an addon already installed in AIOStreams until you reinstall. A saved NZBHydra, Jackett or Prowlarr key is reused only when the imported preset points at the same address, so a key is never sent to an indexer it was not entered for.
-  </Card>
-  <Card title="First-time Nuvio setup" icon="wand">
-    the Nuvio route now builds through the same pipeline as every other install, honours the host you picked instead of swapping in another one, separates import links from manifests, and offers the JSON as a download if every paste service fails. Public import links strip access keys and private URLs and disable any source that needed them.
-  </Card>
-  <Card title="Release notes now say when generated output is unchanged" icon="layers">
-    3.12 to 3.13 produced byte-identical configs, and default-profile users saw none of 3.9 through 3.11 either, yet each release read as a config change: re-importing showed no changes in AIOStreams and looked broken. A new check blocks any release that changes no generated config unless its notes say so, and blocks the opposite claim when output did change.
+  <Card title="Generated output unchanged" icon="sliders">
+    every config the configurator and the CLI build is byte-for-byte what 3.30 produced apart from the version stamp; the new template is a separate file that reproduces that output.
   </Card>
 </CardGroup>
 
 ---
 
-## Configurator v3.13 (Sep 27 2026)
+## Configurator v3.30 (Oct 30 2026)
 
 <CardGroup cols={2}>
-  <Card title="Configuration Doctor repairs hardened" icon="sparkles">
-    three fixes from the post-release audit of the new Doctor. Credential redaction now covers the whole imported file: the diagnosis recorded paths relative to the unwrapped template while the repair pass walked the wrapper, so on array-wrapped exports every selected redaction silently did nothing and the 'repaired' download still carried the keys. The scan now walks the entire input — wrapper keys, string arrays (a token in a synced-URL entry is flagged like any other), and every config in a multi-template array, not just the first one the structural checks unwrap. Removing a dead preset now also removes its instanceId from groups — AIOStreams rejects a config whose group references a preset that no longer exists, which would have turned a safe repair into a save failure; a grouping left empty is dropped, and groups disable entirely when none remain.
+  <Card title="Update my setup" icon="sparkles">
+    once Core Builds has saved a config to your AIOStreams and this browser still has its UUID and password, the first screen offers Update my setup. It rebuilds from your saved choices, shows what changes against what was last saved, and saves over the same config, so your Stremio link keeps working. Streams use the update straight away; changed catalogs show after reinstalling from your manifest link.
   </Card>
-  <Card title="Install verification is now real" icon="bolt">
-    the Full Stack success panel said your addons 'were read back from your account', but nothing read them back. The install now ends with an actual re-read of the Stremio addon collection, checked against what was requested; a missing addon is reported plainly instead of celebrated. The Doctor's payload gauge also now measures the config the host actually receives rather than the template wrapper around it, so a wrapped export is no longer counted against the 100 KB save limit twice over.
+  <Card title="An update never makes a second config" icon="bolt">
+    if the host refuses, your existing config is left as it was and the paste method is offered. If it does not answer in time, the update may or may not have landed, and trying again is safe. Your password goes to a host from the list or your own custom address, passing through the Core Builds relay, which forwards it and keeps nothing.
+  </Card>
+  <Card title="Generated output unchanged" icon="shield-check">
+    every config the configurator and the CLI build is byte-for-byte what 3.29 produced apart from the version stamp; only the way an existing setup is updated changed.
   </Card>
 </CardGroup>

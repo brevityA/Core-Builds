@@ -139,17 +139,16 @@ class TestHostCompatibility:
         assert has_tamtaro
         # The inspector should flag elfhosted as blocked
 
-    def test_not_function_would_block_hosts(self):
-        """SEL expressions using not() should block elfhosted and fortheweak."""
-        t = make_template(config={
-            "excludedStreamExpressions": [
-                {"expression": "/* Test */ not(resolution(streams, '2160p'))"}
-            ]
-        })
-        exprs = t['config']['excludedStreamExpressions']
-        has_not = any('not(' in e.get('expression', '') for e in exprs)
-        assert has_not
-        # The inspector should flag both hosts
+    def test_not_is_valid_sel_on_every_host(self):
+        """not() is valid SEL: AIOStreams builds its expr-eval parser with logical
+        operators on, so no host refuses it. The Inspector used to call it a
+        blocker, and its doctor "repaired" not( into negate(, which needs two
+        stream arrays and always throws."""
+        root = Path(__file__).resolve().parent.parent
+        for rel in ("tools/inspector/index.html", "tools/inspector/doctor.mjs", "configurator/src/js/app.js"):
+            text = (root / rel).read_text(encoding="utf-8")
+            assert "must use negate()" not in text, rel
+            assert "replace-sel-not" not in text, rel
 
     def test_clean_template_is_compatible(self):
         """A clean template should be compatible with all hosts."""

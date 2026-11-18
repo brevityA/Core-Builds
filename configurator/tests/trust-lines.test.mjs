@@ -1,0 +1,58 @@
+/**
+ * Quick install shows two promises. Each is pinned to the code that makes it true,
+ * so neither the sentence nor the behaviour can drift without a test failing.
+ */
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
+
+const app = await readFile(new URL('../src/js/app.js', import.meta.url), 'utf8');
+const worker = await readFile(new URL('../../cloudflare-worker/worker.js', import.meta.url), 'utf8');
+const streams = await readFile(new URL('../../cloudflare-worker/core-streams.js', import.meta.url), 'utf8');
+
+test('"Your other addons stay": a Stremio install keeps every addon unless Clean reinstall is on', () => {
+  assert.match(app, /Adds Core Builds to your Stremio account\. Your other addons stay; only <b>Clean reinstall<\/b> replaces earlier Core Builds addons\./);
+  const push = app.match(/async function pushToStremio\([\s\S]*?\n\}/)?.[0];
+  assert.ok(push, 'pushToStremio not found');
+  // Without Clean reinstall every existing addon is kept; with it, only addons served
+  // from a known AIOStreams host's /stremio/ path are dropped.
+  assert.match(push, /const kept = S\.cleanInstall \? existing\.filter\(a => !isKnownAioManifest\(a\)\) : existing\.slice\(\);/);
+  assert.match(push, /a\.transportUrl\.includes\('\/stremio\/'\) && knownBases\.some\(base => a\.transportUrl\.startsWith\(base\)\)/);
+  assert.match(push, /addons: kept/);
+});
+
+test('"Core Builds never keeps a copy": the relay logs a fixed, body-free field list only', () => {
+  assert.match(app, /Your keys go to your AIOStreams host through the Core Builds relay, which passes them on and keeps nothing\. They are remembered in this browser\./);
+  assert.doesNotMatch(app, /keys go only to/, 'the relay is a second recipient, so no "only" claim');
+  const logs = worker.match(/console\.(log|info|warn|error|debug)\(/g) || [];
+  assert.equal(logs.length, 1, 'the worker has exactly one console sink');
+  assert.match(worker, /const allowed = \['cls', 'host', 'status', 'scope', 'store', 'attempts', 'cache', 'source', 'ms', 'count', 'partial', 'outcome'\];/);
+  // The Core Streams fields added with its telemetry carry labels and numbers only:
+  // a provider id, an outcome or cache label, a duration, a count, a 0/1 flag.
+  const calls = [...streams.matchAll(/emitLog\(logEvent, '([a-z_]+)', \{([^}]*)\}/g)];
+  assert.ok(calls.length >= 4, 'Core Streams telemetry calls found');
+  for (const [, event, fields] of calls) {
+    for (const key of fields.match(/\b[a-z]+(?=:)/g) || []) {
+      assert.ok(['source', 'outcome', 'ms', 'status', 'cache', 'scope', 'count', 'partial'].includes(key), `${event}.${key} is a reviewed field`);
+    }
+  }
+});
+
+test('the key note shows only when Quick install asks for a key', () => {
+  assert.match(app, /const keyNote = \/data-express-cred=\/\.test\(prim \+ extraCreds\)/);
+});
+
+test('Quick install still does what the QuackStart comparison claimed', () => {
+  // v3.33: the one-screen main page dropped the QuackStart line; its claims stay true of Quick install.
+  // "AIOMetadata and the Cinemeta patch": Quick install's Full stack option, on by default.
+  assert.match(app, /id="expressFullStack" \$\{S\.installAIOMeta !== false\?'checked':''\}/);
+  // "just a manifest URL for any app": the Other app target.
+  assert.match(app, /\['manifest','Other app','Copy manifest'\]/);
+});
+
+test('Full stack says the Cinemeta patch goes through Cinebye with the Stremio sign-in', () => {
+  // patchCinemeta posts the Stremio authKey to these hosts; the option must say so.
+  assert.match(app, /const CINEBYE_HOSTS = \[/);
+  assert.match(app, /body: JSON\.stringify\(\{ authKey, patches \}\)/);
+  assert.match(app, /Cinebye, a separate service, makes the Cinemeta patch using your Stremio sign-in\./);
+});

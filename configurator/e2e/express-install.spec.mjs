@@ -103,9 +103,12 @@ test('Express free/P2P hides credentials; manifest target hides Stremio fields',
   await page.locator('[data-express-service="p2p"]').click();
   await expect(page.locator('#expressCreds')).toContainText('No key needed');
   await expect(page.locator('[data-express-cred]')).toHaveCount(0);
-  // Switch back to TorBox → credential appears
+  await expect(page.locator('#expressCreds .fastlane-trust'), 'no key, no key promise').toHaveCount(0);
+  // Switch back to TorBox → credential appears, with where the key goes
   await page.locator('[data-express-service="torbox-pro"]').click();
   await expect(page.locator('[data-express-cred="torbox"]')).toBeVisible();
+  await expect(page.locator('#expressCreds .fastlane-trust')).toContainText('Your keys go to your AIOStreams host through the Core Builds relay');
+  await expect(page.locator('#expressStremio .fastlane-trust')).toContainText('Your other addons stay');
   // Manifest target hides the Stremio block
   await page.locator('[data-express-target="manifest"]').click();
   await expect(page.locator('#expressStremio')).toBeHidden();
@@ -147,8 +150,139 @@ test('Express Install manifest target skips Stremio and shows the manifest modal
   await page.locator('#expressGo').click();
   await page.locator('#pwdPrompt .pwd-go').click();
   await expect(page.locator('#manifestModal')).toBeVisible({ timeout: 45000 });
+  // toBeVisible ignores overlap. The result opened under the Express panel for
+  // months: assert it is the layer actually on top, and that Express closed.
+  const top = await page.evaluate(() => {
+    const box = document.querySelector('#manifestModal .modal-box').getBoundingClientRect();
+    return !!document.elementFromPoint(box.left + box.width / 2, box.top + box.height / 2)?.closest('#manifestModal');
+  });
+  expect(top).toBe(true);
+  await expect(page.locator('#expressLaneModal')).toHaveCount(0);
   expect(posted).toHaveLength(1);
   expect(JSON.stringify(posted[0].config)).not.toContain('torbox-search');
+});
+
+test('Express profile is a main step, and Fast builds 1080p instant-play-only', async ({ page }) => {
+  const posted = [];
+  await mockBackend(page, posted);
+  await fresh(page);
+  page.on('dialog', dialog => dialog.accept());
+  await page.locator('[data-action="open-express-lane"]').click();
+  // On the page itself, not tucked under "Optional".
+  const fast = page.locator('#expressLaneModal [data-express-profile="fast"]');
+  await expect(fast).toBeVisible();
+  await expect(page.locator('#expressLaneModal details.fastlane-optional [data-express-profile]')).toHaveCount(0);
+  await expect(page.locator('#expressLaneModal [data-express-profile="balanced"]')).toContainText('Recommended');
+  await page.locator('[data-express-cred="torbox"]').fill('test-torbox-key');
+  await fast.click();
+  await expect(page.locator('[data-express-cache="cached"]')).toHaveClass(/active/);
+  await expect(page.locator('[data-express-res="1080p"]')).toHaveClass(/active/);
+  await page.locator('[data-express-target="manifest"]').click();
+  await page.locator('#expressGo').click();
+  await page.locator('#pwdPrompt .pwd-go').click();
+  await expect(page.locator('#manifestModal')).toBeVisible({ timeout: 45000 });
+  expect(posted).toHaveLength(1);
+  const config = posted[0].config;
+  // Fast promised 1080p: before 3.26 Quick install's own 4K default overrode it.
+  expect(config.excludedResolutions || []).toContain('2160p');
+  expect(config.excludeUncached, 'Fast shows only streams ready to play').toBe(true);
+  // An English browser keeps the English-only language list every golden carries.
+  expect(config.preferredLanguages[0]).toBe('English');
+  expect(config.preferredLanguages).not.toContain('Spanish');
+});
+
+test.describe('Express language from a Spanish browser', () => {
+  test.use({ locale: 'es-ES' });
+
+  test('pre-fills Spanish, ranks it first and keeps English behind it', async ({ page }) => {
+    const posted = [];
+    await mockBackend(page, posted);
+    await fresh(page);
+    page.on('dialog', dialog => dialog.accept());
+    await page.locator('[data-action="open-express-lane"]').click();
+    await expect(page.locator('#expressLang')).toHaveValue('Spanish');
+    await expect(page.locator('#expressSummary')).toContainText('Spanish');
+    await page.locator('[data-express-cred="torbox"]').fill('test-torbox-key');
+    await page.locator('[data-express-target="manifest"]').click();
+    await page.locator('#expressGo').click();
+    await page.locator('#pwdPrompt .pwd-go').click();
+    await expect(page.locator('#manifestModal')).toBeVisible({ timeout: 45000 });
+    expect(posted).toHaveLength(1);
+    const langs = posted[0].config.preferredLanguages;
+    expect(langs.slice(0, 2)).toEqual(['Spanish', 'English']);
+    expect(langs).toContain('Original');
+  });
+
+  test('an English choice made earlier beats the Spanish browser guess', async ({ page }) => {
+    await fresh(page);
+    // Only the language fields: the rest of the state falls back to its defaults.
+    await page.evaluate(() => localStorage.setItem('coreBuild', JSON.stringify({ langs: ['English'], langsSet: true })));
+    await page.reload();
+    await page.locator('[data-action="open-express-lane"]').click();
+    await expect(page.locator('#expressLang')).toHaveValue('English');
+  });
+
+  test('a Chinese pick posts the one name AIOStreams accepts', async ({ page }) => {
+    const posted = [];
+    await mockBackend(page, posted);
+    await fresh(page);
+    page.on('dialog', dialog => dialog.accept());
+    await page.locator('[data-action="open-express-lane"]').click();
+    await page.locator('details.fastlane-optional summary').click();
+    await page.locator('#expressLang').selectOption('Chinese');
+    await page.locator('[data-express-cred="torbox"]').fill('test-torbox-key');
+    await page.locator('[data-express-target="manifest"]').click();
+    await page.locator('#expressGo').click();
+    await page.locator('#pwdPrompt .pwd-go').click();
+    await expect(page.locator('#manifestModal')).toBeVisible({ timeout: 45000 });
+    const langs = posted[0].config.preferredLanguages;
+    expect(langs[0]).toBe('Chinese');
+    expect(JSON.stringify(posted[0].config)).not.toContain('Chinese (');
+  });
+});
+
+test('Express lane offers a Chillio (ChillLink) install target', async ({ page }) => {
+  await fresh(page);
+  await page.locator('[data-action="open-express-lane"]').click();
+  const tile = page.locator('[data-express-target="chillio"]');
+  await expect(tile).toBeVisible();
+  await expect(tile).toContainText('Chillio');
+});
+
+test('Chillio target blocks a P2P build before anything is posted (ChillLink drops torrents)', async ({ page }) => {
+  const posted = [];
+  await mockBackend(page, posted);
+  await fresh(page);
+  await page.locator('[data-action="open-express-lane"]').click();
+  await page.locator('[data-express-service="p2p"]').click();
+  await page.locator('[data-express-target="chillio"]').click();
+  await page.locator('#expressGo').click();
+  // The gate fires before the password prompt and the /api/v1/user POST.
+  await expect(page.locator('#aioResult')).toContainText("Chillio can't use this setup", { timeout: 15000 });
+  await expect(page.locator('#aioResult')).toContainText('P2P');
+  await expect(page.locator('#pwdPrompt')).toHaveCount(0);
+  expect(posted).toEqual([]);
+});
+
+test('Chillio target posts the config and opens the modal on a /chilllink/ URL', async ({ page }) => {
+  const posted = [];
+  await mockBackend(page, posted);
+  await fresh(page);
+  page.on('dialog', dialog => dialog.accept());
+  await page.locator('[data-action="open-express-lane"]').click();
+  await page.locator('[data-express-cred="torbox"]').fill('test-torbox-key');
+  await page.locator('[data-express-target="chillio"]').click();
+  await page.locator('#expressGo').click();
+  await page.locator('#pwdPrompt .pwd-go').click();
+  await expect(page.locator('#manifestModal')).toBeVisible({ timeout: 45000 });
+  // The modal opens directly on the Chillio tab, whose URL uses the
+  // authenticated /chilllink/<uuid>/<encryptedPassword> route.
+  await expect(page.locator('#mUrlVal')).toContainText('/chilllink/11111111-2222-4333-8444-555555555555/encrypted-password');
+  const chillioTab = page.locator('#mFmtTabs .fmt-tab', { hasText: 'Chillio' });
+  await expect(chillioTab).toHaveClass(/active/);
+  // Companion links to the official ChillLink tools ship in the help box.
+  await expect(page.locator('#mAppHelpBody a[href*="link.chillio.app/manifest-merger"]')).toBeVisible();
+  expect(posted).toHaveLength(1);
 });
 
 test('Express "Additional services & scrapers" popout adds Debridio + folds its key into the config', async ({ page }) => {
@@ -180,6 +314,42 @@ test('Express "Additional services & scrapers" popout adds Debridio + folds its 
   expect(debridio.options.debridioApiKey).toBe('test-debridio-key');
   expect(debridio.options.apiKey).toBeUndefined();
   expect(JSON.stringify(config)).not.toContain('torbox-search');
+  expect(errors).toEqual([]);
+});
+
+test('Express TorBox + EasyNews add-ons brings the EasyNews service, asks for its login and ships the presets', async ({ page }) => {
+  test.setTimeout(90_000);
+  const posted = [];
+  await mockBackend(page, posted);
+  const errors = await fresh(page);
+  page.on('dialog', dialog => dialog.accept());
+  await page.locator('[data-action="open-express-lane"]').click();
+  await page.locator('[data-express-cred="torbox"]').fill('test-torbox-key');
+  await page.locator('#expressExtrasBtn').click();
+  await expect(page.locator('[data-extra-scraper="easynews"]')).toContainText('adds the EasyNews service');
+  await page.locator('[data-extra-scraper="easynews"]').click();
+  await page.locator('[data-extra-scraper="easynewsPlus"]').click();
+  await page.locator('#extraApply').click();
+  // The add-ons read the EasyNews login, so Quick install now asks for it — once.
+  await expect(page.locator('[data-express-cred="easynews"]')).toHaveCount(1);
+  await expect(page.locator('[data-express-cred="easynewsPass"]')).toHaveCount(1);
+  await page.locator('[data-express-cred="easynews"]').fill('en-user');
+  await page.locator('[data-express-cred="easynewsPass"]').fill('en-pass');
+  await page.locator('#stremioEmailInline').fill('test@stremio.com');
+  await page.locator('#stremioPasswordInline').fill('test-password');
+  await page.locator('#expressGo').click();
+  await page.locator('#pwdPrompt .pwd-go').click();
+  await expect(page.locator('#aioResult')).toContainText('Full Stack Installed and verified!', { timeout: 45000 });
+  expect(posted).toHaveLength(1);
+  const config = posted[0].config;
+  const easynews = config.services.find(s => s.id === 'easynews');
+  expect(easynews?.enabled, 'EasyNews service is enabled').toBe(true);
+  expect(easynews.credentials).toEqual({ username: 'en-user', password: 'en-pass' });
+  expect(config.services.find(s => s.id === 'torbox')?.enabled, 'TorBox stays the main service').toBe(true);
+  const types = config.presets.map(p => p.type);
+  for (const type of ['stremthruTorz', 'easynewsPlusPlus', 'easynews-search', 'easynews', 'easynewsPlus']) {
+    expect(types, `${type} preset is in the config`).toContain(type);
+  }
   expect(errors).toEqual([]);
 });
 
