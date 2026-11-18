@@ -55,8 +55,20 @@ For the template-suite release log, see the [Changelog](https://corebuilds-docs.
   <Card title="Samsung TV 4K saves accepted again" icon="wand">
     the same allowlist drift refused Samsung TV 4K setups on restricted hosts; the regex snapshot is re-pinned to upstream. (#822)
   </Card>
-  <Card title="Generated output unchanged" icon="layers">
-    this release changes no config compared with the current main branch; the only config changes since 3.32 are the two regex re-syncs above.
+  <Card title="DV-Only Kill removes only Dolby Vision-only releases" icon="layers">
+    on Samsung, Fire Stick HD, Roku, projectors and other devices without Dolby Vision, the rule had its arguments reversed and removed the HDR10, HDR10+, HLG and SDR streams that lacked DV. It now removes only DV-only releases, and runs before the rules that count streams. (#841)
+  </Card>
+  <Card title="Elite REMUX pins work again" icon="bug">
+    the 4K and 1080p elite REMUX pins asked for the wrong field in each filter and matched nothing; FraMeSToR-class REMUXes are pinned to the top again. (#841)
+  </Card>
+  <Card title="Bad 1080P Bluray limited to new movies" icon="sparkles">
+    the rule now applies only in a movie’s first 90 days, so older movies keep the 1080p Bluray encodes it used to remove. Other quality filters are unchanged. (#841)
+  </Card>
+  <Card title="Titles named “AI” are no longer filtered out" icon="bolt">
+    the AI-upscale exclusion now needs an upscale word such as Upscaled or Enhanced. Restricted hosts accept only the original allowlisted pattern, so there the original is swapped in rather than dropped. (#841)
+  </Card>
+  <Card title="Generated output unchanged" icon="shield-check">
+    this release adds no config change of its own; the config changes since 3.32 are the four stream-selection fixes and two regex re-syncs listed above, already on the main branch.
   </Card>
 </CardGroup>
 

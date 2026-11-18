@@ -14,7 +14,11 @@ export const CHANGELOG = [
     'Usage statistics are opt-in — page visits and downloads are counted only after you tick the box on Review or in Quick install; it starts unticked and never sends keys, account names or your configuration. (#839)',
     'H.264 10-bit regex accepted again — restricted hosts such as ElfHosted refused every save because the H.264 10-bit pattern no longer matched their allowlist word for word after Vidhin05 rewrote it; the regex is re-synced from upstream. (#838)',
     'Samsung TV 4K saves accepted again — the same allowlist drift refused Samsung TV 4K setups on restricted hosts; the regex snapshot is re-pinned to upstream. (#822)',
-    'Generated output unchanged — this release changes no config compared with the current main branch; the only config changes since 3.32 are the two regex re-syncs above.',
+    'DV-Only Kill removes only Dolby Vision-only releases — on Samsung, Fire Stick HD, Roku, projectors and other devices without Dolby Vision, the rule had its arguments reversed and removed the HDR10, HDR10+, HLG and SDR streams that lacked DV. It now removes only DV-only releases, and runs before the rules that count streams. (#841)',
+    'Elite REMUX pins work again — the 4K and 1080p elite REMUX pins asked for the wrong field in each filter and matched nothing; FraMeSToR-class REMUXes are pinned to the top again. (#841)',
+    'Bad 1080P Bluray limited to new movies — the rule now applies only in a movie’s first 90 days, so older movies keep the 1080p Bluray encodes it used to remove. Other quality filters are unchanged. (#841)',
+    'Titles named “AI” are no longer filtered out — the AI-upscale exclusion now needs an upscale word such as Upscaled or Enhanced. Restricted hosts accept only the original allowlisted pattern, so there the original is swapped in rather than dropped. (#841)',
+    'Generated output unchanged — this release adds no config change of its own; the config changes since 3.32 are the four stream-selection fixes and two regex re-syncs listed above, already on the main branch.',
   ]},
   { v:'3.32', date:'Oct 31 2026', items:[
     'Truer line about your keys — Quick install said your keys go only to your AIOStreams host. They pass through the Core Builds relay on the way, which forwards them and keeps nothing, and the line now says so. The first screen says Core Builds keeps no copy of your keys.',
