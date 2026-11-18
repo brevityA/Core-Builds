@@ -24,9 +24,9 @@ Generated from `src/data/hosts.js` and `src/data/host-capabilities.js`. Run `npm
 
 | Profile | Kind | Requires probe | Verification |
 |---|---|---|---|
+| Self-hosted / Docker | self-hosted | Yes | Verified by live status probe when available |
 | ElfHosted (private / paid) | private | Yes | Verified by live status probe when available |
 | TorBox-hosted AIOStreams | vendor | Yes | Unverified until probed |
-| Self-hosted / Docker | self-hosted | Yes | Verified by live status probe when available |
 
 ## Regex policy
 

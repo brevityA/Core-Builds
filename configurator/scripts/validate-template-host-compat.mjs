@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import { readFileSync } from 'node:fs';
 import { readdir, readFile } from 'node:fs/promises';
 import { dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -19,8 +20,57 @@ import {
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const TEMPLATES_ROOT = resolve(ROOT, '..', 'Templates');
-const IGNORED_DIRECTORIES = new Set(['Legacy', 'Personal']);
+// Legacy is a pinned compatibility lane, Personal is never published, and
+// Deprecated holds retired templates that are not offered for any host.
+const IGNORED_DIRECTORIES = new Set(['Deprecated', 'Legacy', 'Personal']);
 const PUBLIC_HOST_IDS = Object.keys(HOST_BASE_URLS);
+
+// Pinned copies of the regex sources an allowlisting host publishes. On a
+// `regexAccess: 'none'` host an inline pattern is accepted when it matches an
+// entry of an allowlisted source word for word (upstream isRegexAllowed), so a
+// pattern is checked against these snapshots, not refused for being inline.
+// Refresh with `node scripts/check_upstream_drift.mjs --update`.
+const REGEX_SOURCE_SNAPSHOTS = {
+  'https://raw.githubusercontent.com/Vidhin05/Releases-Regex/main/English/regexes.json':
+    resolve(ROOT, '..', 'Filtering', 'upstream', 'vidhin05-regexes.snapshot.json'),
+};
+const LOCAL_REGEX_KEYS = ['rankedRegexPatterns', 'excludedRegexPatterns', 'preferredRegexPatterns'];
+const snapshotCache = new Map();
+
+function loadSnapshotPatterns(url) {
+  if (!snapshotCache.has(url)) {
+    const file = REGEX_SOURCE_SNAPSHOTS[url];
+    let patterns = null;
+    if (file) {
+      const entries = JSON.parse(readFileSync(file, 'utf8'));
+      patterns = new Set(entries.map((entry) => entry?.pattern).filter(Boolean));
+    }
+    snapshotCache.set(url, patterns);
+  }
+  return snapshotCache.get(url);
+}
+
+/** Patterns a host accepts inline, or null when no allowlisted source has a pinned copy. */
+export function allowedInlinePatterns(capability) {
+  const sets = (capability.allowedRegexUrls || []).map(loadSnapshotPatterns).filter(Boolean);
+  if (!sets.length) return null;
+  return new Set(sets.flatMap((set) => [...set]));
+}
+
+function patternOf(entry) {
+  if (typeof entry === 'string') return { pattern: entry, label: entry };
+  if (entry && typeof entry === 'object' && typeof entry.pattern === 'string') {
+    return { pattern: entry.pattern, label: entry.name || entry.pattern };
+  }
+  return null;
+}
+
+/** True when a template carries AIOStreams template directives (__if / __switch). */
+export function hasTemplateDirectives(value) {
+  if (Array.isArray(value)) return value.some(hasTemplateDirectives);
+  if (!value || typeof value !== 'object') return false;
+  return Object.entries(value).some(([key, child]) => key === '__if' || key === '__switch' || hasTemplateDirectives(child));
+}
 
 const UPSTREAM_REMOVED_PRESET_IDS = new Set(['torbox', 'usa-tv', 'debridio-watchtower']);
 const PRESET_REFERENCE_KEYS = new Set(['preset', 'presetId', 'presetType']);
@@ -122,17 +172,22 @@ export function evaluateTemplate(template, hostId) {
   }
 
   if (capability.regexAccess === 'none') {
-    const localRegexKeys = [
-      'rankedRegexPatterns',
-      'excludedRegexPatterns',
-      'preferredRegexPatterns',
-    ];
+    // 'none' means "only what this host publishes", not "no regex". Without a
+    // pinned copy of any allowlisted source there is nothing to compare against,
+    // and absence of data is not a violation.
+    const allowed = allowedInlinePatterns(capability);
 
-    for (const key of localRegexKeys) {
-      if (Array.isArray(config[key]) && config[key].length > 0) {
-        issues.push(
-          `${templateId}: local "${key}" are not permitted on ${hostId}, which restricts user regex`
-        );
+    if (allowed) {
+      for (const key of LOCAL_REGEX_KEYS) {
+        for (const entry of Array.isArray(config[key]) ? config[key] : []) {
+          const parsed = patternOf(entry);
+          if (parsed && !allowed.has(parsed.pattern)) {
+            const label = parsed.label.length > 60 ? `${parsed.label.slice(0, 57)}...` : parsed.label;
+            issues.push(
+              `${templateId}: local "${key}" pattern "${label}" is not on ${hostId}'s regex allowlist`
+            );
+          }
+        }
       }
     }
 
@@ -181,6 +236,14 @@ export async function validateTemplates() {
     try {
       const template = JSON.parse(await readFile(filePath, 'utf8'));
       const templateId = template.metadata?.id || relativePath;
+
+      // Directive templates (the smart template) resolve per answer and service;
+      // a preset behind `__if: "!services"` is not in every config. They are
+      // checked by packages/core/tests/smart-template.test.mjs and the save test.
+      if (hasTemplateDirectives(template)) {
+        results.push({ templateId, file: relativePath, compatibleHosts: [], issues: [], skipped: 'template directives' });
+        continue;
+      }
       const compatibleHosts = resolveCompatibleHosts(templateId);
       const hostIssues = [];
 
@@ -211,19 +274,26 @@ export async function validateTemplates() {
   };
 }
 
-const result = await validateTemplates();
+async function main() {
+  const result = await validateTemplates();
 
-if (result.errors.length > 0) {
-  for (const error of result.errors) {
-    console.error(error);
+  if (result.errors.length > 0) {
+    for (const error of result.errors) {
+      console.error(error);
+    }
+
+    console.error(
+      `Template host-compatibility validation failed with ${result.errors.length} error(s).`
+    );
+    process.exitCode = 1;
+  } else {
+    console.log(
+      `Validated ${result.files.length} template JSON file(s) across their compatible hosts.`
+    );
   }
+}
 
-  console.error(
-    `Template host-compatibility validation failed with ${result.errors.length} error(s).`
-  );
-  process.exitCode = 1;
-} else {
-  console.log(
-    `Validated ${result.files.length} template JSON file(s) across their compatible hosts.`
-  );
+// Run only as a script: importing this module (the tests do) must not set exitCode.
+if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  await main();
 }
