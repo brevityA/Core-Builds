@@ -198,6 +198,8 @@ const ids = active.map(p => p.instanceId);  // ← instanceId, NOT options.name
 
 Templates reference three synced expression files via `syncedExcludedStreamExpressionUrls`, `syncedIncludedStreamExpressionUrls`, and `syncedPreferredStreamExpressionUrls`. AIOStreams fetches these at runtime, so updating the files updates ALL templates that reference them — no template regeneration needed.
 
+**Checked 2026-11-19 (feature rundown): no shipped template references these files.** Every active, deprecated and smart template carries these three keys empty, and generated configs inline their SEL. Only `scripts/template_builder.py` would add the URLs. So editing `Filtering/*.json` changes nothing users get today; the inline code in `app.js` is what ships. Re-adding the URLs would also need operator trust, since public hosts refuse untrusted SEL URLs.
+
 | File | Purpose | Current entries |
 |---|---|---|
 | `Filtering/core-builds-pses.json` | Preferred Stream Expressions (PSEs) | ~170 |
@@ -277,7 +279,7 @@ python3 scripts/template_builder.py --only stream  # filter by name
 1. **groups.addons = instanceId** — NEVER use display names (see CRITICAL section above)
 2. **Relative links from /configurator/** — use `../` prefix, not `./`
 3. **GitHub Pages deploy failures** — check Actions tab; `deploy-configurator.yml` must succeed
-4. **Filtering/ files = runtime expressions** — update these to fix ALL templates at once
+4. **Filtering/ files = runtime expressions, but nothing ships them today** — no shipped template sets the synced SEL URLs (see Filtering/ section), so fix the inline code in `app.js`
 5. **sortCriteria direction** — must be `"direction"` not `"order"` (AIOStreams rejects `"order"`)
 6. **addonLogo URL** — must use `/refs/heads/main/` not `/main/`
 7. **Inline regex lookahead** — `(?=...)`, `(?!...)` blocked on public instances (elfhosted, fortheweak)

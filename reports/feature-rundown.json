@@ -343,10 +343,10 @@
         }
       },
       "templates": 0,
-      "smart": true,
+      "smart": false,
       "decision": {
-        "status": "used",
-        "why": "Smart template only; trust itself comes from the operator's TEMPLATE_URLS.",
+        "status": "not-applicable",
+        "why": "Template trust is granted by the operator (TEMPLATE_URLS, TRUSTED_UUIDS), not by the config; written as false.",
         "source": "option"
       },
       "flags": []
@@ -741,10 +741,10 @@
         }
       },
       "templates": 0,
-      "smart": true,
+      "smart": false,
       "decision": {
-        "status": "used",
-        "why": "Smart template only, where an answer keeps a resolution the exclusions would drop.",
+        "status": "off-by-design",
+        "why": "No resolution passthrough case: library and SeaDex passthrough is done with ISEs. Generated configs and the smart template write it at the AIOStreams default so an import shows no change.",
         "source": "option"
       },
       "flags": []
@@ -774,7 +774,7 @@
         }
       },
       "templates": 6,
-      "smart": true,
+      "smart": false,
       "decision": {
         "status": "used",
         "why": "A few static templates (1080p lines) require their resolution; generators rank with PSEs instead so niche titles still return something.",
@@ -873,10 +873,10 @@
         }
       },
       "templates": 0,
-      "smart": true,
+      "smart": false,
       "decision": {
-        "status": "used",
-        "why": "Smart template only (answer-dependent passthrough).",
+        "status": "off-by-design",
+        "why": "No quality passthrough case; ISEs cover library and SeaDex. Generated configs and the smart template write it at the AIOStreams default so an import shows no change.",
         "source": "option"
       },
       "flags": []
@@ -906,10 +906,10 @@
         }
       },
       "templates": 0,
-      "smart": true,
+      "smart": false,
       "decision": {
-        "status": "used",
-        "why": "Smart template only (answer-dependent).",
+        "status": "off-by-design",
+        "why": "Hard requirement; would empty titles that only exist as WEB or HDTV. Generated configs and the smart template write it at the AIOStreams default so an import shows no change.",
         "source": "option"
       },
       "flags": []
@@ -972,10 +972,10 @@
         }
       },
       "templates": 0,
-      "smart": true,
+      "smart": false,
       "decision": {
-        "status": "used",
-        "why": "Smart template only; the generators use requiredLanguages with Unknown, Multi and Dual Audio kept so unlabelled releases are not lost.",
+        "status": "off-by-design",
+        "why": "The generators use requiredLanguages with Unknown, Multi and Dual Audio kept, so unlabelled releases are not lost; excluding by language would drop them. Generated configs and the smart template write it at the AIOStreams default so an import shows no change.",
         "source": "option"
       },
       "flags": []
@@ -1005,7 +1005,7 @@
         }
       },
       "templates": 1,
-      "smart": true,
+      "smart": false,
       "decision": {
         "status": "used",
         "why": "One static template keeps a language through other filters.",
@@ -1038,7 +1038,7 @@
         }
       },
       "templates": 41,
-      "smart": true,
+      "smart": false,
       "decision": {
         "status": "used",
         "why": "Advanced/Labs require the user's languages but always keep Original, Dual Audio, Multi, Dubbed and Unknown, so a release with no language tag still shows.",
@@ -1896,7 +1896,7 @@
         }
       },
       "templates": 43,
-      "smart": true,
+      "smart": false,
       "decision": {
         "status": "used",
         "why": "Eight inline patterns (upscaled, extras, LQ groups, BR-DISK, retags); each string is a verbatim Vidhin05 pattern so ElfHosted's allowlist accepts it.",
@@ -1995,7 +1995,7 @@
         }
       },
       "templates": 41,
-      "smart": true,
+      "smart": false,
       "decision": {
         "status": "used",
         "why": "Tier-1 group patterns (Remux T1, FraMeSToR…), verbatim Vidhin05 strings.",
@@ -2061,7 +2061,7 @@
         }
       },
       "templates": 0,
-      "smart": true,
+      "smart": false,
       "decision": {
         "status": "off-by-design",
         "why": "Removed from active templates: a third-party list broke ElfHosted saves with 'Forbidden URL' when its allowlist drifted. Exclusions are inline instead.",
@@ -2160,7 +2160,7 @@
         }
       },
       "templates": 43,
-      "smart": true,
+      "smart": false,
       "decision": {
         "status": "used",
         "why": "Vidhin05's ranked list, the one synced URL public hosts accept.",
@@ -2193,10 +2193,10 @@
         }
       },
       "templates": 0,
-      "smart": true,
+      "smart": false,
       "decision": {
-        "status": "used",
-        "why": "Static templates and the smart template's trust case point at Filtering/core-builds-pses.json so one edit updates every importer; generated configs inline their PSEs.",
+        "status": "off-by-design",
+        "why": "Generated configs inline their PSEs. No shipped template points at Filtering/core-builds-pses.json any more (only scripts/template_builder.py would add it), and public hosts refuse untrusted SEL URLs. Generated configs and the smart template write it at the AIOStreams default so an import shows no change.",
         "source": "option"
       },
       "flags": []
@@ -2226,10 +2226,10 @@
         }
       },
       "templates": 0,
-      "smart": true,
+      "smart": false,
       "decision": {
-        "status": "used",
-        "why": "Same, for Filtering/core-builds-eses.json.",
+        "status": "off-by-design",
+        "why": "Same as syncedPreferredStreamExpressionUrls, for Filtering/core-builds-eses.json. Generated configs and the smart template write it at the AIOStreams default so an import shows no change.",
         "source": "option"
       },
       "flags": []
@@ -2259,10 +2259,10 @@
         }
       },
       "templates": 0,
-      "smart": true,
+      "smart": false,
       "decision": {
-        "status": "used",
-        "why": "Same, for Filtering/core-builds-ises.json.",
+        "status": "off-by-design",
+        "why": "Same as syncedPreferredStreamExpressionUrls, for Filtering/core-builds-ises.json. Generated configs and the smart template write it at the AIOStreams default so an import shows no change.",
         "source": "option"
       },
       "flags": []
@@ -2325,10 +2325,10 @@
         }
       },
       "templates": 0,
-      "smart": true,
+      "smart": false,
       "decision": {
-        "status": "used",
-        "why": "Smart template trust case only, so operators who add the collection to TEMPLATE_URLS trust it.",
+        "status": "off-by-design",
+        "why": "Ranked expressions are inline (ranked-sel-policy.js) so they ship on hosts that refuse untrusted SEL URLs. Generated configs and the smart template write it at the AIOStreams default so an import shows no change.",
         "source": "option"
       },
       "flags": []
@@ -2893,7 +2893,7 @@
         }
       },
       "templates": 2,
-      "smart": true,
+      "smart": false,
       "decision": {
         "status": "used",
         "why": "Off in generated configs: it drops results before the digital release date, which also removes early legitimate releases. Two static templates enable it.",
@@ -2992,10 +2992,10 @@
         }
       },
       "templates": 0,
-      "smart": true,
+      "smart": false,
       "decision": {
-        "status": "used",
-        "why": "Smart template only; the generators never drop cached results.",
+        "status": "off-by-design",
+        "why": "Cached results are the point of a debrid build; never excluded. Generated configs and the smart template write it at the AIOStreams default so an import shows no change.",
         "source": "option"
       },
       "flags": []
@@ -3025,10 +3025,10 @@
         }
       },
       "templates": 0,
-      "smart": true,
+      "smart": false,
       "decision": {
-        "status": "used",
-        "why": "Smart template only.",
+        "status": "off-by-design",
+        "why": "Cached results are never excluded. Generated configs and the smart template write it at the AIOStreams default so an import shows no change.",
         "source": "option"
       },
       "flags": []
@@ -3058,10 +3058,10 @@
         }
       },
       "templates": 0,
-      "smart": true,
+      "smart": false,
       "decision": {
-        "status": "used",
-        "why": "Smart template only.",
+        "status": "off-by-design",
+        "why": "Cached results are never excluded. Generated configs and the smart template write it at the AIOStreams default so an import shows no change.",
         "source": "option"
       },
       "flags": []
@@ -3091,10 +3091,10 @@
         }
       },
       "templates": 0,
-      "smart": true,
+      "smart": false,
       "decision": {
-        "status": "used",
-        "why": "Smart template only.",
+        "status": "off-by-design",
+        "why": "Cached results are never excluded. Generated configs and the smart template write it at the AIOStreams default so an import shows no change.",
         "source": "option"
       },
       "flags": []
@@ -3190,10 +3190,10 @@
         }
       },
       "templates": 0,
-      "smart": true,
+      "smart": false,
       "decision": {
-        "status": "used",
-        "why": "Smart template only (answer-dependent).",
+        "status": "off-by-design",
+        "why": "Cached-only uses excludeUncached for the whole build; no per-addon split. Generated configs and the smart template write it at the AIOStreams default so an import shows no change.",
         "source": "option"
       },
       "flags": []
@@ -3223,10 +3223,10 @@
         }
       },
       "templates": 0,
-      "smart": true,
+      "smart": false,
       "decision": {
-        "status": "used",
-        "why": "Smart template only.",
+        "status": "off-by-design",
+        "why": "Cached-only uses excludeUncached for the whole build; no per-service split. Generated configs and the smart template write it at the AIOStreams default so an import shows no change.",
         "source": "option"
       },
       "flags": []
@@ -3256,10 +3256,10 @@
         }
       },
       "templates": 0,
-      "smart": true,
+      "smart": false,
       "decision": {
-        "status": "used",
-        "why": "Smart template only.",
+        "status": "off-by-design",
+        "why": "Cached-only uses excludeUncached for the whole build; no per-type split. Generated configs and the smart template write it at the AIOStreams default so an import shows no change.",
         "source": "option"
       },
       "flags": []
@@ -3355,10 +3355,10 @@
         }
       },
       "templates": 0,
-      "smart": true,
+      "smart": false,
       "decision": {
-        "status": "used",
-        "why": "Smart template only (answer-dependent); generators avoid required expressions for the same reason as required regex.",
+        "status": "off-by-design",
+        "why": "Required expressions remove everything that does not match; Core Builds ranks with PSEs and excludes with ESEs instead. Generated configs and the smart template write it at the AIOStreams default so an import shows no change.",
         "source": "option"
       },
       "flags": []
@@ -3388,7 +3388,7 @@
         }
       },
       "templates": 50,
-      "smart": true,
+      "smart": false,
       "decision": {
         "status": "used",
         "why": "PSEs: IQR bitrate tiers, pow() decay, perGroup() balance. None on Core Stable.",
@@ -3421,7 +3421,7 @@
         }
       },
       "templates": 51,
-      "smart": true,
+      "smart": false,
       "decision": {
         "status": "used",
         "why": "ISEs: library and SeaDex passthrough, ID-matched trust, Smart Play pin.",
@@ -3454,7 +3454,7 @@
         }
       },
       "templates": 41,
-      "smart": true,
+      "smart": false,
       "decision": {
         "status": "used",
         "why": "The only writer of streamExpressionScore; without it the score sort and Adaptive Score Floor are stripped. Advanced and Labs only (ranked-sel-policy.js).",
@@ -3487,7 +3487,7 @@
         }
       },
       "templates": 43,
-      "smart": true,
+      "smart": false,
       "decision": {
         "status": "used",
         "why": "Scored regex overrides; without them regexScore is a no-op because every synced Vidhin05 entry scores 0.",
@@ -3520,7 +3520,7 @@
         }
       },
       "templates": 41,
-      "smart": true,
+      "smart": false,
       "decision": {
         "status": "used",
         "why": "Set by AIOStreams on templates that override synced regex scores by name.",
@@ -3553,10 +3553,10 @@
         }
       },
       "templates": 0,
-      "smart": true,
+      "smart": false,
       "decision": {
-        "status": "used",
-        "why": "Smart template only, carried from the per-answer builds.",
+        "status": "off-by-design",
+        "why": "Overrides for synced SEL entries; nothing synced to override because SEL is inline. Generated configs and the smart template write it at the AIOStreams default so an import shows no change.",
         "source": "option"
       },
       "flags": []
@@ -3589,7 +3589,7 @@
         }
       },
       "templates": 49,
-      "smart": true,
+      "smart": false,
       "decision": {
         "status": "used",
         "why": "Advanced/Labs only: returns once the exit condition is met instead of waiting for every source. Core Stable turns it off so a problem reproduces the same way each time — which also means Stable waits on its slowest source.",
@@ -3627,7 +3627,7 @@
         }
       },
       "templates": 0,
-      "smart": true,
+      "smart": false,
       "decision": {
         "status": "off-by-design",
         "why": "Off in every generated config: generators never combine groups with dynamic fetching (two early exits can skip sources), and dynamic wins (output-profile-policy.js#preventStackedFetchExits). Groups must use instanceIds, never display names.",
@@ -4231,7 +4231,7 @@
         }
       },
       "templates": 51,
-      "smart": true,
+      "smart": false,
       "decision": {
         "status": "used",
         "why": "Hides addon error rows in Stremio on Advanced/Labs.",
@@ -4302,7 +4302,7 @@
         }
       },
       "templates": 0,
-      "smart": true,
+      "smart": false,
       "decision": {
         "status": "candidate",
         "why": "Off everywhere. It can show why nothing appeared (showFilterStatsOnNoStreams); worth turning on for empty results only.",
@@ -4475,7 +4475,7 @@
         }
       },
       "templates": 51,
-      "smart": true,
+      "smart": false,
       "decision": {
         "status": "used",
         "why": "Static templates match the release year; generators leave AIOStreams' default.",
@@ -4517,7 +4517,7 @@
         }
       },
       "templates": 51,
-      "smart": true,
+      "smart": false,
       "decision": {
         "status": "used",
         "why": "Off in generated configs (default contains, 0.75): strict title matching drops foreign and alternate titles. Static templates enable it.",
@@ -4716,7 +4716,7 @@
         }
       },
       "templates": 52,
-      "smart": true,
+      "smart": false,
       "decision": {
         "status": "used",
         "why": "Next-episode autoplay by matching attributes; Core Stable turns it off.",
@@ -4753,10 +4753,10 @@
         }
       },
       "templates": 0,
-      "smart": true,
+      "smart": false,
       "decision": {
-        "status": "used",
-        "why": "Smart template only.",
+        "status": "off-by-design",
+        "why": "Viewer prompt between episodes; a player preference, left to the user. Generated configs and the smart template write it at the AIOStreams default so an import shows no change.",
         "source": "option"
       },
       "flags": []
@@ -4786,7 +4786,7 @@
         }
       },
       "templates": 51,
-      "smart": true,
+      "smart": false,
       "decision": {
         "status": "used",
         "why": "Advanced/Labs: asks the service to cache the next episode while this one plays.",
@@ -4955,7 +4955,7 @@
         }
       },
       "templates": 51,
-      "smart": true,
+      "smart": false,
       "decision": {
         "status": "used",
         "why": "Advanced/Labs: pings the top stream so it starts faster. Off on Core Stable.",
@@ -4988,7 +4988,7 @@
         }
       },
       "templates": 54,
-      "smart": true,
+      "smart": false,
       "decision": {
         "status": "used",
         "why": "The user's debrid/usenet services (credentials stripped from shared links).",
@@ -5186,10 +5186,10 @@
         }
       },
       "templates": 0,
-      "smart": true,
+      "smart": false,
       "decision": {
-        "status": "used",
-        "why": "Smart template only.",
+        "status": "not-applicable",
+        "why": "Catalog layout; outside what a stream template should change. Generated configs and the smart template write it at the AIOStreams default so an import shows no change.",
         "source": "option"
       },
       "flags": []
@@ -5219,10 +5219,10 @@
         }
       },
       "templates": 0,
-      "smart": true,
+      "smart": false,
       "decision": {
-        "status": "used",
-        "why": "Smart template only.",
+        "status": "off-by-design",
+        "why": "Download links beside streams; a viewer preference, left off. Generated configs and the smart template write it at the AIOStreams default so an import shows no change.",
         "source": "option"
       },
       "flags": []
@@ -5255,7 +5255,7 @@
         }
       },
       "templates": 31,
-      "smart": true,
+      "smart": false,
       "decision": {
         "status": "used",
         "why": "Advanced/Labs: plays an uncached torrent or NZB once the service has it. Off on Core Stable.",
@@ -5288,10 +5288,10 @@
         }
       },
       "templates": 0,
-      "smart": true,
+      "smart": false,
       "decision": {
-        "status": "used",
-        "why": "Smart template only.",
+        "status": "off-by-design",
+        "why": "Debrid housekeeping that deletes from the user's account; left to the user. Generated configs and the smart template write it at the AIOStreams default so an import shows no change.",
         "source": "option"
       },
       "flags": []
@@ -5321,10 +5321,10 @@
         }
       },
       "templates": 0,
-      "smart": true,
+      "smart": false,
       "decision": {
-        "status": "used",
-        "why": "Smart template only.",
+        "status": "off-by-design",
+        "why": "Library ownership check; a viewer preference, left off. Generated configs and the smart template write it at the AIOStreams default so an import shows no change.",
         "source": "option"
       },
       "flags": []
@@ -5369,7 +5369,7 @@
         }
       },
       "templates": 25,
-      "smart": true,
+      "smart": false,
       "decision": {
         "status": "candidate",
         "why": "Off in generated configs; 25 static templates enable it. 2.35 added onlySameReleaseFailover, which makes it safe to turn on: a failed link falls over to the same release on another source.",

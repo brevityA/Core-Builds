@@ -68,6 +68,30 @@ test('an option is in use only when it switches something on', () => {
   assert.equal(isActive(null), false);
 });
 
+test('reads smart-template directives instead of counting their selectors', () => {
+  // A __switch is on only when some branch is; its selector string is not a value.
+  assert.equal(isActive({ __switch: 'services', cases: { '': false }, default: { __switch: 'inputs.cachedOnly', cases: { true: true }, default: false } }), true);
+  assert.equal(isActive({ __switch: 'services', cases: { '': false }, default: false }), false);
+  assert.equal(isActive({ __switch: 'inputs.language', cases: { French: [] }, default: [] }), false);
+  assert.equal(isActive({ __remove: true }), false);
+  assert.equal(isActive([{ __remove: true }]), false);
+  // An __if guard on a preset does not make a switched-off entry count.
+  assert.equal(isActive({ __if: '!services', enabled: false }), false);
+  assert.equal(isActive({ enabled: { __switch: 'services', cases: { '': true }, default: false } }), true);
+});
+
+test('a smart template that writes an option at its default does not count as use', () => {
+  const r = buildRundown({
+    pin: '2.36.0', latest: '2.36.0',
+    pinSrc: { schemas: SCHEMA, presetManager: PRESETS_PIN, streamExpression: SEL }, latestSrc: null, changelog: [],
+    usage: { goldens: [], templates: [], smart: { excludedResolutions: [], cacheAndPlay: { __switch: 'services', cases: { '': { enabled: false } }, default: { enabled: false } } } },
+    decisions: { lookup: k => ({ excludedResolutions: { status: 'used', why: 'x' }, cacheAndPlay: { status: 'used', why: 'x' } })[k] || { status: 'not-applicable', why: 'x' } },
+  });
+  const flags = Object.fromEntries(r.options.map(o => [o.key, o.flags]));
+  assert.match(flags.excludedResolutions.join(), /decision says used, but no generated config/);
+  assert.match(flags.cacheAndPlay.join(), /decision says used, but no generated config/);
+});
+
 test('keeps only stream-related changelog entries newer than the pin', () => {
   const md = [
     '## [2.38.0](x) (2026-11-14)', '### Features',
