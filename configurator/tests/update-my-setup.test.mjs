@@ -9,13 +9,36 @@ const fn = name => {
   return m[0];
 };
 
-test('Update my setup only ever PATCHes the saved UUID', () => {
+test('Update my setup only ever updates the saved UUID', () => {
   const body = fn('updateMySetup');
-  assert.match(body, /writeHostFetch\(rec\.host, `\/api\/v1\/user\/\$\{rec\.uuid\}`, \{ method: 'PATCH'/);
-  assert.doesNotMatch(body, /method: ?'POST'/, 'a failed update must not create a second config');
-  assert.doesNotMatch(body, /'\/api\/v1\/user'[,)]/);
+  assert.match(body, /aioUserWrite\(rec\.host, \{ uuid: rec\.uuid, password: S\.instancePassword, config: cfg \}/);
+  assert.doesNotMatch(body, /method: ?'(POST|PATCH)'/, 'a failed update must not create a second config');
+  assert.doesNotMatch(body, /writeHostFetch\(/, 'every write goes through the one helper');
   assert.match(body, /Your existing config is unchanged\./);
   assert.match(body, /data-upd-paste/, 'falls back to the paste flow');
+});
+
+// AIOStreams 2.32–2.38 have one update route: PUT /api/v1/user with
+// Authorization: Basic base64(uuid:password). PATCH /api/v1/user/<id> does not
+// exist and answers 404 "Not Found" — what the "Update my setup" screen showed.
+test('config writes follow the AIOStreams contract: PUT + Basic updates, POST creates', async () => {
+  const src = ['sentence', 'aioBasicAuth', 'aioUserWrite'].map(fn).join('\n');
+  const sent = [];
+  const writeHostFetch = async (host, path, opts) => { sent.push({ host, path, ...opts }); return {}; };
+  const api = new Function('writeHostFetch', 'TextEncoder', 'btoa', `${src}; return { sentence, aioBasicAuth, aioUserWrite };`)(writeHostFetch, TextEncoder, btoa);
+  await api.aioUserWrite('https://h', { uuid: 'u-1', password: 'pä:ss', config: { a: 1 } }, 1);
+  await api.aioUserWrite('https://h', { uuid: null, password: 'pw', config: { a: 1 } }, 1);
+  assert.equal(sent[0].method, 'PUT');
+  assert.equal(sent[0].path, '/api/v1/user');
+  assert.equal(Buffer.from(sent[0].headers.Authorization.slice(6), 'base64').toString('utf8'), 'u-1:pä:ss', 'UTF-8 safe, colon in the password kept');
+  assert.deepEqual(JSON.parse(sent[0].body), { config: { a: 1 } }, 'the password is not repeated in the body');
+  assert.equal(sent[1].method, 'POST');
+  assert.equal(sent[1].headers.Authorization, undefined);
+  assert.deepEqual(JSON.parse(sent[1].body), { config: { a: 1 }, password: 'pw' });
+  assert.doesNotMatch(app, /method: ?(id|uuid) \? 'PATCH'/, 'no caller still sends PATCH');
+  assert.doesNotMatch(app, /`\/api\/v1\/user\/\$\{/, 'no caller builds an /api/v1/user/<id> path');
+  assert.equal(api.sentence('Not Found'), 'Not Found.');
+  assert.equal(api.sentence('Invalid password.'), 'Invalid password.');
 });
 
 test('the password only goes to a host the user could have picked', () => {

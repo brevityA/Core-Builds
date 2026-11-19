@@ -37,16 +37,15 @@ test('the manual panel pushes to an entered UUID instead of only rebuilding the 
   // worse than hiding it: it looks like it worked. A uuid with no password still
   // short-circuits, because there is nothing to push.
   assert.match(source, /if \(uuid && !isAuto && !pwd\) \{/, 'the link-only short-circuit requires the absence of a password');
-  const manual = source.match(/const userPath = uuid \?[\s\S]{0,900}/)?.[0] || '';
-  assert.ok(manual, 'the manual install path selects its route from the uuid');
-  assert.match(manual, /method: uuid \? 'PATCH' : 'POST'/, 'a uuid updates in place; no uuid creates');
-  assert.match(manual, /\|\| uuid;/, 'a PATCH response need not echo the uuid, so it falls back to the one sent');
+  const manual = source.match(/const res = await aioUserWrite\(resolvedBase, \{ uuid, [\s\S]{0,900}/)?.[0] || '';
+  assert.ok(manual, 'the manual install path hands the uuid to the write helper (uuid = update, none = create)');
+  assert.match(manual, /\|\| uuid;/, 'an update response need not echo the uuid, so it falls back to the one sent');
 });
 
 test('an entered UUID drives an update-in-place regardless of which host is selected', () => {
-  // validateUuid is format-only, and the install path picks PATCH /api/v1/user/<id>
+  // validateUuid is format-only, and the install path updates in place (PUT + Basic)
   // from the UUID alone — nothing there branches on the host being a public one.
   assert.match(source, /function validateUuid\(val\) \{\s*return \/\^\[0-9a-f\]\{8\}/);
   assert.match(source, /const existingUuid = validateUuid\(uuid\) \? uuid : null;/);
-  assert.match(source, /const path = id \? `\/api\/v1\/user\/\$\{id\}` : '\/api\/v1\/user';/);
+  assert.match(source, /const res = await aioUserWrite\(fastest, \{ uuid: id, password: pwd, config: cfg \}/);
 });

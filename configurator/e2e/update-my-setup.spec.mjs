@@ -10,7 +10,12 @@ test.describe.configure({ retries: 2 });
 const UUID = '11111111-2222-4333-8444-555555555555';
 const CORS_NOISE = /core-builds-cors-proxy|favicon|404 \(Not Found\)|Failed to load resource|blocked by CORS|\/api\/v1\/status/;
 
-async function mockHost(page, calls, { patchStatus = 200 } = {}) {
+// The mock follows AIOStreams' real write contract (2.32–2.38): POST /api/v1/user
+// creates; PUT /api/v1/user with `Authorization: Basic base64(uuid:password)`
+// updates; anything else under /api/v1/user is a 404 "Not Found", as upstream
+// answers it. The earlier mock accepted PATCH /api/v1/user/<id>, which no host
+// does, so this suite passed while every real update failed.
+async function mockHost(page, calls, { updateStatus = 200 } = {}) {
   await page.route('**/*', async route => {
     const request = route.request();
     const url = request.url();
@@ -19,16 +24,21 @@ async function mockHost(page, calls, { patchStatus = 200 } = {}) {
     }
     if (url.includes('/api/v1/user')) {
       const body = JSON.parse(request.postData() || '{}');
-      calls.push({ method: request.method(), url, body });
-      if (request.method() === 'POST') {
+      const auth = request.headers()['authorization'] || '';
+      const basic = auth.startsWith('Basic ') ? Buffer.from(auth.slice(6), 'base64').toString('utf8') : '';
+      calls.push({ method: request.method(), url, body, basic });
+      const path = new URL(url).pathname.replace(/^.*?(\/api\/v1\/user)/, '$1');
+      if (request.method() === 'POST' && path === '/api/v1/user') {
         const verdict = validateConfigOptions(body.config);
         if (!verdict.ok) return route.fulfill({ status: 400, contentType: 'application/json', body: JSON.stringify({ success: false, error: verdict.error }) });
         return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ success: true, data: { uuid: UUID, encryptedPassword: 'encrypted-password' } }) });
       }
-      if (request.method() === 'PATCH') {
-        if (patchStatus !== 200) return route.fulfill({ status: patchStatus, contentType: 'application/json', body: JSON.stringify({ success: false, error: { message: 'Invalid password' } }) });
-        return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ success: true, data: {} }) });
+      if (request.method() === 'PUT' && path === '/api/v1/user') {
+        if (!basic.startsWith(`${UUID}:`)) return route.fulfill({ status: 400, contentType: 'application/json', body: JSON.stringify({ success: false, error: { message: 'Authorization header (Basic) is required' } }) });
+        if (updateStatus !== 200) return route.fulfill({ status: updateStatus, contentType: 'application/json', body: JSON.stringify({ success: false, error: { message: 'Invalid password' } }) });
+        return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ success: true, data: { uuid: UUID, userData: body.config } }) });
       }
+      return route.fulfill({ status: 404, contentType: 'application/json', body: JSON.stringify({ success: false, error: { message: 'Not Found' } }) });
     }
     if (url.includes('core-builds-cors-proxy') && /\/api\/(visit|generate|stats)/.test(url)) {
       return route.fulfill({ status: 200, contentType: 'application/json', body: '{}' });
@@ -78,11 +88,13 @@ test('the first screen offers Update my setup and saves over the same config', a
   await expect(modal).toContainText('No changes');
   await modal.locator('#updSetupGo').click();
   await expect(modal.locator('#updSetupResult')).toContainText('Streams use it straight away');
-  const patches = calls.filter(c => c.method === 'PATCH');
-  expect(patches).toHaveLength(1);
-  expect(patches[0].url).toContain(`/api/v1/user/${UUID}`);
-  expect(patches[0].body.password).toBeTruthy();
-  expect(patches[0].body.config.services.some(s => s.id === 'torbox')).toBe(true);
+  const updates = calls.filter(c => c.method === 'PUT');
+  expect(updates).toHaveLength(1);
+  expect(new URL(updates[0].url).pathname).toMatch(/\/api\/v1\/user$/);
+  // uuid:password travels in the Basic header, not in the body or the path.
+  expect(updates[0].basic).toMatch(new RegExp(`^${UUID}:.+`));
+  expect(updates[0].body.password).toBeUndefined();
+  expect(updates[0].body.config.services.some(s => s.id === 'torbox')).toBe(true);
   expect(calls.filter(c => c.method === 'POST'), 'an update never creates a second config').toHaveLength(1);
   expect(errors).toEqual([]);
 });
@@ -106,12 +118,12 @@ test('a changed choice shows up before saving', async ({ page }) => {
 test('a refused update leaves the config alone and offers the paste method', async ({ page }) => {
   test.setTimeout(90_000);
   const calls = [];
-  await installOnce(page, calls, { patchStatus: 401 });
+  await installOnce(page, calls, { updateStatus: 401 });
   await page.locator('[data-action="update-my-setup"]').click();
   const modal = page.locator('#updateSetupModal');
   await modal.locator('#updSetupGo').click();
   await expect(modal.locator('#updSetupResult')).toContainText('Not saved.');
-  await expect(modal.locator('#updSetupResult')).toContainText('Invalid password');
+  await expect(modal.locator('#updSetupResult')).toContainText('Invalid password. Your existing config is unchanged.');
   expect(calls.filter(c => c.method === 'POST'), 'no fallback to a new config').toHaveLength(1);
   await modal.locator('[data-upd-paste]').click();
   await expect(page.locator('#updateTplModal')).toBeVisible();
