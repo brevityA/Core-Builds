@@ -111,7 +111,7 @@ export const FORMATTER_PREVIEWS = {
  "apex-v2": {
   "default": {
    "4k": {
-    "n": "🟣 4K  ⚡ TB    EXAMPLE FEATURE  Core 87",
+    "n": "🟣 4K  ⚡ TB  👁️ DV 🌟 HDR¹⁰    EXAMPLE FEATURE  Core 87",
     "d": [
      " 🚀 INSTANT  💎 ELITE  ✦ 87  🏷️ ɢʀᴏᴜᴘ  ",
      " 🎬 💎 REMUX  ʜᴇᴠᴄ  72 ᴍʙᴘꜱ  👁️ DV 🌟 🌟 HDR¹⁰  ",
@@ -129,7 +129,7 @@ export const FORMATTER_PREVIEWS = {
     ]
    },
    "uncached": {
-    "n": "🟣 4K  ⚡ TB    EXAMPLE FEATURE  Core 52",
+    "n": "🟣 4K  ⚡ TB  🌟 HDR¹⁰    EXAMPLE FEATURE  Core 52",
     "d": [
      " ⚠️ UNCACHED  ✦ 52  🏷️ ɢʀᴏᴜᴘ  ",
      " 🎬 💿 BLURAY  ʜᴇᴠᴄ  28 ᴍʙᴘꜱ  🌟 🌟 HDR¹⁰  ",
@@ -142,7 +142,7 @@ export const FORMATTER_PREVIEWS = {
  "sigma": {
   "default": {
    "4k": {
-    "n": "✦ Example Feature 「 TB 」 「 🟣 4K 」 「 REMUX 」  「 💎 ᴛʀᴜᴇʜᴅ 」 「 7.1 」 ",
+    "n": "✦ Example Feature 「 TB 」 「 🟣 4K 」 「 REMUX 」  👁️ DV 🌟 HDR¹⁰ 「 💎 ᴛʀᴜᴇʜᴅ 」 「 7.1 」 ",
     "d": [
      "『 💎 ELITE 』 『 ✦ QUALITY 』 『 🚀 INSTANT 』 『 🏷️ ɢʀᴏᴜᴘ 』 ",
      "「 🎬 💎 REMUX 」 「 ʜᴇᴠᴄ 」 「 72 ᴍʙᴘꜱ 」 「 👁️ ᴅᴠ | 🌟 ʜᴅʀ¹⁰ 」  ",
@@ -160,7 +160,7 @@ export const FORMATTER_PREVIEWS = {
     ]
    },
    "uncached": {
-    "n": "✧ Example Feature 「 TB 」 「 🟣 4K 」 「 BLURAY 」  「 🔷 ᴅᴛꜱ-ʜᴅ ᴍᴀ 」 「 5.1 」 ",
+    "n": "✧ Example Feature 「 TB 」 「 🟣 4K 」 「 BLURAY 」  🌟 HDR¹⁰ 「 🔷 ᴅᴛꜱ-ʜᴅ ᴍᴀ 」 「 5.1 」 ",
     "d": [
      "『 ✦ QUALITY 』 『 ⚠️ UNCACHED 』 『 🏷️ ɢʀᴏᴜᴘ 』 ",
      "「 🎬 💿 BLURAY 」 「 ʜᴇᴠᴄ 」 「 28 ᴍʙᴘꜱ 」 「 🌟 ʜᴅʀ¹⁰ 」  ",
@@ -176,7 +176,7 @@ export const FORMATTER_PREVIEWS = {
     "n": "🟣 4K  ⚡ TB  💎 TRUEHD  EXAMPLE FEATURE",
     "d": [
      "🚀 INSTANT  💎 ELITE  ✦ QUALITY  🏷️ ɢʀᴏᴜᴘ ",
-     "💎 REMUX  💎 TRUEHD  7.1  ",
+     "💎 REMUX  👁️ DV 🌟 HDR¹⁰  💎 TRUEHD  7.1  ",
      "62 GB  72 ᴍʙᴘꜱ  "
     ]
    },
@@ -192,7 +192,7 @@ export const FORMATTER_PREVIEWS = {
     "n": "🟣 4K  ⏳ TB  🔷 DTS-HD  EXAMPLE FEATURE",
     "d": [
      "⚠️ UNCACHED  ✦ QUALITY  🏷️ ɢʀᴏᴜᴘ ",
-     "💿 BLURAY  🔷 DTS-HD  5.1  ",
+     "💿 BLURAY  🌟 HDR¹⁰  🔷 DTS-HD  5.1  ",
      "24 GB  28 ᴍʙᴘꜱ  🌱 41  "
     ]
    }
@@ -263,7 +263,7 @@ export const FORMATTER_PREVIEWS = {
  "apex": {
   "default": {
    "4k": {
-    "n": "🟣 4K  ⚡ TB  💎 TRUEHD  EXAMPLE FEATURE",
+    "n": "🟣 4K  ⚡ TB  👁️ DV 🌟 HDR¹⁰  💎 TRUEHD  EXAMPLE FEATURE",
     "d": [
      " 🚀 INSTANT  💎 ELITE  ✦ QUALITY  🏷️ ɢʀᴏᴜᴘ  ",
      " 🎬 💎 REMUX  ʜᴇᴠᴄ  👁️ DV 🌟 🌟 HDR¹⁰  72 ᴍʙᴘꜱ  ",
@@ -281,7 +281,7 @@ export const FORMATTER_PREVIEWS = {
     ]
    },
    "uncached": {
-    "n": "🟣 4K  ⚡ TB  🔷 DTS-HD  EXAMPLE FEATURE",
+    "n": "🟣 4K  ⚡ TB  🌟 HDR¹⁰  🔷 DTS-HD  EXAMPLE FEATURE",
     "d": [
      " ⚠️ UNCACHED  ✦ QUALITY  🏷️ ɢʀᴏᴜᴘ  ",
      " 🎬 💿 BLURAY  ʜᴇᴠᴄ  🌟 🌟 HDR¹⁰  28 ᴍʙᴘꜱ  ",
@@ -294,7 +294,7 @@ export const FORMATTER_PREVIEWS = {
  "elite": {
   "default": {
    "4k": {
-    "n": "🟣 4K  ⚡ TB  EXAMPLE FEATURE",
+    "n": "🟣 4K  ⚡ TB  👁️ DV 🌟 HDR¹⁰  EXAMPLE FEATURE",
     "d": [
      " 🚀 INSTANT  💎 87  🏷️ ɢʀᴏᴜᴘ  ",
      " 🎬 💎 REMUX  ʜᴇᴠᴄ  👁️ DV 🌟 🌟 HDR¹⁰  72 ᴍʙᴘꜱ  ",
@@ -312,7 +312,7 @@ export const FORMATTER_PREVIEWS = {
     ]
    },
    "uncached": {
-    "n": "🟣 4K  ⚡ TB  EXAMPLE FEATURE",
+    "n": "🟣 4K  ⚡ TB  🌟 HDR¹⁰  EXAMPLE FEATURE",
     "d": [
      " ⚠️ UNCACHED  🏷️ ɢʀᴏᴜᴘ  ",
      " 🎬 💿 BLURAY  ʜᴇᴠᴄ  🌟 🌟 HDR¹⁰  28 ᴍʙᴘꜱ  ",
@@ -455,7 +455,7 @@ export const FORMATTER_PREVIEWS = {
  "zenith-diamond": {
   "default": {
    "4k": {
-    "n": "⚡ Iɴsᴛᴀɴᴛ • TB🔹 🟣 4K UHD • 💎 ʀᴇᴍᴜx🔹 💎 ᴛʀᴜᴇʜᴅ • 🎶 ᴀᴛᴍᴏꜱ • 🔊 7.1",
+    "n": "⚡ Iɴsᴛᴀɴᴛ • TB🔹 🟣 4K UHD • 💎 ʀᴇᴍᴜx🔹 💎 ᴛʀᴜᴇʜᴅ • 🎶 ᴀᴛᴍᴏꜱ • 🔊 7.1🔹 ☀️ Hɪᴍᴀʟᴀʏᴀ",
     "d": [
      "🗓️ ✨ Nᴇᴡ🔹 ☁️ ᴅᴇʙʀɪᴅ🔹 🧩 ꜱᴏᴜʀᴄᴇ ᴀ",
      "⚡ 72 ᴍʙᴘꜱ🔹 💾 62 ɢʙ",
@@ -473,7 +473,7 @@ export const FORMATTER_PREVIEWS = {
     ]
    },
    "uncached": {
-    "n": "⏳ Uɴᴄᴀᴄʜᴇᴅ • TB🔹 🟣 4K UHD • 💿 ʙʟᴜʀᴀʏ🔹 🔷 ᴅᴛꜱ-ʜᴅ ᴍᴀ • 🔊 5.1",
+    "n": "⏳ Uɴᴄᴀᴄʜᴇᴅ • TB🔹 🟣 4K UHD • 💿 ʙʟᴜʀᴀʏ🔹 🔷 ᴅᴛꜱ-ʜᴅ ᴍᴀ • 🔊 5.1🔹 ☀️ Hɪᴍᴀʟᴀʏᴀ",
     "d": [
      "🗓️ ✨ Nᴇᴡ🔹 ☁️ ᴅᴇʙʀɪᴅ🔹 🧩 ꜱᴏᴜʀᴄᴇ ᴄ",
      "⚡ 28 ᴍʙᴘꜱ🔹 💾 24 ɢʙ🔹 🌱 41 Sᴇᴇᴅᴇʀs",
