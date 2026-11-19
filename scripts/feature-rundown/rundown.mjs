@@ -217,9 +217,18 @@ function readJson(path) { return JSON.parse(readFileSync(path, 'utf8')); }
 const cfgOf = j => (j && typeof j === 'object' && j.config && typeof j.config === 'object') ? j.config : j;
 
 /** True when a config value switches its feature on: enabled objects, non-empty lists, set scalars. */
+// Whether a list entry survives the smart template's directives: __remove drops it,
+// and a __switch keeps it only if some branch does. Plain values and objects stay.
+function entryKept(x) {
+  if (!x || typeof x !== 'object' || Array.isArray(x)) return true;
+  if (x.__remove === true) return false;
+  if ('__switch' in x) return [...Object.values(x.cases || {}), x.default].some(b => b !== undefined && entryKept(b));
+  return true;
+}
+
 export function isActive(v) {
   if (v === null || v === undefined || v === false || v === '' ) return false;
-  if (Array.isArray(v)) return v.some(x => !(x && typeof x === 'object' && x.__remove === true));
+  if (Array.isArray(v)) return v.some(entryKept);
   if (typeof v === 'object') {
     // Smart-template directives: a __switch is on when any branch is; __remove is off;
     // an __if guard is metadata about the entry, not a value.

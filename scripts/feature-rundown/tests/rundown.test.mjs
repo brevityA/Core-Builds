@@ -75,6 +75,10 @@ test('reads smart-template directives instead of counting their selectors', () =
   assert.equal(isActive({ __switch: 'inputs.language', cases: { French: [] }, default: [] }), false);
   assert.equal(isActive({ __remove: true }), false);
   assert.equal(isActive([{ __remove: true }]), false);
+  // A list entry that is a __switch counts only if some branch keeps a value.
+  assert.equal(isActive([{ __switch: 'services', cases: { '': { __remove: true } }, default: { __remove: true } }]), false);
+  assert.equal(isActive([{ __switch: 'services', cases: { '': { __remove: true } }, default: 'x' }]), true);
+  assert.equal(isActive(['480p', { __remove: true }]), true);
   // An __if guard on a preset does not make a switched-off entry count.
   assert.equal(isActive({ __if: '!services', enabled: false }), false);
   assert.equal(isActive({ enabled: { __switch: 'services', cases: { '': true }, default: false } }), true);
