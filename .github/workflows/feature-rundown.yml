@@ -23,6 +23,7 @@ on:
       - "scripts/feature-rundown/**"
       - "configurator/UPSTREAM.pin"
       - "configurator/e2e/golden/**"
+      - "Templates/**"
       - ".github/workflows/feature-rundown.yml"
 
 concurrency:
@@ -62,7 +63,8 @@ jobs:
             ${{ runner.temp }}/FEATURE-RUNDOWN.md
             ${{ runner.temp }}/feature-rundown.json
       - name: Open, update or close the tracking issue
-        if: github.event_name != 'pull_request' && steps.rundown.outcome == 'success'
+        # main only: a manual run from another branch must not update or close main's issue.
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main' && steps.rundown.outcome == 'success'
         uses: actions/github-script@v9
         env:
           REPORT: ${{ runner.temp }}/FEATURE-RUNDOWN.md

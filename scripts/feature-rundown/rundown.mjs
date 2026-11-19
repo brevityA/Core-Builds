@@ -37,7 +37,7 @@ export const UPSTREAM_FILES = {
 };
 
 // Entries about Live TV, watch parties and playback sessions, whatever their scope.
-const NON_STREAM_WORDS = /\b(live tv|live catalog|live session|live playback|channel|programme|guide|catch-up|archive part|watch[- ]state|watch row|party|syncplay|playlist|jellyfin|poster|robots|memory cache|session|app reports?|reports from the apps|avatar|relay|remote command|custom css|offsets?\b|sign-ins|shared record|for reports)/i;
+const NON_STREAM_WORDS = /\b(live tv|live catalog|live session|live playback|(?<!audio )channels?\b|programme|guide|catch-up|archive part|watch[- ]state|watch row|party|syncplay|playlist|jellyfin|poster|robots|memory cache|session|app reports?|reports from the apps|avatar|relay|remote command|custom css|offsets?\b|sign-ins|shared record|for reports)/i;
 
 // Changelog scopes that never change which streams a config finds or how it ranks them.
 const NON_STREAM_SCOPES = new Set([
@@ -286,13 +286,16 @@ export function collectUsage(root = REPO_ROOT) {
 
 export function loadDecisions(path = join(HERE, 'decisions.json')) {
   const d = readJson(path);
-  const patterns = (d.patterns || []).map(p => ({ ...p, re: new RegExp(p.match) }));
+  // Shared reasons name their keys: nothing is decided by a pattern, so a new
+  // upstream option always arrives as "no decision".
+  const grouped = new Map();
+  for (const g of d.groups || []) for (const k of g.keys || []) grouped.set(k, { status: g.status, why: g.why });
   return {
     raw: d,
     lookup(key) {
       if (d.options?.[key]) return { ...d.options[key], source: 'option' };
-      const p = patterns.find(x => x.re.test(key));
-      return p ? { status: p.status, why: p.why, source: `pattern ${p.match}` } : null;
+      if (grouped.has(key)) return { ...grouped.get(key), source: 'group' };
+      return null;
     },
   };
 }
@@ -316,7 +319,9 @@ export function buildRundown({ pin, latest, pinSrc, latestSrc, changelog, usage,
     }
     const templates = usage.templates.filter(t => isActive(t.cfg?.[key])).length;
     const smart = usage.smart ? (key in usage.smart) : false;
-    const usedAnywhere = Object.values(byProfile).some(x => x.active > 0) || templates > 0;
+    // Present in the smart template is what the Smart column shows; switched on there counts as use.
+    const smartActive = usage.smart ? isActive(usage.smart[key]) : false;
+    const usedAnywhere = Object.values(byProfile).some(x => x.active > 0) || templates > 0 || smartActive;
     const decision = decisions.lookup(key);
     const meta = latestOpts[key] || pinOpts[key];
     const flags = [];
@@ -359,7 +364,8 @@ export function buildRundown({ pin, latest, pinSrc, latestSrc, changelog, usage,
 }
 
 const tick = ({ active, total }) => (total ? (active === total ? '✓' : active ? `${active}/${total}` : '·') : '–');
-const cell = s => String(s || '').replace(/\|/g, '\\|').replace(/\s+/g, ' ').trim();
+// Backslashes first, so a `\|` in upstream text cannot end a table cell early.
+const cell = s => String(s || '').replace(/\\/g, '\\\\').replace(/\|/g, '\\|').replace(/\s+/g, ' ').trim();
 
 export function renderMarkdown(r, { generatedAt = new Date().toISOString().slice(0, 10) } = {}) {
   const L = [];

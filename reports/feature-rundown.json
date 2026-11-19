@@ -46,7 +46,7 @@
       "decision": {
         "status": "not-applicable",
         "why": "Account, identity or server-set field; a template must never carry it.",
-        "source": "pattern ^(uuid|encryptedPassword|accessKey|ip|trusted|linkedAccounts|parentConfig|manifestNotice)$"
+        "source": "group"
       },
       "flags": []
     },
@@ -83,7 +83,7 @@
       "decision": {
         "status": "not-applicable",
         "why": "Account, identity or server-set field; a template must never carry it.",
-        "source": "pattern ^(uuid|encryptedPassword|accessKey|ip|trusted|linkedAccounts|parentConfig|manifestNotice)$"
+        "source": "group"
       },
       "flags": []
     },
@@ -182,7 +182,7 @@
       "decision": {
         "status": "not-applicable",
         "why": "Request-scoped, never persisted (AIOStreams fills it per request).",
-        "source": "pattern ^(activeVariants|autoVariants|healthResults)$"
+        "source": "group"
       },
       "flags": []
     },
@@ -215,7 +215,7 @@
       "decision": {
         "status": "not-applicable",
         "why": "Request-scoped, never persisted (AIOStreams fills it per request).",
-        "source": "pattern ^(activeVariants|autoVariants|healthResults)$"
+        "source": "group"
       },
       "flags": []
     },
@@ -248,7 +248,7 @@
       "decision": {
         "status": "not-applicable",
         "why": "Request-scoped, never persisted (AIOStreams fills it per request).",
-        "source": "pattern ^(activeVariants|autoVariants|healthResults)$"
+        "source": "group"
       },
       "flags": []
     },
@@ -314,7 +314,7 @@
       "decision": {
         "status": "not-applicable",
         "why": "Account, identity or server-set field; a template must never carry it.",
-        "source": "pattern ^(uuid|encryptedPassword|accessKey|ip|trusted|linkedAccounts|parentConfig|manifestNotice)$"
+        "source": "group"
       },
       "flags": []
     },
@@ -413,7 +413,7 @@
       "decision": {
         "status": "not-applicable",
         "why": "Account, identity or server-set field; a template must never carry it.",
-        "source": "pattern ^(uuid|encryptedPassword|accessKey|ip|trusted|linkedAccounts|parentConfig|manifestNotice)$"
+        "source": "group"
       },
       "flags": []
     },
@@ -448,7 +448,7 @@
       "decision": {
         "status": "not-applicable",
         "why": "Account, identity or server-set field; a template must never carry it.",
-        "source": "pattern ^(uuid|encryptedPassword|accessKey|ip|trusted|linkedAccounts|parentConfig|manifestNotice)$"
+        "source": "group"
       },
       "flags": []
     },
@@ -481,7 +481,7 @@
       "decision": {
         "status": "not-applicable",
         "why": "Account, identity or server-set field; a template must never carry it.",
-        "source": "pattern ^(uuid|encryptedPassword|accessKey|ip|trusted|linkedAccounts|parentConfig|manifestNotice)$"
+        "source": "group"
       },
       "flags": []
     },
@@ -514,7 +514,7 @@
       "decision": {
         "status": "not-applicable",
         "why": "Account, identity or server-set field; a template must never carry it.",
-        "source": "pattern ^(uuid|encryptedPassword|accessKey|ip|trusted|linkedAccounts|parentConfig|manifestNotice)$"
+        "source": "group"
       },
       "flags": []
     },
@@ -613,7 +613,7 @@
       "decision": {
         "status": "not-applicable",
         "why": "Branding image; the Core Builds logo is enough.",
-        "source": "pattern ^(addonBackground)$"
+        "source": "group"
       },
       "flags": []
     },
@@ -3743,7 +3743,7 @@
       "decision": {
         "status": "not-applicable",
         "why": "A personal credential or poster-service setting; never written into a template.",
-        "source": "pattern (ApiKey|AccessToken|ProfileId)$|^openposterdb|^topPoster|^aioratings"
+        "source": "group"
       },
       "flags": []
     },
@@ -3776,7 +3776,7 @@
       "decision": {
         "status": "not-applicable",
         "why": "A personal credential or poster-service setting; never written into a template.",
-        "source": "pattern (ApiKey|AccessToken|ProfileId)$|^openposterdb|^topPoster|^aioratings"
+        "source": "group"
       },
       "flags": []
     },
@@ -3809,7 +3809,7 @@
       "decision": {
         "status": "not-applicable",
         "why": "A personal credential or poster-service setting; never written into a template.",
-        "source": "pattern (ApiKey|AccessToken|ProfileId)$|^openposterdb|^topPoster|^aioratings"
+        "source": "group"
       },
       "flags": []
     },
@@ -3842,7 +3842,7 @@
       "decision": {
         "status": "not-applicable",
         "why": "A personal credential or poster-service setting; never written into a template.",
-        "source": "pattern (ApiKey|AccessToken|ProfileId)$|^openposterdb|^topPoster|^aioratings"
+        "source": "group"
       },
       "flags": []
     },
@@ -3875,7 +3875,7 @@
       "decision": {
         "status": "not-applicable",
         "why": "A personal credential or poster-service setting; never written into a template.",
-        "source": "pattern (ApiKey|AccessToken|ProfileId)$|^openposterdb|^topPoster|^aioratings"
+        "source": "group"
       },
       "flags": []
     },
@@ -3908,7 +3908,7 @@
       "decision": {
         "status": "not-applicable",
         "why": "A personal credential or poster-service setting; never written into a template.",
-        "source": "pattern (ApiKey|AccessToken|ProfileId)$|^openposterdb|^topPoster|^aioratings"
+        "source": "group"
       },
       "flags": []
     },
@@ -4405,7 +4405,7 @@
       "decision": {
         "status": "not-applicable",
         "why": "A personal credential or poster-service setting; never written into a template.",
-        "source": "pattern (ApiKey|AccessToken|ProfileId)$|^openposterdb|^topPoster|^aioratings"
+        "source": "group"
       },
       "flags": []
     },
@@ -4438,7 +4438,7 @@
       "decision": {
         "status": "not-applicable",
         "why": "A personal credential or poster-service setting; never written into a template.",
-        "source": "pattern (ApiKey|AccessToken|ProfileId)$|^openposterdb|^topPoster|^aioratings"
+        "source": "group"
       },
       "flags": []
     },
@@ -5124,7 +5124,7 @@
       "decision": {
         "status": "not-applicable",
         "why": "Catalog layout; outside what a stream template should change.",
-        "source": "pattern ^(newCatalogsDisabled|upstreamCatalogOrder|catalogModifications|mergedCatalogs)$"
+        "source": "group"
       },
       "flags": []
     },
@@ -5157,7 +5157,7 @@
       "decision": {
         "status": "not-applicable",
         "why": "Catalog layout; outside what a stream template should change.",
-        "source": "pattern ^(newCatalogsDisabled|upstreamCatalogOrder|catalogModifications|mergedCatalogs)$"
+        "source": "group"
       },
       "flags": []
     },
@@ -5444,7 +5444,7 @@
       "decision": {
         "status": "not-applicable",
         "why": "AIOStreams' Jellyfin server mode; not a Stremio stream setting.",
-        "source": "pattern ^jellyfin$"
+        "source": "group"
       },
       "flags": []
     },

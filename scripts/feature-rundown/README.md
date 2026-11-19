@@ -26,11 +26,11 @@ The report's **Needs attention** table lists:
 | `decision says off-by-design / not-applicable, but configs set it` | A generator or template started using it: confirm and change the status. |
 | `removed upstream by …` | The newest release dropped it. Plan the removal before bumping the pin. |
 
-Statuses: `used`, `candidate` (worth evaluating — say what it would gain), `off-by-design` (deliberately off — say why), `not-applicable` (identity, credentials, UI or server settings a template must not carry). An exact entry under `options` wins over a `patterns` rule.
+Statuses: `used`, `candidate` (worth evaluating — say what it would gain), `off-by-design` (deliberately off — say why), `not-applicable` (identity, credentials, UI or server settings a template must not carry). A reason shared by several options goes under `groups` with an explicit `keys` list. There are no patterns: an option is decided only when it is named, so nothing upstream adds can be decided by accident.
 
 ## Automation
 
-`.github/workflows/feature-rundown.yml` runs every Monday, on demand, and when the pin, goldens, templates or this tool change. On `main` and on schedule it opens or updates one issue labelled `feature-rundown` when an option needs a decision or upstream is ahead of the pin, and closes it once neither is true. On pull requests it only tests and posts the report to the run summary.
+`.github/workflows/feature-rundown.yml` runs every Monday, on demand, and when the pin, goldens, templates or this tool change. On `main` (schedule, manual runs and pushes) it opens or updates one issue labelled `feature-rundown` when an option needs a decision or upstream is ahead of the pin, and closes it once neither is true. On pull requests it only tests and posts the report to the run summary.
 
 ## How usage is counted
 

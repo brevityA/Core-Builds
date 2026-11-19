@@ -74,11 +74,12 @@ test('keeps only stream-related changelog entries newer than the pin', () => {
     '* **presets/meteor:** skip "no results" placeholder stream ([abc1234](x))',
     '* **web:** add a mini player ([abc1234](x))',
     '* **core:** build Live TV channels and programmes from live catalogs ([abc1234](x))',
+    '* **sorter:** sort by audio channels ([abc1234](x))',
     '## [2.36.0](x) (2026-10-12)', '### Features', '* **core:** older entry',
   ].join('\n');
   const s = changelogSince(md, '2.36.0');
   assert.equal(s.length, 1);
-  assert.deepEqual(s[0].entries.map(e => e.text), ['skip "no results" placeholder stream']);
+  assert.deepEqual(s[0].entries.map(e => e.text), ['skip "no results" placeholder stream', 'sort by audio channels'], 'audio channels stay; Live TV channels go');
   assert.ok(compareVersions('v2.38.1', '2.36.0') > 0 && compareVersions('2.36.0', '2.36.0') === 0);
 });
 
@@ -112,8 +113,22 @@ test('flags options with no decision, contradicted decisions and upstream additi
   assert.deepEqual(r.presets.added, ['cinemeta']);
   assert.deepEqual(r.options.find(o => o.key === 'excludedResolutions').byProfile.stable, { active: 1, total: 1 });
   const md = renderMarkdown(r, { generatedAt: '2026-01-01' });
+  const row = renderMarkdown({ ...r, options: [{ ...r.options[0], flags: ['no decision'], doc: String.raw`a \| b` }], attention: [r.options[0].key] }).split('\n').find(l => l.includes('a \\'));
+  assert.ok(row.includes(String.raw`a \\\| b`), `a backslash before a pipe is escaped too, so the cell cannot end early: ${row}`);
   assert.match(md, /\*\*Presets added:\*\* `cinemeta`/);
   assert.match(md, /\| `excludeSeederRange` \| no decision; new upstream after 2\.36\.0 \|/);
+});
+
+test('a setting switched on in the smart template counts against an off-by-design decision', () => {
+  const r = buildRundown({
+    pin: '2.36.0', latest: '2.36.0',
+    pinSrc: { schemas: SCHEMA, presetManager: PRESETS_PIN, streamExpression: SEL }, latestSrc: null, changelog: [],
+    usage: { goldens: [], templates: [], smart: { serviceWrap: { enabled: true }, cacheAndPlay: { enabled: false } } },
+    decisions: { lookup: k => ({ serviceWrap: { status: 'off-by-design', why: 'x' }, cacheAndPlay: { status: 'off-by-design', why: 'x' } })[k] || { status: 'not-applicable', why: 'x' } },
+  });
+  const flags = Object.fromEntries(r.options.map(o => [o.key, o.flags]));
+  assert.match(flags.serviceWrap.join(), /off-by-design, but configs set it/);
+  assert.deepEqual(flags.cacheAndPlay, [], 'present but switched off is not use');
 });
 
 test('decisions.json is valid and uses only known statuses', () => {
@@ -122,9 +137,10 @@ test('decisions.json is valid and uses only known statuses', () => {
     assert.ok(STATUSES.includes(v.status), `${key}: unknown status ${v.status}`);
     assert.ok(v.why && v.why.length > 10, `${key}: give a reason`);
   }
-  for (const p of d.raw.patterns) assert.doesNotThrow(() => new RegExp(p.match), p.match);
-  assert.equal(d.lookup('tmdbApiKey').status, 'used', 'an exact entry wins over a pattern');
-  assert.equal(d.lookup('openposterdbUrl').status, 'not-applicable');
+  assert.equal(d.raw.patterns, undefined, 'no patterns: every decided key is named');
+  for (const g of d.raw.groups) assert.ok(Array.isArray(g.keys) && g.keys.length && STATUSES.includes(g.status));
+  assert.equal(d.lookup('openposterdbUrl').status, 'not-applicable', 'group keys resolve');
+  assert.equal(d.lookup('streamApiKey'), null, 'an unseen option is never decided by a look-alike name');
 });
 
 test('reads this repo: goldens carry a profile, templates and the smart template load', () => {

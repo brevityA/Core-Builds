@@ -1,5 +1,5 @@
 {
-  "_readme": "Why Core Builds uses each AIOStreams config option, or why not. The rundown (rundown.mjs) lists every option upstream accepts and flags any with no entry here, any entry whose status contradicts what the generated configs do, and options upstream removed. Statuses: used | candidate (worth evaluating; say what for) | off-by-design (deliberately left off; say why) | not-applicable (identity, credentials, UI or server settings a template must not carry). An exact entry under `options` wins over a pattern.",
+  "_readme": "Why Core Builds uses each AIOStreams config option, or why not. The rundown (rundown.mjs) lists every option upstream accepts and flags any with no entry here, any entry whose status contradicts what the generated configs do, and options upstream removed. Statuses: used | candidate (worth evaluating; say what for) | off-by-design (deliberately left off; say why) | not-applicable (identity, credentials, UI or server settings a template must not carry). Shared reasons go under `groups`, each with an explicit `keys` list: a key is decided only when it is named, so an option upstream adds always arrives as `no decision`, never caught by a pattern.",
   "options": {
     "showChanges": {
       "status": "used",
@@ -566,34 +566,62 @@
       "why": "Poster service setting added in 2.38.0 (custom poster URL); posters are the user's choice, not part of a stream template."
     }
   },
-  "patterns": [
+  "groups": [
     {
-      "match": "^(uuid|encryptedPassword|accessKey|ip|trusted|linkedAccounts|parentConfig|manifestNotice)$",
+      "keys": [
+        "uuid",
+        "parentConfig",
+        "encryptedPassword",
+        "manifestNotice",
+        "linkedAccounts",
+        "accessKey",
+        "ip"
+      ],
       "status": "not-applicable",
       "why": "Account, identity or server-set field; a template must never carry it."
     },
     {
-      "match": "^(activeVariants|autoVariants|healthResults)$",
+      "keys": [
+        "activeVariants",
+        "autoVariants",
+        "healthResults"
+      ],
       "status": "not-applicable",
       "why": "Request-scoped, never persisted (AIOStreams fills it per request)."
     },
     {
-      "match": "(ApiKey|AccessToken|ProfileId)$|^openposterdb|^topPoster|^aioratings",
+      "keys": [
+        "topPosterApiKey",
+        "aioratingsApiKey",
+        "aioratingsProfileId",
+        "openposterdbApiKey",
+        "openposterdbUrl",
+        "openposterdbParameters",
+        "tvdbApiKey",
+        "pmdbApiKey"
+      ],
       "status": "not-applicable",
       "why": "A personal credential or poster-service setting; never written into a template."
     },
     {
-      "match": "^(addonBackground)$",
+      "keys": [
+        "addonBackground"
+      ],
       "status": "not-applicable",
       "why": "Branding image; the Core Builds logo is enough."
     },
     {
-      "match": "^(newCatalogsDisabled|upstreamCatalogOrder|catalogModifications|mergedCatalogs)$",
+      "keys": [
+        "newCatalogsDisabled",
+        "upstreamCatalogOrder"
+      ],
       "status": "not-applicable",
       "why": "Catalog layout; outside what a stream template should change."
     },
     {
-      "match": "^jellyfin$",
+      "keys": [
+        "jellyfin"
+      ],
       "status": "not-applicable",
       "why": "AIOStreams' Jellyfin server mode; not a Stremio stream setting."
     }
