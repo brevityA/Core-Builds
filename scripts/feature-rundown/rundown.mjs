@@ -37,7 +37,7 @@ export const UPSTREAM_FILES = {
 };
 
 // Entries about Live TV, watch parties and playback sessions, whatever their scope.
-const NON_STREAM_WORDS = /\b(live tv|live catalog|live session|live playback|(?<!audio )channels?\b|programme|guide|catch-up|archive part|watch[- ]state|watch row|party|syncplay|playlist|jellyfin|poster|robots|memory cache|session|app reports?|reports from the apps|avatar|relay|remote command|custom css|offsets?\b|sign-ins|shared record|for reports)/i;
+const NON_STREAM_WORDS = /\b(live tv|live catalog|live session|live playback|(?<!audio[ -])channels?\b|programme|guide|catch-up|archive part|watch[- ]state|watch row|party|syncplay|playlist|jellyfin|poster|robots|memory cache|session|app reports?|reports from the apps|avatar|relay|remote command|custom css|offsets?\b|sign-ins|shared record|for reports)/i;
 
 // Changelog scopes that never change which streams a config finds or how it ranks them.
 const NON_STREAM_SCOPES = new Set([

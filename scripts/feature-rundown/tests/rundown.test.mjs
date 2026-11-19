@@ -75,11 +75,12 @@ test('keeps only stream-related changelog entries newer than the pin', () => {
     '* **web:** add a mini player ([abc1234](x))',
     '* **core:** build Live TV channels and programmes from live catalogs ([abc1234](x))',
     '* **sorter:** sort by audio channels ([abc1234](x))',
+    '* **core:** fix audio-channel sorting ([abc1234](x))',
     '## [2.36.0](x) (2026-10-12)', '### Features', '* **core:** older entry',
   ].join('\n');
   const s = changelogSince(md, '2.36.0');
   assert.equal(s.length, 1);
-  assert.deepEqual(s[0].entries.map(e => e.text), ['skip "no results" placeholder stream', 'sort by audio channels'], 'audio channels stay; Live TV channels go');
+  assert.deepEqual(s[0].entries.map(e => e.text), ['skip "no results" placeholder stream', 'sort by audio channels', 'fix audio-channel sorting'], 'audio channels stay; Live TV channels go');
   assert.ok(compareVersions('v2.38.1', '2.36.0') > 0 && compareVersions('2.36.0', '2.36.0') === 0);
 });
 
