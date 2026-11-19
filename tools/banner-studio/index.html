@@ -1140,7 +1140,7 @@ if(hashErr)setStatus('⚠ '+hashErr);
 else if(fromHash)setStatus('Design loaded from share link');
 // A first visit gets the tour, not a changelog on top of it; the changelog is
 // for people who have used an earlier version.
-if(!localStorage.getItem('bannerStudio.tour')&&!fromHash){try{localStorage.setItem('bannerStudio.seenVer',APP_VERSION)}catch(e){}setTimeout(openTour,900)}
+if(!localStorage.getItem('bannerStudio.tour')&&!localStorage.getItem('bannerStudio.seenVer')&&!fromHash){try{localStorage.setItem('bannerStudio.seenVer',APP_VERSION)}catch(e){}setTimeout(openTour,900)}
 else if(localStorage.getItem('bannerStudio.seenVer')!==APP_VERSION){modal("What's new in v"+APP_VERSION,CHANGELOG,[['Got it',c=>c()]]);try{localStorage.setItem('bannerStudio.seenVer',APP_VERSION)}catch(e){}}
 addEventListener('keydown',e=>{if(e.target&&/input|select|textarea/i.test(e.target.tagName))return;
   if(e.key==='?'&&!openModal){e.preventDefault();openTour()}

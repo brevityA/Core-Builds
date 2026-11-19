@@ -1497,9 +1497,13 @@ function fmtCompareHtml() {
   </section>`;
 }
 
-function refreshFmtCompare(focusSelector) {
-  document.querySelectorAll('.fmt-compare-wrap').forEach(wrap => { wrap.innerHTML = fmtCompareHtml(); });
-  if (focusSelector) document.querySelector(`.fmt-compare-wrap ${focusSelector}`)?.focus({ preventScroll: true });
+// Focus goes back inside the picker that received the action: Review and
+// Fine-Tune can both hold one, and Fine-Tune is a modal.
+function refreshFmtCompare(focusSelector, origin) {
+  const wraps = [...document.querySelectorAll('.fmt-compare-wrap')];
+  const at = origin ? wraps.indexOf(origin.closest('.fmt-compare-wrap')) : -1;
+  wraps.forEach(wrap => { wrap.innerHTML = fmtCompareHtml(); });
+  if (focusSelector) (wraps[at] || wraps[0])?.querySelector(focusSelector)?.focus({ preventScroll: true });
 }
 
 function fmtDropdownHtml() {
@@ -2191,7 +2195,8 @@ function openAdvancedDrawer(trigger) {
   document.body.classList.add('advanced-drawer-open');
   overlay.addEventListener('click', event => { if (event.target === overlay) closeAdvancedDrawer(); });
   overlay.addEventListener('keydown', event => {
-    if (event.key === 'Escape') { event.preventDefault(); closeAdvancedDrawer(); return; }
+    // Stopped here so the wizard's own Escape (Back) does not also run.
+    if (event.key === 'Escape') { event.preventDefault(); event.stopPropagation(); closeAdvancedDrawer(); return; }
     if (event.key !== 'Tab') return;
     const focusable = overlay.querySelectorAll('button:not(:disabled),a[href],input:not(:disabled),select:not(:disabled),summary,[tabindex]:not([tabindex="-1"])');
     if (!focusable.length) return;
@@ -3356,7 +3361,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (e.target.matches('[data-action="fmt-compare-slot"]')) {
       compareSlots();
       _fmtCompare.slots[Number(e.target.dataset.slot)] = e.target.value;
-      refreshFmtCompare(`#fmtCmpPick${e.target.dataset.slot}`);
+      refreshFmtCompare(`#fmtCmpPick${e.target.dataset.slot}`, e.target);
       return;
     }
     if (e.target.matches('[data-action="fmt-dropdown-change"]')) {
@@ -3449,12 +3454,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (action === 'fmt-compare-toggle') {
       _fmtCompare.open = !_fmtCompare.open;
-      refreshFmtCompare(_fmtCompare.open ? '.fmt-compare-close' : '.fmt-compare-open');
+      refreshFmtCompare(_fmtCompare.open ? '.fmt-compare-close' : '.fmt-compare-open', el);
       return;
     }
     if (action === 'fmt-compare-sample' || action === 'fmt-compare-device') {
       _fmtCompare[action === 'fmt-compare-sample' ? 'sample' : 'device'] = el.dataset.val;
-      refreshFmtCompare(`[data-action="${action}"][data-val="${el.dataset.val}"]`);
+      refreshFmtCompare(`[data-action="${action}"][data-val="${el.dataset.val}"]`, el);
       return;
     }
     if (action === 'fmt-compare-use') {
@@ -3463,7 +3468,7 @@ document.addEventListener('DOMContentLoaded', () => {
       saveState();
       updateFmtFeatured();
       updateFmtReceiptRow();
-      refreshFmtCompare(`[data-action="fmt-compare-use"][data-fmt="${el.dataset.fmt}"]`);
+      refreshFmtCompare(`[data-action="fmt-compare-use"][data-fmt="${el.dataset.fmt}"]`, el);
       showToast(`Stream cards: ${fmtLabelText()}`);
       return;
     }
@@ -3482,6 +3487,7 @@ document.addEventListener('DOMContentLoaded', () => {
       saveState();
       updateFmtFeatured();
       updateFmtReceiptRow();
+      if (_fmtCompare.open) refreshFmtCompare(); // its "In use" button follows the pick
       return;
     }
 
@@ -7601,7 +7607,10 @@ function handleDeepLink(hash) {
     setTimeout(() => runDeepAction(DEEP_ACTIONS[hash]), 250); return;
   }
   if (hash === '#backup') { step = STEPS; pushStep(); render(); window.scrollTo(0, 0); return; } // backup timeline lives on the final/Done screen
-  if (hash === '#changelog') { setTimeout(showChangelog, 250); return; } // tools page "Full Configurator changelog" link
+  if (hash === '#changelog') { // the menu's What's new, and the tools page changelog link
+    try { history.replaceState(history.state, '', location.pathname + location.search); } catch (e) { /* still opens */ }
+    setTimeout(showChangelog, 250); return;
+  } // tools page "Full Configurator changelog" link
 }
 
 function showTroubleshooter() {
