@@ -136,3 +136,23 @@ test('npm run dev listens on localhost only', () => {
   const pkg = JSON.parse(readFileSync(join(ROOT, 'configurator', 'package.json'), 'utf8'));
   assert.match(pkg.scripts.dev, /--bind 127\.0\.0\.1/);
 });
+
+test('the drawer takes the page\'s own ground, and the floating button leaves room at the end', () => {
+  assert.doesNotMatch(nav, /prefers-color-scheme:light\)\{:root:not/, 'no longer keyed to the system theme alone');
+  assert.match(nav, /:root\.cbn-light-page \.cbn-drawer\{/);
+  assert.match(nav, /function open\(\) \{\n    lastFocus = document\.activeElement;\n    syncTheme\(\);/);
+  assert.match(nav, /html\.cbn-floats body::after\{content:"";display:block;height:/);
+});
+
+test('pages with the Genie-family header, Inspector and Account Tools load the shared shell', () => {
+  const shell = readFileSync(join(ROOT, 'tools', 'core-shell.css'), 'utf8');
+  assert.match(shell, /\.hdr \.pill\{order:9/);
+  for (const page of TOOL_PAGES) {
+    const html = readFileSync(join(ROOT, page), 'utf8');
+    const needs = /class="hdr"|class="cb-title"/.test(html);
+    const m = html.match(/<link rel="stylesheet" href="([^"]*core-shell\.css)">/);
+    if (!needs) continue;
+    assert.ok(m, `${page} uses shared classes without core-shell.css`);
+    assert.equal(relative(ROOT, resolve(ROOT, dirname(page), m[1])), join('tools', 'core-shell.css'));
+  }
+});

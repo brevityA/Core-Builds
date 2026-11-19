@@ -183,9 +183,10 @@ body{
 .tool-card .tool-desc{grid-column:2;margin:0;font-size:.76rem;line-height:1.45;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .tool-card .tool-foot{grid-column:2;margin:4px 0 0;padding:0;border:0;justify-content:flex-start}
 .tool-card .tool-foot .badge{font-size:.6rem}
-.tool-card.tool-primary{background:linear-gradient(100deg,#22d3ee,#4facfe);border-color:transparent;color:#03151b;box-shadow:0 12px 30px rgba(34,211,238,.18)}
-.tool-card.tool-primary .tool-name,.tool-card.tool-primary .tool-desc{color:#03151b}.tool-card.tool-primary .tool-icon{background:rgba(255,255,255,.22);color:#03151b}.tool-card.tool-primary .tool-foot{display:none}
-[data-theme="light"] .tool-card.tool-primary{background:linear-gradient(100deg,#0891b2,#2563eb)}[data-theme="light"] .tool-card.tool-primary :is(.tool-name,.tool-desc,.tool-icon){color:#fff}
+/* Same treatment as the main page's Core Builds row: the card ground, a gradient edge and a soft glow. */
+.tool-card.tool-primary{background:linear-gradient(var(--th-card),var(--th-card)) padding-box,linear-gradient(100deg,#22d3ee,#4facfe) border-box;border:1px solid transparent;box-shadow:0 0 28px rgba(34,211,238,.14)}
+.tool-card.tool-primary .tool-icon{background:linear-gradient(135deg,#22d3ee,#4facfe);color:#03151b}.tool-card.tool-primary .tool-foot{display:none}
+[data-theme="light"] .tool-card.tool-primary{background:linear-gradient(#fff,#fff) padding-box,linear-gradient(100deg,#0891b2,#2563eb) border-box;box-shadow:0 0 24px rgba(8,145,178,.12)}
 .fold{margin-top:14px}.fold>summary{cursor:pointer;list-style:none;display:flex;align-items:center;font-weight:700;font-size:.85rem}.fold>summary::-webkit-details-marker{display:none}
 .fold>summary::after{content:'＋';margin-left:auto;color:var(--th-accent)}.fold[open]>summary::after{content:'－'}.fold[open]>summary{margin-bottom:10px}
 @media(max-width:640px){.tool-grid.g2,.tool-grid.g3{grid-template-columns:1fr}.hdr-icon{width:72px;height:72px}}

@@ -92,8 +92,8 @@ html.cbn-hide .cbn-btn{display:none}
 .cbn-drawer a[aria-current="page"]{background:rgba(31,200,232,.1);color:#fff;box-shadow:inset 0 0 0 1px rgba(31,200,232,.3)}
 .cbn-drawer a svg{flex:0 0 auto;width:18px;height:18px;color:#7f8b98}.cbn-drawer a:hover svg,.cbn-drawer a[aria-current="page"] svg{color:#1fc8e8}
 .cbn-drawer a .cbn-ext{margin-left:auto;font-size:12px;color:#5d6773}
-@media (prefers-color-scheme:light){:root:not([data-theme="dark"]) .cbn-drawer{background:#fbfcfd;color:#1c2128;border-color:#d8dee4}:root:not([data-theme="dark"]) .cbn-drawer a{color:#3a434d}:root:not([data-theme="dark"]) .cbn-drawer a:hover{background:#eef2f6;color:#0d1117}:root:not([data-theme="dark"]) .cbn-head,:root:not([data-theme="dark"]) .cbn-close{border-color:#d8dee4}:root:not([data-theme="dark"]) .cbn-label,:root:not([data-theme="dark"]) .cbn-head .cbn-mark{color:#0a7ea4}:root:not([data-theme="dark"]) .cbn-drawer a[aria-current="page"]{background:rgba(10,126,164,.08);color:#0d1117;box-shadow:inset 0 0 0 1px rgba(10,126,164,.3)}}
-:root[data-theme="light"] .cbn-drawer{background:#fbfcfd;color:#1c2128;border-color:#d8dee4}:root[data-theme="light"] .cbn-drawer a{color:#3a434d}:root[data-theme="light"] .cbn-drawer a:hover{background:#eef2f6;color:#0d1117}:root[data-theme="light"] .cbn-head,:root[data-theme="light"] .cbn-close{border-color:#d8dee4}:root[data-theme="light"] .cbn-label,:root[data-theme="light"] .cbn-head .cbn-mark{color:#0a7ea4}:root[data-theme="light"] .cbn-drawer a[aria-current="page"]{background:rgba(10,126,164,.08);color:#0d1117;box-shadow:inset 0 0 0 1px rgba(10,126,164,.3)}
+:root.cbn-light-page .cbn-drawer{background:#fbfcfd;color:#1c2128;border-color:#d8dee4}:root.cbn-light-page .cbn-drawer a{color:#3a434d}:root.cbn-light-page .cbn-drawer a:hover{background:#eef2f6;color:#0d1117}:root.cbn-light-page .cbn-head,:root.cbn-light-page .cbn-close{border-color:#d8dee4}:root.cbn-light-page .cbn-label,:root.cbn-light-page .cbn-head .cbn-mark{color:#0a7ea4}:root.cbn-light-page .cbn-drawer a[aria-current="page"]{background:rgba(10,126,164,.08);color:#0d1117;box-shadow:inset 0 0 0 1px rgba(10,126,164,.3)}
+html.cbn-floats body::after{content:"";display:block;height:calc(80px + env(safe-area-inset-bottom))}
 @media print{.cbn-btn,.cbn-scrim,.cbn-drawer{display:none!important}}
 @media (prefers-reduced-motion:reduce){.cbn-drawer,.cbn-scrim{transition:none}}
 `;
@@ -154,10 +154,26 @@ function mountCoreNav({ root, hideOn, anchor, markCurrent = true } = {}) {
   else document.body.append(btn);
   document.body.append(scrim, drawer);
 
+  if (!anchor) document.documentElement.classList.add('cbn-floats');
+
+  // The drawer takes the page's own ground, light or dark, measured when it
+  // opens: several tool pages are dark whatever the system theme says.
+  function syncTheme() {
+    let light = window.matchMedia?.('(prefers-color-scheme: light)').matches;
+    for (const el of [document.body, document.documentElement]) {
+      const m = getComputedStyle(el).backgroundColor.match(/[\d.]+/g);
+      if (!m || (m.length > 3 && +m[3] === 0)) continue;
+      light = (0.2126 * m[0] + 0.7152 * m[1] + 0.0722 * m[2]) / 255 > 0.5;
+      break;
+    }
+    document.documentElement.classList.toggle('cbn-light-page', !!light);
+  }
+
   let lastFocus = null;
   const isOpen = () => document.documentElement.classList.contains('cbn-open');
   function open() {
     lastFocus = document.activeElement;
+    syncTheme();
     scrim.hidden = false;
     drawer.hidden = false;
     requestAnimationFrame(() => document.documentElement.classList.add('cbn-open'));

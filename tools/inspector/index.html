@@ -55,10 +55,12 @@
   @keyframes spin{to{transform:rotate(360deg)}}
 </style>
 <style>/* Core Builds page transitions: cross-fade between same-site pages. */@media(prefers-reduced-motion:no-preference){@view-transition{navigation:auto}}</style>
+<link rel="stylesheet" href="../core-shell.css">
 </head>
 <body>
 <div class="container">
-  <h1>🔍 Template Inspector</h1>
+  <p class="cb-kicker">Core Builds · JSON check</p>
+  <h1 class="cb-title">Template Inspector</h1>
   <p class="sub">Paste any AIOStreams JSON config — get plain-English findings, safe repairs, and host compatibility.</p>
 
   <textarea id="input" placeholder='Paste your AIOStreams template JSON here...\n\nOr paste a manifest URL (https://...) to fetch and inspect.'></textarea>
