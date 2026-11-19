@@ -30,8 +30,8 @@
       "why": "Drops resolutions the build never wants. Core Stable drops 576p and below, which can leave DVD-only titles with nothing: see the effectiveness audit."
     },
     "includedResolutions": {
-      "status": "used",
-      "why": "Smart template only, where an answer keeps a resolution the exclusions would drop."
+      "status": "off-by-design",
+      "why": "No resolution passthrough case: library and SeaDex passthrough is done with ISEs. Generated configs and the smart template write it at the AIOStreams default so an import shows no change."
     },
     "requiredResolutions": {
       "status": "used",
@@ -46,20 +46,20 @@
       "why": "Removes CAM, TS, TC, SCR and HC rips on Stable and Balanced; Advanced/Labs do this in an ESE so library and SeaDex passthrough can override it."
     },
     "includedQualities": {
-      "status": "used",
-      "why": "Smart template only (answer-dependent passthrough)."
+      "status": "off-by-design",
+      "why": "No quality passthrough case; ISEs cover library and SeaDex. Generated configs and the smart template write it at the AIOStreams default so an import shows no change."
     },
     "requiredQualities": {
-      "status": "used",
-      "why": "Smart template only (answer-dependent)."
+      "status": "off-by-design",
+      "why": "Hard requirement; would empty titles that only exist as WEB or HDTV. Generated configs and the smart template write it at the AIOStreams default so an import shows no change."
     },
     "preferredQualities": {
       "status": "used",
       "why": "Ranks REMUX and BluRay above WEB for quality-first builds."
     },
     "excludedLanguages": {
-      "status": "used",
-      "why": "Smart template only; the generators use requiredLanguages with Unknown, Multi and Dual Audio kept so unlabelled releases are not lost."
+      "status": "off-by-design",
+      "why": "The generators use requiredLanguages with Unknown, Multi and Dual Audio kept, so unlabelled releases are not lost; excluding by language would drop them. Generated configs and the smart template write it at the AIOStreams default so an import shows no change."
     },
     "includedLanguages": {
       "status": "used",
@@ -146,20 +146,20 @@
       "why": "Removed from active templates: a third-party list broke ElfHosted saves with 'Forbidden URL' when its allowlist drifted. Exclusions are inline instead."
     },
     "syncedPreferredStreamExpressionUrls": {
-      "status": "used",
-      "why": "Static templates and the smart template's trust case point at Filtering/core-builds-pses.json so one edit updates every importer; generated configs inline their PSEs."
+      "status": "off-by-design",
+      "why": "Generated configs inline their PSEs. No shipped template points at Filtering/core-builds-pses.json any more (only scripts/template_builder.py would add it), and public hosts refuse untrusted SEL URLs. Generated configs and the smart template write it at the AIOStreams default so an import shows no change."
     },
     "syncedExcludedStreamExpressionUrls": {
-      "status": "used",
-      "why": "Same, for Filtering/core-builds-eses.json."
+      "status": "off-by-design",
+      "why": "Same as syncedPreferredStreamExpressionUrls, for Filtering/core-builds-eses.json. Generated configs and the smart template write it at the AIOStreams default so an import shows no change."
     },
     "syncedIncludedStreamExpressionUrls": {
-      "status": "used",
-      "why": "Same, for Filtering/core-builds-ises.json."
+      "status": "off-by-design",
+      "why": "Same as syncedPreferredStreamExpressionUrls, for Filtering/core-builds-ises.json. Generated configs and the smart template write it at the AIOStreams default so an import shows no change."
     },
     "syncedRankedStreamExpressionUrls": {
-      "status": "used",
-      "why": "Smart template trust case only, so operators who add the collection to TEMPLATE_URLS trust it."
+      "status": "off-by-design",
+      "why": "Ranked expressions are inline (ranked-sel-policy.js) so they ship on hosts that refuse untrusted SEL URLs. Generated configs and the smart template write it at the AIOStreams default so an import shows no change."
     },
     "syncedPreferredRegexUrls": {
       "status": "off-by-design",
@@ -186,8 +186,8 @@
       "why": "Hard requirement; would empty results for titles with no matching group."
     },
     "requiredStreamExpressions": {
-      "status": "used",
-      "why": "Smart template only (answer-dependent); generators avoid required expressions for the same reason as required regex."
+      "status": "off-by-design",
+      "why": "Required expressions remove everything that does not match; Core Builds ranks with PSEs and excludes with ESEs instead. Generated configs and the smart template write it at the AIOStreams default so an import shows no change."
     },
     "excludedStreamExpressions": {
       "status": "used",
@@ -206,8 +206,8 @@
       "why": "The only writer of streamExpressionScore; without it the score sort and Adaptive Score Floor are stripped. Advanced and Labs only (ranked-sel-policy.js)."
     },
     "selOverrides": {
-      "status": "used",
-      "why": "Smart template only, carried from the per-answer builds."
+      "status": "off-by-design",
+      "why": "Overrides for synced SEL entries; nothing synced to override because SEL is inline. Generated configs and the smart template write it at the AIOStreams default so an import shows no change."
     },
     "excludeUncached": {
       "status": "used",
@@ -218,32 +218,32 @@
       "why": "Always 'or', the AIOStreams default, written explicitly so an import shows no change."
     },
     "excludeUncachedFromAddons": {
-      "status": "used",
-      "why": "Smart template only (answer-dependent)."
+      "status": "off-by-design",
+      "why": "Cached-only uses excludeUncached for the whole build; no per-addon split. Generated configs and the smart template write it at the AIOStreams default so an import shows no change."
     },
     "excludeUncachedFromServices": {
-      "status": "used",
-      "why": "Smart template only."
+      "status": "off-by-design",
+      "why": "Cached-only uses excludeUncached for the whole build; no per-service split. Generated configs and the smart template write it at the AIOStreams default so an import shows no change."
     },
     "excludeUncachedFromStreamTypes": {
-      "status": "used",
-      "why": "Smart template only."
+      "status": "off-by-design",
+      "why": "Cached-only uses excludeUncached for the whole build; no per-type split. Generated configs and the smart template write it at the AIOStreams default so an import shows no change."
     },
     "excludeCached": {
-      "status": "used",
-      "why": "Smart template only; the generators never drop cached results."
+      "status": "off-by-design",
+      "why": "Cached results are the point of a debrid build; never excluded. Generated configs and the smart template write it at the AIOStreams default so an import shows no change."
     },
     "excludeCachedFromAddons": {
-      "status": "used",
-      "why": "Smart template only."
+      "status": "off-by-design",
+      "why": "Cached results are never excluded. Generated configs and the smart template write it at the AIOStreams default so an import shows no change."
     },
     "excludeCachedFromServices": {
-      "status": "used",
-      "why": "Smart template only."
+      "status": "off-by-design",
+      "why": "Cached results are never excluded. Generated configs and the smart template write it at the AIOStreams default so an import shows no change."
     },
     "excludeCachedFromStreamTypes": {
-      "status": "used",
-      "why": "Smart template only."
+      "status": "off-by-design",
+      "why": "Cached results are never excluded. Generated configs and the smart template write it at the AIOStreams default so an import shows no change."
     },
     "excludeCachedMode": {
       "status": "off-by-design",
@@ -318,8 +318,8 @@
       "why": "Next-episode autoplay by matching attributes; Core Stable turns it off."
     },
     "areYouStillThere": {
-      "status": "used",
-      "why": "Smart template only."
+      "status": "off-by-design",
+      "why": "Viewer prompt between episodes; a player preference, left to the user. Generated configs and the smart template write it at the AIOStreams default so an import shows no change."
     },
     "precacheNextEpisode": {
       "status": "used",
@@ -402,24 +402,24 @@
       "why": "Static templates hide or reorder catalogs; generated configs leave catalogs alone."
     },
     "mergedCatalogs": {
-      "status": "used",
-      "why": "Smart template only."
+      "status": "not-applicable",
+      "why": "Catalog layout; outside what a stream template should change. Generated configs and the smart template write it at the AIOStreams default so an import shows no change."
     },
     "externalDownloads": {
-      "status": "used",
-      "why": "Smart template only."
+      "status": "off-by-design",
+      "why": "Download links beside streams; a viewer preference, left off. Generated configs and the smart template write it at the AIOStreams default so an import shows no change."
     },
     "autoRemoveDownloads": {
-      "status": "used",
-      "why": "Smart template only."
+      "status": "off-by-design",
+      "why": "Debrid housekeeping that deletes from the user's account; left to the user. Generated configs and the smart template write it at the AIOStreams default so an import shows no change."
     },
     "checkOwned": {
-      "status": "used",
-      "why": "Smart template only."
+      "status": "off-by-design",
+      "why": "Library ownership check; a viewer preference, left off. Generated configs and the smart template write it at the AIOStreams default so an import shows no change."
     },
     "trusted": {
-      "status": "used",
-      "why": "Smart template only; trust itself comes from the operator's TEMPLATE_URLS."
+      "status": "not-applicable",
+      "why": "Template trust is granted by the operator (TEMPLATE_URLS, TRUSTED_UUIDS), not by the config; written as false."
     },
     "serviceWrap": {
       "status": "candidate",

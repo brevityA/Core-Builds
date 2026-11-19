@@ -11,10 +11,10 @@ Usage comes from 20 golden configs (profiles: stable, balanced, advanced, labs),
 | Config options AIOStreams accepts (2.38.1) | 162 |
 | Used by at least one generated profile or template | 69 |
 | Used by the default profile (Core Stable) | 33 |
-| Decision: used | 91 |
+| Decision: used | 68 |
 | Decision: candidate | 13 |
-| Decision: off-by-design | 35 |
-| Decision: not-applicable | 23 |
+| Decision: off-by-design | 56 |
+| Decision: not-applicable | 25 |
 | **Needs attention** | **0** |
 
 ## Needs attention
@@ -75,27 +75,22 @@ Web player, Jellyfin, UI, desktop, Android, TV and watch-state entries are left 
 - _Bug Fixes_ · skip merged catalog sources that don't declare a requested extra
 - _Performance Improvements_ · **core:** reject values that can't be encrypted before parsing them
 
-## Used (91)
+## Used (68)
 
 | Option | Stable | Balanced | Advanced | Labs | Templates | Smart | Why |
 |---|---|---|---|---|---|---|---|
-| `trusted` | · | · | · | · | · | ✓ | Smart template only; trust itself comes from the operator's TEMPLATE_URLS. |
 | `showChanges` | ✓ | ✓ | ✓ | ✓ | 53 | ✓ | Template metadata: tells AIOStreams to show what an update changes before the user applies it. |
 | `addonName` | ✓ | ✓ | ✓ | ✓ | 54 | ✓ | Brands the addon in Stremio as Core Builds (with the build's name). |
 | `addonLogo` | ✓ | ✓ | ✓ | ✓ | 46 | ✓ | Core Builds icon; must use the /refs/heads/main/ raw URL (CLAUDE.md, known validator rules). |
 | `addonDescription` | ✓ | ✓ | ✓ | ✓ | 54 | ✓ | Describes the build in the Stremio addon list. |
 | `appliedTemplates` | · | · | · | · | 40 | · | Set by AIOStreams on static templates it has applied; the generator does not write it. |
 | `excludedResolutions` | ✓ | ✓ | ✓ | ✓ | 53 | ✓ | Drops resolutions the build never wants. Core Stable drops 576p and below, which can leave DVD-only titles with nothing: see the effectiveness audit. |
-| `includedResolutions` | · | · | · | · | · | ✓ | Smart template only, where an answer keeps a resolution the exclusions would drop. |
-| `requiredResolutions` | · | · | · | · | 6 | ✓ | A few static templates (1080p lines) require their resolution; generators rank with PSEs instead so niche titles still return something. |
+| `requiredResolutions` | · | · | · | · | 6 | · | A few static templates (1080p lines) require their resolution; generators rank with PSEs instead so niche titles still return something. |
 | `preferredResolutions` | ✓ | ✓ | ✓ | ✓ | 53 | ✓ | Ranks the target resolution first; for 4K builds the sort is resolution, cached, quality (sort-policy.js). |
 | `excludedQualities` | ✓ | ✓ | · | · | 4 | ✓ | Removes CAM, TS, TC, SCR and HC rips on Stable and Balanced; Advanced/Labs do this in an ESE so library and SeaDex passthrough can override it. |
-| `includedQualities` | · | · | · | · | · | ✓ | Smart template only (answer-dependent passthrough). |
-| `requiredQualities` | · | · | · | · | · | ✓ | Smart template only (answer-dependent). |
 | `preferredQualities` | ✓ | ✓ | ✓ | ✓ | 53 | ✓ | Ranks REMUX and BluRay above WEB for quality-first builds. |
-| `excludedLanguages` | · | · | · | · | · | ✓ | Smart template only; the generators use requiredLanguages with Unknown, Multi and Dual Audio kept so unlabelled releases are not lost. |
-| `includedLanguages` | · | · | · | · | 1 | ✓ | One static template keeps a language through other filters. |
-| `requiredLanguages` | · | · | ✓ | ✓ | 41 | ✓ | Advanced/Labs require the user's languages but always keep Original, Dual Audio, Multi, Dubbed and Unknown, so a release with no language tag still shows. |
+| `includedLanguages` | · | · | · | · | 1 | · | One static template keeps a language through other filters. |
+| `requiredLanguages` | · | · | ✓ | ✓ | 41 | · | Advanced/Labs require the user's languages but always keep Original, Dual Audio, Multi, Dubbed and Unknown, so a release with no language tag still shows. |
 | `preferredLanguages` | ✓ | ✓ | ✓ | ✓ | 53 | ✓ | Ranks the user's languages first. |
 | `preferredSubtitles` | · | · | · | · | 50 | · | Static templates rank releases carrying the user's subtitle language. |
 | `excludedVisualTags` | ✓ | ✓ | · | · | 53 | ✓ | Drops 3D and half-SBS/OU everywhere; device profiles add DV-only kills where DV fails. |
@@ -109,34 +104,21 @@ Web player, Jellyfin, UI, desktop, Android, TV and watch-state entries are left 
 | `preferredStreamTypes` | · | · | · | · | 50 | · | Static templates rank debrid over usenet or the reverse per line. |
 | `excludedEncodes` | 14/15 | ✓ | ✓ | ✓ | 26 | ✓ | Drops AV1 and VC-1 on devices without safe hardware decode (deviceAv1Safe). |
 | `preferredEncodes` | ✓ | ✓ | ✓ | ✓ | 54 | ✓ | Ranks HEVC/AVC by device. |
-| `excludedRegexPatterns` | · | ✓ | ✓ | ✓ | 43 | ✓ | Eight inline patterns (upscaled, extras, LQ groups, BR-DISK, retags); each string is a verbatim Vidhin05 pattern so ElfHosted's allowlist accepts it. |
-| `preferredRegexPatterns` | · | ✓ | ✓ | ✓ | 41 | ✓ | Tier-1 group patterns (Remux T1, FraMeSToR…), verbatim Vidhin05 strings. |
-| `syncedRankedRegexUrls` | · | · | ✓ | ✓ | 43 | ✓ | Vidhin05's ranked list, the one synced URL public hosts accept. |
-| `syncedPreferredStreamExpressionUrls` | · | · | · | · | · | ✓ | Static templates and the smart template's trust case point at Filtering/core-builds-pses.json so one edit updates every importer; generated configs inline their PSEs. |
-| `syncedExcludedStreamExpressionUrls` | · | · | · | · | · | ✓ | Same, for Filtering/core-builds-eses.json. |
-| `syncedIncludedStreamExpressionUrls` | · | · | · | · | · | ✓ | Same, for Filtering/core-builds-ises.json. |
-| `syncedRankedStreamExpressionUrls` | · | · | · | · | · | ✓ | Smart template trust case only, so operators who add the collection to TEMPLATE_URLS trust it. |
+| `excludedRegexPatterns` | · | ✓ | ✓ | ✓ | 43 | · | Eight inline patterns (upscaled, extras, LQ groups, BR-DISK, retags); each string is a verbatim Vidhin05 pattern so ElfHosted's allowlist accepts it. |
+| `preferredRegexPatterns` | · | ✓ | ✓ | ✓ | 41 | · | Tier-1 group patterns (Remux T1, FraMeSToR…), verbatim Vidhin05 strings. |
+| `syncedRankedRegexUrls` | · | · | ✓ | ✓ | 43 | · | Vidhin05's ranked list, the one synced URL public hosts accept. |
 | `includeSeederRange` | · | · | · | · | 43 | · | Static templates keep well-seeded torrents through other filters. |
-| `digitalReleaseFilter` <sub>enabled, tolerance, checkResultAge, requestTypes, addons, showInfoOnFilter</sub> | · | · | · | · | 2 | ✓ | Off in generated configs: it drops results before the digital release date, which also removes early legitimate releases. Two static templates enable it. |
+| `digitalReleaseFilter` <sub>enabled, tolerance, checkResultAge, requestTypes, addons, showInfoOnFilter</sub> | · | · | · | · | 2 | · | Off in generated configs: it drops results before the digital release date, which also removes early legitimate releases. Two static templates enable it. |
 | `enableSeadex` | ✓ | ✓ | ✓ | ✓ | 42 | ✓ | SeaDex best-release data for anime; feeds the seadex sort key and the Library/SeaDex ISE. |
-| `excludeCached` | · | · | · | · | · | ✓ | Smart template only; the generators never drop cached results. |
-| `excludeCachedFromAddons` | · | · | · | · | · | ✓ | Smart template only. |
-| `excludeCachedFromServices` | · | · | · | · | · | ✓ | Smart template only. |
-| `excludeCachedFromStreamTypes` | · | · | · | · | · | ✓ | Smart template only. |
 | `excludeUncached` | 1/15 | · | · | 1/3 | · | ✓ | Set when the user picks cached-only; otherwise uncached stays so a title nobody has cached still shows something. |
-| `excludeUncachedFromAddons` | · | · | · | · | · | ✓ | Smart template only (answer-dependent). |
-| `excludeUncachedFromServices` | · | · | · | · | · | ✓ | Smart template only. |
-| `excludeUncachedFromStreamTypes` | · | · | · | · | · | ✓ | Smart template only. |
 | `excludeUncachedMode` | ✓ | ✓ | ✓ | ✓ | 45 | ✓ | Always 'or', the AIOStreams default, written explicitly so an import shows no change. |
 | `excludedStreamExpressions` | ✓ | ✓ | ✓ | ✓ | 53 | ✓ | ESEs: one on Core Stable (external-stream kill), 29 on the IQR build. Pack filtering runs last so a valid episode request never ends empty (CLAUDE.md, late pack fallback). |
-| `requiredStreamExpressions` | · | · | · | · | · | ✓ | Smart template only (answer-dependent); generators avoid required expressions for the same reason as required regex. |
-| `preferredStreamExpressions` | · | ✓ | ✓ | ✓ | 50 | ✓ | PSEs: IQR bitrate tiers, pow() decay, perGroup() balance. None on Core Stable. |
-| `includedStreamExpressions` | · | ✓ | ✓ | ✓ | 51 | ✓ | ISEs: library and SeaDex passthrough, ID-matched trust, Smart Play pin. |
-| `rankedStreamExpressions` | · | · | ✓ | ✓ | 41 | ✓ | The only writer of streamExpressionScore; without it the score sort and Adaptive Score Floor are stripped. Advanced and Labs only (ranked-sel-policy.js). |
-| `rankedRegexPatterns` | · | ✓ | ✓ | ✓ | 43 | ✓ | Scored regex overrides; without them regexScore is a no-op because every synced Vidhin05 entry scores 0. |
-| `regexOverrides` | · | · | · | · | 41 | ✓ | Set by AIOStreams on templates that override synced regex scores by name. |
-| `selOverrides` | · | · | · | · | · | ✓ | Smart template only, carried from the per-answer builds. |
-| `dynamicAddonFetching` <sub>enabled, condition</sub> | · | · | ✓ | ✓ | 49 | ✓ | Advanced/Labs only: returns once the exit condition is met instead of waiting for every source. Core Stable turns it off so a problem reproduces the same way each time — which also means Stable waits on its slowest source. |
+| `preferredStreamExpressions` | · | ✓ | ✓ | ✓ | 50 | · | PSEs: IQR bitrate tiers, pow() decay, perGroup() balance. None on Core Stable. |
+| `includedStreamExpressions` | · | ✓ | ✓ | ✓ | 51 | · | ISEs: library and SeaDex passthrough, ID-matched trust, Smart Play pin. |
+| `rankedStreamExpressions` | · | · | ✓ | ✓ | 41 | · | The only writer of streamExpressionScore; without it the score sort and Adaptive Score Floor are stripped. Advanced and Labs only (ranked-sel-policy.js). |
+| `rankedRegexPatterns` | · | ✓ | ✓ | ✓ | 43 | · | Scored regex overrides; without them regexScore is a no-op because every synced Vidhin05 entry scores 0. |
+| `regexOverrides` | · | · | · | · | 41 | · | Set by AIOStreams on templates that override synced regex scores by name. |
+| `dynamicAddonFetching` <sub>enabled, condition</sub> | · | · | ✓ | ✓ | 49 | · | Advanced/Labs only: returns once the exit condition is met instead of waiting for every source. Core Stable turns it off so a problem reproduces the same way each time — which also means Stable waits on its slowest source. |
 | `sortCriteria` <sub>global, movies, series, anime, cached, uncached, cachedMovies, uncachedMovies, …</sub> | ✓ | ✓ | ✓ | ✓ | 54 | ✓ | Stable multi-key sort: cached and stream-expression keys first, then resolution and quality. audioChannel is dropped from generated configs because the upstream sorter has no case for it. |
 | `rpdbApiKey` | · | ✓ | ✓ | ✓ | 52 | · | RPDB posters: RPDB's public free-tier key t0-free-rpdb by default, or the user's own. |
 | `posterService` | ✓ | ✓ | ✓ | ✓ | 54 | ✓ | Poster source for catalogs. |
@@ -147,29 +129,24 @@ Web player, Jellyfin, UI, desktop, Android, TV and watch-state entries are left 
 | `resultLimits` <sub>global, service, addon, resolution, quality, streamType, indexer, releaseGroup, …</sub> | ✓ | ✓ | ✓ | ✓ | 53 | ✓ | 10–12 results on Core Stable (3 per resolution), 30–35 on Advanced/Labs. |
 | `size` <sub>global, resolution</sub> | 1/15 | ✓ | ✓ | ✓ | 52 | ✓ | Size ranges per resolution, from the user's size limit. |
 | `bitrate` <sub>useMetadataRuntime, global, resolution</sub> | · | ✓ | ✓ | ✓ | 44 | · | Bitrate ranges, and the bandwidth cap (80% of the typed speed). |
-| `hideErrors` | · | · | ✓ | ✓ | 51 | ✓ | Hides addon error rows in Stremio on Advanced/Labs. |
+| `hideErrors` | · | · | ✓ | ✓ | 51 | · | Hides addon error rows in Stremio on Advanced/Labs. |
 | `hideErrorsForResources` | ✓ | ✓ | ✓ | ✓ | 46 | ✓ | Scopes error hiding to resource types. |
 | `tmdbAccessToken` | · | · | · | · | 51 | · | Static templates carry `<template_placeholder>` for the user's own token; never a real value. |
 | `tmdbApiKey` | · | · | · | · | 51 | · | Same as tmdbAccessToken. |
-| `yearMatching` <sub>enabled, tolerance, strict, strictTypes, useInitialAirDate, requestTypes, addons</sub> | · | · | · | · | 51 | ✓ | Static templates match the release year; generators leave AIOStreams' default. |
-| `titleMatching` <sub>mode, matchYear, yearTolerance, similarityThreshold, enabled, ambiguousResults, requestTypes, addons</sub> | · | · | · | · | 51 | ✓ | Off in generated configs (default contains, 0.75): strict title matching drops foreign and alternate titles. Static templates enable it. |
+| `yearMatching` <sub>enabled, tolerance, strict, strictTypes, useInitialAirDate, requestTypes, addons</sub> | · | · | · | · | 51 | · | Static templates match the release year; generators leave AIOStreams' default. |
+| `titleMatching` <sub>mode, matchYear, yearTolerance, similarityThreshold, enabled, ambiguousResults, requestTypes, addons</sub> | · | · | · | · | 51 | · | Off in generated configs (default contains, 0.75): strict title matching drops foreign and alternate titles. Static templates enable it. |
 | `seasonEpisodeMatching` <sub>enabled, strict, requestTypes, addons</sub> | ✓ | ✓ | ✓ | ✓ | 54 | ✓ | On, non-strict: drops wrong-episode results while letting packs through for AIOStreams to verify. |
 | `deduplicator` <sub>enabled, excludeAddons, multiGroupBehaviour, keys, cached, uncached, p2p, http, …</sub> | ✓ | ✓ | ✓ | ✓ | 54 | ✓ | Filename, infoHash and smartDetect keys; one cached result per release, uncached per service. |
-| `autoPlay` <sub>enabled, method, attributes</sub> | · | ✓ | ✓ | ✓ | 52 | ✓ | Next-episode autoplay by matching attributes; Core Stable turns it off. |
-| `areYouStillThere` <sub>enabled, episodesBeforeCheck, cooldownMinutes</sub> | · | · | · | · | · | ✓ | Smart template only. |
-| `precacheNextEpisode` | · | · | ✓ | ✓ | 51 | ✓ | Advanced/Labs: asks the service to cache the next episode while this one plays. |
+| `autoPlay` <sub>enabled, method, attributes</sub> | · | ✓ | ✓ | ✓ | 52 | · | Next-episode autoplay by matching attributes; Core Stable turns it off. |
+| `precacheNextEpisode` | · | · | ✓ | ✓ | 51 | · | Advanced/Labs: asks the service to cache the next episode while this one plays. |
 | `precacheSelector` | · | · | ✓ | ✓ | 50 | · | Which stream to precache (replaces the deprecated alwaysPrecache/precacheCondition). |
 | `precacheSingleStream` | · | · | ✓ | ✓ | 51 | · | Precache only the first selected stream. |
-| `preloadStreams` <sub>enabled, selector, singleStream</sub> | · | · | ✓ | ✓ | 51 | ✓ | Advanced/Labs: pings the top stream so it starts faster. Off on Core Stable. |
-| `services` | 12/15 | ✓ | ✓ | ✓ | 54 | ✓ | The user's debrid/usenet services (credentials stripped from shared links). |
+| `preloadStreams` <sub>enabled, selector, singleStream</sub> | · | · | ✓ | ✓ | 51 | · | Advanced/Labs: pings the top stream so it starts faster. Off on Core Stable. |
+| `services` | 12/15 | ✓ | ✓ | ✓ | 54 | · | The user's debrid/usenet services (credentials stripped from shared links). |
 | `presets` | ✓ | ✓ | ✓ | ✓ | 54 | ✓ | The addons. Core Stable emits three torrent sources on TorBox (StremThru Torz, Meteor, Comet); Balanced and above add Zilean, MediaFusion, EZTV, Torrent Galaxy and Knaben. |
 | `addonCategoryColors` | ✓ | ✓ | ✓ | ✓ | 45 | ✓ | Colours the addon categories in AIOStreams' own UI so the generated build reads clearly. |
 | `catalogModifications` | · | · | · | · | 24 | · | Static templates hide or reorder catalogs; generated configs leave catalogs alone. |
-| `mergedCatalogs` | · | · | · | · | · | ✓ | Smart template only. |
-| `externalDownloads` | · | · | · | · | · | ✓ | Smart template only. |
-| `cacheAndPlay` <sub>enabled, streamTypes</sub> | · | · | ✓ | ✓ | 31 | ✓ | Advanced/Labs: plays an uncached torrent or NZB once the service has it. Off on Core Stable. |
-| `autoRemoveDownloads` | · | · | · | · | · | ✓ | Smart template only. |
-| `checkOwned` | · | · | · | · | · | ✓ | Smart template only. |
+| `cacheAndPlay` <sub>enabled, streamTypes</sub> | · | · | ✓ | ✓ | 31 | · | Advanced/Labs: plays an uncached torrent or NZB once the service has it. Off on Core Stable. |
 
 ## Candidates — worth evaluating (13)
 
@@ -182,17 +159,21 @@ Web player, Jellyfin, UI, desktop, Android, TV and watch-state entries are left 
 | `seederRangeTypes` | · | · | · | · | · | · | Which result types the seeder ranges apply to; needed if excludeSeederRange is adopted. |
 | `excludeAgeRange` | · | · | · | · | · | · | Native usenet age filter; could replace the Usenet Propagation Guard ESE. |
 | `ageRangeTypes` | · | · | · | · | · | · | Which result types the age ranges apply to; needed if excludeAgeRange is adopted. |
-| `statistics` <sub>enabled, position, statsToShow, showFilterStatsOnNoStreams</sub> | · | · | · | · | · | ✓ | Off everywhere. It can show why nothing appeared (showFilterStatsOnNoStreams); worth turning on for empty results only. |
+| `statistics` <sub>enabled, position, statsToShow, showFilterStatsOnNoStreams</sub> | · | · | · | · | · | · | Off everywhere. It can show why nothing appeared (showFilterStatsOnNoStreams); worth turning on for empty results only. |
 | `episodeTitleMatching` <sub>enabled, similarityThreshold, requestTypes, addons</sub> | · | · | · | · | · | · | Matches episodes by title when numbering differs between sources; could recover anime, specials and absolute-numbered shows. |
 | `languageInference` <sub>enabled, sources</sub> | · | · | · | · | · | · | Infers language from the title or episode title when the filename has none, so language filters drop fewer unlabelled releases. |
-| `failover` <sub>enabled, contentTypes, allowCrossType, maxAttempts, parallel, staggerMs, preferredGraceMs, maxWaitMs, …</sub> | · | · | · | · | 25 | ✓ | Off in generated configs; 25 static templates enable it. 2.35 added onlySameReleaseFailover, which makes it safe to turn on: a failed link falls over to the same release on another source. |
+| `failover` <sub>enabled, contentTypes, allowCrossType, maxAttempts, parallel, staggerMs, preferredGraceMs, maxWaitMs, …</sub> | · | · | · | · | 25 | · | Off in generated configs; 25 static templates enable it. 2.35 added onlySameReleaseFailover, which makes it safe to turn on: a failed link falls over to the same release on another source. |
 | `serviceWrap` <sub>enabled, presets, services, reconfigureService</sub> | · | · | · | · | · | · | Runs P2P-only presets' torrents through the user's debrid service, so sources like Torrentio, Knaben and Zilean can return cached results on a debrid build. Likely the cheapest gain in sources found; measure before shipping. |
 | `remuxDb` <sub>enabled</sub> | · | · | · | · | · | · | RemuxDB lookups (on by default upstream since 2.36) fill real audio and subtitle tracks from probes. We rely on the default; decide whether to set it explicitly. |
 
-## Off by design (35)
+## Off by design (56)
 
 | Option | Stable | Balanced | Advanced | Labs | Templates | Smart | Why |
 |---|---|---|---|---|---|---|---|
+| `includedResolutions` | · | · | · | · | · | · | No resolution passthrough case: library and SeaDex passthrough is done with ISEs. Generated configs and the smart template write it at the AIOStreams default so an import shows no change. |
+| `includedQualities` | · | · | · | · | · | · | No quality passthrough case; ISEs cover library and SeaDex. Generated configs and the smart template write it at the AIOStreams default so an import shows no change. |
+| `requiredQualities` | · | · | · | · | · | · | Hard requirement; would empty titles that only exist as WEB or HDTV. Generated configs and the smart template write it at the AIOStreams default so an import shows no change. |
+| `excludedLanguages` | · | · | · | · | · | · | The generators use requiredLanguages with Unknown, Multi and Dual Audio kept, so unlabelled releases are not lost; excluding by language would drop them. Generated configs and the smart template write it at the AIOStreams default so an import shows no change. |
 | `excludedSubtitles` | · | · | · | · | · | · | Subtitle tags are unreliable in filenames; excluding by them would drop good releases. |
 | `includedSubtitles` | · | · | · | · | · | · | Same as excludedSubtitles. |
 | `requiredSubtitles` | · | · | · | · | · | · | Same; subtitles are fetched by subtitle addons instead. |
@@ -208,10 +189,14 @@ Web player, Jellyfin, UI, desktop, Android, TV and watch-state entries are left 
 | `includedRegexPatterns` | · | · | · | · | · | · | Passthrough is done with ISEs (library, SeaDex, ID-matched), which compose with SEL. |
 | `requiredRegexPatterns` | · | · | · | · | · | · | Hard requirement; would empty results for titles with no matching group. |
 | `syncedPreferredRegexUrls` | · | · | · | · | · | · | Preferred patterns are inline (five or seven Vidhin05 strings); a synced URL would need host allowlisting for no gain. |
-| `syncedExcludedRegexUrls` | · | · | · | · | · | ✓ | Removed from active templates: a third-party list broke ElfHosted saves with 'Forbidden URL' when its allowlist drifted. Exclusions are inline instead. |
+| `syncedExcludedRegexUrls` | · | · | · | · | · | · | Removed from active templates: a third-party list broke ElfHosted saves with 'Forbidden URL' when its allowlist drifted. Exclusions are inline instead. |
 | `syncedIncludedRegexUrls` | · | · | · | · | · | · | No included-regex set exists; ISEs cover passthrough. |
 | `syncedRequiredRegexUrls` | · | · | · | · | · | · | Required regex would hard-remove unmatched releases; ranking is preferred so niche titles still return something. |
+| `syncedPreferredStreamExpressionUrls` | · | · | · | · | · | · | Generated configs inline their PSEs. No shipped template points at Filtering/core-builds-pses.json any more (only scripts/template_builder.py would add it), and public hosts refuse untrusted SEL URLs. Generated configs and the smart template write it at the AI |
+| `syncedExcludedStreamExpressionUrls` | · | · | · | · | · | · | Same as syncedPreferredStreamExpressionUrls, for Filtering/core-builds-eses.json. Generated configs and the smart template write it at the AIOStreams default so an import shows no change. |
+| `syncedIncludedStreamExpressionUrls` | · | · | · | · | · | · | Same as syncedPreferredStreamExpressionUrls, for Filtering/core-builds-ises.json. Generated configs and the smart template write it at the AIOStreams default so an import shows no change. |
 | `syncedRequiredStreamExpressionUrls` | · | · | · | · | · | · | Required expressions remove everything that does not match; Core Builds ranks with PSEs and excludes with ESEs instead. |
+| `syncedRankedStreamExpressionUrls` | · | · | · | · | · | · | Ranked expressions are inline (ranked-sel-policy.js) so they ship on hosts that refuse untrusted SEL URLs. Generated configs and the smart template write it at the AIOStreams default so an import shows no change. |
 | `excludedReleaseGroups` | · | · | · | · | · | · | Bad groups are excluded through verbatim Vidhin05 regex and ESEs, which public hosts accept and which cover group variants. |
 | `includedReleaseGroups` | · | · | · | · | · | · | Elite groups are pinned with pin(releaseGroup(...)) PSEs instead. |
 | `requiredReleaseGroups` | · | · | · | · | · | · | Hard requirement; would empty most titles. |
@@ -224,12 +209,25 @@ Web player, Jellyfin, UI, desktop, Android, TV and watch-state entries are left 
 | `includeAgeRange` | · | · | · | · | · | · | No age-based passthrough is needed. |
 | `requiredAgeRange` | · | · | · | · | · | · | A hard age requirement would remove old but valid NZBs. |
 | `excludeSeasonPacks` | · | · | · | · | · | · | Never remove season packs outright: the late pack fallback hides them only when three playable single episodes remain (CLAUDE.md). |
+| `excludeCached` | · | · | · | · | · | · | Cached results are the point of a debrid build; never excluded. Generated configs and the smart template write it at the AIOStreams default so an import shows no change. |
+| `excludeCachedFromAddons` | · | · | · | · | · | · | Cached results are never excluded. Generated configs and the smart template write it at the AIOStreams default so an import shows no change. |
+| `excludeCachedFromServices` | · | · | · | · | · | · | Cached results are never excluded. Generated configs and the smart template write it at the AIOStreams default so an import shows no change. |
+| `excludeCachedFromStreamTypes` | · | · | · | · | · | · | Cached results are never excluded. Generated configs and the smart template write it at the AIOStreams default so an import shows no change. |
 | `excludeCachedMode` | · | · | · | · | · | · | Cached results are never excluded by the generators, so the mode is never needed. |
-| `groups` <sub>enabled, groupings, behaviour, onConditionFailure</sub> | · | · | · | · | · | ✓ | Off in every generated config: generators never combine groups with dynamic fetching (two early exits can skip sources), and dynamic wins (output-profile-policy.js#preventStackedFetchExits). Groups must use instanceIds, never display names. |
+| `excludeUncachedFromAddons` | · | · | · | · | · | · | Cached-only uses excludeUncached for the whole build; no per-addon split. Generated configs and the smart template write it at the AIOStreams default so an import shows no change. |
+| `excludeUncachedFromServices` | · | · | · | · | · | · | Cached-only uses excludeUncached for the whole build; no per-service split. Generated configs and the smart template write it at the AIOStreams default so an import shows no change. |
+| `excludeUncachedFromStreamTypes` | · | · | · | · | · | · | Cached-only uses excludeUncached for the whole build; no per-type split. Generated configs and the smart template write it at the AIOStreams default so an import shows no change. |
+| `requiredStreamExpressions` | · | · | · | · | · | · | Required expressions remove everything that does not match; Core Builds ranks with PSEs and excludes with ESEs instead. Generated configs and the smart template write it at the AIOStreams default so an import shows no change. |
+| `selOverrides` | · | · | · | · | · | · | Overrides for synced SEL entries; nothing synced to override because SEL is inline. Generated configs and the smart template write it at the AIOStreams default so an import shows no change. |
+| `groups` <sub>enabled, groupings, behaviour, onConditionFailure</sub> | · | · | · | · | · | · | Off in every generated config: generators never combine groups with dynamic fetching (two early exits can skip sources), and dynamic wins (output-profile-policy.js#preventStackedFetchExits). Groups must use instanceIds, never display names. |
+| `areYouStillThere` <sub>enabled, episodesBeforeCheck, cooldownMinutes</sub> | · | · | · | · | · | · | Viewer prompt between episodes; a player preference, left to the user. Generated configs and the smart template write it at the AIOStreams default so an import shows no change. |
 | `alwaysPrecache` | · | · | · | · | · | · | Deprecated upstream in favour of precacheSelector. |
 | `precacheCondition` | · | · | · | · | · | · | Deprecated upstream in favour of precacheSelector. |
+| `externalDownloads` | · | · | · | · | · | · | Download links beside streams; a viewer preference, left off. Generated configs and the smart template write it at the AIOStreams default so an import shows no change. |
+| `autoRemoveDownloads` | · | · | · | · | · | · | Debrid housekeeping that deletes from the user's account; left to the user. Generated configs and the smart template write it at the AIOStreams default so an import shows no change. |
+| `checkOwned` | · | · | · | · | · | · | Library ownership check; a viewer preference, left off. Generated configs and the smart template write it at the AIOStreams default so an import shows no change. |
 
-## Not a template concern (23)
+## Not a template concern (25)
 
 | Option | Stable | Balanced | Advanced | Labs | Templates | Smart | Why |
 |---|---|---|---|---|---|---|---|
@@ -239,6 +237,7 @@ Web player, Jellyfin, UI, desktop, Android, TV and watch-state entries are left 
 | `autoVariants` | · | · | · | · | · | · | Request-scoped, never persisted (AIOStreams fills it per request). |
 | `healthResults` | · | · | · | · | · | · | Request-scoped, never persisted (AIOStreams fills it per request). |
 | `encryptedPassword` | · | · | · | · | · | · | Account, identity or server-set field; a template must never carry it. |
+| `trusted` | · | · | · | · | · | · | Template trust is granted by the operator (TEMPLATE_URLS, TRUSTED_UUIDS), not by the config; written as false. |
 | `manifestNotice` | · | · | · | · | · | · | Account, identity or server-set field; a template must never carry it. |
 | `linkedAccounts` <sub>pushBehaviour</sub> | · | · | · | · | · | · | Account, identity or server-set field; a template must never carry it. |
 | `accessKey` | · | · | · | · | · | · | Account, identity or server-set field; a template must never carry it. |
@@ -254,10 +253,11 @@ Web player, Jellyfin, UI, desktop, Android, TV and watch-state entries are left 
 | `pmdbApiKey` | · | · | · | · | · | · | A personal credential or poster-service setting; never written into a template. |
 | `newCatalogsDisabled` | · | · | · | · | · | · | Catalog layout; outside what a stream template should change. |
 | `upstreamCatalogOrder` | · | · | · | · | · | · | Catalog layout; outside what a stream template should change. |
+| `mergedCatalogs` | · | · | · | · | · | · | Catalog layout; outside what a stream template should change. Generated configs and the smart template write it at the AIOStreams default so an import shows no change. |
 | `jellyfin` | · | · | · | · | · | · | AIOStreams' Jellyfin server mode; not a Stremio stream setting. |
 | `customPosterUrl` | · | · | · | · | · | · | Poster service setting added in 2.38.0 (custom poster URL); posters are the user's choice, not part of a stream template. |
 
-Profile columns: ✓ every golden of that profile sets it, n/m some do, · none do.
+Profile columns: ✓ every golden of that profile sets it, n/m some do, · none do. Smart: ✓ when at least one answer switches it on.
 
 ## Presets
 

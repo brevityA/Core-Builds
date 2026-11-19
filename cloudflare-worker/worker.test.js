@@ -1430,3 +1430,74 @@ test('every worker URL referenced in the repo names a route the worker serves', 
   const dangling = referenced.filter((path) => !served(path));
   assert.deepEqual(dangling, [], `worker URL(s) point at routes the worker does not serve: ${dangling.join(', ')}`);
 });
+
+// --- Update in place: PUT /api/v1/user with Basic auth ----------------------
+//
+// AIOStreams 2.32–2.38 update a config only through PUT /api/v1/user with
+// `Authorization: Basic base64(uuid:password)`. There is no PATCH route, so the
+// configurator's old PATCH /api/v1/user/<id> came back 404 "Not Found" on every
+// host. This is the one AIOStreams door that relays a credential, and only a
+// well-formed Basic header on exactly that path and method.
+
+const BASIC = 'Basic ' + Buffer.from('11111111-2222-3333-4444-555555555555:pw').toString('base64');
+const putUser = (host, path = '/api/v1/user', headers = {}, method = 'PUT') => worker.fetch(
+  new Request(`https://w.example/proxy${path}?host=${encodeURIComponent(host)}`, { method, headers: { 'Content-Type': 'application/json', ...headers }, body: '{"config":{}}' }),
+  { TEMPLATES: undefined, STATS: undefined, RATELIMIT: undefined }, { waitUntil: () => {} });
+
+for (const [lane, host] of [['allowlisted', 'https://aiostreams.elfhosted.com'], ['custom', 'https://selfhost.example.com']]) {
+  test(`${lane} lane: PUT /api/v1/user forwards the Basic header (update in place)`, async () => {
+    let seen;
+    global.fetch = async (req) => { seen = req; return new Response('{"success":true}', { status: 200, headers: { 'Content-Type': 'application/json' } }); };
+    const res = await putUser(host, '/api/v1/user', { Authorization: BASIC });
+    assert.equal(res.status, 200);
+    assert.equal(seen.method, 'PUT');
+    assert.match(seen.url, /\/api\/v1\/user$/);
+    assert.equal(seen.headers.get('Authorization'), BASIC);
+  });
+
+  test(`${lane} lane: no credential leaves on any other AIOStreams door`, async () => {
+    const seen = [];
+    global.fetch = async (req) => { seen.push(req.headers.get('Authorization')); return new Response('{}', { status: 200, headers: { 'Content-Type': 'application/json' } }); };
+    await putUser(host, '/api/v1/user', { Authorization: BASIC }, 'POST');
+    await putUser(host, '/api/v1/user/abc-123', { Authorization: BASIC }, 'PATCH');
+    assert.deepEqual(seen, [null, null], 'POST and PATCH reach the host without the header');
+    // A PUT without a well-formed Basic header is refused before any upstream call.
+    for (const auth of ['Bearer abc.def', 'Basic not base64!', undefined]) {
+      const res = await putUser(host, '/api/v1/user', auth ? { Authorization: auth } : {});
+      assert.equal(res.status, 403);
+    }
+    assert.equal(seen.length, 2);
+  });
+
+  test(`${lane} lane: GET /api/v1/user forwards the Basic header (encryptedPassword read-back)`, async () => {
+    let seen;
+    global.fetch = async (req) => { seen = req; return new Response('{"success":true,"data":{"encryptedPassword":"e"}}', { status: 200, headers: { 'Content-Type': 'application/json' } }); };
+    const res = await worker.fetch(new Request(`https://w.example/proxy/api/v1/user?host=${encodeURIComponent(host)}`, { headers: { Authorization: BASIC } }), { TEMPLATES: undefined, STATS: undefined, RATELIMIT: undefined }, { waitUntil: () => {} });
+    assert.equal(res.status, 200);
+    assert.equal(seen.method, 'GET');
+    assert.equal(seen.headers.get('Authorization'), BASIC);
+  });
+
+  test(`${lane} lane: PUT is only open on the exact /api/v1/user path`, async () => {
+    let reached = false;
+    global.fetch = async () => { reached = true; return new Response('{}', { status: 200 }); };
+    for (const p of ['/api/v1/user/abc-123', '/api/v1/status', '/api/v1/user/session']) {
+      const res = await putUser(host, p, { Authorization: BASIC });
+      assert.equal(res.status, 403, `PUT ${p} must be refused`);
+    }
+    assert.equal(reached, false);
+  });
+}
+
+test('PUT is advertised for CORS preflight', async () => {
+  const res = await worker.fetch(new Request('https://w.example/proxy/api/v1/user?host=https%3A%2F%2Faiostreams.elfhosted.com', { method: 'OPTIONS', headers: { Origin: 'https://brevitya.github.io', 'Access-Control-Request-Method': 'PUT' } }), {}, { waitUntil: () => {} });
+  assert.match(res.headers.get('Access-Control-Allow-Methods') || '', /\bPUT\b/);
+});
+
+test('api.torbox.app still refuses PUT', async () => {
+  let reached = false;
+  global.fetch = async () => { reached = true; return new Response('{}', { status: 200 }); };
+  const res = await putUser('https://api.torbox.app', '/v1/api/speedtest', { Authorization: BASIC });
+  assert.equal(res.status, 405);
+  assert.equal(reached, false);
+});

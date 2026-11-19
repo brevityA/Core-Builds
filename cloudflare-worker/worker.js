@@ -30,7 +30,7 @@ import { handleCoreStreams } from './core-streams.js';
 // wait-loop. A second deploy on the same date takes a letter suffix (…-11 →
 // …-11b): reusing a live tag makes that wait-loop pass instantly and lets smoke
 // run before the new build has propagated. Never parsed as a date.
-const WORKER_VERSION = '2026-11-03';
+const WORKER_VERSION = '2026-11-19';
 
 // ── Hardening constants ─────────────────────────────────────────────────────
 const PROXY_MAX_SIZE = 2 * 1024 * 1024;     // 2 MB proxy request body cap (configs are a few KB)
@@ -198,7 +198,7 @@ const ALLOWED_HOSTS = new Set([
   'https://api.torbox.app',
 ]);
 
-const ALLOWED_METHODS = new Set(['GET', 'POST', 'PATCH']);
+const ALLOWED_METHODS = new Set(['GET', 'POST', 'PATCH', 'PUT']);
 
 // Hosts that may receive a caller-supplied Authorization header (INFRA-AUDIT S3).
 // Only the WuPlay genie lane uses device tokens; every other allowlisted host is
@@ -244,6 +244,22 @@ const LANE_EXACT_HOSTS = new Set(['https://api.wuplay.app', 'https://api.torbox.
 const AIO_LANE_HOSTS = new Set([...ALLOWED_HOSTS].filter((h) => !LANE_EXACT_HOSTS.has(h)));
 
 const AIO_USER_PATH_RE = /^\/api\/v1\/user(\/[A-Za-z0-9_-]{1,128})?$/;
+
+// Updating an existing AIOStreams config. Upstream (2.32 through 2.38) has exactly
+// one update route: PUT /api/v1/user, authenticated by
+// `Authorization: Basic base64(uuid:password)`; it has no PATCH route and no
+// /<id> form, so PATCH /api/v1/user/<id> has always come back 404 "Not Found".
+// GET on the same path with the same header returns the encryptedPassword a
+// manifest link needs (a PUT does not; /stremio/<uuid>/<pwd> refuses a raw one).
+// These are the only AIOStreams doors that forward a caller credential, and only
+// a well-formed Basic header: the uuid:password it carries is the same secret the
+// create route already takes in its body, sent to the same host.
+const AIO_UPDATE_PATH = '/api/v1/user';
+const BASIC_AUTH_RE = /^Basic [A-Za-z0-9+/]{4,1024}={0,2}$/;
+function aioUpdateScope(method, upstreamPath, extra) {
+  if ((method === 'PUT' || method === 'GET') && upstreamPath === AIO_UPDATE_PATH) return { ...extra, forwardBasicAuth: true };
+  return null;
+}
 const AIO_STREMIO_PATH_RE = /^\/stremio\/[^/]+\/[^/]+\/(manifest\.json|stream\/[^/]+\/[^/]+\.json)$/;
 const AIO_MANIFEST_BASE_RE = /^\/stremio\/[^/]+\/[^/]+$/;
 const AIO_MANIFEST_STREAM_RE = /^\/stream\/[^/]+\/[^/]+\.json$/;
@@ -251,6 +267,7 @@ const AIO_MANIFEST_STREAM_RE = /^\/stream\/[^/]+\/[^/]+\.json$/;
 // AIOStreams instance lane — the direct-install surface the configurator uses:
 //   origin form  (host = https://instance):              GET /api/v1/status;
 //                                                        POST|PATCH /api/v1/user[/<id>];
+//                                                        PUT|GET /api/v1/user (update / read back; Basic auth forwarded);
 //                                                        GET /stremio/<uuid>/<epwd>/{manifest.json, stream/…}
 //   manifest form (host = https://instance/stremio/<uuid>/<epwd>): GET /stream/<type>/<id>.json
 // The manifest-base door is exactly the custom lane's ("Test Streams" probe);
@@ -261,6 +278,8 @@ function aioLaneScope(host, method, upstreamPath) {
   const base = u.pathname;
   if (base === '/') {
     if (method === 'GET' && upstreamPath === '/api/v1/status') return { lane: 'aio', stripAuth: true };
+    const update = aioUpdateScope(method, upstreamPath, { lane: 'aio' });
+    if (update) return update;
     if ((method === 'POST' || method === 'PATCH') && AIO_USER_PATH_RE.test(upstreamPath)) return { lane: 'aio', stripAuth: true };
     if (method === 'GET' && AIO_STREMIO_PATH_RE.test(upstreamPath)) return { lane: 'aio', stripAuth: true };
     return null;
@@ -294,7 +313,9 @@ function wuplayLaneScope(host, method, upstreamPath) {
 //   host = origin only (https://self-host.example.com)
 //     GET    /api/v1/status            health/version probe
 //     POST   /api/v1/user              create config
-//     PATCH  /api/v1/user[/<id>]       update config (by id = update in place)
+//     PUT    /api/v1/user              update config in place (Basic uuid:password forwarded)
+//     GET    /api/v1/user              read back the encryptedPassword for the manifest link (same)
+//     PATCH  /api/v1/user[/<id>]       kept for older pages; AIOStreams has no such route (404)
 //
 // The /<id> form matches the AIOStreams lane (same AIO_USER_PATH_RE, so the
 // same bounded id charset). Without it a self-hoster could only ever POST, so
@@ -336,6 +357,8 @@ function customHostScope(host, method, upstreamPath) {
   if (path === '/') {
     const okStatus = method === 'GET' && upstreamPath === '/api/v1/status';
     const okUser   = (method === 'POST' || method === 'PATCH') && AIO_USER_PATH_RE.test(upstreamPath);
+    const update = aioUpdateScope(method, upstreamPath, { custom: true });
+    if (update) return update;
     return (okStatus || okUser) ? { custom: true, stripAuth: true } : null;
   }
   if (!path.startsWith('/stremio/') || segs !== 4) return null; // exactly /stremio/<uuid>/<epwd>
@@ -367,7 +390,7 @@ function corsHeaders(request, publicRead = false) {
   else allowed = ALLOWED_ORIGINS.has(origin) ? origin : 'https://brevitya.github.io';
   return {
     'Access-Control-Allow-Origin': allowed,
-    'Access-Control-Allow-Methods': 'GET, POST, PATCH, OPTIONS',
+    'Access-Control-Allow-Methods': 'GET, POST, PATCH, PUT, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type, Authorization',
     'Access-Control-Max-Age': '86400',
     // Public-read responses carry ACAO:* — the value does not depend on the
@@ -1065,6 +1088,11 @@ export default {
     if (!hostScope) {
       return respond(403, { error: 'host not allowed' });
     }
+    // The credentialed config doors (PUT/GET /api/v1/user) open only with a
+    // well-formed Basic header; without one they stay shut like any other path.
+    if (hostScope.forwardBasicAuth && !BASIC_AUTH_RE.test(request.headers.get('Authorization') || '')) {
+      return respond(403, { error: 'path not allowed' });
+    }
 
     const hostname = hostLabel(host, !!customHost);
     const breakerKey = customHost ? (() => { try { return new URL(host).hostname; } catch { return 'custom'; } })() : hostname;
@@ -1076,7 +1104,10 @@ export default {
     // fetch and the rate-limit burn on every page load.
     const isStatusProbe = request.method === 'GET' && upstreamPath === '/api/v1/status';
     const auth = request.headers.get('Authorization');
-    const forwardsAuth = !!auth && !hostScope?.stripAuth && AUTH_FORWARD_HOSTS.has(host);
+    const forwardsAuth = !!auth && (
+      (!hostScope?.stripAuth && AUTH_FORWARD_HOSTS.has(host)) ||
+      (hostScope?.forwardBasicAuth === true && BASIC_AUTH_RE.test(auth))
+    );
     const shareable = isStatusProbe && !forwardsAuth;
     if (shareable) {
       const cached = await statusProbeCacheGet(url);

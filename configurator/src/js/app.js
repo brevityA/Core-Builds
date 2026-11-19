@@ -53,7 +53,7 @@ const STEPS = 6;
 // workflow) the raw x.y here expands to x.y.0 in package.json / versions.json and
 // the release tag; the built badge drops the trailing .0. At the 2026-09-06
 // audit the release tag was v3.7.0 while this said 3.1 — they must move together.
-const CONFIGURATOR_VERSION = '3.35';
+const CONFIGURATOR_VERSION = '3.36';
 // Set to a collector endpoint to enable the opt-in anonymous usage ping (service+device+resolution only).
 // Leave empty to keep the feature fully disabled and hidden.
 const USAGE_BEACON_URL = '';
@@ -871,9 +871,13 @@ function updateMySetup() {
     go.disabled = true; go.textContent = 'Saving…'; out.innerHTML = '';
     const pasteBtn = '<button type="button" class="upd-cancel upd-paste" data-upd-paste>Use the paste method instead</button>';
     try {
-      const res = await writeHostFetch(rec.host, `/api/v1/user/${rec.uuid}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ config: cfg, password: S.instancePassword }) }, 10000);
+      const res = await aioUserWrite(rec.host, { uuid: rec.uuid, password: S.instancePassword, config: cfg }, 10000);
       const data = await res.json().catch(() => ({}));
-      if (!res.ok || data?.success === false) throw new Error(data?.error?.message || data?.message || data?.detail || `Server returned ${res.status}`);
+      if (!res.ok || data?.success === false) {
+        const refusal = new Error(data?.error?.message || data?.message || data?.detail || `Server returned ${res.status}`);
+        refusal.refused = aioHostRefused(res, data);
+        throw refusal;
+      }
       recordSavedConfig(rec.host, rec.uuid, cfg);
       saveLastGen();
       go.textContent = 'Saved';
@@ -883,12 +887,15 @@ function updateMySetup() {
     } catch(err) {
       logError('deploy', 'Update in place failed', { host: S.instanceHost, error: err?.message });
       go.disabled = false; go.textContent = 'Try again';
-      // A timeout can land after the host applied the PATCH; only a refusal is known to change nothing.
-      // Retrying is safe: it saves the same config to the same UUID.
-      const timedOut = err?.name === 'AbortError';
-      out.innerHTML = timedOut
-        ? `<div class="upd-err"><b>No answer.</b> The host did not reply in time, so the update may or may not have been saved. Try again to be sure.</div>${pasteBtn}`
-        : `<div class="upd-err"><b>Not saved.</b> ${escHtml(String(err?.message || err))} Your existing config is unchanged.</div>${pasteBtn}`;
+      // Only a refusal from AIOStreams itself is known to change nothing. A timeout,
+      // a network or proxy failure, or a 5xx can land after the host applied the
+      // update. Retrying is safe: it saves the same config to the same UUID.
+      const msg = escHtml(sentence(String(err?.message || err)));
+      out.innerHTML = err?.refused
+        ? `<div class="upd-err"><b>Not saved.</b> ${msg} Your existing config is unchanged.</div>${pasteBtn}`
+        : err?.name === 'AbortError'
+          ? `<div class="upd-err"><b>No answer.</b> The host did not reply in time, so the update may or may not have been saved. Try again to be sure.</div>${pasteBtn}`
+          : `<div class="upd-err"><b>Not confirmed.</b> ${msg} The update may or may not have been saved. Try again to be sure.</div>${pasteBtn}`;
     }
   });
 }
@@ -2211,6 +2218,10 @@ function openAdvancedDrawer(trigger) {
   requestAnimationFrame(() => { overlay.classList.add('active'); syncFtJump(); });
 }
 
+// Set while Fine-Tune is open from Quick install: closing it goes back there, with
+// the lane rebuilt from saved state so a change made in Fine-Tune shows in it.
+let _ftFromQuick = null;
+
 function closeAdvancedDrawer() {
   const overlay = document.getElementById('advancedDrawer');
   showAdvanced = false;
@@ -2221,6 +2232,15 @@ function closeAdvancedDrawer() {
   }
   render();
   _advancedTrigger = null;
+  if (_ftFromQuick) {
+    const back = _ftFromQuick; _ftFromQuick = null;
+    S.simpleMode = back.simpleMode; S.quickStart = back.quickStart; saveState();
+    // Drop the hidden lane without touching history (its entry is reused), then
+    // rebuild it from S so picks changed in Fine-Tune show.
+    back.lane?._closeLane?.(true);
+    showExpressLane({ target: back.target, mode: back.mode });
+    return;
+  }
   setTimeout(() => document.querySelector('[data-action="open-advanced"]')?.focus(), 200);
 }
 
@@ -3262,6 +3282,8 @@ document.addEventListener('DOMContentLoaded', () => {
   window.addEventListener('popstate', (e) => {
     // The Express lane's own history entry: Back closes the lane and leaves the page as it was.
     if (_expressLanePop) { _expressLanePop = false; return; }
+    // Back inside Fine-Tune opened from Quick install returns to Quick install.
+    if (_ftFromQuick && document.getElementById('advancedDrawer')) { closeAdvancedDrawer(); return; }
     const lane = document.getElementById('expressLaneModal');
     if (lane?._closeLane) { lane._closeLane(true); return; }
     const m = document.getElementById('manifestModal'); if (m) m.remove();
@@ -7919,11 +7941,12 @@ function pillSelectHtml(id, title, choices, value) {
   return `<fieldset class="ux-pill-field"><legend>${escHtml(title)}</legend><div class="ux-pill-grid" id="${id}Pills" role="radiogroup" aria-label="${escHtml(title)}" data-pill-select="${id}">${choices.map(([v, n]) => `<button type="button" class="chip-btn${v===value?' active':''}" role="radio" aria-checked="${v===value}" tabindex="${v===value?'0':'-1'}" data-pill-value="${escHtml(v)}">${escHtml(n)}</button>`).join('')}</div><select id="${id}" hidden aria-hidden="true" tabindex="-1">${choices.map(([v,n]) => `<option value="${escHtml(v)}"${v===value?' selected':''}>${escHtml(n)}</option>`).join('')}</select></fieldset>`;
 }
 
-function showExpressLane() {
+function showExpressLane(resume = null) {
   document.getElementById('expressLaneModal')?.remove();
   const gh = window.__genieHandoff; window.__genieHandoff = null; // one-shot seed: read both fields, then clear (review P4)
   const svc = gh?.service || ((S.service && EXPRESS_SERVICES.some(([v]) => v === S.service)) ? S.service : 'torbox-pro');
-  const state = { service: svc, target: gh?.app || 'app', mode:S.installMode === 'manifest' ? 'manifest' : 'direct', profile:S.quickProfile || 'balanced', device:S.device || 'generic', resolution:S.resolution || '4k', extras:(S.multiServices||[]).filter(v=>CAROUSEL_SVCS.includes(v) && v!==svc), scrapers:[...(S.optionalScrapers||[])],
+  // `resume` carries the two lane-only picks (app and delivery) back from Fine-Tune.
+  const state = { service: svc, target: gh?.app || resume?.target || 'app', mode: resume?.mode || (S.installMode === 'manifest' ? 'manifest' : 'direct'), profile:S.quickProfile || 'balanced', device:S.device || 'generic', resolution:S.resolution || '4k', extras:(S.multiServices||[]).filter(v=>CAROUSEL_SVCS.includes(v) && v!==svc), scrapers:[...(S.optionalScrapers||[])],
     // A language already chosen (Custom build or an earlier Quick install) wins, English
     // included; only a never-chosen list falls back to the browser's language.
     lang: (S.langsSet && S.langs?.[0]) || ((S.langs?.[0] && S.langs[0] !== 'English') ? S.langs[0] : browserLang()) };
@@ -8071,7 +8094,8 @@ function showExpressLane() {
     </aside></div>
   </div>`;
   document.body.appendChild(overlay);
-  try { history.pushState({ ...(history.state || {}), expressLane: true }, ''); } catch(e) {}
+  // Coming back from Fine-Tune, the lane's entry may still be current: reuse it.
+  if (!history.state?.expressLane) { try { history.pushState({ ...(history.state || {}), expressLane: true }, ''); } catch(e) {} }
   const syncRadioGroup = (selector, value, key) => {
     overlay.querySelectorAll(selector).forEach(button => {
       const active = button.dataset[key] === String(value);
@@ -8271,17 +8295,18 @@ function showExpressLane() {
       const hostSel = document.getElementById('expressHost');
       if (hostSel) S.instanceHost = hostSel.value;
       applyExpressChoices(expressPayload());
+      // Fine-Tune opens over the landing, not the builder, and closing it returns
+      // to Quick install: no second screen with its own menu in between.
+      // The lane stays, hidden, so its history entry still catches the phone's Back.
+      _ftFromQuick = { simpleMode: S.simpleMode, quickStart: S.quickStart, target: state.target, mode: state.mode, lane: overlay };
       S.simpleMode = false; S.quickStart = false;
-      closeLane(true);
-      // Replace the lane's history entry with the builder's, so Back from here returns to the landing.
-      step = STEPS;
-      try { history.replaceState({ step }, ''); } catch(err) {}
-      saveState(); render(); window.scrollTo(0, 0);
-      openAdvancedDrawer(document.querySelector('[data-action="open-advanced"]'));
+      overlay.hidden = true;
+      saveState();
+      openAdvancedDrawer(customizeBtn);
       // Same landing as the section chips: just under the pinned header and bar.
       const sectionId = customizeBtn.dataset.expressCustomize;
       if (sectionId) requestAnimationFrame(() => ftJumpTo(sectionId, false));
-      showToast('Your Quick install choices are kept — change anything, then install from Review');
+      showToast('Your Quick install choices are kept — close Fine-Tune to go back and install');
       return;
     }
     if (e.target.closest('#expressGo')) {
@@ -8768,14 +8793,17 @@ async function pushToStremio(manifestUrl, email, password) {
   if (!getData?.result?.addons) throw new Error(stremioErrText(getData?.error, 'Could not fetch your addon list.'));
   const existing = getData.result.addons;
   const already = existing.some(a => a.transportUrl === manifestUrl);
-  if (already && !S.cleanInstall) return 'already';
+  // The caller needs the session too: the full-stack steps (AIOMetadata, Cinemeta
+  // patch, reorder) act on the same account. Returning a bare string here left
+  // them with authKey undefined and hid the "Already installed" result.
+  if (already && !S.cleanInstall) return { status: 'already', authKey };
   const knownBases = Object.values(HOST_BASE_URLS);
   const isKnownAioManifest = a => typeof a?.transportUrl === 'string' && a.transportUrl.includes('/stremio/') && knownBases.some(base => a.transportUrl.startsWith(base));
   const kept = S.cleanInstall ? existing.filter(a => !isKnownAioManifest(a)) : existing.slice();
   if (!kept.some(a => a.transportUrl === manifestUrl)) kept.push({ transportName:'http', transportUrl: manifestUrl, flags:{} });
   const setData = await stremioFetch('https://api.strem.io/api/addonCollectionSet', { type:'AddonCollectionSet', authKey, addons: kept });
   if (!setData?.result) throw new Error(stremioErrText(setData?.error, 'Install failed.'));
-  return S.cleanInstall ? 'replaced' : 'installed';
+  return { status: S.cleanInstall ? 'replaced' : 'installed', authKey };
 }
 
 // ── Full Stack Install (Cinemeta patch + AIOMetadata + addon ordering) ──
@@ -8835,10 +8863,14 @@ async function fullStackAfterPush(authKey, aiostreamsUrl, opts = {}) {
   if (installAIOMetadata) {
     try {
       const getData = await stremioFetch('https://api.strem.io/api/addonCollectionGet', { type:'AddonCollectionGet', authKey, update:true });
-      const existing = getData?.result?.addons || [];
+      // Never write a collection built from a failed read: `[]` here would replace
+      // every addon on the account with AIOMetadata alone.
+      const existing = getData?.result?.addons;
+      if (!Array.isArray(existing)) throw new Error(stremioErrText(getData?.error, 'could not read your addon list, so nothing was changed'));
       if (!existing.some(a => a.transportUrl === AIOMETADATA_MANIFEST)) {
         const updated = [...existing, { transportName:'http', transportUrl: AIOMETADATA_MANIFEST, flags:{} }];
-        await stremioFetch('https://api.strem.io/api/addonCollectionSet', { type:'AddonCollectionSet', authKey, addons: updated });
+        const setData = await stremioFetch('https://api.strem.io/api/addonCollectionSet', { type:'AddonCollectionSet', authKey, addons: updated });
+        if (!setData?.result) throw new Error(stremioErrText(setData?.error, 'install failed'));
         steps.push('✓ AIOMetadata installed');
       } else {
         steps.push('✓ AIOMetadata already installed');
@@ -9019,6 +9051,51 @@ function raceHostFetch(host, path, options, timeout) {
 // do NOT fall back — the proxy may have already forwarded the write, and a direct
 // retry would create a duplicate config on the host. A proxy 429 is also safe to fall
 // back on: it means the worker rejected the request before forwarding it.
+// AIOStreams' write contract (2.32 through 2.38, packages/server/src/routes/api/user.ts):
+// POST /api/v1/user {config, password} creates a config; PUT /api/v1/user {config}
+// with `Authorization: Basic base64(uuid:password)` updates one in place. There is
+// no PATCH route and no /<id> form: the PATCH /api/v1/user/<id> this used to send
+// came back 404 "Not Found" on every host, so "Update my setup" never saved and a
+// reinstall with a saved UUID quietly minted a new config instead.
+// Host messages arrive bare ("Not Found"); end them so the next sentence reads.
+function sentence(msg) {
+  const t = String(msg || '').trim();
+  return !t || /[.!?…]$/.test(t) ? t : `${t}.`;
+}
+// A refusal AIOStreams itself sent: a 4xx carrying its error shape { error: { code } }.
+// Only then is it known that nothing was written. A timeout, a network failure, a
+// 5xx or a proxy error can come after the host applied the write.
+function aioHostRefused(res, data) {
+  return !!res && res.status >= 400 && res.status < 500 && typeof data?.error?.code === 'string';
+}
+function aioBasicAuth(uuid, password) {
+  let bin = '';
+  new TextEncoder().encode(`${uuid}:${password}`).forEach(b => { bin += String.fromCharCode(b); });
+  return `Basic ${btoa(bin)}`;
+}
+function aioUserWrite(host, { uuid, password, config }, timeout) {
+  if (uuid) {
+    return writeHostFetch(host, '/api/v1/user', { method: 'PUT', headers: { 'Content-Type': 'application/json', Authorization: aioBasicAuth(uuid, password) }, body: JSON.stringify({ config }) }, timeout);
+  }
+  return writeHostFetch(host, '/api/v1/user', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ config, password }) }, timeout);
+}
+
+// A PUT answers without the encryptedPassword a manifest link needs, and
+// /stremio/<uuid>/<pwd>/ refuses a raw password, so read it back the documented way.
+async function aioEncryptedPassword(host, uuid, password, timeout) {
+  try {
+    const res = await writeHostFetch(host, '/api/v1/user', { method: 'GET', headers: { Authorization: aioBasicAuth(uuid, password) } }, timeout);
+    const data = await res.json().catch(() => ({}));
+    const epwd = res.ok ? data?.data?.encryptedPassword : null;
+    return typeof epwd === 'string' && epwd ? epwd : null;
+  } catch (e) { return null; }
+}
+// Saved over an existing config, but no encrypted password came back for a new link:
+// the link the user installed before still points at this config.
+function updatedInPlaceHtml(hostLbl) {
+  return `<div class="u-mt12 import-success"><strong class="u-green">Updated on ${escHtml(hostLbl)}</strong><div class="u-note">Saved over your existing config. The Stremio link you installed before keeps working, and streams use the update straight away.</div></div>`;
+}
+
 async function writeHostFetch(host, path, options, timeout) {
   if (!CORS_PROXY) return fetchWithTimeout(`${host}${path}`, options, timeout);
   let res;
@@ -9160,23 +9237,33 @@ async function openInAIOStreams() {
     }
     rememberGoodHost(fastest);
     const attempt = async (id) => {
-      const path = id ? `/api/v1/user/${id}` : '/api/v1/user';
-      const res = await writeHostFetch(fastest, path, { method: id ? 'PATCH' : 'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ config:cfg, password:pwd }) }, 5000);
+      const res = await aioUserWrite(fastest, { uuid: id, password: pwd, config: cfg }, 5000);
       const data = await res.json().catch(()=>({}));
-      if (res.ok && data?.success !== false) return { host: fastest, uuid: id || data?.data?.uuid || data?.uuid || data?.user?.uuid || data?.id, epwd: data?.data?.encryptedPassword };
+      if (res.ok && data?.success !== false) {
+        const epwd = data?.data?.encryptedPassword || (id ? await aioEncryptedPassword(fastest, id, pwd, 5000) : null);
+        return { host: fastest, uuid: id || data?.data?.uuid || data?.uuid || data?.user?.uuid || data?.id, epwd, updated: !!id };
+      }
       const apiMsg = data?.error?.message || data?.message || data?.detail || `Server returned ${res.status}`;
-      throw new Error(`API_ERROR:${apiMsg}`);
+      const failure = new Error(`API_ERROR:${apiMsg}`);
+      failure.refused = aioHostRefused(res, data);
+      failure.code = data?.error?.code;
+      throw failure;
     };
     try {
       let winner;
       try { winner = await attempt(existingUuid); }
       catch(err) {
-        if (existingUuid) winner = await attempt(null);
+        // Create a new config only when AIOStreams answered that this UUID and
+        // password do not open a config (nothing was written). After a timeout,
+        // network or proxy failure or a 5xx the update may have landed, so keep
+        // the saved UUID and report instead of minting a second config.
+        if (existingUuid && err?.refused && err.code === 'USER_INVALID_DETAILS') winner = await attempt(null);
         else throw err;
       }
       if (winner.uuid) { S.instanceUuid = winner.uuid; saveState(); recordSavedConfig(winner.host, winner.uuid, cfg); }
-      const manifestPwd = winner.epwd || encodeURIComponent(pwd);
       resetBtn(origHtml);
+      if (winner.updated && !winner.epwd) { result.innerHTML = updatedInPlaceHtml(HOST_LABELS[winner.host] || winner.host.replace('https://','').split('/')[0]); return; }
+      const manifestPwd = winner.epwd || encodeURIComponent(pwd);
       showManifestModal(`${winner.host}/stremio/${winner.uuid}/${manifestPwd}/manifest.json`, pwd, HOST_LABELS[winner.host] || winner.host.replace('https://','').split('/')[0]);
     } catch(e) {
       const isApiError = e.message && e.message.startsWith('API_ERROR:');
@@ -9240,19 +9327,20 @@ async function openInAIOStreams() {
       const cfg = buildFinal().config;
       const sz = payloadSizeGuard(cfg);
       if (sz.over) { resetBtn(origHtml); result.innerHTML = payloadTooLargeHtml(sz); return; }
-      // With a UUID this updates that config in place; without one it creates a
-      // new config. Same shape auto mode uses, and the proxy's custom lane
-      // accepts the /<id> form, so self-hosted hosts take this path too.
-      const userPath = uuid ? `/api/v1/user/${uuid}` : '/api/v1/user';
-      const res = await writeHostFetch(resolvedBase, userPath, { method: uuid ? 'PATCH' : 'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ config: cfg, password: pwd }) }, 8000);
+      // With a UUID this updates that config in place (PUT + Basic auth); without
+      // one it creates a new config. Same call auto mode uses, and the proxy's
+      // custom lane carries it, so self-hosted hosts take this path too.
+      const res = await aioUserWrite(resolvedBase, { uuid, password: pwd, config: cfg }, 8000);
       const data = await res.json().catch(()=>({}));
       if (res.ok && data?.success !== false) {
-        // A PATCH answers without echoing the uuid, so fall back to the one we sent.
+        // Fall back to the uuid we sent if the answer does not echo it.
         const outUuid = data?.data?.uuid || data?.uuid || data?.user?.uuid || data?.id || uuid;
-        const epwd = data?.data?.encryptedPassword || encodeURIComponent(pwd);
+        const readBack = data?.data?.encryptedPassword || (uuid ? await aioEncryptedPassword(resolvedBase, uuid, pwd, 5000) : null);
         if (outUuid && !uuid) { S.instanceUuid = outUuid; saveState(); }
         recordSavedConfig(resolvedBase, outUuid, cfg);
         resetBtn(origHtml);
+        if (uuid && !readBack) { result.innerHTML = updatedInPlaceHtml(hostLabel); return; }
+        const epwd = readBack || encodeURIComponent(pwd);
         showManifestModal(`${resolvedBase}/stremio/${outUuid}/${epwd}/manifest.json`, pwd, hostLabel);
       } else throw new Error('API Error');
     } catch(e) {

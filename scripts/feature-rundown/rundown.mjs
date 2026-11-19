@@ -217,12 +217,25 @@ function readJson(path) { return JSON.parse(readFileSync(path, 'utf8')); }
 const cfgOf = j => (j && typeof j === 'object' && j.config && typeof j.config === 'object') ? j.config : j;
 
 /** True when a config value switches its feature on: enabled objects, non-empty lists, set scalars. */
+// Whether a list entry survives the smart template's directives: __remove drops it,
+// and a __switch keeps it only if some branch does. Plain values and objects stay.
+function entryKept(x) {
+  if (!x || typeof x !== 'object' || Array.isArray(x)) return true;
+  if (x.__remove === true) return false;
+  if ('__switch' in x) return [...Object.values(x.cases || {}), x.default].some(b => b !== undefined && entryKept(b));
+  return true;
+}
+
 export function isActive(v) {
   if (v === null || v === undefined || v === false || v === '' ) return false;
-  if (Array.isArray(v)) return v.length > 0;
+  if (Array.isArray(v)) return v.some(entryKept);
   if (typeof v === 'object') {
-    if ('enabled' in v) return v.enabled === true;
-    return Object.values(v).some(isActive);
+    // Smart-template directives: a __switch is on when any branch is; __remove is off;
+    // an __if guard is metadata about the entry, not a value.
+    if (v.__remove === true) return false;
+    if ('__switch' in v) return [...Object.values(v.cases || {}), v.default].some(isActive);
+    if ('enabled' in v) return isActive(v.enabled);
+    return Object.entries(v).some(([k, x]) => k !== '__if' && isActive(x));
   }
   return true;
 }
@@ -318,16 +331,16 @@ export function buildRundown({ pin, latest, pinSrc, latestSrc, changelog, usage,
       byProfile[p] = { active: gs.filter(g => isActive(g.cfg?.[key])).length, total: gs.length };
     }
     const templates = usage.templates.filter(t => isActive(t.cfg?.[key])).length;
-    const smart = usage.smart ? (key in usage.smart) : false;
-    // Present in the smart template is what the Smart column shows; switched on there counts as use.
-    const smartActive = usage.smart ? isActive(usage.smart[key]) : false;
-    const usedAnywhere = Object.values(byProfile).some(x => x.active > 0) || templates > 0 || smartActive;
+    // Same rule as the goldens: the smart template uses an option when some answer switches it on.
+    // Merely writing the key (often as false or []) is not use.
+    const smart = usage.smart ? isActive(usage.smart[key]) : false;
+    const usedAnywhere = Object.values(byProfile).some(x => x.active > 0) || templates > 0 || smart;
     const decision = decisions.lookup(key);
     const meta = latestOpts[key] || pinOpts[key];
     const flags = [];
     if (!decision) flags.push('no decision');
     else if (!STATUSES.includes(decision.status)) flags.push(`unknown status "${decision.status}"`);
-    else if (decision.status === 'used' && !usedAnywhere && !smart) flags.push('decision says used, but no generated config or template sets it');
+    else if (decision.status === 'used' && !usedAnywhere) flags.push('decision says used, but no generated config or template sets it');
     else if (['off-by-design', 'not-applicable'].includes(decision.status) && usedAnywhere) flags.push(`decision says ${decision.status}, but configs set it`);
     if (!inPin && inLatest) flags.push(`new upstream after ${pin}`);
     if (inPin && !inLatest) flags.push(`removed upstream by ${latest}`);
@@ -421,7 +434,7 @@ export function renderMarkdown(r, { generatedAt = new Date().toISOString().slice
     }
     L.push('');
   }
-  L.push('Profile columns: ✓ every golden of that profile sets it, n/m some do, · none do.', '');
+  L.push('Profile columns: ✓ every golden of that profile sets it, n/m some do, · none do. Smart: ✓ when at least one answer switches it on.', '');
 
   L.push('## Presets', '');
   const ours = r.presets.ours;

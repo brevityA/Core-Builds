@@ -34,4 +34,4 @@ Statuses: `used`, `candidate` (worth evaluating — say what it would gain), `of
 
 ## How usage is counted
 
-A golden "uses" an option when the option switches something on: an object with `enabled: true`, a non-empty list, or a set value. `{ enabled: false }` and `[]` count as off. Templates under `Personal/`, `Deprecated/` and `Legacy/` are left out. The smart template counts an option when the key is present, since its values are answer-dependent directives.
+A golden "uses" an option when the option switches something on: an object with `enabled: true`, a non-empty list, or a set value. `{ enabled: false }` and `[]` count as off. Templates under `Personal/`, `Deprecated/` and `Legacy/` are left out. The smart template is read the same way through its directives: a `__switch` counts when any of its cases or its default switches the option on, `__remove` counts as off, and a preset's `__if` guard is ignored. Writing a key at its default (`false`, `[]`, `{ enabled: false }`), which the smart template and the goldens do for most keys so an import shows no change, is not use.

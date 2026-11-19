@@ -15,8 +15,8 @@
   .sub{color:var(--tx2);font-size:.82rem;margin-bottom:24px}
   textarea{width:100%;height:280px;background:var(--card);border:1.5px solid var(--border);border-radius:10px;padding:14px;color:var(--tx);font-family:'SF Mono',Monaco,Consolas,monospace;font-size:.78rem;resize:vertical;outline:none;transition:border-color .15s}
   textarea:focus{border-color:rgba(0,212,255,.4)}
-  .actions{display:flex;gap:8px;margin:12px 0}
-  button{padding:10px 20px;border-radius:8px;border:1.5px solid rgba(0,212,255,.3);background:var(--accent-bg);color:var(--accent);font-size:.82rem;font-weight:700;cursor:pointer;transition:all .15s}
+  .actions{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+  button,.btn-secondary{padding:10px 20px;border-radius:8px;border:1.5px solid rgba(0,212,255,.3);background:var(--accent-bg);color:var(--accent);font-size:.82rem;font-weight:700;cursor:pointer;transition:all .15s}
   button:hover{background:rgba(0,212,255,.15)}
   button:disabled{opacity:.4;cursor:not-allowed}
   .btn-secondary{border-color:var(--border);background:transparent;color:var(--tx2)}
@@ -63,11 +63,11 @@
   <h1 class="cb-title">Template Inspector</h1>
   <p class="sub">Paste any AIOStreams JSON config — get plain-English findings, safe repairs, and host compatibility.</p>
 
-  <textarea id="input" placeholder='Paste your AIOStreams template JSON here...\n\nOr paste a manifest URL (https://...) to fetch and inspect.'></textarea>
+  <textarea id="input" placeholder='Paste your AIOStreams template JSON here…&#10;&#10;Or paste a manifest URL (https://…) to fetch and inspect.'></textarea>
 
   <div class="actions">
     <button id="inspectBtn" onclick="inspect()">Inspect Template</button>
-    <label class="btn-secondary" for="jsonFile" style="cursor:pointer;display:inline-flex;align-items:center">📁 Import JSON File<input type="file" id="jsonFile" accept=".json,application/json" style="display:none" onchange="loadFile(this)"></label>
+    <label class="btn-secondary" for="jsonFile" style="cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap">📁 Import JSON File<input type="file" id="jsonFile" accept=".json,application/json" style="display:none" onchange="loadFile(this)"></label>
     <button class="btn-secondary" onclick="clearAll()">Clear</button>
     <button class="btn-secondary" onclick="loadExample()">Load Example</button>
   </div>
