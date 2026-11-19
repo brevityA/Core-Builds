@@ -4,6 +4,7 @@ import { CHANGELOG } from '../data/changelog.js';
 import { FORMATTERS, AUDIO_HELP } from '../data/formatters.js';
 import { CORE_SCORE_MODES, DEFAULT_CORE_SCORE_MODE, buildCoreFormatter, isCoreFormatter } from '../data/core-formatters.js';
 import { CORE_FORMATTER_PREVIEWS, CORE_PREVIEW_ENGINE_VERSION } from '../data/core-formatter-previews.js';
+import { FORMATTER_PREVIEWS, FORMATTER_PREVIEW_ENGINE_VERSION, FORMATTER_PREVIEW_SAMPLES } from '../data/formatter-previews.js';
 import { OPTIONAL_SCRAPER_DEFS, presetRole, withPenguplay } from '../data/scrapers.js';
 import { HOST_BASE_URLS, HOST_LABEL_MAP, HOST_META, MIN_AIOSTREAMS_VERSION } from '../data/hosts.js';
 import { DEVICE_AUDIO_DEFAULTS, DEVICE_FORCE_LIMITED_AUDIO, DEVICE_AV1_SAFE, DEVICE_DV_SAFE, POPULAR_DEVICE_IDS, DEVICE_PROFILES } from '../data/devices.js';
@@ -43,6 +44,7 @@ import { buildFeedbackReport } from '../core/feedback-report-policy.js';
 import { preflightFindings, hasBlockers, summarise, findingsAsMessages } from '../core/preflight-policy.js';
 import { verifyAddonInstall } from '../core/install-transaction-policy.js';
 import { unknownConfigKeys } from '../config/generated/aiostreams-config-schema.js';
+import '../../../tools/core-nav.js'; // classic script: defines window.CoreNav
 
 function toggleTheme(){const html=document.documentElement;const t=html.getAttribute('data-theme')==='dark'?'light':'dark';html.setAttribute('data-theme',t);try{localStorage.setItem('cbTheme',t)}catch(e){/* storage unavailable — the theme still applies for this visit */}}
 
@@ -51,7 +53,7 @@ const STEPS = 6;
 // workflow) the raw x.y here expands to x.y.0 in package.json / versions.json and
 // the release tag; the built badge drops the trailing .0. At the 2026-09-06
 // audit the release tag was v3.7.0 while this said 3.1 — they must move together.
-const CONFIGURATOR_VERSION = '3.34';
+const CONFIGURATOR_VERSION = '3.35';
 // Set to a collector endpoint to enable the opt-in anonymous usage ping (service+device+resolution only).
 // Leave empty to keep the feature fully disabled and hidden.
 const USAGE_BEACON_URL = '';
@@ -498,7 +500,7 @@ function releaseMigrationFields(fields) {
 function releaseMigrationForControl(action, element) {
   if (action === 'set-output-profile') { S._migrationKeep = null; S._migrationRemove = []; return; }
   const key = element.dataset.key;
-  if (['set-formatter', 'set-simple-fmt', 'fmt-scroll-pick', 'fmt-dropdown-change', 'clear-custom-formatter', 'set-fmt-score'].includes(action)) releaseMigrationFields(['formatter']);
+  if (['set-formatter', 'set-simple-fmt', 'fmt-scroll-pick', 'fmt-compare-use', 'fmt-dropdown-change', 'clear-custom-formatter', 'set-fmt-score'].includes(action)) releaseMigrationFields(['formatter']);
   if (['set-simple-quality', 'set-simple-resfirst', 'set-library-boost'].includes(action)
     || (action === 'toggle-pref' && ['qualityFirst', 'resolutionFirst'].includes(key))) {
     releaseMigrationFields(CONFIG_UPDATE_SECTIONS.find(section => section.key === 'sort').fields);
@@ -1402,7 +1404,7 @@ function corePreview(id) {
   if (!set) return null;
   const p = set[S.fmtScore] || set[DEFAULT_CORE_SCORE_MODE];
   const lines = String(p.n).split('\n');
-  return { n: lines.map(escHtml).join('<br>'), d: p.d.map(escHtml), rendered: true };
+  return { n: lines.map(escHtml).join('<br>'), d: p.d.map(escHtml), rendered: true, core: true };
 }
 
 const SCORE_MODE_LABELS = {
@@ -1415,11 +1417,15 @@ const SCORE_MODE_LABELS = {
  * Score display for the Core collection. Shown only while a Core style is
  * selected; the choice is kept when switching styles away and back.
  */
+// Each picker gets its own radio-group name: Review and Fine-Tune can both be in
+// the page, and one shared name made checking one clear the other.
+let _fmtScoreGroup = 0;
 function fmtScoreControlHtml() {
+  const group = `fmtScore-${++_fmtScoreGroup}`;
   const radios = CORE_SCORE_MODES.map(mode => {
     const [text, sample] = SCORE_MODE_LABELS[mode];
     const checked = (S.fmtScore || DEFAULT_CORE_SCORE_MODE) === mode;
-    return `<label class="fmt-score-opt"><input type="radio" name="fmtScore" value="${mode}" data-action="set-fmt-score"${checked ? ' checked' : ''}> <span>${text}</span> <span class="fmt-score-sample" aria-hidden="true">${escHtml(sample)}</span></label>`;
+    return `<label class="fmt-score-opt"><input type="radio" name="${group}" value="${mode}" data-action="set-fmt-score"${checked ? ' checked' : ''}> <span>${text}</span> <span class="fmt-score-sample" aria-hidden="true">${escHtml(sample)}</span></label>`;
   }).join('');
   return `<fieldset class="fmt-score" id="fmtScoreControl"${isCoreFormatter(S.formatter) ? '' : ' hidden'}>
     <legend>Score display <span class="fmt-score-scope">Core styles only</span></legend>
@@ -1428,56 +1434,134 @@ function fmtScoreControlHtml() {
   </fieldset>`;
 }
 
+/**
+ * Any built-in formatter rendered by AIOStreams' engine for one compare sample,
+ * as {n, d[]} with every line escaped. Core styles follow the score display.
+ */
+function enginePreview(id, sample = '4k') {
+  const set = FORMATTER_PREVIEWS[id];
+  if (!set) return null;
+  const mode = set[S.fmtScore] || set.default || set[DEFAULT_CORE_SCORE_MODE];
+  const p = mode && mode[sample];
+  if (!p) return null;
+  return { n: String(p.n).split('\n').map(escHtml).join('<br>'), d: p.d.map(escHtml), rendered: true };
+}
+
+// Side-by-side compare: the same sample stream in up to three formatters, laid
+// out as a phone app or a TV app shows a result. State lives for the session.
+const _fmtCompare = { open: false, slots: [], sample: '4k', device: 'phone' };
+const COMPARE_DEVICES = [['phone', 'Phone'], ['tv', 'TV']];
+
+function compareChoices() {
+  return FORMATTERS.filter(f => FORMATTER_PREVIEWS[f.id]);
+}
+
+function compareSlots() {
+  const ids = new Set(compareChoices().map(f => f.id));
+  if (!_fmtCompare.slots.length) {
+    const first = ids.has(S.formatter) ? S.formatter : 'family-v4';
+    _fmtCompare.slots = [first, first === 'core-compact' ? 'family-v4' : 'core-compact', ''];
+  }
+  _fmtCompare.slots = _fmtCompare.slots.map((id, i) => (id === '' && i > 0) || ids.has(id) ? id : 'family-v4');
+  return _fmtCompare.slots;
+}
+
+function fmtCompareColumn(id, i) {
+  const choices = compareChoices();
+  const options = (i > 0 ? `<option value=""${id === '' ? ' selected' : ''}>Add a formatter…</option>` : '')
+    + choices.map(f => `<option value="${escHtml(f.id)}"${f.id === id ? ' selected' : ''}>${escHtml(f.label)}</option>`).join('');
+  const select = `<select class="fmt-cmp-pick" id="fmtCmpPick${i}" data-action="fmt-compare-slot" data-slot="${i}" aria-label="Formatter ${i + 1}">${options}</select>`;
+  if (!id) return `<div class="fmt-cmp-col fmt-cmp-empty">${select}<div class="fmt-cmp-screen fmt-cmp-blank">Pick a formatter to compare</div></div>`;
+  const p = enginePreview(id, _fmtCompare.sample);
+  const inUse = S.formatter === id && !(S.formatter === 'custom' && S.customFormatter);
+  const body = p
+    ? `<div class="fmt-cmp-row"><div class="fmt-cmp-n">${p.n}</div><div class="fmt-cmp-d">${p.d.map(l => `<div>${l}</div>`).join('')}</div></div>`
+    : '<div class="fmt-cmp-blank">No preview for this formatter</div>';
+  return `<div class="fmt-cmp-col">${select}<div class="fmt-cmp-screen">${body}</div>`
+    + `<button type="button" class="fmt-cmp-use" data-action="fmt-compare-use" data-fmt="${escHtml(id)}"${inUse ? ' disabled' : ''}>${inUse ? 'In use' : 'Use this'}</button></div>`;
+}
+
+function fmtCompareHtml() {
+  if (!_fmtCompare.open) {
+    return `<button type="button" class="fmt-compare-open" data-action="fmt-compare-toggle" aria-expanded="false">${ICO.palette(14,'currentColor')} Compare side by side</button>`;
+  }
+  const seg = (action, items, current, label) => `<div class="fmt-cmp-seg" role="group" aria-label="${label}">${items.map(([v, n]) => `<button type="button" data-action="${action}" data-val="${v}" aria-pressed="${v === current}">${escHtml(n)}</button>`).join('')}</div>`;
+  return `<section class="fmt-compare" aria-label="Compare stream cards">
+    <div class="fmt-compare-head"><b>Compare side by side</b><button type="button" class="fmt-compare-close" data-action="fmt-compare-toggle" aria-expanded="true">Close</button></div>
+    <div class="fmt-compare-controls">
+      ${seg('fmt-compare-sample', FORMATTER_PREVIEW_SAMPLES.map(s => [s.key, s.label]), _fmtCompare.sample, 'Sample stream')}
+      ${seg('fmt-compare-device', COMPARE_DEVICES, _fmtCompare.device, 'Screen')}
+    </div>
+    <div class="fmt-cmp-cols" data-device="${_fmtCompare.device}">${compareSlots().map(fmtCompareColumn).join('')}</div>
+    <p class="fmt-compare-note">The same sample stream in each, rendered by AIOStreams ${escHtml(FORMATTER_PREVIEW_ENGINE_VERSION)}'s formatter engine. Fonts, emoji and line breaks are your app's.</p>
+  </section>`;
+}
+
+// Focus goes back inside the picker that received the action: Review and
+// Fine-Tune can both hold one, and Fine-Tune is a modal.
+function refreshFmtCompare(focusSelector, origin) {
+  const wraps = [...document.querySelectorAll('.fmt-compare-wrap')];
+  const at = origin ? wraps.indexOf(origin.closest('.fmt-compare-wrap')) : -1;
+  wraps.forEach(wrap => { wrap.innerHTML = fmtCompareHtml(); });
+  if (focusSelector) (wraps[at] || wraps[0])?.querySelector(focusSelector)?.focus({ preventScroll: true });
+}
+
 function fmtDropdownHtml() {
   const isCustom = S.formatter === 'custom' && S.customFormatter;
   const allFmts = [...FORMATTERS];
   if (S.customFormatter) allFmts.push({ id:'custom', label:S.customFormatter.label||'Custom', badge:'Imported', bc:'#a78bfa', desc:'Your imported formatter' });
-  const cards = allFmts.map(f => {
+  const rows = allFmts.map(f => {
     const active = (isCustom && f.id === 'custom') || (!isCustom && f.id === S.formatter);
-    const p = corePreview(f.id) || FMT_PREVIEWS[f.id] || FMT_PREVIEWS['family-v4'];
-    return `<div class="fmt-scroll-card" data-active="${active}" data-action="fmt-scroll-pick" data-fmt="${f.id}">
-      <div class="fmt-scroll-head">
-        <div class="fmt-scroll-dot" style="background:${f.bc}"></div>
-        <span class="fmt-scroll-label">${f.label}</span>
-        <span class="fmt-scroll-badge" style="background:${f.bc}22;color:${f.bc}">${f.badge}</span>
-      </div>
-      <div class="fmt-scroll-desc">${f.desc}</div>
-      <div class="fmt-live-preview">
-        <div class="fmt-live-poster">${ICO.film(14,'#6b7280')}</div>
-        <div class="fmt-live-lines">
-          <div class="fmt-live-n">${p.n}</div>
-          ${p.d.map(l=>`<div class="fmt-live-d">${l}</div>`).join('')}
-        </div>
-      </div>
-      <div class="fmt-preview-note">${p.rendered ? `Rendered by AIOStreams ${CORE_PREVIEW_ENGINE_VERSION}'s formatter for a sample stream` : 'Illustrative preview'}</div>
+    return `<div class="fmt-row" data-active="${active}" data-action="fmt-scroll-pick" data-fmt="${f.id}" role="button" tabindex="0" aria-pressed="${active}">
+      <span class="fmt-row-dot" style="background:${f.bc}" aria-hidden="true"></span>
+      <span class="fmt-row-main"><span class="fmt-row-name">${escHtml(f.label)}</span><span class="fmt-row-desc">${escHtml(f.desc)}</span></span>
+      <span class="fmt-row-tag">${escHtml(f.badge)}</span>
     </div>`;
   }).join('');
-  return `<div class="scroll-fade-wrap" data-scroll-start="true" data-scroll-end="false"><div class="fmt-scroll" id="fmtScroll">${cards}</div></div>${fmtScoreControlHtml()}`;
+  return `<div class="fmt-pick">${fmtStageHtml()}<div class="fmt-list" id="fmtScroll">${rows}</div></div>${fmtScoreControlHtml()}<div class="fmt-compare-wrap">${fmtCompareHtml()}</div>`;
+}
+
+/**
+ * The one large preview above the list: the selected formatter on a sample
+ * stream, as the app's results screen shows it. An imported formatter has no
+ * rendered preview, so it says so rather than borrowing another one's.
+ */
+function fmtStageHtml() {
+  const isCustom = S.formatter === 'custom' && S.customFormatter;
+  const id = isCustom ? 'custom' : (S.formatter || 'family-v4');
+  const f = isCustom ? { label: S.customFormatter.label || 'Custom', badge: 'Imported' } : (FORMATTERS.find(x => x.id === id) || FORMATTERS[0]);
+  const p = isCustom ? null : (corePreview(id) || enginePreview(id) || FMT_PREVIEWS[id]);
+  const body = p
+    ? `<div class="fmt-cmp-row"><div class="fmt-cmp-n">${p.n}</div><div class="fmt-cmp-d">${p.d.map(l => `<div>${l}</div>`).join('')}</div></div>`
+    : '<div class="fmt-cmp-blank">No preview for an imported formatter. Save a config and check it in your app.</div>';
+  const note = p && p.rendered
+    ? `Sample 4K REMUX stream, rendered by AIOStreams ${escHtml(p.core ? CORE_PREVIEW_ENGINE_VERSION : FORMATTER_PREVIEW_ENGINE_VERSION)}'s formatter. Fonts and emoji are your app's.`
+    : p ? 'Illustrative preview.' : '';
+  return `<div class="fmt-stage" aria-live="polite">
+    <div class="fmt-stage-head"><span class="fmt-stage-eyebrow">Preview</span><b class="fmt-stage-name">${escHtml(f.label)}</b><span class="fmt-row-tag">${escHtml(f.badge)}</span></div>
+    <div class="fmt-cmp-screen fmt-stage-screen">${body}</div>
+    ${note ? `<p class="fmt-preview-note">${note}</p>` : ''}
+  </div>`;
+}
+
+function refreshFmtStage() {
+  document.querySelectorAll('.fmt-stage').forEach(el => { el.outerHTML = fmtStageHtml(); });
 }
 
 function updateFmtFeatured() {
-  document.querySelectorAll('.fmt-scroll-card').forEach(card => {
+  document.querySelectorAll('.fmt-row').forEach(card => {
     const isSel = card.dataset.fmt === S.formatter;
     card.dataset.active = isSel ? 'true' : 'false';
-    if (isSel) card.scrollIntoView({ behavior:'smooth', block:'nearest', inline:'center' });
+    card.setAttribute('aria-pressed', String(isSel));
   });
+  refreshFmtStage();
   document.querySelectorAll('.fmt-score').forEach(el => { el.hidden = !isCoreFormatter(S.formatter); });
 }
 
-/** Re-render the Core cards' previews after the score display changes. */
+/** Re-render the preview after the score display changes. */
 function updateCorePreviews() {
-  document.querySelectorAll('.fmt-scroll-card').forEach(card => {
-    const p = corePreview(card.dataset.fmt);
-    if (!p) return;
-    const n = card.querySelector('.fmt-live-n');
-    const lines = card.querySelector('.fmt-live-lines');
-    if (n) n.innerHTML = p.n;
-    if (lines) {
-      lines.querySelectorAll('.fmt-live-d').forEach(el => el.remove());
-      lines.insertAdjacentHTML('beforeend', p.d.map(l => `<div class="fmt-live-d">${l}</div>`).join(''));
-    }
-  });
-  document.querySelectorAll('input[name="fmtScore"]').forEach(input => { input.checked = input.value === S.fmtScore; });
+  refreshFmtStage();
+  document.querySelectorAll('input[data-action="set-fmt-score"]').forEach(input => { input.checked = input.value === S.fmtScore; });
 }
 
 function updateDeviceScroll() {
@@ -1698,9 +1782,9 @@ function renderOutputProfilePicker({ compact=false } = {}) {
     const [color, bg, border] = palette[profile];
     const info = OUTPUT_PROFILE_INFO[profile];
     const on = active === profile;
-    return `<button type="button" data-action="set-output-profile" data-val="${profile}" aria-pressed="${on}" style="text-align:left;padding:9px 10px;border-radius:9px;border:1px solid ${on ? border : 'rgba(255,255,255,.08)'};background:${on ? bg : 'rgba(255,255,255,.015)'};color:#e6edf3;cursor:pointer;min-width:0;flex:1;transition:all .15s">
-      <span style="display:block;font-size:.73rem;font-weight:800;color:${on ? color : '#9ca3af'}">${info.label}${on ? ' ✓' : ''}</span>
-      <span style="display:block;font-size:.62rem;line-height:1.35;color:${on ? '#c9d1d9' : '#6b7280'};margin-top:3px">${info.description}</span>
+    return `<button type="button" data-action="set-output-profile" data-val="${profile}" aria-pressed="${on}" style="text-align:left;padding:9px 10px;border-radius:9px;border:1px solid ${on ? border : 'var(--th-border-strong)'};background:${on ? bg : 'var(--th-input-bg)'};color:var(--th-tx);cursor:pointer;min-width:0;flex:1;transition:all .15s">
+      <span style="display:block;font-size:.73rem;font-weight:800;color:${on ? color : 'var(--th-tx2)'}">${info.label}${on ? ' ✓' : ''}</span>
+      <span style="display:block;font-size:.62rem;line-height:1.35;color:${on ? 'var(--th-tx)' : 'var(--th-tx3)'};margin-top:3px">${info.description}</span>
     </button>`;
   }).join('');
   const flowDefault = OUTPUT_PROFILE_INFO[resolveOutputProfile({ ...outputProfileContext(), outputProfile: 'auto' })].label;
@@ -1717,15 +1801,15 @@ function renderOutputProfilePicker({ compact=false } = {}) {
     'unknown': 'Unknown target: old TorBox Search is removed rather than assumed portable.',
   };
   const targetNote = TARGET_NOTES[target] || TARGET_NOTES.unknown;
-  const targetControl = `<div style="margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.06)"><label style="display:block;font-size:.64rem;color:#8b949e;font-weight:700;letter-spacing:.04em;text-transform:uppercase;margin-bottom:5px">AIOStreams compatibility target</label><select data-action="set-aiostreams-target" style="width:100%;background:#0b0f16;color:#e6edf3;border:1px solid rgba(255,255,255,.12);border-radius:7px;padding:7px 8px;font-size:.72rem">${AIOSTREAMS_COMPATIBILITY_TARGETS.map(v => `<option value="${v}" ${target === v ? 'selected' : ''}>${v === 'unknown' ? 'Unknown / older — do not assume legacy preset support' : v + (v === '2.31.1' ? ' — legacy TorBox Search lane' : v === '2.32.0' ? ' — remove legacy preset' : v === DEFAULT_AIOSTREAMS_VERSION ? ' — pinned release (default)' : ' — variants supported')}</option>`).join('')}</select><div style="font-size:.62rem;line-height:1.4;color:#6b7280;margin-top:5px">${targetNote}</div></div>`;
+  const targetControl = `<div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--th-border)"><label style="display:block;font-size:.64rem;color:var(--th-tx3);font-weight:700;letter-spacing:.04em;text-transform:uppercase;margin-bottom:5px">AIOStreams compatibility target</label><select data-action="set-aiostreams-target" style="width:100%;background:var(--th-input-bg);color:var(--th-tx);color-scheme:var(--th-select-scheme);border:1px solid var(--th-input-border);border-radius:7px;padding:7px 8px;font-size:.72rem">${AIOSTREAMS_COMPATIBILITY_TARGETS.map(v => `<option value="${v}" ${target === v ? 'selected' : ''}>${v === 'unknown' ? 'Unknown / older — do not assume legacy preset support' : v + (v === '2.31.1' ? ' — legacy TorBox Search lane' : v === '2.32.0' ? ' — remove legacy preset' : v === DEFAULT_AIOSTREAMS_VERSION ? ' — pinned release (default)' : ' — variants supported')}</option>`).join('')}</select><div style="font-size:.62rem;line-height:1.4;color:var(--th-tx3);margin-top:5px">${targetNote}</div></div>`;
   const reset = S.outputProfile && S.outputProfile !== 'auto'
-    ? `<button type="button" data-action="set-output-profile" data-val="auto" style="margin-top:7px;padding:0;border:0;background:none;color:#6b7280;font-size:.66rem;font-weight:700;cursor:pointer;text-decoration:underline;text-underline-offset:2px">Use this flow’s default (${flowDefault})</button>`
-    : `<span style="display:block;margin-top:7px;color:#4b5563;font-size:.66rem">This flow defaults to ${flowDefault}.</span>`;
+    ? `<button type="button" data-action="set-output-profile" data-val="auto" style="margin-top:7px;padding:0;border:0;background:none;color:var(--th-tx3);font-size:.66rem;font-weight:700;cursor:pointer;text-decoration:underline;text-underline-offset:2px">Use this flow’s default (${flowDefault})</button>`
+    : `<span style="display:block;margin-top:7px;color:var(--th-tx4);font-size:.66rem">This flow defaults to ${flowDefault}.</span>`;
   return `<div class="pref-card" style="cursor:default;flex-direction:column;align-items:stretch;gap:8px;margin-top:10px">
-    <div style="display:flex;align-items:center;gap:7px"><span style="font-size:.76rem;font-weight:800;color:#9ca3af;letter-spacing:.04em;text-transform:uppercase">Output profile</span><span style="font-size:.62rem;font-weight:700;color:${palette[active][0]};padding:2px 6px;border-radius:4px;background:${palette[active][1]};border:1px solid ${palette[active][2]}">${OUTPUT_PROFILE_INFO[active].shortLabel}</span></div>
+    <div style="display:flex;align-items:center;gap:7px"><span style="font-size:.76rem;font-weight:800;color:var(--th-tx2);letter-spacing:.04em;text-transform:uppercase">Output profile</span><span style="font-size:.62rem;font-weight:700;color:${palette[active][0]};padding:2px 6px;border-radius:4px;background:${palette[active][1]};border:1px solid ${palette[active][2]}">${OUTPUT_PROFILE_INFO[active].shortLabel}</span></div>
     <div style="display:grid;grid-template-columns:repeat(${compact ? 2 : 2},minmax(0,1fr));gap:6px">${cards}</div>
-    ${active === 'stable' ? `<div style="font-size:.66rem;line-height:1.45;color:#8b949e">No remote scoring or synced rules. Groups, dynamic fetch exit, background prefetch, and autoplay are disabled so import and stream problems are easier to reproduce. Stream-pool and quality-first tuning are not exported in this profile.</div>` : ''}
-    ${active === 'balanced' ? `<div style="font-size:.66rem;line-height:1.45;color:#8b949e">Waits for every source before returning: groups, dynamic fetch exit (Stream Pool), stream preloading, next-episode precache and cache-and-play are turned off. Pick Advanced to use them.</div>` : ''}
+    ${active === 'stable' ? `<div style="font-size:.66rem;line-height:1.45;color:var(--th-tx3)">No remote scoring or synced rules. Groups, dynamic fetch exit, background prefetch, and autoplay are disabled so import and stream problems are easier to reproduce. Stream-pool and quality-first tuning are not exported in this profile.</div>` : ''}
+    ${active === 'balanced' ? `<div style="font-size:.66rem;line-height:1.45;color:var(--th-tx3)">Waits for every source before returning: groups, dynamic fetch exit (Stream Pool), stream preloading, next-episode precache and cache-and-play are turned off. Pick Advanced to use them.</div>` : ''}
     ${active === 'labs' ? `<div style="font-size:.66rem;line-height:1.45;color:#fbbf24">Labs uses experimental behaviour. Review every warning before installing.</div>` : ''}
     ${targetControl}
     ${reset}
@@ -1823,6 +1907,65 @@ function optionalScraperLaneBlock(id) {
   return '';
 }
 
+// Fine-Tune section bar: one chip per section, sticky under the drawer header,
+// so Stream cards (and everything else) is one tap away instead of screens down.
+const FT_SECTIONS = [['ft-profile','Profile'],['ft-layout','Stream cards'],['ft-audio','Sound'],['ft-video','Video'],['ft-subtitles','Subtitles'],['ft-catalogs','Catalogs'],['ft-more','More']];
+function ftJumpHtml() {
+  return `<nav class="ft-jump" aria-label="Fine-Tune sections">${FT_SECTIONS.map(([id, name]) => `<button type="button" class="ft-jump-chip" data-action="ft-jump" data-target="${id}">${name}</button>`).join('')}</nav>`;
+}
+
+let _ftJumpSeq = 0;
+/** Scroll the open Fine-Tune drawer to a section and mark its chip. */
+function ftJumpTo(id, smooth = true) {
+  const target = document.querySelector(`#advancedDrawer #${id}`);
+  if (!target) return false;
+  // Land the section just under the sticky header and section bar, whatever their height.
+  const bar = document.querySelector('#advancedDrawer .ft-top');
+  target.style.scrollMarginTop = `${(bar ? bar.offsetHeight : 0) + 12}px`;
+  const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  target.scrollIntoView({ block: 'start', behavior: smooth && !reduced ? 'smooth' : 'auto' });
+  syncFtJump(id);
+  const jump = ++_ftJumpSeq;
+  // A jump made while the drawer is still sliding in (Quick install, #cards) is
+  // measured mid-animation; once it settles, make sure the heading clears the bar.
+  // A newer jump in the meantime wins: this correction is then dropped.
+  if (!smooth) setTimeout(() => {
+    if (jump !== _ftJumpSeq) return;
+    const panel = target.closest('.advanced-drawer-panel');
+    if (!panel || !bar) return;
+    const gap = target.getBoundingClientRect().top - bar.getBoundingClientRect().bottom;
+    if (gap < 8) panel.scrollTop -= 8 - gap;
+    syncFtJump(id);
+  }, 220);
+  return true;
+}
+
+/** Mark the chip of the section at the top of the drawer (or `forced`). */
+function syncFtJump(forced) {
+  const drawer = document.getElementById('advancedDrawer');
+  if (!drawer) return;
+  let current = forced;
+  if (!current) {
+    const bar = drawer.querySelector('.ft-top');
+    const line = (bar ? bar.getBoundingClientRect().bottom : 0) + 40;
+    current = FT_SECTIONS[0][0];
+    for (const [id] of FT_SECTIONS) {
+      const el = drawer.querySelector(`#${id}`);
+      if (el && el.getBoundingClientRect().top <= line) current = id;
+    }
+  }
+  drawer.querySelectorAll('.ft-jump-chip').forEach(chip => {
+    const on = chip.dataset.target === current;
+    if (on) chip.setAttribute('aria-current', 'true'); else chip.removeAttribute('aria-current');
+    // Scroll only the chip row: scrollIntoView here would cancel the drawer's own smooth scroll.
+    if (on) {
+      const row = chip.parentElement;
+      const left = chip.offsetLeft - row.offsetLeft;
+      if (left < row.scrollLeft || left + chip.offsetWidth > row.scrollLeft + row.clientWidth) row.scrollLeft = left - 16;
+    }
+  });
+}
+
 function renderAdvancedPanel() {
   const chk = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#0d1117" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
   const reachedReview = (localStorage.getItem('coreBuildStep') && parseInt(localStorage.getItem('coreBuildStep'), 10) === STEPS);
@@ -1835,20 +1978,19 @@ function renderAdvancedPanel() {
   ];
   const audioRows = AUDIO_OPTS.map(o => {
     const on = S.audio === o.v;
-    return `<div class="svc-list-row opt adv-audio-row" data-action="set-audio" data-val="${o.v}" data-active="${on}" style="cursor:pointer;border:1px solid ${on?'rgba(0,212,255,.35)':'rgba(255,255,255,.07)'};background:${on?'rgba(0,212,255,.05)':'rgba(13,17,23,.7)'};border-radius:11px;padding:11px 14px;display:flex;align-items:center;gap:12px;transition:border-color .15s,background .15s">
+    return `<div class="svc-list-row opt adv-audio-row" data-action="set-audio" data-val="${o.v}" data-active="${on}" style="cursor:pointer;border:1px solid ${on?'rgba(0,212,255,.35)':'var(--th-border)'};background:${on?'rgba(0,212,255,.05)':'rgba(13,17,23,.7)'};border-radius:11px;padding:11px 14px;display:flex;align-items:center;gap:12px;transition:border-color .15s,background .15s">
       <div style="flex-shrink:0;pointer-events:none">${o.icon}</div>
-      <div style="flex:1;min-width:0;pointer-events:none"><div style="font-size:.86rem;font-weight:600;color:${on?'#00d4ff':'#e6edf3'}">${o.name}</div><div style="font-size:.69rem;color:#6b7280;margin-top:1px">${o.desc}</div></div>
+      <div style="flex:1;min-width:0;pointer-events:none"><div style="font-size:.86rem;font-weight:600;color:${on?'var(--th-accent)':'var(--th-tx)'}">${o.name}</div><div style="font-size:.69rem;color:var(--th-tx3);margin-top:1px">${o.desc}</div></div>
       <button type="button" class="help-btn" data-action="toggle-help-target" data-target="audiohelp_adv_${o.v}" title="What does this mean?" aria-label="Explain ${o.name}">?</button>
-      <span style="color:${on?'#00d4ff':'#374151'};flex-shrink:0;pointer-events:none">${on?ICO.check(14,'#00d4ff'):'<span style="font-size:.9rem">›</span>'}</span>
+      <span style="color:${on?'var(--th-accent)':'var(--th-tx5)'};flex-shrink:0;pointer-events:none">${on?ICO.check(14,'#00d4ff'):'<span style="font-size:.9rem">›</span>'}</span>
     </div><div class="device-help" id="audiohelp_adv_${o.v}" style="border:none;padding:6px 14px 2px">${AUDIO_HELP[o.v] || ''}</div>`;
   }).join('');
-
 
   const sizeOpts = ['10','20','30','50','unlimited'];
   const sizePills = sizeOpts.map(v => {
     const on = (S.sizeLimit || 'unlimited') === v;
     const lbl = v === 'unlimited' ? 'Unlimited' : v + 'GB';
-    return `<button data-action="set-size-limit" data-val="${v}" class="size-btn${on?' size-btn-active':''}" style="flex:1;padding:8px 4px;border-radius:8px;border:1.5px solid ${on?'rgba(0,212,255,.4)':'rgba(255,255,255,.07)'};background:${on?'rgba(0,212,255,.1)':'transparent'};color:${on?'#00d4ff':'#6b7280'};font-size:.8rem;font-weight:${on?'700':'500'};cursor:pointer;transition:all .15s">${lbl}</button>`;
+    return `<button data-action="set-size-limit" data-val="${v}" class="size-btn${on?' size-btn-active':''}" style="flex:1;padding:8px 4px;border-radius:8px;border:1.5px solid ${on?'rgba(0,212,255,.4)':'var(--th-border)'};background:${on?'rgba(0,212,255,.1)':'transparent'};color:${on?'var(--th-accent)':'var(--th-tx3)'};font-size:.8rem;font-weight:${on?'700':'500'};cursor:pointer;transition:all .15s">${lbl}</button>`;
   }).join('');
 
   const prefCard = (key, title, desc) => {
@@ -1860,15 +2002,24 @@ function renderAdvancedPanel() {
   };
 
   return `<div class="card" style="padding:0">
-    <div style="display:flex;align-items:center;gap:12px;padding:18px 20px 14px;border-bottom:1px solid rgba(255,255,255,.06)">
-      <button data-action="close-advanced" style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);border-radius:8px;color:#9ca3af;font-size:.9rem;padding:6px 11px;cursor:pointer;transition:all .15s" onmouseover="this.style.background='rgba(255,255,255,.1)'" onmouseout="this.style.background='rgba(255,255,255,.05)'">${backText}</button>
+    <div class="ft-top">
+    <div style="display:flex;align-items:center;gap:12px;padding:18px 20px 12px">
+      <button type="button" class="ft-close" data-action="close-advanced" style="background:var(--th-input-bg);border:1px solid var(--th-border-strong);border-radius:8px;color:var(--th-tx2);font-size:.9rem;padding:6px 11px;cursor:pointer;transition:all .15s" onmouseover="this.style.background='var(--th-accent-bg)'" onmouseout="this.style.background='var(--th-input-bg)'">${backText}</button>
       <div>
-        <div style="font-weight:800;font-size:1rem;color:#e6edf3">Fine-Tune</div>
-        <div style="font-size:.72rem;color:#4b5563;margin-top:1px">Audio · Video · Formatter</div>
+        <div class="ft-title">Fine-Tune</div>
+        <div style="font-size:.72rem;color:var(--th-tx3);margin-top:1px">Every setting Quick install leaves at its default</div>
       </div>
     </div>
+    ${ftJumpHtml()}
+    </div>
     <div style="padding:18px 20px;display:flex;flex-direction:column;gap:20px">
-      ${renderOutputProfilePicker()}
+      <div id="ft-profile">${renderOutputProfilePicker()}</div>
+
+      <div>
+        <div class="ft-head" id="ft-layout">${ICO.palette(16,'#a78bfa')} Stream cards <span class="ft-head-alt">(formatter)</span> ${ftTip('Controls how streams appear in Stremio. The <strong>formatter</strong> defines the layout of each stream result &mdash; what info is shown (codec, resolution, size, etc.) and how it&apos;s arranged. You can import custom formatters for different visual styles.')}</div>
+        ${fmtDropdownHtml()}
+        <button data-action="import-formatter" style="margin-top:10px;width:100%;padding:10px;border-radius:8px;border:1.5px dashed rgba(167,139,250,.3);background:transparent;color:#a78bfa;font-size:.78rem;font-weight:600;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='rgba(167,139,250,.6)'" onmouseout="this.style.borderColor='rgba(167,139,250,.3)'">${S.customFormatter ? '⟳ Replace Custom Formatter' : ICO.folder(14,'#a78bfa')+' Import Custom Formatter'}</button>
+      </div>
 
       <div>
         <div class="ft-head" id="ft-audio">${ICO.speaker(16,'#f59e0b')} Sound Profile ${ftTip('Controls which <strong>audio codecs</strong> are allowed in your streams. <strong>Auto</strong> lets the device profile decide and drops lossless formats (TrueHD, DTS-HD MA) on devices that cannot pass them through. <strong>Full Lossless</strong> keeps everything, for home-theatre setups with a capable receiver.')}</div>
@@ -1878,7 +2029,7 @@ function renderAdvancedPanel() {
       <div>
         <div class="ft-head" id="ft-video">${ICO.video(16,'#ec4899')} Video Preferences ${ftTip('<strong>Size Limit</strong> caps per-file size. <strong>Quality vs Resolution</strong> decides ranking priority &mdash; quality prefers REMUX/WEB-DL over raw resolution. <strong>Exclude 4K</strong> removes 2160p for bandwidth saving. <strong>Exclude DV</strong> removes Dolby Vision streams that cause purple/green tint on unsupported screens.')}</div>
         <div class="ft-box u-mb8">
-          <div style="font-size:.78rem;font-weight:600;color:#6b7280;margin-bottom:10px">Size Limit</div>
+          <div style="font-size:.78rem;font-weight:600;color:var(--th-tx3);margin-bottom:10px">Size Limit</div>
           <div class="u-row5">${sizePills}</div>
         </div>
         ${prefCard('qualityFirst','Prioritize Quality over Resolution','Sorts by source quality (e.g. REMUX) before resolution.')}
@@ -1887,67 +2038,61 @@ function renderAdvancedPanel() {
         ${prefCard('excludeDV','Exclude Dolby Vision','Fixes purple/green tint on unsupported screens.')}
         <div class="ft-box u-mt8">
           <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px">
-            <span style="font-size:.78rem;font-weight:600;color:#6b7280">Stream Pool</span> ${ftTip('When AIOStreams may stop waiting for slower sources: it returns once this many cached results at your target resolution have arrived, or after the time limit. <strong>Larger = more choice</strong>, slower loads. Only the Advanced and Labs profiles use it; Stable and Balanced always wait for every source.')}
+            <span style="font-size:.78rem;font-weight:600;color:var(--th-tx3)">Stream Pool</span> ${ftTip('When AIOStreams may stop waiting for slower sources: it returns once this many cached results at your target resolution have arrived, or after the time limit. <strong>Larger = more choice</strong>, slower loads. Only the Advanced and Labs profiles use it; Stable and Balanced always wait for every source.')}
             <span class="u-micro">${streamPoolSummary()}</span>
           </div>
           <div class="u-row5">
-            ${streamPoolChoices().map(([v,l,c]) => `<button data-action="set-pool" data-val="${v}" style="flex:1;padding:8px 8px 6px;border-radius:6px;font-size:.72rem;font-weight:700;cursor:pointer;transition:all .15s;border:1px solid ${(S.streamPool||'normal')===v?'rgba(0,212,255,.4)':'rgba(255,255,255,.08)'};background:${(S.streamPool||'normal')===v?'rgba(0,212,255,.1)':'transparent'};color:${(S.streamPool||'normal')===v?'#00d4ff':'#6b7280'};line-height:1.3">${l}<br><span style="font-size:.6rem;font-weight:600;opacity:.7">${c}</span></button>`).join('')}
+            ${streamPoolChoices().map(([v,l,c]) => `<button data-action="set-pool" data-val="${v}" style="flex:1;padding:8px 8px 6px;border-radius:6px;font-size:.72rem;font-weight:700;cursor:pointer;transition:all .15s;border:1px solid ${(S.streamPool||'normal')===v?'rgba(0,212,255,.4)':'var(--th-border-strong)'};background:${(S.streamPool||'normal')===v?'rgba(0,212,255,.1)':'transparent'};color:${(S.streamPool||'normal')===v?'var(--th-accent)':'var(--th-tx3)'};line-height:1.3">${l}<br><span style="font-size:.6rem;font-weight:600;opacity:.7">${c}</span></button>`).join('')}
           </div>
-          <div style="font-size:.65rem;color:#4b5563;margin-top:6px;line-height:1.4">More streams = better quality picks but slower load times</div>
+          <div style="font-size:.65rem;color:var(--th-tx4);margin-top:6px;line-height:1.4">More streams = better quality picks but slower load times</div>
         </div>
         ${(S.service !== 'http' && S.service !== 'p2p') ? `<div class="ft-box u-mt8">
           <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
-            <span style="font-size:.78rem;font-weight:600;color:#6b7280">PSE Quality Architecture</span> ${ftTip('<strong>Standard</strong> uses simple resolution/quality tiers to rank streams. <strong>Apex IQR</strong> uses statistical bitrate analysis (interquartile range) to detect outliers &mdash; it adapts to what&apos;s actually available, filtering out suspiciously low or high bitrates. Apex IQR matches the flagship 4K Apex template.')}
+            <span style="font-size:.78rem;font-weight:600;color:var(--th-tx3)">PSE Quality Architecture</span> ${ftTip('<strong>Standard</strong> uses simple resolution/quality tiers to rank streams. <strong>Apex IQR</strong> uses statistical bitrate analysis (interquartile range) to detect outliers &mdash; it adapts to what&apos;s actually available, filtering out suspiciously low or high bitrates. Apex IQR matches the flagship 4K Apex template.')}
           </div>
-          <div style="font-size:.65rem;color:#4b5563;margin-bottom:10px;line-height:1.4">How stream quality tiers are built. Standard uses simple resolution/quality filters. Apex IQR uses statistical bitrate analysis matching the flagship Apex template.</div>
+          <div style="font-size:.65rem;color:var(--th-tx4);margin-bottom:10px;line-height:1.4">How stream quality tiers are built. Standard uses simple resolution/quality filters. Apex IQR uses statistical bitrate analysis matching the flagship Apex template.</div>
           <div class="u-row5">
-            ${[['standard','Standard','Simple quality tiers'],['iqr','Apex IQR','Statistical bitrate filtering'],['apex-mixed','Apex Mixed','IQR + adaptive · niche-friendly']].map(([v,l,d]) => { const on=(S.pseArch||'standard')===v; return `<button data-action="set-pse-arch" data-val="${v}" data-active="${on}" style="flex:1;padding:8px 8px 6px;border-radius:6px;font-size:.72rem;font-weight:700;cursor:pointer;transition:all .15s;border:1px solid ${on?'rgba(0,212,255,.4)':'rgba(255,255,255,.08)'};background:${on?'rgba(0,212,255,.1)':'transparent'};color:${on?'#00d4ff':'#6b7280'};line-height:1.3">${l}<br><span style="font-size:.6rem;font-weight:600;opacity:.7">${d}</span></button>`; }).join('')}
+            ${[['standard','Standard','Simple quality tiers'],['iqr','Apex IQR','Statistical bitrate filtering'],['apex-mixed','Apex Mixed','IQR + adaptive · niche-friendly']].map(([v,l,d]) => { const on=(S.pseArch||'standard')===v; return `<button data-action="set-pse-arch" data-val="${v}" data-active="${on}" style="flex:1;padding:8px 8px 6px;border-radius:6px;font-size:.72rem;font-weight:700;cursor:pointer;transition:all .15s;border:1px solid ${on?'rgba(0,212,255,.4)':'var(--th-border-strong)'};background:${on?'rgba(0,212,255,.1)':'transparent'};color:${on?'var(--th-accent)':'var(--th-tx3)'};line-height:1.3">${l}<br><span style="font-size:.6rem;font-weight:600;opacity:.7">${d}</span></button>`; }).join('')}
           </div>
         </div>` : ''}
         ${(S.service !== 'http' && S.service !== 'p2p') ? `<div class="ft-box u-mt8">
           <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
-            <span style="font-size:.78rem;font-weight:600;color:#6b7280">Library Boost</span> ${ftTip('<strong>Default</strong> ranks library items first within each quality tier. <strong>Strong</strong> always puts library items at the very top regardless of quality. <strong>None</strong> removes library sorting entirely.')}
+            <span style="font-size:.78rem;font-weight:600;color:var(--th-tx3)">Library Boost</span> ${ftTip('<strong>Default</strong> ranks library items first within each quality tier. <strong>Strong</strong> always puts library items at the very top regardless of quality. <strong>None</strong> removes library sorting entirely.')}
           </div>
-          <div style="font-size:.65rem;color:#4b5563;margin-bottom:10px;line-height:1.4">How much priority your existing library items get in results</div>
+          <div style="font-size:.65rem;color:var(--th-tx4);margin-bottom:10px;line-height:1.4">How much priority your existing library items get in results</div>
           <div class="u-row5">
-            ${[['none','None','Sorted normally'],['default','Default','First within tier'],['strong','Strong','Always top']].map(([v,l,dd]) => { const on=(S.libraryBoost||'default')===v; return `<button data-action="set-library-boost" data-val="${v}" style="flex:1;padding:8px 8px 6px;border-radius:6px;font-size:.72rem;font-weight:700;cursor:pointer;transition:all .15s;border:1px solid ${on?'rgba(0,212,255,.4)':'rgba(255,255,255,.08)'};background:${on?'rgba(0,212,255,.1)':'transparent'};color:${on?'#00d4ff':'#6b7280'};line-height:1.3">${l}<br><span style="font-size:.6rem;font-weight:600;opacity:.7">${dd}</span></button>`; }).join('')}
+            ${[['none','None','Sorted normally'],['default','Default','First within tier'],['strong','Strong','Always top']].map(([v,l,dd]) => { const on=(S.libraryBoost||'default')===v; return `<button data-action="set-library-boost" data-val="${v}" style="flex:1;padding:8px 8px 6px;border-radius:6px;font-size:.72rem;font-weight:700;cursor:pointer;transition:all .15s;border:1px solid ${on?'rgba(0,212,255,.4)':'var(--th-border-strong)'};background:${on?'rgba(0,212,255,.1)':'transparent'};color:${on?'var(--th-accent)':'var(--th-tx3)'};line-height:1.3">${l}<br><span style="font-size:.6rem;font-weight:600;opacity:.7">${dd}</span></button>`; }).join('')}
           </div>
         </div>` : ''}
         ${(S.service !== 'http' && S.service !== 'p2p' && (S.multiServices.includes('easynews') || S.multiServices.includes('nzbgeek') || S.multiServices.includes('streamnzb') || S.service === 'easynews' || S.service === 'nzbgeek' || S.service === 'streamnzb')) ? `<div class="ft-box u-mt8">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
             <div>
-              <div style="font-size:.78rem;font-weight:700;color:#e6edf3">Failover</div>
-              <div style="font-size:.68rem;color:#6b7280">Retry dead picks server-side from Usenet + debrid alternates</div>
+              <div style="font-size:.78rem;font-weight:700;color:var(--th-tx)">Failover</div>
+              <div style="font-size:.68rem;color:var(--th-tx3)">Retry dead picks server-side from Usenet + debrid alternates</div>
             </div>
             <label class="toggle-sw"><input type="checkbox" data-action="toggle-nzb-failover" ${S.nzbFailover?'checked':''}><span class="toggle-track"></span></label>
           </div>
           ${S.nzbFailover ? `
             <div style="display:flex;gap:6px;margin-bottom:8px">
-              ${[['before-torrents','Before limiting'],['after-torrents','Final list']].map(([v,l]) => { const on=(S.nzbFailoverPosition||'after-torrents')===v; return `<button data-action="set-nzb-failover-pos" data-val="${v}" style="flex:1;padding:6px 8px;border-radius:7px;border:1px solid ${on?'rgba(0,212,255,.4)':'rgba(255,255,255,.08)'};background:${on?'rgba(0,212,255,.1)':'transparent'};color:${on?'#00d4ff':'#6b7280'};font-size:.7rem;font-weight:700;cursor:pointer">${l}</button>`; }).join('')}
+              ${[['before-torrents','Before limiting'],['after-torrents','Final list']].map(([v,l]) => { const on=(S.nzbFailoverPosition||'after-torrents')===v; return `<button data-action="set-nzb-failover-pos" data-val="${v}" style="flex:1;padding:6px 8px;border-radius:7px;border:1px solid ${on?'rgba(0,212,255,.4)':'var(--th-border-strong)'};background:${on?'rgba(0,212,255,.1)':'transparent'};color:${on?'var(--th-accent)':'var(--th-tx3)'};font-size:.7rem;font-weight:700;cursor:pointer">${l}</button>`; }).join('')}
             </div>
             <div class="u-row6">
-              ${[[1,'1 attempt'],[2,'2 attempts'],[3,'3 attempts'],[5,'5 attempts']].map(([v,l]) => { const on=(S.maxFailoverNzbs||3)===v; return `<button data-action="set-max-failover-nzbs" data-val="${v}" style="flex:1;padding:6px 8px;border-radius:7px;border:1px solid ${on?'rgba(0,212,255,.4)':'rgba(255,255,255,.08)'};background:${on?'rgba(0,212,255,.1)':'transparent'};color:${on?'#00d4ff':'#6b7280'};font-size:.7rem;font-weight:700;cursor:pointer">${l}</button>`; }).join('')}
+              ${[[1,'1 attempt'],[2,'2 attempts'],[3,'3 attempts'],[5,'5 attempts']].map(([v,l]) => { const on=(S.maxFailoverNzbs||3)===v; return `<button data-action="set-max-failover-nzbs" data-val="${v}" style="flex:1;padding:6px 8px;border-radius:7px;border:1px solid ${on?'rgba(0,212,255,.4)':'var(--th-border-strong)'};background:${on?'rgba(0,212,255,.1)':'transparent'};color:${on?'var(--th-accent)':'var(--th-tx3)'};font-size:.7rem;font-weight:700;cursor:pointer">${l}</button>`; }).join('')}
             </div>
           ` : ''}
         </div>` : ''}
       </div>
 
       <div>
-        <div class="ft-head" id="ft-layout">${ICO.palette(16,'#a78bfa')} Stream Layout (Formatter) ${ftTip('Controls how streams appear in Stremio. The <strong>formatter</strong> defines the layout of each stream result &mdash; what info is shown (codec, resolution, size, etc.) and how it&apos;s arranged. You can import custom formatters for different visual styles.')}</div>
-        ${fmtDropdownHtml()}
-        <button data-action="import-formatter" style="margin-top:10px;width:100%;padding:10px;border-radius:8px;border:1.5px dashed rgba(167,139,250,.3);background:transparent;color:#a78bfa;font-size:.78rem;font-weight:600;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='rgba(167,139,250,.6)'" onmouseout="this.style.borderColor='rgba(167,139,250,.3)'">${S.customFormatter ? '⟳ Replace Custom Formatter' : ICO.folder(14,'#a78bfa')+' Import Custom Formatter'}</button>
-      </div>
-
-      <div>
         <div class="ft-head" id="ft-subtitles">${ICO.globe(16,'#06b6d4')} Subtitles ${ftTip('Choose subtitle providers and languages. <strong>OpenSubtitles v3+</strong> (the default) has the largest database. <strong>SubDL</strong> is a fast alternative (requires a free API key from subdl.com). Select languages your household needs &mdash; this affects which subtitles are fetched.')}</div>
         <div class="ft-box">
-          <div style="font-size:.78rem;font-weight:600;color:#6b7280;margin-bottom:8px">Subtitle Sources</div>
+          <div style="font-size:.78rem;font-weight:600;color:var(--th-tx3);margin-bottom:8px">Subtitle Sources</div>
           <div style="display:flex;flex-direction:column;gap:5px">
             ${[['opensubtitles-v3-plus','OpenSubtitles v3+','Largest database · default'],['subdl','SubDL','Needs a free SubDL API key']].map(([id,name,desc])=>{
               const on=(S.subtitleAddons||['opensubtitles-v3-plus']).includes(id);
-              return `<div data-action="toggle-sub-addon" data-val="${id}" style="cursor:pointer;display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;border:1px solid ${on?'rgba(6,182,212,.35)':'rgba(255,255,255,.06)'};background:${on?'rgba(6,182,212,.05)':'transparent'};transition:all .15s">
+              return `<div data-action="toggle-sub-addon" data-val="${id}" style="cursor:pointer;display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;border:1px solid ${on?'rgba(6,182,212,.35)':'var(--th-border)'};background:${on?'rgba(6,182,212,.05)':'transparent'};transition:all .15s">
                 <div class="chk-box" style="width:16px;height:16px;border-radius:4px;border:1.5px solid ${on?'#06b6d4':'#374151'};display:flex;align-items:center;justify-content:center;flex-shrink:0;background:${on?'#06b6d4':'transparent'}">${on?'<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#0d1117" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>':''}</div>
-                <div class="u-flex1"><div class="opt-nm" style="font-size:.8rem;font-weight:600;color:${on?'#06b6d4':'#9ca3af'}">${name}</div><div class="u-micro">${desc}</div></div>
+                <div class="u-flex1"><div class="opt-nm" style="font-size:.8rem;font-weight:600;color:${on?'#06b6d4':'var(--th-tx2)'}">${name}</div><div class="u-micro">${desc}</div></div>
               </div>`;
             }).join('')}
           </div>
@@ -1961,19 +2106,19 @@ function renderAdvancedPanel() {
               <input class="name-input" id="cred_subdl" data-service="subdl" data-action="update-cred" type="password" autocapitalize="none" spellcheck="false" enterkeyhint="done" placeholder="Your SubDL API key"
                 value="${escH(S.creds.subdl || '')}" maxlength="120" style="padding-right:38px;font-size:.78rem">
               <button type="button" class="input-paste-btn" data-action="paste-input" data-target="cred_subdl">Paste Key</button><button type="button" class="input-eye-btn" aria-label="Show or hide credential" data-action="toggle-cred-vis" data-target="cred_subdl" title="Show / hide"
-                style="position:absolute;right:10px;background:none;border:none;cursor:pointer;color:#4b5563;padding:0;line-height:1;font-size:.72rem;transition:color .15s"
-                onmouseover="this.style.color='#9ca3af'" onmouseout="this.style.color='#4b5563'">
+                style="position:absolute;right:10px;background:none;border:none;cursor:pointer;color:var(--th-tx4);padding:0;line-height:1;font-size:.72rem;transition:color .15s"
+                onmouseover="this.style.color='var(--th-tx2)'" onmouseout="this.style.color='var(--th-tx4)'">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
               </button>
             </div>
-            <div style="font-size:.62rem;color:#4b5563;margin-top:5px;line-height:1.4">Required by SubDL. Free keys available at subdl.com/panel/api</div>
+            <div style="font-size:.62rem;color:var(--th-tx4);margin-top:5px;line-height:1.4">Required by SubDL. Free keys available at subdl.com/panel/api</div>
           </div>` : ''}
-          <div style="font-size:.78rem;font-weight:600;color:#6b7280;margin-top:12px;margin-bottom:8px">Subtitle Languages</div>
+          <div style="font-size:.78rem;font-weight:600;color:var(--th-tx3);margin-top:12px;margin-bottom:8px">Subtitle Languages</div>
           <div style="display:flex;flex-wrap:wrap;gap:4px">
             ${['en','es','fr','de','it','pt','nl','pl','ru','ar','ja','ko','zh','hi','tr','sv','da','no','fi','cs','hu','ro','el','he','th','vi','id','ms','uk','bg'].map(l=>{
               const on=(S.subtitleLangs||['en']).includes(l);
               const names={en:'English',es:'Spanish',fr:'French',de:'German',it:'Italian',pt:'Portuguese',nl:'Dutch',pl:'Polish',ru:'Russian',ar:'Arabic',ja:'Japanese',ko:'Korean',zh:'Chinese',hi:'Hindi',tr:'Turkish',sv:'Swedish',da:'Danish',no:'Norwegian',fi:'Finnish',cs:'Czech',hu:'Hungarian',ro:'Romanian',el:'Greek',he:'Hebrew',th:'Thai',vi:'Vietnamese',id:'Indonesian',ms:'Malay',uk:'Ukrainian',bg:'Bulgarian'};
-              return `<button data-action="toggle-sub-lang" data-val="${l}" style="padding:4px 8px;border-radius:6px;font-size:.68rem;font-weight:${on?'700':'500'};border:1px solid ${on?'rgba(6,182,212,.4)':'rgba(255,255,255,.07)'};background:${on?'rgba(6,182,212,.1)':'transparent'};color:${on?'#06b6d4':'#6b7280'};cursor:pointer;transition:all .15s" title="${names[l]||l}">${l.toUpperCase()}</button>`;
+              return `<button data-action="toggle-sub-lang" data-val="${l}" style="padding:4px 8px;border-radius:6px;font-size:.68rem;font-weight:${on?'700':'500'};border:1px solid ${on?'rgba(6,182,212,.4)':'var(--th-border)'};background:${on?'rgba(6,182,212,.1)':'transparent'};color:${on?'#06b6d4':'var(--th-tx3)'};cursor:pointer;transition:all .15s" title="${names[l]||l}">${l.toUpperCase()}</button>`;
             }).join('')}
           </div>
         </div>
@@ -1982,13 +2127,13 @@ function renderAdvancedPanel() {
       <div>
         <div class="ft-head" id="ft-catalogs">${ICO.compass(16,'#f97316')} Catalogs & Discovery ${ftTip('Adds <strong>browse catalogs</strong> to your Stremio home screen for discovering content. These don&apos;t affect stream quality &mdash; they just add new ways to find movies and shows (trending, by streaming service, anime databases, etc).')}</div>
         <div class="ft-box">
-          <div style="font-size:.65rem;color:#4b5563;margin-bottom:10px;line-height:1.4">Add browse catalogs to your Stremio home screen for discovering content.</div>
+          <div style="font-size:.65rem;color:var(--th-tx4);margin-bottom:10px;line-height:1.4">Add browse catalogs to your Stremio home screen for discovering content.</div>
           <div style="display:flex;flex-direction:column;gap:5px">
             ${[['tmdb-addon','TMDB Addon','Popular & trending movies/series'],['streaming-catalogs','Streaming Catalogs','Netflix, Disney+, etc.'],['anime-catalogs','Anime Catalogs','MAL, AniList, Kitsu'],['rpdb-catalogs','RPDB Catalogs','Release tracking & ratings'],['torrent-catalogs','Torrent Catalogs','Top seeded torrents']].map(([id,name,desc])=>{
               const on=(S.catalogs||['tmdb-addon']).includes(id);
-              return `<div data-action="toggle-catalog" data-val="${id}" style="cursor:pointer;display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;border:1px solid ${on?'rgba(249,115,22,.35)':'rgba(255,255,255,.06)'};background:${on?'rgba(249,115,22,.05)':'transparent'};transition:all .15s">
+              return `<div data-action="toggle-catalog" data-val="${id}" style="cursor:pointer;display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;border:1px solid ${on?'rgba(249,115,22,.35)':'var(--th-border)'};background:${on?'rgba(249,115,22,.05)':'transparent'};transition:all .15s">
                 <div class="chk-box" style="width:16px;height:16px;border-radius:4px;border:1.5px solid ${on?'#f97316':'#374151'};display:flex;align-items:center;justify-content:center;flex-shrink:0;background:${on?'#f97316':'transparent'}">${on?'<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#0d1117" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>':''}</div>
-                <div class="u-flex1"><div class="opt-nm" style="font-size:.8rem;font-weight:600;color:${on?'#f97316':'#9ca3af'}">${name}</div><div class="u-micro">${desc}</div></div>
+                <div class="u-flex1"><div class="opt-nm" style="font-size:.8rem;font-weight:600;color:${on?'#f97316':'var(--th-tx2)'}">${name}</div><div class="u-micro">${desc}</div></div>
               </div>`;
             }).join('')}
           </div>
@@ -1996,33 +2141,33 @@ function renderAdvancedPanel() {
       </div>
 
       <div>
-        <div class="ft-head">${ICO.gear(16,'#64748b')} Resilience</div>
+        <div class="ft-head" id="ft-more">${ICO.gear(16,'#64748b')} Resilience &amp; more</div>
         ${prefCard('dedupMerge','Failover Streams','Keep deduplicated streams as fallbacks. If the primary stream fails, AIOStreams tries the next best match.')}
       </div>
 
       <div>
-        <div style="font-size:.72rem;font-weight:700;color:#4b5563;letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px">Playback & Timing</div>
+        <div style="font-size:.72rem;font-weight:700;color:var(--th-tx4);letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px">Playback & Timing</div>
         ${prefCard('preloadEnabled','Preload first streams','Preload cached candidates to reduce wait time. Disable to reduce background requests.')}
-        <div class="u-mt8"><div style="font-size:.68rem;color:#6b7280;margin-bottom:5px">Autoplay method</div><div class="u-row5">${[['matchingFile','Matching file'],['matchingIndex','Matching index'],['firstFile','First file']].map(([v,l])=>`<button data-action="set-autoplay-method" data-val="${v}" style="flex:1;padding:6px;border-radius:7px;border:1px solid ${(S.autoPlayMethod||'matchingFile')===v?'rgba(0,212,255,.4)':'rgba(255,255,255,.08)'};background:${(S.autoPlayMethod||'matchingFile')===v?'rgba(0,212,255,.1)':'transparent'};color:${(S.autoPlayMethod||'matchingFile')===v?'#67e8f9':'#6b7280'};font-size:.65rem;cursor:pointer">${l}</button>`).join('')}</div></div>
-        <div class="u-mt8"><div style="font-size:.68rem;color:#6b7280;margin-bottom:5px">Global addon timeout</div><div class="u-row5">${[4000,6000,8000,10000].map(v=>`<button data-action="set-addon-timeout" data-val="${v}" style="flex:1;padding:6px;border-radius:7px;border:1px solid ${Number(S.addonTimeout||6000)===v?'rgba(0,212,255,.4)':'rgba(255,255,255,.08)'};background:${Number(S.addonTimeout||6000)===v?'rgba(0,212,255,.1)':'transparent'};color:${Number(S.addonTimeout||6000)===v?'#67e8f9':'#6b7280'};font-size:.65rem;cursor:pointer">${v/1000}s</button>`).join('')}</div></div>
-        <div class="u-mt8"><div style="font-size:.68rem;color:#6b7280;margin-bottom:5px">Bandwidth cap (Mbps) <span class="u-dim">— auto-limits bitrate to 80% of your speed</span></div><input type="number" min="1" max="10000" placeholder="e.g. 100" value="${Number(S.bandwidthMbps)||''}" data-action="set-bandwidth" style="width:100%;padding:7px 10px;border-radius:7px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.04);color:#e6edf3;font-size:.72rem;outline:none" /></div>
+        <div class="u-mt8"><div style="font-size:.68rem;color:var(--th-tx3);margin-bottom:5px">Autoplay method</div><div class="u-row5">${[['matchingFile','Matching file'],['matchingIndex','Matching index'],['firstFile','First file']].map(([v,l])=>`<button data-action="set-autoplay-method" data-val="${v}" style="flex:1;padding:6px;border-radius:7px;border:1px solid ${(S.autoPlayMethod||'matchingFile')===v?'rgba(0,212,255,.4)':'var(--th-border-strong)'};background:${(S.autoPlayMethod||'matchingFile')===v?'rgba(0,212,255,.1)':'transparent'};color:${(S.autoPlayMethod||'matchingFile')===v?'var(--th-accent)':'var(--th-tx3)'};font-size:.65rem;cursor:pointer">${l}</button>`).join('')}</div></div>
+        <div class="u-mt8"><div style="font-size:.68rem;color:var(--th-tx3);margin-bottom:5px">Global addon timeout</div><div class="u-row5">${[4000,6000,8000,10000].map(v=>`<button data-action="set-addon-timeout" data-val="${v}" style="flex:1;padding:6px;border-radius:7px;border:1px solid ${Number(S.addonTimeout||6000)===v?'rgba(0,212,255,.4)':'var(--th-border-strong)'};background:${Number(S.addonTimeout||6000)===v?'rgba(0,212,255,.1)':'transparent'};color:${Number(S.addonTimeout||6000)===v?'var(--th-accent)':'var(--th-tx3)'};font-size:.65rem;cursor:pointer">${v/1000}s</button>`).join('')}</div></div>
+        <div class="u-mt8"><div style="font-size:.68rem;color:var(--th-tx3);margin-bottom:5px">Bandwidth cap (Mbps) <span class="u-dim">— auto-limits bitrate to 80% of your speed</span></div><input type="number" min="1" max="10000" placeholder="e.g. 100" value="${Number(S.bandwidthMbps)||''}" data-action="set-bandwidth" style="width:100%;padding:7px 10px;border-radius:7px;border:1px solid var(--th-input-border);background:var(--th-input-bg);color:var(--th-tx);font-size:.72rem;outline:none" /></div>
       </div>
 
       <div>
-        <div style="font-size:.72rem;font-weight:700;color:#4b5563;letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px">Stream Proxy</div>
+        <div style="font-size:.72rem;font-weight:700;color:var(--th-tx4);letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px">Stream Proxy</div>
         ${streamProxyCardHtml()}
       </div>
 
       <div>
-        <div style="font-size:.72rem;font-weight:700;color:#4b5563;letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px">Partial Exports</div>
-        <div style="font-size:.67rem;color:#6b7280;margin-bottom:8px">Download only the layer you want to apply. Credentials are excluded.</div>
+        <div style="font-size:.72rem;font-weight:700;color:var(--th-tx4);letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px">Partial Exports</div>
+        <div style="font-size:.67rem;color:var(--th-tx3);margin-bottom:8px">Download only the layer you want to apply. Credentials are excluded.</div>
         <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px">
           ${[['formatter','Formatter only'],['filtering','Filtering only'],['sorting','Sorting only'],['device','Device limits'],['services','Services & presets']].map(([kind,label])=>`<button data-action="export-partial" data-kind="${kind}" style="padding:8px;border-radius:8px;border:1px solid rgba(0,212,255,.18);background:rgba(0,212,255,.04);color:#67e8f9;font-size:.7rem;font-weight:700;cursor:pointer">${label}</button>`).join('')}
         </div>
       </div>
 
     </div>
-    ${S.multiServices.length > 0 ? `<div style="position:sticky;bottom:0;padding:14px 20px;border-top:1px solid rgba(255,255,255,.06);background:linear-gradient(to top,#0d1017 60%,transparent)"><button data-action="close-and-next" style="width:100%;padding:14px 20px;border-radius:12px;border:none;background:linear-gradient(135deg,#0891b2,#00d4ff);color:#0d1017;font-size:.92rem;font-weight:800;cursor:pointer;letter-spacing:.02em;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .18s;box-shadow:0 4px 20px rgba(0,212,255,.3)" onmouseover="this.style.boxShadow='0 6px 28px rgba(0,212,255,.5)';this.style.transform='translateY(-1px)'" onmouseout="this.style.boxShadow='0 4px 20px rgba(0,212,255,.3)';this.style.transform='none'">Save &amp; Continue<span style="font-size:1.1rem">→</span></button></div>` : ''}
+    ${S.multiServices.length > 0 ? `<div style="position:sticky;bottom:0;padding:14px 20px;border-top:1px solid var(--th-border);background:linear-gradient(to top,var(--th-bg) 60%,transparent)"><button data-action="close-and-next" style="width:100%;padding:14px 20px;border-radius:12px;border:none;background:linear-gradient(135deg,#0891b2,#00d4ff);color:#0d1017;font-size:.92rem;font-weight:800;cursor:pointer;letter-spacing:.02em;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .18s;box-shadow:0 4px 20px rgba(0,212,255,.3)" onmouseover="this.style.boxShadow='0 6px 28px rgba(0,212,255,.5)';this.style.transform='translateY(-1px)'" onmouseout="this.style.boxShadow='0 4px 20px rgba(0,212,255,.3)';this.style.transform='none'">Save &amp; Continue<span style="font-size:1.1rem">→</span></button></div>` : ''}
   </div>`;
 }
 
@@ -2050,7 +2195,8 @@ function openAdvancedDrawer(trigger) {
   document.body.classList.add('advanced-drawer-open');
   overlay.addEventListener('click', event => { if (event.target === overlay) closeAdvancedDrawer(); });
   overlay.addEventListener('keydown', event => {
-    if (event.key === 'Escape') { event.preventDefault(); closeAdvancedDrawer(); return; }
+    // Stopped here so the wizard's own Escape (Back) does not also run.
+    if (event.key === 'Escape') { event.preventDefault(); event.stopPropagation(); closeAdvancedDrawer(); return; }
     if (event.key !== 'Tab') return;
     const focusable = overlay.querySelectorAll('button:not(:disabled),a[href],input:not(:disabled),select:not(:disabled),summary,[tabindex]:not([tabindex="-1"])');
     if (!focusable.length) return;
@@ -2058,8 +2204,11 @@ function openAdvancedDrawer(trigger) {
     if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
     else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
   });
+  // Keep the section bar's chip on the section being read (any descendant scrolls).
+  let ftRaf = 0;
+  overlay.addEventListener('scroll', () => { if (!ftRaf) ftRaf = requestAnimationFrame(() => { ftRaf = 0; syncFtJump(); }); }, { capture: true, passive: true });
   overlay.querySelector('[data-action="close-advanced"]')?.focus();
-  requestAnimationFrame(() => overlay.classList.add('active'));
+  requestAnimationFrame(() => { overlay.classList.add('active'); syncFtJump(); });
 }
 
 function closeAdvancedDrawer() {
@@ -2075,10 +2224,42 @@ function closeAdvancedDrawer() {
   setTimeout(() => document.querySelector('[data-action="open-advanced"]')?.focus(), 200);
 }
 
+/** The selected stream card's name as plain text (label() returns HTML). */
+function fmtLabelText() {
+  if (S.formatter === 'custom' && S.customFormatter) return S.customFormatter.label || 'Custom';
+  const f = FORMATTERS.find(x => x.id === (S.formatter || 'family-v4')) || FORMATTERS[0];
+  return f ? f.label : 'Default';
+}
+
+/**
+ * One way to the stream-card picker from anywhere: on Review it opens the
+ * Stream cards panel in place; on any other screen it opens Fine-Tune at its
+ * Stream cards section. Used by the Review row, the wizard button, the
+ * #cards link and the site menu.
+ */
+function openStreamCards(trigger) {
+  // From the main page, enter the builder first so Fine-Tune opens over a step.
+  if (document.querySelector('.hybrid-splash')) {
+    runDeepAction('custom-start');
+    setTimeout(() => { if (!document.querySelector('.hybrid-splash')) openStreamCards(trigger); }, 300);
+    return;
+  }
+  const review = document.getElementById('fmtPickerDetails');
+  if (review && !document.getElementById('advancedDrawer')) {
+    for (let d = review; d; d = d.parentElement && d.parentElement.closest('details')) d.open = true;
+    const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    review.scrollIntoView({ block: 'start', behavior: reduced ? 'auto' : 'smooth' });
+    review.querySelector('summary')?.focus({ preventScroll: true });
+    return;
+  }
+  if (!document.getElementById('advancedDrawer')) openAdvancedDrawer(trigger || document.querySelector('[data-action="open-advanced"]'));
+  requestAnimationFrame(() => ftJumpTo('ft-layout', false));
+}
+
 function refreshAdvancedDrawer() {
   const content = document.querySelector('#advancedDrawer .advanced-drawer-content');
   if (!content) return false;
-  try { content.innerHTML = renderAdvancedPanel(); }
+  try { content.innerHTML = renderAdvancedPanel(); syncFtJump(); }
   catch (error) {
     console.error('Fine-Tune refresh failed', error);
     closeAdvancedDrawer();
@@ -2537,13 +2718,18 @@ function renderCore() {
             </details>
           </div>
         </details>
+        <button type="button" class="rv-cards-row" data-action="show-stream-cards">
+          <span class="rv-cards-ico" aria-hidden="true">${ICO.palette(16,'currentColor')}</span>
+          <span class="rv-cards-text"><span class="rv-cards-label">Stream cards</span><span class="rv-cards-val">${escHtml(fmtLabelText())}</span></span>
+          <span class="rv-cards-go">Change<span aria-hidden="true"> ›</span></span>
+        </button>
         <details class="rv-section">
           <summary class="rv-section-hdr"><span class="rv-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg> Customize</span><span class="rv-arr">›</span></summary>
           <div class="rv-section-body">
             ${insightsHtml()}
             <details id="fmtPickerDetails" data-persist-open class="rv-accord" style="margin-top:0;margin-bottom:12px">
               <summary class="rv-accord-hdr">
-                <span class="u-rowc8"><span>${ICO.palette(14,'currentColor')}</span> Stream Formatter <span style="font-weight:600;color:var(--th-tx5);text-transform:none;letter-spacing:0;font-size:.72rem">— ${label('formatter', S.formatter)}</span></span><span class="rv-arr">›</span>
+                <span class="u-rowc8"><span>${ICO.palette(14,'currentColor')}</span> Stream cards <span style="font-weight:600;color:var(--th-tx5);text-transform:none;letter-spacing:0;font-size:.72rem">— ${label('formatter', S.formatter)}</span></span><span class="rv-arr">›</span>
               </summary>
               <div class="rv-accord-body">${formatterPickerHtml()}</div>
             </details>
@@ -2772,7 +2958,7 @@ function renderCore() {
         ${def.id === 'device' ? `<button type="button" data-action="skip-device" class="skip-step-btn">Skip — use standard settings →</button>` : ''}
         ${def.id === 'content' ? renderCacheMode() + renderMatchMode() + renderP2pToggle() : ''}
         ${def.id === 'content' ? `<button type="button" data-action="skip-content" class="skip-step-btn">Skip — use Everything (safe default) →</button>` : ''}
-        ${def.id === 'service' ? `<button type="button" data-action="open-advanced" class="fine-tune-btn"><span class="u-rowc8">${ICO.gear(16,'currentColor')} Fine-Tune</span><span class="fine-tune-sub">Expert settings — audio, video, formatter. Opens over your step; nothing is reset.</span></button>` : ''}
+        ${def.id === 'service' ? `<button type="button" data-action="show-stream-cards" class="fine-tune-btn fine-tune-cards"><span class="u-rowc8">${ICO.palette(16,'currentColor')} Stream cards</span><span class="fine-tune-sub">How each result looks in your app — now: ${escHtml(fmtLabelText())}</span></button><button type="button" data-action="open-advanced" class="fine-tune-btn"><span class="u-rowc8">${ICO.gear(16,'currentColor')} Fine-Tune</span><span class="fine-tune-sub">Expert settings — stream cards, sound, video, subtitles. Opens over your step; nothing is reset.</span></button>` : ''}
       </div>`;
     nav.style.display = 'flex';
     const btnBack = document.getElementById('btnBack');
@@ -3021,8 +3207,22 @@ document.addEventListener('DOMContentLoaded', () => {
   render();
   if (!_genieRoute && !_badgeBuilderRoute) {
     try { handleDeepLink(location.hash); } catch(e) { logError('deeplink', e.message, { hash: location.hash }); }
-    window.addEventListener('hashchange', () => { try { handleDeepLink(location.hash); } catch(e) { logError('deeplink', e.message, { hash: location.hash }); } });
   }
+  // Listened for on every start-up path: the menu's same-page links (#cards,
+  // #changelog) change the hash after a hand-off too.
+  window.addEventListener('hashchange', () => { try { handleDeepLink(location.hash); } catch(e) { logError('deeplink', e.message, { hash: location.hash }); } });
+  // Site menu on every screen but the main page (its rows and All Core Tools
+  // cover these routes). It sits at the start of the wizard header and hides
+  // while Quick install or a dialog is open. Mounted on every start-up path,
+  // Genie and Badge Builder hand-offs included. Same file the tool pages load.
+  try {
+    window.CoreNav.mount({
+      root: new URL('../', location.href),
+      anchor: document.querySelector('.wrap > .hdr'),
+      markCurrent: false,
+      hideOn: () => !!document.querySelector('.hybrid-splash, #expressLaneModal, .modal-overlay, .fastlane-overlay'),
+    });
+  } catch(e) { logError('core-nav', e.message); }
   if (_genieRoute) {
     setTimeout(() => {
       try {
@@ -3072,6 +3272,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Keyboard shortcuts: Enter = next, Escape = back, Arrows = navigate options, Ctrl+/ = help
   document.addEventListener('keydown', (e) => {
+    // The site menu handles its own keys: Enter on its button or a link must not
+    // advance the wizard, and Escape that closes it must not also go Back.
+    if (document.documentElement.classList.contains('cbn-open') || (e.target && e.target.closest && e.target.closest('.cbn-btn, .cbn-drawer'))) return;
     if ((e.ctrlKey || e.metaKey) && (e.key === '/' || e.key === '?' || e.code === 'Slash')) { e.preventDefault(); showShortcutsModal(); return; }
     if (_tutStep >= 0) { if (e.key === 'Escape') tutClose(); else if (e.key === 'ArrowRight' || e.key === 'Enter') document.getElementById('tutNext')?.click(); else if (e.key === 'ArrowLeft') document.getElementById('tutBack')?.click(); return; }
 
@@ -3155,6 +3358,12 @@ document.addEventListener('DOMContentLoaded', () => {
   // Handle all clicks
   document.addEventListener('change', (e) => {
     if (e.target.dataset.action) releaseMigrationForControl(e.target.dataset.action, e.target);
+    if (e.target.matches('[data-action="fmt-compare-slot"]')) {
+      compareSlots();
+      _fmtCompare.slots[Number(e.target.dataset.slot)] = e.target.value;
+      refreshFmtCompare(`#fmtCmpPick${e.target.dataset.slot}`, e.target);
+      return;
+    }
     if (e.target.matches('[data-action="fmt-dropdown-change"]')) {
       S.formatter = e.target.value;
       applyChoiceProfile('formatter');
@@ -3187,9 +3396,9 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
   });
-  // Keyboard support for the device grid cards (Enter / Space activates them).
+  // Keyboard support for the device grid cards and the stream-card picker (Enter / Space activates them).
   document.addEventListener('keydown', (e) => {
-    const card = e.target.closest && e.target.closest('.device-card');
+    const card = e.target.closest && e.target.closest('.device-card, .fmt-row');
     if (!card) return;
     if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); card.click(); }
   });
@@ -3243,11 +3452,32 @@ document.addEventListener('DOMContentLoaded', () => {
     if(!action) return;
     releaseMigrationForControl(action, el);
 
+    if (action === 'fmt-compare-toggle') {
+      _fmtCompare.open = !_fmtCompare.open;
+      refreshFmtCompare(_fmtCompare.open ? '.fmt-compare-close' : '.fmt-compare-open', el);
+      return;
+    }
+    if (action === 'fmt-compare-sample' || action === 'fmt-compare-device') {
+      _fmtCompare[action === 'fmt-compare-sample' ? 'sample' : 'device'] = el.dataset.val;
+      refreshFmtCompare(`[data-action="${action}"][data-val="${el.dataset.val}"]`, el);
+      return;
+    }
+    if (action === 'fmt-compare-use') {
+      S.formatter = el.dataset.fmt;
+      applyChoiceProfile('formatter');
+      saveState();
+      updateFmtFeatured();
+      updateFmtReceiptRow();
+      refreshFmtCompare(`[data-action="fmt-compare-use"][data-fmt="${el.dataset.fmt}"]`, el);
+      showToast(`Stream cards: ${fmtLabelText()}`);
+      return;
+    }
     if (action === 'set-fmt-score') {
       if (!CORE_SCORE_MODES.includes(el.value)) return;
       S.fmtScore = el.value;
       saveState();
       updateCorePreviews();
+      if (_fmtCompare.open) refreshFmtCompare();
       return;
     }
 
@@ -3257,6 +3487,7 @@ document.addEventListener('DOMContentLoaded', () => {
       saveState();
       updateFmtFeatured();
       updateFmtReceiptRow();
+      if (_fmtCompare.open) refreshFmtCompare(); // its "In use" button follows the pick
       return;
     }
 
@@ -3355,6 +3586,8 @@ document.addEventListener('DOMContentLoaded', () => {
       if (d) { d.open = true; d.scrollIntoView({ behavior:'smooth', block:'center' }); }
     }
     if (action === 'open-advanced') openAdvancedDrawer(el);
+    if (action === 'ft-jump') { ftJumpTo(el.dataset.target); return; }
+    if (action === 'show-stream-cards') { openStreamCards(el); return; }
     if (action === 'close-advanced') closeAdvancedDrawer();
     if (action === 'close-and-next') { closeAdvancedDrawer(); if (step < STEPS && S.multiServices.length > 0) { step++; pushStep(); saveState(); render(); window.scrollTo(0,0); } }
     if (action === 'start-setup') { S.quickStart = false; document.getElementById('main').classList.remove('nav-back'); step = 1; pushStep(); saveState(); render(); window.scrollTo(0,0); }
@@ -7367,14 +7600,17 @@ function handleDeepLink(hash) {
   // Entry deep-links (used by the Genie pages + tools landing). Splash stays the base view;
   // these call the same handlers the splash doors use, so behavior can't drift apart.
   // A deep link runs the same delegated handler a button would, without needing that button on screen.
-  const DEEP_ACTIONS = { '#express':'open-express-lane', '#advanced':'custom-start', '#guided':'easy-start', '#update':'update-template', '#import':'paste-manifest-splash', '#tour':'open-tutorial', '#compare':'compare-templates', '#report':'open-diagnostics', '#support':'open-support' };
+  const DEEP_ACTIONS = { '#express':'open-express-lane', '#advanced':'custom-start', '#guided':'easy-start', '#update':'update-template', '#import':'paste-manifest-splash', '#tour':'open-tutorial', '#compare':'compare-templates', '#report':'open-diagnostics', '#support':'open-support', '#cards':'show-stream-cards' };
   if (DEEP_ACTIONS[hash]) {
     // Clear the link once it has run, so a reload does not reopen the dialog and the same link works again.
     try { history.replaceState(history.state, '', location.pathname + location.search); } catch (e) { /* the action still runs */ }
     setTimeout(() => runDeepAction(DEEP_ACTIONS[hash]), 250); return;
   }
   if (hash === '#backup') { step = STEPS; pushStep(); render(); window.scrollTo(0, 0); return; } // backup timeline lives on the final/Done screen
-  if (hash === '#changelog') { setTimeout(showChangelog, 250); return; } // tools page "Full Configurator changelog" link
+  if (hash === '#changelog') { // the menu's What's new, and the tools page changelog link
+    try { history.replaceState(history.state, '', location.pathname + location.search); } catch (e) { /* still opens */ }
+    setTimeout(showChangelog, 250); return;
+  } // tools page "Full Configurator changelog" link
 }
 
 function showTroubleshooter() {
@@ -7801,6 +8037,8 @@ function showExpressLane() {
         <button type="button" class="fastlane-choice${S.cacheMode==='cached'?' active':''}" data-express-cache="cached"><b>⚡ Cached only</b><span>Instant play guaranteed — uncached hidden</span></button>
         </div>
         <p class="ux-hint" id="expressCacheHint"></p>
+        <div class="ux-field-label">Stream cards</div>
+        <button type="button" class="fastlane-default ux-cards-row" data-express-customize="ft-layout"><span class="fastlane-default-name">${ICO.palette(15,'currentColor')} How results look</span><span class="fastlane-default-val">${escHtml(fmtLabelText())}</span><span class="fastlane-default-go" aria-hidden="true">›</span></button>
       </div>
     </section>
     <details class="fastlane-optional ux-advanced ux-more" id="expressAdvanced"><summary><span class="ux-more-title">Options &amp; defaults</span><span class="ux-advanced-hint">Device, resolution, speed, profile, language</span></summary>
@@ -8040,8 +8278,9 @@ function showExpressLane() {
       try { history.replaceState({ step }, ''); } catch(err) {}
       saveState(); render(); window.scrollTo(0, 0);
       openAdvancedDrawer(document.querySelector('[data-action="open-advanced"]'));
-      const target = customizeBtn.dataset.expressCustomize && document.getElementById(customizeBtn.dataset.expressCustomize);
-      if (target) requestAnimationFrame(() => target.scrollIntoView({ block: 'start' }));
+      // Same landing as the section chips: just under the pinned header and bar.
+      const sectionId = customizeBtn.dataset.expressCustomize;
+      if (sectionId) requestAnimationFrame(() => ftJumpTo(sectionId, false));
       showToast('Your Quick install choices are kept — change anything, then install from Review');
       return;
     }
@@ -8096,13 +8335,13 @@ function applyExpressChoices(p) {
 }
 
 // The rows under "Defaults we'll use": what Quick install leaves at its default,
-// each opening the Fine-Tune section that changes it.
+// each opening the Fine-Tune section that changes it. Stream cards has its own
+// row in step 3, outside this fold, so it is not repeated here.
 function expressDefaultRows() {
   const subs = (S.subtitleAddons || []).length ? `${(S.subtitleLangs || ['en']).map(l => String(l).toUpperCase()).join(', ')} · ${(S.subtitleAddons || []).length} source${(S.subtitleAddons || []).length > 1 ? 's' : ''}` : 'Off';
   return [
     ['ft-audio', 'Audio', label('audio', S.audio)],
     ['ft-video', 'Size and quality', `${S.sizeLimit === 'unlimited' || !S.sizeLimit ? 'No size limit' : escHtml(String(S.sizeLimit))}${S.exclude4K ? ' · no 4K' : ''}${S.excludeDV ? ' · no Dolby Vision' : ''}`],
-    ['ft-layout', 'Stream cards', label('formatter', S.formatter || 'family-v4')],
     ['ft-subtitles', 'Subtitles', escHtml(subs)],
     ['ft-catalogs', 'Catalogs', `${(S.catalogs || []).length} on`],
   ];

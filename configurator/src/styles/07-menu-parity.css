@@ -307,3 +307,97 @@ html body:has(.hybrid-splash) #themeToggle{display:none}
 @media(prefers-reduced-motion:no-preference) and (min-width:641px){#expressLaneModal .fastlane-panel{animation:cbRise .32s cubic-bezier(.2,.8,.2,1) both}}
 @keyframes cbPageOut{to{opacity:0;transform:translateY(-6px)}}@keyframes cbPageIn{from{opacity:0;transform:translateY(10px)}}
 @keyframes cbRise{from{opacity:0;transform:translateY(12px)}}@keyframes cbFade{from{opacity:0}}
+
+/* Fine-Tune section bar and stream-card entry points (v3.35).
+   The drawer's first block is already sticky (div:first-child above); .ft-top is
+   that block now, holding the header and the section chips together. */
+/* overflow:hidden on .card made the card its own scroll container, so the sticky
+   header scrolled away with the content; the drawer's card must not clip. */
+.advanced-drawer-content>.card{overflow:visible}
+.advanced-drawer-content>.card>div.ft-top:first-child{background:var(--th-card);border-bottom:1px solid var(--th-border)}
+.ft-jump{display:flex;gap:6px;overflow-x:auto;padding:2px 20px 12px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.ft-jump::-webkit-scrollbar{display:none}
+.ft-jump-chip{appearance:none;flex:0 0 auto;height:34px;padding:0 14px;border-radius:999px;border:1px solid var(--th-border-strong);background:var(--th-input-bg);color:var(--th-tx2);font:inherit;font-size:.78rem;font-weight:600;line-height:1;white-space:nowrap;cursor:pointer;transition:color .15s,border-color .15s,background .15s}
+.ft-jump-chip:hover{color:var(--th-tx);border-color:var(--th-accent-border)}
+.ft-jump-chip[aria-current="true"]{color:var(--th-accent);border-color:var(--th-accent-border);background:var(--th-accent-bg)}
+.ft-jump-chip:focus-visible{outline:2px solid var(--th-accent);outline-offset:2px}
+@media(pointer:coarse){.ft-jump-chip{height:40px}}
+.ft-head-alt{font-weight:500;color:var(--th-tx3);text-transform:none;letter-spacing:0}
+.rv-cards-row{appearance:none;font:inherit;width:100%;display:flex;align-items:center;gap:12px;margin:0 0 12px;padding:12px 14px;border-radius:12px;border:1px solid var(--th-border-strong);background:var(--th-card-alt);color:var(--th-tx);text-align:left;cursor:pointer;transition:border-color .15s,background .15s}
+.rv-cards-row:hover{border-color:var(--th-accent-border);background:var(--th-accent-bg)}
+.rv-cards-row:focus-visible{outline:2px solid var(--th-accent);outline-offset:2px}
+.rv-cards-ico{display:inline-flex;color:var(--th-purple)}
+.rv-cards-text{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.rv-cards-label{font-size:.68rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--th-tx3)}
+.rv-cards-val{font-size:.9rem;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rv-cards-go{flex:0 0 auto;color:var(--th-accent);font-size:.82rem;font-weight:700}
+.ux-cards-row .fastlane-default-name{display:inline-flex;align-items:center;gap:8px}
+.fine-tune-cards .u-rowc8 svg{color:var(--th-purple)}
+@media(prefers-reduced-motion:reduce){.ft-jump-chip,.rv-cards-row{transition:none}}
+/* Quick install's hero header (v3.33) is ~200px tall and transparent; the older
+   phone rule kept it sticky, so every step slid underneath the wordmark while
+   scrolling. It scrolls away with the page instead. */
+#expressLaneModal .fastlane-head.ux-hero{position:relative}
+
+/* Stream cards: side-by-side compare (v3.35). The screens are pictures of an
+   app's results list, so they stay dark in both themes, like the app itself. */
+.fmt-compare-open{appearance:none;font:inherit;display:inline-flex;align-items:center;gap:8px;margin-top:10px;height:38px;padding:0 16px;border-radius:999px;border:1px solid var(--th-accent-border);background:var(--th-accent-bg);color:var(--th-accent);font-size:.8rem;font-weight:700;cursor:pointer}
+.fmt-compare-open:hover{border-color:var(--th-accent)}
+.fmt-compare{margin-top:12px;padding:14px;border:1px solid var(--th-border-strong);border-radius:14px;background:var(--th-card-alt)}
+.fmt-compare-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
+.fmt-compare-head b{font-size:.92rem;color:var(--th-tx)}
+.fmt-compare-close{appearance:none;font:inherit;height:32px;padding:0 12px;border-radius:8px;border:1px solid var(--th-border-strong);background:transparent;color:var(--th-tx2);font-size:.76rem;font-weight:600;cursor:pointer}
+.fmt-compare-controls{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.fmt-cmp-seg{display:flex;flex-wrap:wrap;gap:4px;padding:3px;border-radius:10px;border:1px solid var(--th-border);background:var(--th-input-bg)}
+.fmt-cmp-seg button{appearance:none;font:inherit;min-height:32px;padding:0 10px;border:0;border-radius:7px;background:transparent;color:var(--th-tx2);font-size:.74rem;font-weight:600;cursor:pointer}
+.fmt-cmp-seg button[aria-pressed="true"]{background:var(--th-accent-bg);color:var(--th-accent);box-shadow:inset 0 0 0 1px var(--th-accent-border)}
+.fmt-cmp-cols{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.fmt-cmp-col{min-width:0;display:flex;flex-direction:column;gap:8px}
+.fmt-cmp-pick{width:100%;min-height:36px;padding:0 10px;border-radius:8px;border:1px solid var(--th-input-border);background:var(--th-input-bg);color:var(--th-tx);color-scheme:var(--th-select-scheme);font:inherit;font-size:.78rem;font-weight:600}
+.fmt-cmp-screen{flex:1;min-height:132px;padding:12px;border-radius:12px;background:#0f1216;border:1px solid #232a33;color:#e9edf2;overflow-x:auto}
+.fmt-cmp-row{display:flex;flex-direction:column;gap:6px}
+.fmt-cmp-n{font-size:.78rem;font-weight:700;line-height:1.4;white-space:pre-wrap;overflow-wrap:break-word}
+.fmt-cmp-d{font-size:.72rem;line-height:1.5;color:#aab4bf;overflow-wrap:break-word}
+/* TV: one full-width row per formatter, the way a TV app lists results. */
+.fmt-cmp-cols[data-device="tv"]{grid-template-columns:minmax(0,1fr)}
+.fmt-cmp-cols[data-device="tv"] .fmt-cmp-col{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:'pick use' 'screen screen';align-items:center;gap:8px}
+.fmt-cmp-cols[data-device="tv"] .fmt-cmp-pick{grid-area:pick}.fmt-cmp-cols[data-device="tv"] .fmt-cmp-use{grid-area:use;padding:0 14px}.fmt-cmp-cols[data-device="tv"] .fmt-cmp-screen{grid-area:screen;padding:16px;min-height:110px}
+.fmt-cmp-cols[data-device="tv"] .fmt-cmp-row{display:grid;grid-template-columns:minmax(0,38%) minmax(0,1fr);gap:12px;align-items:start}
+.fmt-cmp-cols[data-device="tv"] .fmt-cmp-n{font-size:.9rem;padding-right:12px;border-right:1px solid #2a323c}
+.fmt-cmp-cols[data-device="tv"] .fmt-cmp-d{font-size:.82rem}
+.fmt-cmp-blank{display:grid;place-items:center;text-align:center;color:#7d8794;font-size:.74rem}
+.fmt-cmp-empty .fmt-cmp-screen{border-style:dashed;background:transparent;border-color:var(--th-border-strong);color:var(--th-tx3)}
+.fmt-cmp-use{appearance:none;font:inherit;min-height:36px;border-radius:8px;border:1px solid var(--th-accent-border);background:var(--th-accent-bg);color:var(--th-accent);font-size:.78rem;font-weight:700;cursor:pointer}
+.fmt-cmp-use:disabled{border-color:var(--th-border);background:transparent;color:var(--th-tx3);cursor:default}
+.fmt-compare-open:focus-visible,.fmt-compare-close:focus-visible,.fmt-cmp-seg button:focus-visible,.fmt-cmp-pick:focus-visible,.fmt-cmp-use:focus-visible{outline:2px solid var(--th-accent);outline-offset:2px}
+.fmt-compare-note{margin:10px 0 0;font-size:.7rem;line-height:1.45;color:var(--th-tx3)}
+/* Phones: keep the columns side by side and let them scroll sideways. */
+@media(max-width:640px){.fmt-cmp-cols[data-device="phone"]{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:4px}.fmt-cmp-cols[data-device="phone"] .fmt-cmp-col{flex:0 0 78%;scroll-snap-align:start}}
+/* Stream-card picker (v3.35): one preview on top, quiet rows in the main page's style below. */
+.fmt-pick{display:flex;flex-direction:column;gap:14px;min-width:0}
+.fmt-stage{display:flex;flex-direction:column;gap:8px;min-width:0}
+.fmt-stage-head{display:flex;align-items:center;gap:10px;min-width:0}
+.fmt-stage-eyebrow{font-family:var(--font-mono);font-size:.62rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--th-signal-bright)}
+.fmt-stage-name{flex:1;min-width:0;font-size:.92rem;font-weight:600;color:var(--th-tx);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fmt-stage-screen{min-height:0;padding:14px 16px}
+.fmt-stage .fmt-preview-note{margin:0;font-size:.68rem;color:var(--th-tx3);line-height:1.45}
+.fmt-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.fmt-row{display:flex;align-items:center;gap:12px;min-width:0;min-height:56px;padding:9px 14px;border:1px solid var(--th-border);border-radius:12px;background:var(--th-card);cursor:pointer;transition:border-color .15s,background .15s}
+.fmt-row:focus-visible{outline:2px solid var(--th-signal-bright);outline-offset:2px}
+.fmt-row[data-active="true"]{border-color:var(--th-accent-border);background:var(--th-accent-bg)}
+.fmt-row-dot{flex:none;width:8px;height:8px;border-radius:50%;opacity:.85}
+.fmt-row-main{display:flex;flex-direction:column;gap:2px;flex:1;min-width:0}
+.fmt-row-name{font-size:.86rem;font-weight:600;color:var(--th-tx);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fmt-row[data-active="true"] .fmt-row-name{color:var(--th-signal-bright)}
+.fmt-row-desc{font-size:.7rem;color:var(--th-tx3);line-height:1.35;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fmt-row-tag{flex:none;padding:3px 7px;border:1px solid var(--th-border);border-radius:6px;font-family:var(--font-mono);font-size:.58rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--th-tx3);white-space:nowrap}
+.fmt-row[data-active="true"] .fmt-row-tag,.fmt-stage-head .fmt-row-tag{border-color:var(--th-accent-border);color:var(--th-signal-bright)}
+@media(hover:hover){.fmt-row:hover{border-color:var(--th-accent-border)}}
+@media(max-width:640px){.fmt-list{grid-template-columns:minmax(0,1fr)}.fmt-row{min-height:52px}}
+/* Fine-Tune in the main page's style: mono section labels, light chips, round help marks. */
+#advancedDrawer .ft-head{font-family:var(--font-mono);font-size:.66rem;letter-spacing:.14em;color:var(--th-signal-bright)}
+#advancedDrawer .ft-head svg{display:none}
+#advancedDrawer .ft-head-alt{font-family:var(--font-sans);letter-spacing:0;text-transform:none;color:var(--th-tx3)}
+#advancedDrawer .ft-info{flex:none;width:20px;height:20px;min-width:0;min-height:0;padding:0;border-radius:50%;line-height:1}
+#advancedDrawer .ft-close{flex:none;white-space:nowrap;min-height:36px}
+#advancedDrawer .ft-title{font-family:var(--font-display);font-size:1.25rem;font-weight:700;letter-spacing:-.02em;color:var(--th-tx)}

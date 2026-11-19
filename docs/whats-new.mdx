@@ -1,14 +1,48 @@
 ---
-title: "What's New — Configurator v3.34"
+title: "What's New — Configurator v3.35"
 sidebarTitle: "What's New"
-description: "Latest Core Builds Configurator releases (v3.34 and earlier), auto-generated from the in-app changelog."
+description: "Latest Core Builds Configurator releases (v3.35 and earlier), auto-generated from the in-app changelog."
 ---
 
 # What's New in the Configurator
 
-This page is regenerated from `configurator/src/data/changelog.js` by `scripts/sync-docs.py`, so it always reflects the latest shipped configurator version (currently **v3.34**).
+This page is regenerated from `configurator/src/data/changelog.js` by `scripts/sync-docs.py`, so it always reflects the latest shipped configurator version (currently **v3.35**).
 
 For the template-suite release log, see the [Changelog](https://corebuilds-docs.docsalot.dev/changelog).
+
+## Configurator v3.35 (Nov 18 2026)
+
+<CardGroup cols={2}>
+  <Card title="A menu on every other page" icon="sparkles">
+    a Menu button opens the same list everywhere except the main page: Build (main page, Quick install, Custom build, Guided setup, update, import), Tools, Help (what’s new, the tour, Report an issue, Support) and Community (docs, Reddit, Discord, GitHub). In the configurator it sits at the start of the header, so it never covers the Continue bar; on the tool pages it is in the bottom-left corner. The main page has no Menu button: its rows open Quick install and the tools, and Guided setup, update, import, the tour and Report an issue are on All Core Tools.
+  </Card>
+  <Card title="Stream cards easier to find" icon="bolt">
+    the stream-card picker (the formatter) now has a row in Quick install’s step 3, a Stream cards button on Custom build’s first step, a Stream cards row on Review outside the folded panels, an entry in the menu and its own link (…/configurator/#cards). Each opens the picker directly; before, it sat inside a folded panel on Review or four sections down Fine-Tune.
+  </Card>
+  <Card title="A cleaner stream-card picker" icon="shield-check">
+    one large preview of the selected style sits on top, with every style below as a plain row: name, one-line description and a tag, in the main page’s look. Before, each style was a card with its own small preview in a sideways strip, and only two and a half fitted on screen. An imported formatter now says it has no preview instead of showing Family v4’s.
+  </Card>
+  <Card title="Compare stream cards side by side" icon="sliders">
+    under the stream-card picker, Compare side by side shows the same sample stream in up to three formatters at once, laid out as a phone list or as TV rows, for a cached 4K REMUX, a cached 1080p WEB-DL or a 4K stream that is not cached, with a Use this button on each. Every card preview is now rendered by AIOStreams’ own formatter engine instead of a hand-made illustration.
+  </Card>
+  <Card title="Fine-Tune, tidied" icon="gauge">
+    section labels, the title and the help marks now match the main page, a row of section chips (Profile, Stream cards, Sound, Video, Subtitles, Catalogs, More) stays pinned under the header and follows your place as you scroll, Stream cards moved up to second, and the light theme no longer shows white titles on a white panel. The header itself stays put now; it used to scroll away.
+  </Card>
+  <Card title="Tool pages, closer to the main page" icon="wand">
+    the menu now opens light or dark to match the page it is on (it went light on dark pages), and leaves room at the bottom so it no longer covers the last row. Template Inspector and Account Tools get the same title and label as the other tools, the All Core Tools page swaps its bright banner for the main page’s outlined row, and on phones the Genie, Nuvio, WuPlay and Preflight headers stop squeezing their names into a narrow column. Banner Studio shows its tour on a first visit instead of the tour and the changelog at once.
+  </Card>
+  <Card title="Quick install heading on phones" icon="layers">
+    the large Core Builds heading stayed pinned while you scrolled, so every step slid underneath it. It now scrolls away with the page.
+  </Card>
+  <Card title="Stream cards from the keyboard" icon="bug">
+    the cards can be reached with Tab and picked with Enter or Space, and the score display choices in Review and Fine-Tune no longer clear each other when both are open.
+  </Card>
+  <Card title="Generated output unchanged" icon="sparkles">
+    every config the configurator and the CLI build is byte-for-byte what 3.34 produced apart from the version stamp; only navigation and the settings screens changed.
+  </Card>
+</CardGroup>
+
+---
 
 ## Configurator v3.34 (Nov 18 2026)
 
@@ -107,24 +141,5 @@ For the template-suite release log, see the [Changelog](https://corebuilds-docs.
   </Card>
   <Card title="Generated output unchanged" icon="sliders">
     every config the configurator and the CLI build is byte-for-byte what 3.31 produced apart from the version stamp; only wording and the language prefill changed.
-  </Card>
-</CardGroup>
-
----
-
-## Configurator v3.31 (Oct 31 2026)
-
-<CardGroup cols={2}>
-  <Card title="One Core Builds template inside AIOStreams" icon="sparkles">
-    a single template asks what you watch on (26 devices), the picture you want, what matters most, whether to show only streams that play straight away, your language and whether you mostly watch anime, then uses the service you pick in AIOStreams (none gives the free P2P setup). It builds the same config Quick install would for those answers. It is first in the template directory, with Import buttons for every host.
-  </Card>
-  <Card title="Proven against AIOStreams itself" icon="bolt">
-    a test runs the template through AIOStreams’ own template code, fetched at the pinned release, for every answer and service, and fails on any difference from the configurator’s output; a browser test checks that output against what Quick install builds for every service and device. Picking two services at once gives one config with both, and those combinations are saved in a real AIOStreams on every pull request.
-  </Card>
-  <Card title="Smaller operator collection" icon="shield-check">
-    the collection hosts add to TEMPLATE_URLS now holds just this template (94 KB instead of 3.4 MB) and no longer includes personal templates. It still carries every regex pattern and synced address the other templates use, so instances that trusted them keep trusting them.
-  </Card>
-  <Card title="Generated output unchanged" icon="sliders">
-    every config the configurator and the CLI build is byte-for-byte what 3.30 produced apart from the version stamp; the new template is a separate file that reproduces that output.
   </Card>
 </CardGroup>

@@ -1138,8 +1138,10 @@ if(document.fonts&&document.fonts.load)document.fonts.load('90px BebasSrc').then
 document.fonts&&document.fonts.ready.then(()=>render());
 if(hashErr)setStatus('⚠ '+hashErr);
 else if(fromHash)setStatus('Design loaded from share link');
-if(!localStorage.getItem('bannerStudio.seenVer')||localStorage.getItem('bannerStudio.seenVer')!==APP_VERSION){modal("What's new in v"+APP_VERSION,CHANGELOG,[['Got it',c=>c()]]);try{localStorage.setItem('bannerStudio.seenVer',APP_VERSION)}catch(e){}}
-if(!localStorage.getItem('bannerStudio.tour')&&!fromHash)setTimeout(openTour,900);
+// A first visit gets the tour, not a changelog on top of it; the changelog is
+// for people who have used an earlier version.
+if(!localStorage.getItem('bannerStudio.tour')&&!localStorage.getItem('bannerStudio.seenVer')&&!fromHash){try{localStorage.setItem('bannerStudio.seenVer',APP_VERSION)}catch(e){}setTimeout(openTour,900)}
+else if(localStorage.getItem('bannerStudio.seenVer')!==APP_VERSION){modal("What's new in v"+APP_VERSION,CHANGELOG,[['Got it',c=>c()]]);try{localStorage.setItem('bannerStudio.seenVer',APP_VERSION)}catch(e){}}
 addEventListener('keydown',e=>{if(e.target&&/input|select|textarea/i.test(e.target.tagName))return;
   if(e.key==='?'&&!openModal){e.preventDefault();openTour()}
   if(e.key.toLowerCase()==='d'&&!openModal&&e.shiftKey){e.preventDefault();openDiag()}});
@@ -1149,4 +1151,5 @@ try{const t=localStorage.getItem('bsTheme');if(t==='light'||t==='dark')bsApplyTh
 globalThis.__probe={get box(){return logoBox},get clamped(){return clamped},get contrast(){return lastContrast}};
 
 </script>
+<script src="../core-nav.js" defer></script>
 </body></html>

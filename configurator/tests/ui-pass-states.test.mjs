@@ -103,7 +103,7 @@ test('skip buttons apply the documented defaults (verified against handlers)', (
 // ── 5. Fine-Tune copy matches what openAdvancedDrawer actually does ──
 
 test('Fine-Tune sub-line does not claim defaults are applied or picks are kept ambiguously', () => {
-  assert.match(app, /class="fine-tune-sub">Expert settings — audio, video, formatter\. Opens over your step; nothing is reset\.</);
+  assert.match(app, /class="fine-tune-sub">Expert settings — stream cards, sound, video, subtitles\. Opens over your step; nothing is reset\.</);
   // the drawer must not mutate state on open
   const d = app.match(/function openAdvancedDrawer[\s\S]*?\n}/);
   assert.doesNotMatch(d[0], /S\.\w+\s*=/, 'opening the drawer must not set any selection');

@@ -1,0 +1,20 @@
+/*
+ * Core Builds shell: the few rules every tool page shares with the main page.
+ * Each tool keeps its own controls; this sets the type and fixes the header
+ * on phones. Linked after each page's own <style>, so equal selectors win here.
+ */
+:root{--cb-font-sans:'Segoe UI',Roboto,system-ui,-apple-system,sans-serif;--cb-font-display:Georgia,'Times New Roman',serif;--cb-font-mono:ui-monospace,SFMono-Regular,Consolas,monospace;--cb-signal:#22d3ee}
+
+/* Page title and eyebrow, as on the main page and the Genie pages. */
+.cb-kicker{font-family:var(--cb-font-mono);font-size:.66rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--cb-signal);margin:0 0 6px}
+.cb-title{font-family:var(--cb-font-display);font-weight:700;letter-spacing:-.02em;line-height:1.15}
+.cb-title em{font-style:italic;color:var(--cb-signal)}
+
+/* Genie-family header (.hdr): on a phone, the title takes the row and the
+   reassurance pill drops below it. The back links duplicate the Menu. */
+@media(max-width:600px){
+  .hdr{flex-wrap:wrap;row-gap:8px}
+  .hdr>div:not([class]){flex:1 1 calc(100% - 56px);min-width:0}
+  .hdr .spacer,.hdr .backlink{display:none}
+  .hdr .pill{order:9;margin-left:46px;white-space:normal}
+}

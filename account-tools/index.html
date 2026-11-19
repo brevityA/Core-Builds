@@ -52,9 +52,11 @@ button:disabled{opacity:.4;cursor:default}
 .hidden{display:none}
 @media(max-width:560px){.row,.row3{grid-template-columns:1fr}}
 </style><style>/* Core Builds page transitions: cross-fade between same-site pages. */@media(prefers-reduced-motion:no-preference){@view-transition{navigation:auto}}</style>
+<link rel="stylesheet" href="../tools/core-shell.css">
 </head><body><main class="wrap">
 <nav class="toolnav"><a href="../">Configurator</a><a href="../tools/">All Tools</a></nav>
-<h1>Core Account Tools</h1>
+<p class="cb-kicker">Core Builds · Stremio account</p>
+<h1 class="cb-title">Core Account <em>Tools</em></h1>
 <p>Addon backup, inspection, comparison, and restore. Mutations auto-backup before applying — undo is always available.</p>
 <div class="warn">Login details are sent directly to the Stremio API and kept only in page memory. Never use this from an untrusted copy.</div>
 
@@ -551,4 +553,5 @@ $('restoreFile').onchange=async e=>{
   }
 };
 
-})();</script></body></html>
+})();</script><script src="../tools/core-nav.js" defer></script>
+</body></html>

@@ -1,10 +1,10 @@
 {
   "name": "core-builds-configurator",
-  "version": "3.34.0",
+  "version": "3.35.0",
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "python3 -m http.server 8080 -d src",
+    "dev": "echo 'Configurator: http://localhost:8080/configurator/src/' && python3 -m http.server 8080 -d .. --bind 127.0.0.1",
     "test": "node --test tests/*.test.mjs",
     "validate": "node scripts/validate.mjs",
     "build": "node scripts/build.mjs",

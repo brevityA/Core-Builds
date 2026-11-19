@@ -69,11 +69,11 @@ test('the score control is shown for Core styles only, labelled and keyboard-ope
   });
   await expect(page.locator('#fmtHost .fmt-score')).toBeHidden();
 
-  await page.locator('#fmtHost .fmt-scroll-card[data-fmt="core-compact"]').click();
+  await page.locator('#fmtHost .fmt-row[data-fmt="core-compact"]').click();
   const control = page.locator('#fmtHost .fmt-score');
   await expect(control).toBeVisible();
   await expect(page.getByRole('group', { name: /Score display/ })).toBeVisible();
-  await expect(page.locator('#fmtHost .fmt-scroll-card[data-fmt="core-compact"] .fmt-preview-note')).toContainText('Rendered by AIOStreams');
+  await expect(page.locator('#fmtHost .fmt-stage .fmt-preview-note')).toContainText('rendered by AIOStreams');
 
   const plain = page.getByRole('radio', { name: /Plain digits/ });
   const bold = page.getByRole('radio', { name: /Bold-looking digits/ });
@@ -81,13 +81,13 @@ test('the score control is shown for Core styles only, labelled and keyboard-ope
   await plain.focus();
   await page.keyboard.press('ArrowRight');
   await expect(bold).toBeChecked();
-  await expect(page.locator('#fmtHost .fmt-scroll-card[data-fmt="core-compact"] .fmt-live-n')).toContainText('𝟴𝟳');
+  await expect(page.locator('#fmtHost .fmt-stage .fmt-cmp-n')).toContainText('𝟴𝟳');
   expect(await page.evaluate(() => window.__coreBuilds.generate({}).config.formatter.definitions.overrides.tamtaro.name)).toContain('translate(');
 
   const overflow = await control.evaluate(el => el.scrollWidth > el.clientWidth + 1);
   expect(overflow, 'score control fits a 360px screen').toBe(false);
 
-  await page.locator('#fmtHost .fmt-scroll-card[data-fmt="family-v4"]').click();
+  await page.locator('#fmtHost .fmt-row[data-fmt="family-v4"]').click();
   await expect(control).toBeHidden();
   expect(await page.evaluate(() => window.__coreBuilds.generate({}).config.formatter.definitions.overrides.tamtaro.name)).not.toContain('translate(');
 });
