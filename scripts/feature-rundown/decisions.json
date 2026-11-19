@@ -1,0 +1,601 @@
+{
+  "_readme": "Why Core Builds uses each AIOStreams config option, or why not. The rundown (rundown.mjs) lists every option upstream accepts and flags any with no entry here, any entry whose status contradicts what the generated configs do, and options upstream removed. Statuses: used | candidate (worth evaluating; say what for) | off-by-design (deliberately left off; say why) | not-applicable (identity, credentials, UI or server settings a template must not carry). An exact entry under `options` wins over a pattern.",
+  "options": {
+    "showChanges": {
+      "status": "used",
+      "why": "Template metadata: tells AIOStreams to show what an update changes before the user applies it."
+    },
+    "addonName": {
+      "status": "used",
+      "why": "Brands the addon in Stremio as Core Builds (with the build's name)."
+    },
+    "addonLogo": {
+      "status": "used",
+      "why": "Core Builds icon; must use the /refs/heads/main/ raw URL (CLAUDE.md, known validator rules)."
+    },
+    "addonDescription": {
+      "status": "used",
+      "why": "Describes the build in the Stremio addon list."
+    },
+    "appliedTemplates": {
+      "status": "used",
+      "why": "Set by AIOStreams on static templates it has applied; the generator does not write it."
+    },
+    "addonCategoryColors": {
+      "status": "used",
+      "why": "Colours the addon categories in AIOStreams' own UI so the generated build reads clearly."
+    },
+    "excludedResolutions": {
+      "status": "used",
+      "why": "Drops resolutions the build never wants. Core Stable drops 576p and below, which can leave DVD-only titles with nothing: see the effectiveness audit."
+    },
+    "includedResolutions": {
+      "status": "used",
+      "why": "Smart template only, where an answer keeps a resolution the exclusions would drop."
+    },
+    "requiredResolutions": {
+      "status": "used",
+      "why": "A few static templates (1080p lines) require their resolution; generators rank with PSEs instead so niche titles still return something."
+    },
+    "preferredResolutions": {
+      "status": "used",
+      "why": "Ranks the target resolution first; for 4K builds the sort is resolution, cached, quality (sort-policy.js)."
+    },
+    "excludedQualities": {
+      "status": "used",
+      "why": "Removes CAM, TS, TC, SCR and HC rips on Stable and Balanced; Advanced/Labs do this in an ESE so library and SeaDex passthrough can override it."
+    },
+    "includedQualities": {
+      "status": "used",
+      "why": "Smart template only (answer-dependent passthrough)."
+    },
+    "requiredQualities": {
+      "status": "used",
+      "why": "Smart template only (answer-dependent)."
+    },
+    "preferredQualities": {
+      "status": "used",
+      "why": "Ranks REMUX and BluRay above WEB for quality-first builds."
+    },
+    "excludedLanguages": {
+      "status": "used",
+      "why": "Smart template only; the generators use requiredLanguages with Unknown, Multi and Dual Audio kept so unlabelled releases are not lost."
+    },
+    "includedLanguages": {
+      "status": "used",
+      "why": "One static template keeps a language through other filters."
+    },
+    "requiredLanguages": {
+      "status": "used",
+      "why": "Advanced/Labs require the user's languages but always keep Original, Dual Audio, Multi, Dubbed and Unknown, so a release with no language tag still shows."
+    },
+    "preferredLanguages": {
+      "status": "used",
+      "why": "Ranks the user's languages first."
+    },
+    "preferredSubtitles": {
+      "status": "used",
+      "why": "Static templates rank releases carrying the user's subtitle language."
+    },
+    "excludedVisualTags": {
+      "status": "used",
+      "why": "Drops 3D and half-SBS/OU everywhere; device profiles add DV-only kills where DV fails."
+    },
+    "includedVisualTags": {
+      "status": "used",
+      "why": "A few static device templates keep HDR tags through other filters."
+    },
+    "preferredVisualTags": {
+      "status": "used",
+      "why": "Ranks DV/HDR10+/HDR by what the device supports (devices.js)."
+    },
+    "excludedAudioTags": {
+      "status": "used",
+      "why": "Removes audio the device cannot pass through (TrueHD, DTS-HD MA, DTS:X, FLAC on most TVs)."
+    },
+    "preferredAudioTags": {
+      "status": "used",
+      "why": "Ranks Atmos/DD+ or lossless by the device's audio profile."
+    },
+    "excludedAudioChannels": {
+      "status": "used",
+      "why": "Static templates only, for devices that mishandle 7.1."
+    },
+    "preferredAudioChannels": {
+      "status": "used",
+      "why": "Ranks 7.1/5.1 by the sound profile."
+    },
+    "excludedStreamTypes": {
+      "status": "used",
+      "why": "Debrid builds drop p2p/http/youtube results that would not play through the service; P2P builds keep p2p."
+    },
+    "preferredStreamTypes": {
+      "status": "used",
+      "why": "Static templates rank debrid over usenet or the reverse per line."
+    },
+    "excludedEncodes": {
+      "status": "used",
+      "why": "Drops AV1 and VC-1 on devices without safe hardware decode (deviceAv1Safe)."
+    },
+    "preferredEncodes": {
+      "status": "used",
+      "why": "Ranks HEVC/AVC by device."
+    },
+    "excludedRegexPatterns": {
+      "status": "used",
+      "why": "Eight inline patterns (upscaled, extras, LQ groups, BR-DISK, retags); each string is a verbatim Vidhin05 pattern so ElfHosted's allowlist accepts it."
+    },
+    "preferredRegexPatterns": {
+      "status": "used",
+      "why": "Tier-1 group patterns (Remux T1, FraMeSToR…), verbatim Vidhin05 strings."
+    },
+    "rankedRegexPatterns": {
+      "status": "used",
+      "why": "Scored regex overrides; without them regexScore is a no-op because every synced Vidhin05 entry scores 0."
+    },
+    "regexOverrides": {
+      "status": "used",
+      "why": "Set by AIOStreams on templates that override synced regex scores by name."
+    },
+    "syncedRankedRegexUrls": {
+      "status": "used",
+      "why": "Vidhin05's ranked list, the one synced URL public hosts accept."
+    },
+    "syncedExcludedRegexUrls": {
+      "status": "off-by-design",
+      "why": "Removed from active templates: a third-party list broke ElfHosted saves with 'Forbidden URL' when its allowlist drifted. Exclusions are inline instead."
+    },
+    "syncedPreferredStreamExpressionUrls": {
+      "status": "used",
+      "why": "Static templates and the smart template's trust case point at Filtering/core-builds-pses.json so one edit updates every importer; generated configs inline their PSEs."
+    },
+    "syncedExcludedStreamExpressionUrls": {
+      "status": "used",
+      "why": "Same, for Filtering/core-builds-eses.json."
+    },
+    "syncedIncludedStreamExpressionUrls": {
+      "status": "used",
+      "why": "Same, for Filtering/core-builds-ises.json."
+    },
+    "syncedRankedStreamExpressionUrls": {
+      "status": "used",
+      "why": "Smart template trust case only, so operators who add the collection to TEMPLATE_URLS trust it."
+    },
+    "syncedPreferredRegexUrls": {
+      "status": "off-by-design",
+      "why": "Preferred patterns are inline (five or seven Vidhin05 strings); a synced URL would need host allowlisting for no gain."
+    },
+    "syncedIncludedRegexUrls": {
+      "status": "off-by-design",
+      "why": "No included-regex set exists; ISEs cover passthrough."
+    },
+    "syncedRequiredRegexUrls": {
+      "status": "off-by-design",
+      "why": "Required regex would hard-remove unmatched releases; ranking is preferred so niche titles still return something."
+    },
+    "syncedRequiredStreamExpressionUrls": {
+      "status": "off-by-design",
+      "why": "Required expressions remove everything that does not match; Core Builds ranks with PSEs and excludes with ESEs instead."
+    },
+    "includedRegexPatterns": {
+      "status": "off-by-design",
+      "why": "Passthrough is done with ISEs (library, SeaDex, ID-matched), which compose with SEL."
+    },
+    "requiredRegexPatterns": {
+      "status": "off-by-design",
+      "why": "Hard requirement; would empty results for titles with no matching group."
+    },
+    "requiredStreamExpressions": {
+      "status": "used",
+      "why": "Smart template only (answer-dependent); generators avoid required expressions for the same reason as required regex."
+    },
+    "excludedStreamExpressions": {
+      "status": "used",
+      "why": "ESEs: one on Core Stable (external-stream kill), 29 on the IQR build. Pack filtering runs last so a valid episode request never ends empty (CLAUDE.md, late pack fallback)."
+    },
+    "includedStreamExpressions": {
+      "status": "used",
+      "why": "ISEs: library and SeaDex passthrough, ID-matched trust, Smart Play pin."
+    },
+    "preferredStreamExpressions": {
+      "status": "used",
+      "why": "PSEs: IQR bitrate tiers, pow() decay, perGroup() balance. None on Core Stable."
+    },
+    "rankedStreamExpressions": {
+      "status": "used",
+      "why": "The only writer of streamExpressionScore; without it the score sort and Adaptive Score Floor are stripped. Advanced and Labs only (ranked-sel-policy.js)."
+    },
+    "selOverrides": {
+      "status": "used",
+      "why": "Smart template only, carried from the per-answer builds."
+    },
+    "excludeUncached": {
+      "status": "used",
+      "why": "Set when the user picks cached-only; otherwise uncached stays so a title nobody has cached still shows something."
+    },
+    "excludeUncachedMode": {
+      "status": "used",
+      "why": "Always 'or', the AIOStreams default, written explicitly so an import shows no change."
+    },
+    "excludeUncachedFromAddons": {
+      "status": "used",
+      "why": "Smart template only (answer-dependent)."
+    },
+    "excludeUncachedFromServices": {
+      "status": "used",
+      "why": "Smart template only."
+    },
+    "excludeUncachedFromStreamTypes": {
+      "status": "used",
+      "why": "Smart template only."
+    },
+    "excludeCached": {
+      "status": "used",
+      "why": "Smart template only; the generators never drop cached results."
+    },
+    "excludeCachedFromAddons": {
+      "status": "used",
+      "why": "Smart template only."
+    },
+    "excludeCachedFromServices": {
+      "status": "used",
+      "why": "Smart template only."
+    },
+    "excludeCachedFromStreamTypes": {
+      "status": "used",
+      "why": "Smart template only."
+    },
+    "excludeCachedMode": {
+      "status": "off-by-design",
+      "why": "Cached results are never excluded by the generators, so the mode is never needed."
+    },
+    "enableSeadex": {
+      "status": "used",
+      "why": "SeaDex best-release data for anime; feeds the seadex sort key and the Library/SeaDex ISE."
+    },
+    "excludeSeasonPacks": {
+      "status": "off-by-design",
+      "why": "Never remove season packs outright: the late pack fallback hides them only when three playable single episodes remain (CLAUDE.md)."
+    },
+    "digitalReleaseFilter": {
+      "status": "used",
+      "why": "Off in generated configs: it drops results before the digital release date, which also removes early legitimate releases. Two static templates enable it."
+    },
+    "dynamicAddonFetching": {
+      "status": "used",
+      "why": "Advanced/Labs only: returns once the exit condition is met instead of waiting for every source. Core Stable turns it off so a problem reproduces the same way each time — which also means Stable waits on its slowest source."
+    },
+    "groups": {
+      "status": "off-by-design",
+      "why": "Off in every generated config: generators never combine groups with dynamic fetching (two early exits can skip sources), and dynamic wins (output-profile-policy.js#preventStackedFetchExits). Groups must use instanceIds, never display names."
+    },
+    "sortCriteria": {
+      "status": "used",
+      "why": "Stable multi-key sort: cached and stream-expression keys first, then resolution and quality. audioChannel is dropped from generated configs because the upstream sorter has no case for it."
+    },
+    "resultLimits": {
+      "status": "used",
+      "why": "10–12 results on Core Stable (3 per resolution), 30–35 on Advanced/Labs."
+    },
+    "size": {
+      "status": "used",
+      "why": "Size ranges per resolution, from the user's size limit."
+    },
+    "bitrate": {
+      "status": "used",
+      "why": "Bitrate ranges, and the bandwidth cap (80% of the typed speed)."
+    },
+    "hideErrors": {
+      "status": "used",
+      "why": "Hides addon error rows in Stremio on Advanced/Labs."
+    },
+    "hideErrorsForResources": {
+      "status": "used",
+      "why": "Scopes error hiding to resource types."
+    },
+    "statistics": {
+      "status": "candidate",
+      "why": "Off everywhere. It can show why nothing appeared (showFilterStatsOnNoStreams); worth turning on for empty results only."
+    },
+    "yearMatching": {
+      "status": "used",
+      "why": "Static templates match the release year; generators leave AIOStreams' default."
+    },
+    "titleMatching": {
+      "status": "used",
+      "why": "Off in generated configs (default contains, 0.75): strict title matching drops foreign and alternate titles. Static templates enable it."
+    },
+    "seasonEpisodeMatching": {
+      "status": "used",
+      "why": "On, non-strict: drops wrong-episode results while letting packs through for AIOStreams to verify."
+    },
+    "deduplicator": {
+      "status": "used",
+      "why": "Filename, infoHash and smartDetect keys; one cached result per release, uncached per service."
+    },
+    "autoPlay": {
+      "status": "used",
+      "why": "Next-episode autoplay by matching attributes; Core Stable turns it off."
+    },
+    "areYouStillThere": {
+      "status": "used",
+      "why": "Smart template only."
+    },
+    "precacheNextEpisode": {
+      "status": "used",
+      "why": "Advanced/Labs: asks the service to cache the next episode while this one plays."
+    },
+    "precacheSelector": {
+      "status": "used",
+      "why": "Which stream to precache (replaces the deprecated alwaysPrecache/precacheCondition)."
+    },
+    "precacheSingleStream": {
+      "status": "used",
+      "why": "Precache only the first selected stream."
+    },
+    "alwaysPrecache": {
+      "status": "off-by-design",
+      "why": "Deprecated upstream in favour of precacheSelector."
+    },
+    "precacheCondition": {
+      "status": "off-by-design",
+      "why": "Deprecated upstream in favour of precacheSelector."
+    },
+    "preloadStreams": {
+      "status": "used",
+      "why": "Advanced/Labs: pings the top stream so it starts faster. Off on Core Stable."
+    },
+    "cacheAndPlay": {
+      "status": "used",
+      "why": "Advanced/Labs: plays an uncached torrent or NZB once the service has it. Off on Core Stable."
+    },
+    "failover": {
+      "status": "candidate",
+      "why": "Off in generated configs; 25 static templates enable it. 2.35 added onlySameReleaseFailover, which makes it safe to turn on: a failed link falls over to the same release on another source."
+    },
+    "nzbFailover": {
+      "status": "used",
+      "why": "Usenet builds: NZB failover position and count."
+    },
+    "services": {
+      "status": "used",
+      "why": "The user's debrid/usenet services (credentials stripped from shared links)."
+    },
+    "presets": {
+      "status": "used",
+      "why": "The addons. Core Stable emits three torrent sources on TorBox (StremThru Torz, Meteor, Comet); Balanced and above add Zilean, MediaFusion, EZTV, Torrent Galaxy and Knaben."
+    },
+    "formatter": {
+      "status": "used",
+      "why": "Stream card layout (family-v4 by default, Core collection, or imported)."
+    },
+    "proxy": {
+      "status": "used",
+      "why": "Neutral stub until address, credentials and enabled are all set (stream-proxy-policy.js)."
+    },
+    "posterService": {
+      "status": "used",
+      "why": "Poster source for catalogs."
+    },
+    "rpdbApiKey": {
+      "status": "used",
+      "why": "RPDB posters: RPDB's public free-tier key t0-free-rpdb by default, or the user's own."
+    },
+    "usePosterRedirectApi": {
+      "status": "used",
+      "why": "Poster redirect for RPDB."
+    },
+    "usePosterServiceForMeta": {
+      "status": "used",
+      "why": "Posters in meta pages too."
+    },
+    "tmdbAccessToken": {
+      "status": "used",
+      "why": "Static templates carry `<template_placeholder>` for the user's own token; never a real value."
+    },
+    "tmdbApiKey": {
+      "status": "used",
+      "why": "Same as tmdbAccessToken."
+    },
+    "catalogModifications": {
+      "status": "used",
+      "why": "Static templates hide or reorder catalogs; generated configs leave catalogs alone."
+    },
+    "mergedCatalogs": {
+      "status": "used",
+      "why": "Smart template only."
+    },
+    "externalDownloads": {
+      "status": "used",
+      "why": "Smart template only."
+    },
+    "autoRemoveDownloads": {
+      "status": "used",
+      "why": "Smart template only."
+    },
+    "checkOwned": {
+      "status": "used",
+      "why": "Smart template only."
+    },
+    "trusted": {
+      "status": "used",
+      "why": "Smart template only; trust itself comes from the operator's TEMPLATE_URLS."
+    },
+    "serviceWrap": {
+      "status": "candidate",
+      "why": "Runs P2P-only presets' torrents through the user's debrid service, so sources like Torrentio, Knaben and Zilean can return cached results on a debrid build. Likely the cheapest gain in sources found; measure before shipping."
+    },
+    "variants": {
+      "status": "candidate",
+      "why": "Config scripts applied by condition (2.33+). With healthChecks, a build could fall back to P2P or usenet automatically when the debrid service is down."
+    },
+    "healthChecks": {
+      "status": "candidate",
+      "why": "URL checks referenced as health('<id>') from variant conditions. Pairs with variants for automatic fallback."
+    },
+    "variantSelectorLocation": {
+      "status": "candidate",
+      "why": "Where an explicit variant is named (query or path); only matters once variants are used."
+    },
+    "episodeTitleMatching": {
+      "status": "candidate",
+      "why": "Matches episodes by title when numbering differs between sources; could recover anime, specials and absolute-numbered shows."
+    },
+    "languageInference": {
+      "status": "candidate",
+      "why": "Infers language from the title or episode title when the filename has none, so language filters drop fewer unlabelled releases."
+    },
+    "excludeSeederRange": {
+      "status": "candidate",
+      "why": "Native seeder filter; could replace the Low Seeders / Low Seeder Cull ESEs and run cheaper."
+    },
+    "includeSeederRange": {
+      "status": "used",
+      "why": "Static templates keep well-seeded torrents through other filters."
+    },
+    "requiredSeederRange": {
+      "status": "off-by-design",
+      "why": "A hard seeder minimum empties niche titles; ESEs cull only when better options exist."
+    },
+    "seederRangeTypes": {
+      "status": "candidate",
+      "why": "Which result types the seeder ranges apply to; needed if excludeSeederRange is adopted."
+    },
+    "excludeAgeRange": {
+      "status": "candidate",
+      "why": "Native usenet age filter; could replace the Usenet Propagation Guard ESE."
+    },
+    "includeAgeRange": {
+      "status": "off-by-design",
+      "why": "No age-based passthrough is needed."
+    },
+    "requiredAgeRange": {
+      "status": "off-by-design",
+      "why": "A hard age requirement would remove old but valid NZBs."
+    },
+    "ageRangeTypes": {
+      "status": "candidate",
+      "why": "Which result types the age ranges apply to; needed if excludeAgeRange is adopted."
+    },
+    "remuxDb": {
+      "status": "candidate",
+      "why": "RemuxDB lookups (on by default upstream since 2.36) fill real audio and subtitle tracks from probes. We rely on the default; decide whether to set it explicitly."
+    },
+    "excludedReleaseGroups": {
+      "status": "off-by-design",
+      "why": "Bad groups are excluded through verbatim Vidhin05 regex and ESEs, which public hosts accept and which cover group variants."
+    },
+    "includedReleaseGroups": {
+      "status": "off-by-design",
+      "why": "Elite groups are pinned with pin(releaseGroup(...)) PSEs instead."
+    },
+    "requiredReleaseGroups": {
+      "status": "off-by-design",
+      "why": "Hard requirement; would empty most titles."
+    },
+    "preferredReleaseGroups": {
+      "status": "off-by-design",
+      "why": "Ranking by group is done with ranked regex and PSEs, which score rather than order."
+    },
+    "excludedKeywords": {
+      "status": "off-by-design",
+      "why": "Keyword exclusion is done in ESEs with keyword(), which can be scoped (anime exempt, library passthrough)."
+    },
+    "includedKeywords": {
+      "status": "off-by-design",
+      "why": "Passthrough is done with ISEs."
+    },
+    "requiredKeywords": {
+      "status": "off-by-design",
+      "why": "Hard requirement; would empty most titles."
+    },
+    "preferredKeywords": {
+      "status": "off-by-design",
+      "why": "REPACK/PROPER boosts are PSEs with keyword()."
+    },
+    "excludedSubtitles": {
+      "status": "off-by-design",
+      "why": "Subtitle tags are unreliable in filenames; excluding by them would drop good releases."
+    },
+    "includedSubtitles": {
+      "status": "off-by-design",
+      "why": "Same as excludedSubtitles."
+    },
+    "requiredSubtitles": {
+      "status": "off-by-design",
+      "why": "Same; subtitles are fetched by subtitle addons instead."
+    },
+    "requiredVisualTags": {
+      "status": "off-by-design",
+      "why": "Hard requirement; HDR-only would empty SDR-only titles."
+    },
+    "includedAudioTags": {
+      "status": "off-by-design",
+      "why": "Not needed: audio exclusions are device-driven and have no passthrough case."
+    },
+    "requiredAudioTags": {
+      "status": "off-by-design",
+      "why": "Hard requirement; would empty titles without the tag."
+    },
+    "includedAudioChannels": {
+      "status": "off-by-design",
+      "why": "No passthrough case."
+    },
+    "requiredAudioChannels": {
+      "status": "off-by-design",
+      "why": "Hard requirement."
+    },
+    "includedStreamTypes": {
+      "status": "off-by-design",
+      "why": "Stream types are excluded per build; no passthrough case."
+    },
+    "requiredStreamTypes": {
+      "status": "off-by-design",
+      "why": "Hard requirement; excludedStreamTypes already narrows per build."
+    },
+    "includedEncodes": {
+      "status": "off-by-design",
+      "why": "No passthrough case."
+    },
+    "requiredEncodes": {
+      "status": "off-by-design",
+      "why": "Hard requirement."
+    },
+    "customPosterUrl": {
+      "status": "not-applicable",
+      "why": "Poster service setting added in 2.38.0 (custom poster URL); posters are the user's choice, not part of a stream template."
+    }
+  },
+  "patterns": [
+    {
+      "match": "^(uuid|encryptedPassword|accessKey|ip|trusted|linkedAccounts|parentConfig|manifestNotice)$",
+      "status": "not-applicable",
+      "why": "Account, identity or server-set field; a template must never carry it."
+    },
+    {
+      "match": "^(activeVariants|autoVariants|healthResults)$",
+      "status": "not-applicable",
+      "why": "Request-scoped, never persisted (AIOStreams fills it per request)."
+    },
+    {
+      "match": "(ApiKey|AccessToken|ProfileId)$|^openposterdb|^topPoster|^aioratings",
+      "status": "not-applicable",
+      "why": "A personal credential or poster-service setting; never written into a template."
+    },
+    {
+      "match": "^(addonBackground)$",
+      "status": "not-applicable",
+      "why": "Branding image; the Core Builds logo is enough."
+    },
+    {
+      "match": "^(newCatalogsDisabled|upstreamCatalogOrder|catalogModifications|mergedCatalogs)$",
+      "status": "not-applicable",
+      "why": "Catalog layout; outside what a stream template should change."
+    },
+    {
+      "match": "^jellyfin$",
+      "status": "not-applicable",
+      "why": "AIOStreams' Jellyfin server mode; not a Stremio stream setting."
+    }
+  ]
+}

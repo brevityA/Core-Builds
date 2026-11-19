@@ -1,0 +1,6001 @@
+{
+  "pin": "2.36.0",
+  "latest": "2.38.1",
+  "behind": true,
+  "releasesSincePin": [
+    "2.38.1",
+    "2.38.0",
+    "2.37.0"
+  ],
+  "profiles": [
+    "stable",
+    "balanced",
+    "advanced",
+    "labs"
+  ],
+  "goldens": 20,
+  "templates": 54,
+  "smart": true,
+  "options": [
+    {
+      "key": "uuid",
+      "kind": "string",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 0,
+          "total": 1
+        },
+        "labs": {
+          "active": 0,
+          "total": 3
+        }
+      },
+      "templates": 0,
+      "smart": false,
+      "decision": {
+        "status": "not-applicable",
+        "why": "Account, identity or server-set field; a template must never carry it.",
+        "source": "pattern ^(uuid|encryptedPassword|accessKey|ip|trusted|linkedAccounts|parentConfig|manifestNotice)$"
+      },
+      "flags": []
+    },
+    {
+      "key": "parentConfig",
+      "kind": "object",
+      "keys": [
+        "uuid",
+        "password",
+        "mergeStrategies"
+      ],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 0,
+          "total": 1
+        },
+        "labs": {
+          "active": 0,
+          "total": 3
+        }
+      },
+      "templates": 0,
+      "smart": false,
+      "decision": {
+        "status": "not-applicable",
+        "why": "Account, identity or server-set field; a template must never carry it.",
+        "source": "pattern ^(uuid|encryptedPassword|accessKey|ip|trusted|linkedAccounts|parentConfig|manifestNotice)$"
+      },
+      "flags": []
+    },
+    {
+      "key": "variants",
+      "kind": "array",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 0,
+          "total": 1
+        },
+        "labs": {
+          "active": 0,
+          "total": 3
+        }
+      },
+      "templates": 0,
+      "smart": false,
+      "decision": {
+        "status": "candidate",
+        "why": "Config scripts applied by condition (2.33+). With healthChecks, a build could fall back to P2P or usenet automatically when the debrid service is down.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "healthChecks",
+      "kind": "array",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 0,
+          "total": 1
+        },
+        "labs": {
+          "active": 0,
+          "total": 3
+        }
+      },
+      "templates": 0,
+      "smart": false,
+      "decision": {
+        "status": "candidate",
+        "why": "URL checks referenced as health('<id>') from variant conditions. Pairs with variants for automatic fallback.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "activeVariants",
+      "kind": "array",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 0,
+          "total": 1
+        },
+        "labs": {
+          "active": 0,
+          "total": 3
+        }
+      },
+      "templates": 0,
+      "smart": false,
+      "decision": {
+        "status": "not-applicable",
+        "why": "Request-scoped, never persisted (AIOStreams fills it per request).",
+        "source": "pattern ^(activeVariants|autoVariants|healthResults)$"
+      },
+      "flags": []
+    },
+    {
+      "key": "autoVariants",
+      "kind": "array",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 0,
+          "total": 1
+        },
+        "labs": {
+          "active": 0,
+          "total": 3
+        }
+      },
+      "templates": 0,
+      "smart": false,
+      "decision": {
+        "status": "not-applicable",
+        "why": "Request-scoped, never persisted (AIOStreams fills it per request).",
+        "source": "pattern ^(activeVariants|autoVariants|healthResults)$"
+      },
+      "flags": []
+    },
+    {
+      "key": "healthResults",
+      "kind": "record",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 0,
+          "total": 1
+        },
+        "labs": {
+          "active": 0,
+          "total": 3
+        }
+      },
+      "templates": 0,
+      "smart": false,
+      "decision": {
+        "status": "not-applicable",
+        "why": "Request-scoped, never persisted (AIOStreams fills it per request).",
+        "source": "pattern ^(activeVariants|autoVariants|healthResults)$"
+      },
+      "flags": []
+    },
+    {
+      "key": "variantSelectorLocation",
+      "kind": "enum",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 0,
+          "total": 1
+        },
+        "labs": {
+          "active": 0,
+          "total": 3
+        }
+      },
+      "templates": 0,
+      "smart": false,
+      "decision": {
+        "status": "candidate",
+        "why": "Where an explicit variant is named (query or path); only matters once variants are used.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "encryptedPassword",
+      "kind": "string",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 0,
+          "total": 1
+        },
+        "labs": {
+          "active": 0,
+          "total": 3
+        }
+      },
+      "templates": 0,
+      "smart": false,
+      "decision": {
+        "status": "not-applicable",
+        "why": "Account, identity or server-set field; a template must never carry it.",
+        "source": "pattern ^(uuid|encryptedPassword|accessKey|ip|trusted|linkedAccounts|parentConfig|manifestNotice)$"
+      },
+      "flags": []
+    },
+    {
+      "key": "trusted",
+      "kind": "boolean",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 0,
+          "total": 1
+        },
+        "labs": {
+          "active": 0,
+          "total": 3
+        }
+      },
+      "templates": 0,
+      "smart": true,
+      "decision": {
+        "status": "used",
+        "why": "Smart template only; trust itself comes from the operator's TEMPLATE_URLS.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "showChanges",
+      "kind": "boolean",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 15,
+          "total": 15
+        },
+        "balanced": {
+          "active": 1,
+          "total": 1
+        },
+        "advanced": {
+          "active": 1,
+          "total": 1
+        },
+        "labs": {
+          "active": 3,
+          "total": 3
+        }
+      },
+      "templates": 53,
+      "smart": true,
+      "decision": {
+        "status": "used",
+        "why": "Template metadata: tells AIOStreams to show what an update changes before the user applies it.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "manifestNotice",
+      "kind": "enum",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 0,
+          "total": 1
+        },
+        "labs": {
+          "active": 0,
+          "total": 3
+        }
+      },
+      "templates": 0,
+      "smart": false,
+      "decision": {
+        "status": "not-applicable",
+        "why": "Account, identity or server-set field; a template must never carry it.",
+        "source": "pattern ^(uuid|encryptedPassword|accessKey|ip|trusted|linkedAccounts|parentConfig|manifestNotice)$"
+      },
+      "flags": []
+    },
+    {
+      "key": "linkedAccounts",
+      "kind": "object",
+      "keys": [
+        "pushBehaviour"
+      ],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 0,
+          "total": 1
+        },
+        "labs": {
+          "active": 0,
+          "total": 3
+        }
+      },
+      "templates": 0,
+      "smart": false,
+      "decision": {
+        "status": "not-applicable",
+        "why": "Account, identity or server-set field; a template must never carry it.",
+        "source": "pattern ^(uuid|encryptedPassword|accessKey|ip|trusted|linkedAccounts|parentConfig|manifestNotice)$"
+      },
+      "flags": []
+    },
+    {
+      "key": "accessKey",
+      "kind": "string",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 0,
+          "total": 1
+        },
+        "labs": {
+          "active": 0,
+          "total": 3
+        }
+      },
+      "templates": 0,
+      "smart": false,
+      "decision": {
+        "status": "not-applicable",
+        "why": "Account, identity or server-set field; a template must never carry it.",
+        "source": "pattern ^(uuid|encryptedPassword|accessKey|ip|trusted|linkedAccounts|parentConfig|manifestNotice)$"
+      },
+      "flags": []
+    },
+    {
+      "key": "ip",
+      "kind": "string",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 0,
+          "total": 1
+        },
+        "labs": {
+          "active": 0,
+          "total": 3
+        }
+      },
+      "templates": 0,
+      "smart": false,
+      "decision": {
+        "status": "not-applicable",
+        "why": "Account, identity or server-set field; a template must never carry it.",
+        "source": "pattern ^(uuid|encryptedPassword|accessKey|ip|trusted|linkedAccounts|parentConfig|manifestNotice)$"
+      },
+      "flags": []
+    },
+    {
+      "key": "addonName",
+      "kind": "string",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 15,
+          "total": 15
+        },
+        "balanced": {
+          "active": 1,
+          "total": 1
+        },
+        "advanced": {
+          "active": 1,
+          "total": 1
+        },
+        "labs": {
+          "active": 3,
+          "total": 3
+        }
+      },
+      "templates": 54,
+      "smart": true,
+      "decision": {
+        "status": "used",
+        "why": "Brands the addon in Stremio as Core Builds (with the build's name).",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "addonLogo",
+      "kind": "string",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 15,
+          "total": 15
+        },
+        "balanced": {
+          "active": 1,
+          "total": 1
+        },
+        "advanced": {
+          "active": 1,
+          "total": 1
+        },
+        "labs": {
+          "active": 3,
+          "total": 3
+        }
+      },
+      "templates": 46,
+      "smart": true,
+      "decision": {
+        "status": "used",
+        "why": "Core Builds icon; must use the /refs/heads/main/ raw URL (CLAUDE.md, known validator rules).",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "addonBackground",
+      "kind": "string",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 0,
+          "total": 1
+        },
+        "labs": {
+          "active": 0,
+          "total": 3
+        }
+      },
+      "templates": 0,
+      "smart": false,
+      "decision": {
+        "status": "not-applicable",
+        "why": "Branding image; the Core Builds logo is enough.",
+        "source": "pattern ^(addonBackground)$"
+      },
+      "flags": []
+    },
+    {
+      "key": "addonDescription",
+      "kind": "string",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 15,
+          "total": 15
+        },
+        "balanced": {
+          "active": 1,
+          "total": 1
+        },
+        "advanced": {
+          "active": 1,
+          "total": 1
+        },
+        "labs": {
+          "active": 3,
+          "total": 3
+        }
+      },
+      "templates": 54,
+      "smart": true,
+      "decision": {
+        "status": "used",
+        "why": "Describes the build in the Stremio addon list.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "appliedTemplates",
+      "kind": "array",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 0,
+          "total": 1
+        },
+        "labs": {
+          "active": 0,
+          "total": 3
+        }
+      },
+      "templates": 40,
+      "smart": false,
+      "decision": {
+        "status": "used",
+        "why": "Set by AIOStreams on static templates it has applied; the generator does not write it.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "excludedResolutions",
+      "kind": "array",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 15,
+          "total": 15
+        },
+        "balanced": {
+          "active": 1,
+          "total": 1
+        },
+        "advanced": {
+          "active": 1,
+          "total": 1
+        },
+        "labs": {
+          "active": 3,
+          "total": 3
+        }
+      },
+      "templates": 53,
+      "smart": true,
+      "decision": {
+        "status": "used",
+        "why": "Drops resolutions the build never wants. Core Stable drops 576p and below, which can leave DVD-only titles with nothing: see the effectiveness audit.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "includedResolutions",
+      "kind": "array",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 0,
+          "total": 1
+        },
+        "labs": {
+          "active": 0,
+          "total": 3
+        }
+      },
+      "templates": 0,
+      "smart": true,
+      "decision": {
+        "status": "used",
+        "why": "Smart template only, where an answer keeps a resolution the exclusions would drop.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "requiredResolutions",
+      "kind": "array",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 0,
+          "total": 1
+        },
+        "labs": {
+          "active": 0,
+          "total": 3
+        }
+      },
+      "templates": 6,
+      "smart": true,
+      "decision": {
+        "status": "used",
+        "why": "A few static templates (1080p lines) require their resolution; generators rank with PSEs instead so niche titles still return something.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "preferredResolutions",
+      "kind": "array",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 15,
+          "total": 15
+        },
+        "balanced": {
+          "active": 1,
+          "total": 1
+        },
+        "advanced": {
+          "active": 1,
+          "total": 1
+        },
+        "labs": {
+          "active": 3,
+          "total": 3
+        }
+      },
+      "templates": 53,
+      "smart": true,
+      "decision": {
+        "status": "used",
+        "why": "Ranks the target resolution first; for 4K builds the sort is resolution, cached, quality (sort-policy.js).",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "excludedQualities",
+      "kind": "array",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 15,
+          "total": 15
+        },
+        "balanced": {
+          "active": 1,
+          "total": 1
+        },
+        "advanced": {
+          "active": 0,
+          "total": 1
+        },
+        "labs": {
+          "active": 0,
+          "total": 3
+        }
+      },
+      "templates": 4,
+      "smart": true,
+      "decision": {
+        "status": "used",
+        "why": "Removes CAM, TS, TC, SCR and HC rips on Stable and Balanced; Advanced/Labs do this in an ESE so library and SeaDex passthrough can override it.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "includedQualities",
+      "kind": "array",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 0,
+          "total": 1
+        },
+        "labs": {
+          "active": 0,
+          "total": 3
+        }
+      },
+      "templates": 0,
+      "smart": true,
+      "decision": {
+        "status": "used",
+        "why": "Smart template only (answer-dependent passthrough).",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "requiredQualities",
+      "kind": "array",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 0,
+          "total": 1
+        },
+        "labs": {
+          "active": 0,
+          "total": 3
+        }
+      },
+      "templates": 0,
+      "smart": true,
+      "decision": {
+        "status": "used",
+        "why": "Smart template only (answer-dependent).",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "preferredQualities",
+      "kind": "array",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 15,
+          "total": 15
+        },
+        "balanced": {
+          "active": 1,
+          "total": 1
+        },
+        "advanced": {
+          "active": 1,
+          "total": 1
+        },
+        "labs": {
+          "active": 3,
+          "total": 3
+        }
+      },
+      "templates": 53,
+      "smart": true,
+      "decision": {
+        "status": "used",
+        "why": "Ranks REMUX and BluRay above WEB for quality-first builds.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "excludedLanguages",
+      "kind": "array",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 0,
+          "total": 1
+        },
+        "labs": {
+          "active": 0,
+          "total": 3
+        }
+      },
+      "templates": 0,
+      "smart": true,
+      "decision": {
+        "status": "used",
+        "why": "Smart template only; the generators use requiredLanguages with Unknown, Multi and Dual Audio kept so unlabelled releases are not lost.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "includedLanguages",
+      "kind": "array",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 0,
+          "total": 1
+        },
+        "labs": {
+          "active": 0,
+          "total": 3
+        }
+      },
+      "templates": 1,
+      "smart": true,
+      "decision": {
+        "status": "used",
+        "why": "One static template keeps a language through other filters.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "requiredLanguages",
+      "kind": "array",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 1,
+          "total": 1
+        },
+        "labs": {
+          "active": 3,
+          "total": 3
+        }
+      },
+      "templates": 41,
+      "smart": true,
+      "decision": {
+        "status": "used",
+        "why": "Advanced/Labs require the user's languages but always keep Original, Dual Audio, Multi, Dubbed and Unknown, so a release with no language tag still shows.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "preferredLanguages",
+      "kind": "array",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 15,
+          "total": 15
+        },
+        "balanced": {
+          "active": 1,
+          "total": 1
+        },
+        "advanced": {
+          "active": 1,
+          "total": 1
+        },
+        "labs": {
+          "active": 3,
+          "total": 3
+        }
+      },
+      "templates": 53,
+      "smart": true,
+      "decision": {
+        "status": "used",
+        "why": "Ranks the user's languages first.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "excludedSubtitles",
+      "kind": "array",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 0,
+          "total": 1
+        },
+        "labs": {
+          "active": 0,
+          "total": 3
+        }
+      },
+      "templates": 0,
+      "smart": false,
+      "decision": {
+        "status": "off-by-design",
+        "why": "Subtitle tags are unreliable in filenames; excluding by them would drop good releases.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "includedSubtitles",
+      "kind": "array",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 0,
+          "total": 1
+        },
+        "labs": {
+          "active": 0,
+          "total": 3
+        }
+      },
+      "templates": 0,
+      "smart": false,
+      "decision": {
+        "status": "off-by-design",
+        "why": "Same as excludedSubtitles.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "requiredSubtitles",
+      "kind": "array",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 0,
+          "total": 1
+        },
+        "labs": {
+          "active": 0,
+          "total": 3
+        }
+      },
+      "templates": 0,
+      "smart": false,
+      "decision": {
+        "status": "off-by-design",
+        "why": "Same; subtitles are fetched by subtitle addons instead.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "preferredSubtitles",
+      "kind": "array",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 0,
+          "total": 1
+        },
+        "labs": {
+          "active": 0,
+          "total": 3
+        }
+      },
+      "templates": 50,
+      "smart": false,
+      "decision": {
+        "status": "used",
+        "why": "Static templates rank releases carrying the user's subtitle language.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "excludedVisualTags",
+      "kind": "array",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 15,
+          "total": 15
+        },
+        "balanced": {
+          "active": 1,
+          "total": 1
+        },
+        "advanced": {
+          "active": 0,
+          "total": 1
+        },
+        "labs": {
+          "active": 0,
+          "total": 3
+        }
+      },
+      "templates": 53,
+      "smart": true,
+      "decision": {
+        "status": "used",
+        "why": "Drops 3D and half-SBS/OU everywhere; device profiles add DV-only kills where DV fails.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "includedVisualTags",
+      "kind": "array",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 0,
+          "total": 1
+        },
+        "labs": {
+          "active": 0,
+          "total": 3
+        }
+      },
+      "templates": 4,
+      "smart": false,
+      "decision": {
+        "status": "used",
+        "why": "A few static device templates keep HDR tags through other filters.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "requiredVisualTags",
+      "kind": "array",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 0,
+          "total": 1
+        },
+        "labs": {
+          "active": 0,
+          "total": 3
+        }
+      },
+      "templates": 0,
+      "smart": false,
+      "decision": {
+        "status": "off-by-design",
+        "why": "Hard requirement; HDR-only would empty SDR-only titles.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "preferredVisualTags",
+      "kind": "array",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 15,
+          "total": 15
+        },
+        "balanced": {
+          "active": 1,
+          "total": 1
+        },
+        "advanced": {
+          "active": 1,
+          "total": 1
+        },
+        "labs": {
+          "active": 3,
+          "total": 3
+        }
+      },
+      "templates": 53,
+      "smart": true,
+      "decision": {
+        "status": "used",
+        "why": "Ranks DV/HDR10+/HDR by what the device supports (devices.js).",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "excludedAudioTags",
+      "kind": "array",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 14,
+          "total": 15
+        },
+        "balanced": {
+          "active": 1,
+          "total": 1
+        },
+        "advanced": {
+          "active": 1,
+          "total": 1
+        },
+        "labs": {
+          "active": 3,
+          "total": 3
+        }
+      },
+      "templates": 24,
+      "smart": true,
+      "decision": {
+        "status": "used",
+        "why": "Removes audio the device cannot pass through (TrueHD, DTS-HD MA, DTS:X, FLAC on most TVs).",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "includedAudioTags",
+      "kind": "array",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 0,
+          "total": 1
+        },
+        "labs": {
+          "active": 0,
+          "total": 3
+        }
+      },
+      "templates": 0,
+      "smart": false,
+      "decision": {
+        "status": "off-by-design",
+        "why": "Not needed: audio exclusions are device-driven and have no passthrough case.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "requiredAudioTags",
+      "kind": "array",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 0,
+          "total": 1
+        },
+        "labs": {
+          "active": 0,
+          "total": 3
+        }
+      },
+      "templates": 0,
+      "smart": false,
+      "decision": {
+        "status": "off-by-design",
+        "why": "Hard requirement; would empty titles without the tag.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "preferredAudioTags",
+      "kind": "array",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 15,
+          "total": 15
+        },
+        "balanced": {
+          "active": 1,
+          "total": 1
+        },
+        "advanced": {
+          "active": 1,
+          "total": 1
+        },
+        "labs": {
+          "active": 3,
+          "total": 3
+        }
+      },
+      "templates": 53,
+      "smart": true,
+      "decision": {
+        "status": "used",
+        "why": "Ranks Atmos/DD+ or lossless by the device's audio profile.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "excludedAudioChannels",
+      "kind": "array",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 0,
+          "total": 1
+        },
+        "labs": {
+          "active": 0,
+          "total": 3
+        }
+      },
+      "templates": 38,
+      "smart": false,
+      "decision": {
+        "status": "used",
+        "why": "Static templates only, for devices that mishandle 7.1.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "includedAudioChannels",
+      "kind": "array",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 0,
+          "total": 1
+        },
+        "labs": {
+          "active": 0,
+          "total": 3
+        }
+      },
+      "templates": 0,
+      "smart": false,
+      "decision": {
+        "status": "off-by-design",
+        "why": "No passthrough case.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "requiredAudioChannels",
+      "kind": "array",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 0,
+          "total": 1
+        },
+        "labs": {
+          "active": 0,
+          "total": 3
+        }
+      },
+      "templates": 0,
+      "smart": false,
+      "decision": {
+        "status": "off-by-design",
+        "why": "Hard requirement.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "preferredAudioChannels",
+      "kind": "array",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 15,
+          "total": 15
+        },
+        "balanced": {
+          "active": 1,
+          "total": 1
+        },
+        "advanced": {
+          "active": 1,
+          "total": 1
+        },
+        "labs": {
+          "active": 3,
+          "total": 3
+        }
+      },
+      "templates": 53,
+      "smart": true,
+      "decision": {
+        "status": "used",
+        "why": "Ranks 7.1/5.1 by the sound profile.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "excludedStreamTypes",
+      "kind": "array",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 15,
+          "total": 15
+        },
+        "balanced": {
+          "active": 1,
+          "total": 1
+        },
+        "advanced": {
+          "active": 1,
+          "total": 1
+        },
+        "labs": {
+          "active": 3,
+          "total": 3
+        }
+      },
+      "templates": 53,
+      "smart": true,
+      "decision": {
+        "status": "used",
+        "why": "Debrid builds drop p2p/http/youtube results that would not play through the service; P2P builds keep p2p.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "includedStreamTypes",
+      "kind": "array",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 0,
+          "total": 1
+        },
+        "labs": {
+          "active": 0,
+          "total": 3
+        }
+      },
+      "templates": 0,
+      "smart": false,
+      "decision": {
+        "status": "off-by-design",
+        "why": "Stream types are excluded per build; no passthrough case.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "requiredStreamTypes",
+      "kind": "array",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 0,
+          "total": 1
+        },
+        "labs": {
+          "active": 0,
+          "total": 3
+        }
+      },
+      "templates": 0,
+      "smart": false,
+      "decision": {
+        "status": "off-by-design",
+        "why": "Hard requirement; excludedStreamTypes already narrows per build.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "preferredStreamTypes",
+      "kind": "array",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 0,
+          "total": 1
+        },
+        "labs": {
+          "active": 0,
+          "total": 3
+        }
+      },
+      "templates": 50,
+      "smart": false,
+      "decision": {
+        "status": "used",
+        "why": "Static templates rank debrid over usenet or the reverse per line.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "excludedEncodes",
+      "kind": "array",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 14,
+          "total": 15
+        },
+        "balanced": {
+          "active": 1,
+          "total": 1
+        },
+        "advanced": {
+          "active": 1,
+          "total": 1
+        },
+        "labs": {
+          "active": 3,
+          "total": 3
+        }
+      },
+      "templates": 26,
+      "smart": true,
+      "decision": {
+        "status": "used",
+        "why": "Drops AV1 and VC-1 on devices without safe hardware decode (deviceAv1Safe).",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "includedEncodes",
+      "kind": "array",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 0,
+          "total": 1
+        },
+        "labs": {
+          "active": 0,
+          "total": 3
+        }
+      },
+      "templates": 0,
+      "smart": false,
+      "decision": {
+        "status": "off-by-design",
+        "why": "No passthrough case.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "requiredEncodes",
+      "kind": "array",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 0,
+          "total": 1
+        },
+        "labs": {
+          "active": 0,
+          "total": 3
+        }
+      },
+      "templates": 0,
+      "smart": false,
+      "decision": {
+        "status": "off-by-design",
+        "why": "Hard requirement.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "preferredEncodes",
+      "kind": "array",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 15,
+          "total": 15
+        },
+        "balanced": {
+          "active": 1,
+          "total": 1
+        },
+        "advanced": {
+          "active": 1,
+          "total": 1
+        },
+        "labs": {
+          "active": 3,
+          "total": 3
+        }
+      },
+      "templates": 54,
+      "smart": true,
+      "decision": {
+        "status": "used",
+        "why": "Ranks HEVC/AVC by device.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "excludedRegexPatterns",
+      "kind": "array",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 1,
+          "total": 1
+        },
+        "advanced": {
+          "active": 1,
+          "total": 1
+        },
+        "labs": {
+          "active": 3,
+          "total": 3
+        }
+      },
+      "templates": 43,
+      "smart": true,
+      "decision": {
+        "status": "used",
+        "why": "Eight inline patterns (upscaled, extras, LQ groups, BR-DISK, retags); each string is a verbatim Vidhin05 pattern so ElfHosted's allowlist accepts it.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "includedRegexPatterns",
+      "kind": "array",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 0,
+          "total": 1
+        },
+        "labs": {
+          "active": 0,
+          "total": 3
+        }
+      },
+      "templates": 0,
+      "smart": false,
+      "decision": {
+        "status": "off-by-design",
+        "why": "Passthrough is done with ISEs (library, SeaDex, ID-matched), which compose with SEL.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "requiredRegexPatterns",
+      "kind": "array",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 0,
+          "total": 1
+        },
+        "labs": {
+          "active": 0,
+          "total": 3
+        }
+      },
+      "templates": 0,
+      "smart": false,
+      "decision": {
+        "status": "off-by-design",
+        "why": "Hard requirement; would empty results for titles with no matching group.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "preferredRegexPatterns",
+      "kind": "array",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 1,
+          "total": 1
+        },
+        "advanced": {
+          "active": 1,
+          "total": 1
+        },
+        "labs": {
+          "active": 3,
+          "total": 3
+        }
+      },
+      "templates": 41,
+      "smart": true,
+      "decision": {
+        "status": "used",
+        "why": "Tier-1 group patterns (Remux T1, FraMeSToR…), verbatim Vidhin05 strings.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "syncedPreferredRegexUrls",
+      "kind": "array",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 0,
+          "total": 1
+        },
+        "labs": {
+          "active": 0,
+          "total": 3
+        }
+      },
+      "templates": 0,
+      "smart": false,
+      "decision": {
+        "status": "off-by-design",
+        "why": "Preferred patterns are inline (five or seven Vidhin05 strings); a synced URL would need host allowlisting for no gain.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "syncedExcludedRegexUrls",
+      "kind": "array",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 0,
+          "total": 1
+        },
+        "labs": {
+          "active": 0,
+          "total": 3
+        }
+      },
+      "templates": 0,
+      "smart": true,
+      "decision": {
+        "status": "off-by-design",
+        "why": "Removed from active templates: a third-party list broke ElfHosted saves with 'Forbidden URL' when its allowlist drifted. Exclusions are inline instead.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "syncedIncludedRegexUrls",
+      "kind": "array",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 0,
+          "total": 1
+        },
+        "labs": {
+          "active": 0,
+          "total": 3
+        }
+      },
+      "templates": 0,
+      "smart": false,
+      "decision": {
+        "status": "off-by-design",
+        "why": "No included-regex set exists; ISEs cover passthrough.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "syncedRequiredRegexUrls",
+      "kind": "array",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 0,
+          "total": 1
+        },
+        "labs": {
+          "active": 0,
+          "total": 3
+        }
+      },
+      "templates": 0,
+      "smart": false,
+      "decision": {
+        "status": "off-by-design",
+        "why": "Required regex would hard-remove unmatched releases; ranking is preferred so niche titles still return something.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "syncedRankedRegexUrls",
+      "kind": "array",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 1,
+          "total": 1
+        },
+        "labs": {
+          "active": 3,
+          "total": 3
+        }
+      },
+      "templates": 43,
+      "smart": true,
+      "decision": {
+        "status": "used",
+        "why": "Vidhin05's ranked list, the one synced URL public hosts accept.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "syncedPreferredStreamExpressionUrls",
+      "kind": "array",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 0,
+          "total": 1
+        },
+        "labs": {
+          "active": 0,
+          "total": 3
+        }
+      },
+      "templates": 0,
+      "smart": true,
+      "decision": {
+        "status": "used",
+        "why": "Static templates and the smart template's trust case point at Filtering/core-builds-pses.json so one edit updates every importer; generated configs inline their PSEs.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "syncedExcludedStreamExpressionUrls",
+      "kind": "array",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 0,
+          "total": 1
+        },
+        "labs": {
+          "active": 0,
+          "total": 3
+        }
+      },
+      "templates": 0,
+      "smart": true,
+      "decision": {
+        "status": "used",
+        "why": "Same, for Filtering/core-builds-eses.json.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "syncedIncludedStreamExpressionUrls",
+      "kind": "array",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 0,
+          "total": 1
+        },
+        "labs": {
+          "active": 0,
+          "total": 3
+        }
+      },
+      "templates": 0,
+      "smart": true,
+      "decision": {
+        "status": "used",
+        "why": "Same, for Filtering/core-builds-ises.json.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "syncedRequiredStreamExpressionUrls",
+      "kind": "array",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 0,
+          "total": 1
+        },
+        "labs": {
+          "active": 0,
+          "total": 3
+        }
+      },
+      "templates": 0,
+      "smart": false,
+      "decision": {
+        "status": "off-by-design",
+        "why": "Required expressions remove everything that does not match; Core Builds ranks with PSEs and excludes with ESEs instead.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "syncedRankedStreamExpressionUrls",
+      "kind": "array",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 0,
+          "total": 1
+        },
+        "labs": {
+          "active": 0,
+          "total": 3
+        }
+      },
+      "templates": 0,
+      "smart": true,
+      "decision": {
+        "status": "used",
+        "why": "Smart template trust case only, so operators who add the collection to TEMPLATE_URLS trust it.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "excludedReleaseGroups",
+      "kind": "array",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 0,
+          "total": 1
+        },
+        "labs": {
+          "active": 0,
+          "total": 3
+        }
+      },
+      "templates": 0,
+      "smart": false,
+      "decision": {
+        "status": "off-by-design",
+        "why": "Bad groups are excluded through verbatim Vidhin05 regex and ESEs, which public hosts accept and which cover group variants.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "includedReleaseGroups",
+      "kind": "array",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 0,
+          "total": 1
+        },
+        "labs": {
+          "active": 0,
+          "total": 3
+        }
+      },
+      "templates": 0,
+      "smart": false,
+      "decision": {
+        "status": "off-by-design",
+        "why": "Elite groups are pinned with pin(releaseGroup(...)) PSEs instead.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "requiredReleaseGroups",
+      "kind": "array",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 0,
+          "total": 1
+        },
+        "labs": {
+          "active": 0,
+          "total": 3
+        }
+      },
+      "templates": 0,
+      "smart": false,
+      "decision": {
+        "status": "off-by-design",
+        "why": "Hard requirement; would empty most titles.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "preferredReleaseGroups",
+      "kind": "array",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 0,
+          "total": 1
+        },
+        "labs": {
+          "active": 0,
+          "total": 3
+        }
+      },
+      "templates": 0,
+      "smart": false,
+      "decision": {
+        "status": "off-by-design",
+        "why": "Ranking by group is done with ranked regex and PSEs, which score rather than order.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "requiredKeywords",
+      "kind": "array",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 0,
+          "total": 1
+        },
+        "labs": {
+          "active": 0,
+          "total": 3
+        }
+      },
+      "templates": 0,
+      "smart": false,
+      "decision": {
+        "status": "off-by-design",
+        "why": "Hard requirement; would empty most titles.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "includedKeywords",
+      "kind": "array",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 0,
+          "total": 1
+        },
+        "labs": {
+          "active": 0,
+          "total": 3
+        }
+      },
+      "templates": 0,
+      "smart": false,
+      "decision": {
+        "status": "off-by-design",
+        "why": "Passthrough is done with ISEs.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "excludedKeywords",
+      "kind": "array",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 0,
+          "total": 1
+        },
+        "labs": {
+          "active": 0,
+          "total": 3
+        }
+      },
+      "templates": 0,
+      "smart": false,
+      "decision": {
+        "status": "off-by-design",
+        "why": "Keyword exclusion is done in ESEs with keyword(), which can be scoped (anime exempt, library passthrough).",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "preferredKeywords",
+      "kind": "array",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 0,
+          "total": 1
+        },
+        "labs": {
+          "active": 0,
+          "total": 3
+        }
+      },
+      "templates": 0,
+      "smart": false,
+      "decision": {
+        "status": "off-by-design",
+        "why": "REPACK/PROPER boosts are PSEs with keyword().",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "excludeSeederRange",
+      "kind": "tuple",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 0,
+          "total": 1
+        },
+        "labs": {
+          "active": 0,
+          "total": 3
+        }
+      },
+      "templates": 0,
+      "smart": false,
+      "decision": {
+        "status": "candidate",
+        "why": "Native seeder filter; could replace the Low Seeders / Low Seeder Cull ESEs and run cheaper.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "includeSeederRange",
+      "kind": "tuple",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 0,
+          "total": 1
+        },
+        "labs": {
+          "active": 0,
+          "total": 3
+        }
+      },
+      "templates": 43,
+      "smart": false,
+      "decision": {
+        "status": "used",
+        "why": "Static templates keep well-seeded torrents through other filters.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "requiredSeederRange",
+      "kind": "tuple",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 0,
+          "total": 1
+        },
+        "labs": {
+          "active": 0,
+          "total": 3
+        }
+      },
+      "templates": 0,
+      "smart": false,
+      "decision": {
+        "status": "off-by-design",
+        "why": "A hard seeder minimum empties niche titles; ESEs cull only when better options exist.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "seederRangeTypes",
+      "kind": "array",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 0,
+          "total": 1
+        },
+        "labs": {
+          "active": 0,
+          "total": 3
+        }
+      },
+      "templates": 0,
+      "smart": false,
+      "decision": {
+        "status": "candidate",
+        "why": "Which result types the seeder ranges apply to; needed if excludeSeederRange is adopted.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "excludeAgeRange",
+      "kind": "tuple",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 0,
+          "total": 1
+        },
+        "labs": {
+          "active": 0,
+          "total": 3
+        }
+      },
+      "templates": 0,
+      "smart": false,
+      "decision": {
+        "status": "candidate",
+        "why": "Native usenet age filter; could replace the Usenet Propagation Guard ESE.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "includeAgeRange",
+      "kind": "tuple",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 0,
+          "total": 1
+        },
+        "labs": {
+          "active": 0,
+          "total": 3
+        }
+      },
+      "templates": 0,
+      "smart": false,
+      "decision": {
+        "status": "off-by-design",
+        "why": "No age-based passthrough is needed.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "requiredAgeRange",
+      "kind": "tuple",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 0,
+          "total": 1
+        },
+        "labs": {
+          "active": 0,
+          "total": 3
+        }
+      },
+      "templates": 0,
+      "smart": false,
+      "decision": {
+        "status": "off-by-design",
+        "why": "A hard age requirement would remove old but valid NZBs.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "ageRangeTypes",
+      "kind": "array",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 0,
+          "total": 1
+        },
+        "labs": {
+          "active": 0,
+          "total": 3
+        }
+      },
+      "templates": 0,
+      "smart": false,
+      "decision": {
+        "status": "candidate",
+        "why": "Which result types the age ranges apply to; needed if excludeAgeRange is adopted.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "digitalReleaseFilter",
+      "kind": "object",
+      "keys": [
+        "enabled",
+        "tolerance",
+        "checkResultAge",
+        "requestTypes",
+        "addons",
+        "showInfoOnFilter"
+      ],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 0,
+          "total": 1
+        },
+        "labs": {
+          "active": 0,
+          "total": 3
+        }
+      },
+      "templates": 2,
+      "smart": true,
+      "decision": {
+        "status": "used",
+        "why": "Off in generated configs: it drops results before the digital release date, which also removes early legitimate releases. Two static templates enable it.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "enableSeadex",
+      "kind": "boolean",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 15,
+          "total": 15
+        },
+        "balanced": {
+          "active": 1,
+          "total": 1
+        },
+        "advanced": {
+          "active": 1,
+          "total": 1
+        },
+        "labs": {
+          "active": 3,
+          "total": 3
+        }
+      },
+      "templates": 42,
+      "smart": true,
+      "decision": {
+        "status": "used",
+        "why": "SeaDex best-release data for anime; feeds the seadex sort key and the Library/SeaDex ISE.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "excludeSeasonPacks",
+      "kind": "boolean",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 0,
+          "total": 1
+        },
+        "labs": {
+          "active": 0,
+          "total": 3
+        }
+      },
+      "templates": 0,
+      "smart": false,
+      "decision": {
+        "status": "off-by-design",
+        "why": "Never remove season packs outright: the late pack fallback hides them only when three playable single episodes remain (CLAUDE.md).",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "excludeCached",
+      "kind": "boolean",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 0,
+          "total": 1
+        },
+        "labs": {
+          "active": 0,
+          "total": 3
+        }
+      },
+      "templates": 0,
+      "smart": true,
+      "decision": {
+        "status": "used",
+        "why": "Smart template only; the generators never drop cached results.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "excludeCachedFromAddons",
+      "kind": "array",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 0,
+          "total": 1
+        },
+        "labs": {
+          "active": 0,
+          "total": 3
+        }
+      },
+      "templates": 0,
+      "smart": true,
+      "decision": {
+        "status": "used",
+        "why": "Smart template only.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "excludeCachedFromServices",
+      "kind": "array",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 0,
+          "total": 1
+        },
+        "labs": {
+          "active": 0,
+          "total": 3
+        }
+      },
+      "templates": 0,
+      "smart": true,
+      "decision": {
+        "status": "used",
+        "why": "Smart template only.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "excludeCachedFromStreamTypes",
+      "kind": "array",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 0,
+          "total": 1
+        },
+        "labs": {
+          "active": 0,
+          "total": 3
+        }
+      },
+      "templates": 0,
+      "smart": true,
+      "decision": {
+        "status": "used",
+        "why": "Smart template only.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "excludeCachedMode",
+      "kind": "enum",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 0,
+          "total": 1
+        },
+        "labs": {
+          "active": 0,
+          "total": 3
+        }
+      },
+      "templates": 0,
+      "smart": false,
+      "decision": {
+        "status": "off-by-design",
+        "why": "Cached results are never excluded by the generators, so the mode is never needed.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "excludeUncached",
+      "kind": "boolean",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 1,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 0,
+          "total": 1
+        },
+        "labs": {
+          "active": 1,
+          "total": 3
+        }
+      },
+      "templates": 0,
+      "smart": true,
+      "decision": {
+        "status": "used",
+        "why": "Set when the user picks cached-only; otherwise uncached stays so a title nobody has cached still shows something.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "excludeUncachedFromAddons",
+      "kind": "array",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 0,
+          "total": 1
+        },
+        "labs": {
+          "active": 0,
+          "total": 3
+        }
+      },
+      "templates": 0,
+      "smart": true,
+      "decision": {
+        "status": "used",
+        "why": "Smart template only (answer-dependent).",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "excludeUncachedFromServices",
+      "kind": "array",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 0,
+          "total": 1
+        },
+        "labs": {
+          "active": 0,
+          "total": 3
+        }
+      },
+      "templates": 0,
+      "smart": true,
+      "decision": {
+        "status": "used",
+        "why": "Smart template only.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "excludeUncachedFromStreamTypes",
+      "kind": "array",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 0,
+          "total": 1
+        },
+        "labs": {
+          "active": 0,
+          "total": 3
+        }
+      },
+      "templates": 0,
+      "smart": true,
+      "decision": {
+        "status": "used",
+        "why": "Smart template only.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "excludeUncachedMode",
+      "kind": "enum",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 15,
+          "total": 15
+        },
+        "balanced": {
+          "active": 1,
+          "total": 1
+        },
+        "advanced": {
+          "active": 1,
+          "total": 1
+        },
+        "labs": {
+          "active": 3,
+          "total": 3
+        }
+      },
+      "templates": 45,
+      "smart": true,
+      "decision": {
+        "status": "used",
+        "why": "Always 'or', the AIOStreams default, written explicitly so an import shows no change.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "excludedStreamExpressions",
+      "kind": "array",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 15,
+          "total": 15
+        },
+        "balanced": {
+          "active": 1,
+          "total": 1
+        },
+        "advanced": {
+          "active": 1,
+          "total": 1
+        },
+        "labs": {
+          "active": 3,
+          "total": 3
+        }
+      },
+      "templates": 53,
+      "smart": true,
+      "decision": {
+        "status": "used",
+        "why": "ESEs: one on Core Stable (external-stream kill), 29 on the IQR build. Pack filtering runs last so a valid episode request never ends empty (CLAUDE.md, late pack fallback).",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "requiredStreamExpressions",
+      "kind": "array",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 0,
+          "total": 1
+        },
+        "labs": {
+          "active": 0,
+          "total": 3
+        }
+      },
+      "templates": 0,
+      "smart": true,
+      "decision": {
+        "status": "used",
+        "why": "Smart template only (answer-dependent); generators avoid required expressions for the same reason as required regex.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "preferredStreamExpressions",
+      "kind": "array",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 1,
+          "total": 1
+        },
+        "advanced": {
+          "active": 1,
+          "total": 1
+        },
+        "labs": {
+          "active": 3,
+          "total": 3
+        }
+      },
+      "templates": 50,
+      "smart": true,
+      "decision": {
+        "status": "used",
+        "why": "PSEs: IQR bitrate tiers, pow() decay, perGroup() balance. None on Core Stable.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "includedStreamExpressions",
+      "kind": "array",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 1,
+          "total": 1
+        },
+        "advanced": {
+          "active": 1,
+          "total": 1
+        },
+        "labs": {
+          "active": 3,
+          "total": 3
+        }
+      },
+      "templates": 51,
+      "smart": true,
+      "decision": {
+        "status": "used",
+        "why": "ISEs: library and SeaDex passthrough, ID-matched trust, Smart Play pin.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "rankedStreamExpressions",
+      "kind": "array",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 1,
+          "total": 1
+        },
+        "labs": {
+          "active": 3,
+          "total": 3
+        }
+      },
+      "templates": 41,
+      "smart": true,
+      "decision": {
+        "status": "used",
+        "why": "The only writer of streamExpressionScore; without it the score sort and Adaptive Score Floor are stripped. Advanced and Labs only (ranked-sel-policy.js).",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "rankedRegexPatterns",
+      "kind": "array",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 1,
+          "total": 1
+        },
+        "advanced": {
+          "active": 1,
+          "total": 1
+        },
+        "labs": {
+          "active": 3,
+          "total": 3
+        }
+      },
+      "templates": 43,
+      "smart": true,
+      "decision": {
+        "status": "used",
+        "why": "Scored regex overrides; without them regexScore is a no-op because every synced Vidhin05 entry scores 0.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "regexOverrides",
+      "kind": "array",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 0,
+          "total": 1
+        },
+        "labs": {
+          "active": 0,
+          "total": 3
+        }
+      },
+      "templates": 41,
+      "smart": true,
+      "decision": {
+        "status": "used",
+        "why": "Set by AIOStreams on templates that override synced regex scores by name.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "selOverrides",
+      "kind": "array",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 0,
+          "total": 1
+        },
+        "labs": {
+          "active": 0,
+          "total": 3
+        }
+      },
+      "templates": 0,
+      "smart": true,
+      "decision": {
+        "status": "used",
+        "why": "Smart template only, carried from the per-answer builds.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "dynamicAddonFetching",
+      "kind": "object",
+      "keys": [
+        "enabled",
+        "condition"
+      ],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 1,
+          "total": 1
+        },
+        "labs": {
+          "active": 3,
+          "total": 3
+        }
+      },
+      "templates": 49,
+      "smart": true,
+      "decision": {
+        "status": "used",
+        "why": "Advanced/Labs only: returns once the exit condition is met instead of waiting for every source. Core Stable turns it off so a problem reproduces the same way each time — which also means Stable waits on its slowest source.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "groups",
+      "kind": "object",
+      "keys": [
+        "enabled",
+        "groupings",
+        "behaviour",
+        "onConditionFailure"
+      ],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 0,
+          "total": 1
+        },
+        "labs": {
+          "active": 0,
+          "total": 3
+        }
+      },
+      "templates": 0,
+      "smart": true,
+      "decision": {
+        "status": "off-by-design",
+        "why": "Off in every generated config: generators never combine groups with dynamic fetching (two early exits can skip sources), and dynamic wins (output-profile-policy.js#preventStackedFetchExits). Groups must use instanceIds, never display names.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "sortCriteria",
+      "kind": "object",
+      "keys": [
+        "global",
+        "movies",
+        "series",
+        "anime",
+        "cached",
+        "uncached",
+        "cachedMovies",
+        "uncachedMovies",
+        "cachedSeries",
+        "uncachedSeries",
+        "cachedAnime",
+        "uncachedAnime"
+      ],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 15,
+          "total": 15
+        },
+        "balanced": {
+          "active": 1,
+          "total": 1
+        },
+        "advanced": {
+          "active": 1,
+          "total": 1
+        },
+        "labs": {
+          "active": 3,
+          "total": 3
+        }
+      },
+      "templates": 54,
+      "smart": true,
+      "decision": {
+        "status": "used",
+        "why": "Stable multi-key sort: cached and stream-expression keys first, then resolution and quality. audioChannel is dropped from generated configs because the upstream sorter has no case for it.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "rpdbApiKey",
+      "kind": "string",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 1,
+          "total": 1
+        },
+        "advanced": {
+          "active": 1,
+          "total": 1
+        },
+        "labs": {
+          "active": 3,
+          "total": 3
+        }
+      },
+      "templates": 52,
+      "smart": false,
+      "decision": {
+        "status": "used",
+        "why": "RPDB posters: RPDB's public free-tier key t0-free-rpdb by default, or the user's own.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "topPosterApiKey",
+      "kind": "string",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 0,
+          "total": 1
+        },
+        "labs": {
+          "active": 0,
+          "total": 3
+        }
+      },
+      "templates": 0,
+      "smart": false,
+      "decision": {
+        "status": "not-applicable",
+        "why": "A personal credential or poster-service setting; never written into a template.",
+        "source": "pattern (ApiKey|AccessToken|ProfileId)$|^openposterdb|^topPoster|^aioratings"
+      },
+      "flags": []
+    },
+    {
+      "key": "aioratingsApiKey",
+      "kind": "string",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 0,
+          "total": 1
+        },
+        "labs": {
+          "active": 0,
+          "total": 3
+        }
+      },
+      "templates": 0,
+      "smart": false,
+      "decision": {
+        "status": "not-applicable",
+        "why": "A personal credential or poster-service setting; never written into a template.",
+        "source": "pattern (ApiKey|AccessToken|ProfileId)$|^openposterdb|^topPoster|^aioratings"
+      },
+      "flags": []
+    },
+    {
+      "key": "aioratingsProfileId",
+      "kind": "string",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 0,
+          "total": 1
+        },
+        "labs": {
+          "active": 0,
+          "total": 3
+        }
+      },
+      "templates": 0,
+      "smart": false,
+      "decision": {
+        "status": "not-applicable",
+        "why": "A personal credential or poster-service setting; never written into a template.",
+        "source": "pattern (ApiKey|AccessToken|ProfileId)$|^openposterdb|^topPoster|^aioratings"
+      },
+      "flags": []
+    },
+    {
+      "key": "openposterdbApiKey",
+      "kind": "string",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 0,
+          "total": 1
+        },
+        "labs": {
+          "active": 0,
+          "total": 3
+        }
+      },
+      "templates": 0,
+      "smart": false,
+      "decision": {
+        "status": "not-applicable",
+        "why": "A personal credential or poster-service setting; never written into a template.",
+        "source": "pattern (ApiKey|AccessToken|ProfileId)$|^openposterdb|^topPoster|^aioratings"
+      },
+      "flags": []
+    },
+    {
+      "key": "openposterdbUrl",
+      "kind": "preprocess",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 0,
+          "total": 1
+        },
+        "labs": {
+          "active": 0,
+          "total": 3
+        }
+      },
+      "templates": 0,
+      "smart": false,
+      "decision": {
+        "status": "not-applicable",
+        "why": "A personal credential or poster-service setting; never written into a template.",
+        "source": "pattern (ApiKey|AccessToken|ProfileId)$|^openposterdb|^topPoster|^aioratings"
+      },
+      "flags": []
+    },
+    {
+      "key": "openposterdbParameters",
+      "kind": "preprocess",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 0,
+          "total": 1
+        },
+        "labs": {
+          "active": 0,
+          "total": 3
+        }
+      },
+      "templates": 0,
+      "smart": false,
+      "decision": {
+        "status": "not-applicable",
+        "why": "A personal credential or poster-service setting; never written into a template.",
+        "source": "pattern (ApiKey|AccessToken|ProfileId)$|^openposterdb|^topPoster|^aioratings"
+      },
+      "flags": []
+    },
+    {
+      "key": "posterService",
+      "kind": "enum",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 15,
+          "total": 15
+        },
+        "balanced": {
+          "active": 1,
+          "total": 1
+        },
+        "advanced": {
+          "active": 1,
+          "total": 1
+        },
+        "labs": {
+          "active": 3,
+          "total": 3
+        }
+      },
+      "templates": 54,
+      "smart": true,
+      "decision": {
+        "status": "used",
+        "why": "Poster source for catalogs.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "usePosterRedirectApi",
+      "kind": "boolean",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 1,
+          "total": 1
+        },
+        "advanced": {
+          "active": 1,
+          "total": 1
+        },
+        "labs": {
+          "active": 3,
+          "total": 3
+        }
+      },
+      "templates": 52,
+      "smart": false,
+      "decision": {
+        "status": "used",
+        "why": "Poster redirect for RPDB.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "usePosterServiceForMeta",
+      "kind": "boolean",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 1,
+          "total": 1
+        },
+        "advanced": {
+          "active": 1,
+          "total": 1
+        },
+        "labs": {
+          "active": 3,
+          "total": 3
+        }
+      },
+      "templates": 52,
+      "smart": false,
+      "decision": {
+        "status": "used",
+        "why": "Posters in meta pages too.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "formatter",
+      "kind": "object",
+      "keys": [
+        "id",
+        "selectedSaved",
+        "definitions"
+      ],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 15,
+          "total": 15
+        },
+        "balanced": {
+          "active": 1,
+          "total": 1
+        },
+        "advanced": {
+          "active": 1,
+          "total": 1
+        },
+        "labs": {
+          "active": 3,
+          "total": 3
+        }
+      },
+      "templates": 54,
+      "smart": true,
+      "decision": {
+        "status": "used",
+        "why": "Stream card layout (family-v4 by default, Core collection, or imported).",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "proxy",
+      "kind": "object",
+      "keys": [
+        "enabled",
+        "id",
+        "url",
+        "publicUrl",
+        "credentials",
+        "publicIp",
+        "proxiedAddons",
+        "proxiedServices"
+      ],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 15,
+          "total": 15
+        },
+        "balanced": {
+          "active": 1,
+          "total": 1
+        },
+        "advanced": {
+          "active": 1,
+          "total": 1
+        },
+        "labs": {
+          "active": 3,
+          "total": 3
+        }
+      },
+      "templates": 53,
+      "smart": true,
+      "decision": {
+        "status": "used",
+        "why": "Neutral stub until address, credentials and enabled are all set (stream-proxy-policy.js).",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "resultLimits",
+      "kind": "object",
+      "keys": [
+        "global",
+        "service",
+        "addon",
+        "resolution",
+        "quality",
+        "streamType",
+        "indexer",
+        "releaseGroup",
+        "mode"
+      ],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 15,
+          "total": 15
+        },
+        "balanced": {
+          "active": 1,
+          "total": 1
+        },
+        "advanced": {
+          "active": 1,
+          "total": 1
+        },
+        "labs": {
+          "active": 3,
+          "total": 3
+        }
+      },
+      "templates": 53,
+      "smart": true,
+      "decision": {
+        "status": "used",
+        "why": "10–12 results on Core Stable (3 per resolution), 30–35 on Advanced/Labs.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "size",
+      "kind": "object",
+      "keys": [
+        "global",
+        "resolution"
+      ],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 1,
+          "total": 15
+        },
+        "balanced": {
+          "active": 1,
+          "total": 1
+        },
+        "advanced": {
+          "active": 1,
+          "total": 1
+        },
+        "labs": {
+          "active": 3,
+          "total": 3
+        }
+      },
+      "templates": 52,
+      "smart": true,
+      "decision": {
+        "status": "used",
+        "why": "Size ranges per resolution, from the user's size limit.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "bitrate",
+      "kind": "object",
+      "keys": [
+        "useMetadataRuntime",
+        "global",
+        "resolution"
+      ],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 1,
+          "total": 1
+        },
+        "advanced": {
+          "active": 1,
+          "total": 1
+        },
+        "labs": {
+          "active": 3,
+          "total": 3
+        }
+      },
+      "templates": 44,
+      "smart": false,
+      "decision": {
+        "status": "used",
+        "why": "Bitrate ranges, and the bandwidth cap (80% of the typed speed).",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "hideErrors",
+      "kind": "boolean",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 1,
+          "total": 1
+        },
+        "labs": {
+          "active": 3,
+          "total": 3
+        }
+      },
+      "templates": 51,
+      "smart": true,
+      "decision": {
+        "status": "used",
+        "why": "Hides addon error rows in Stremio on Advanced/Labs.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "hideErrorsForResources",
+      "kind": "array",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 15,
+          "total": 15
+        },
+        "balanced": {
+          "active": 1,
+          "total": 1
+        },
+        "advanced": {
+          "active": 1,
+          "total": 1
+        },
+        "labs": {
+          "active": 3,
+          "total": 3
+        }
+      },
+      "templates": 46,
+      "smart": true,
+      "decision": {
+        "status": "used",
+        "why": "Scopes error hiding to resource types.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "statistics",
+      "kind": "object",
+      "keys": [
+        "enabled",
+        "position",
+        "statsToShow",
+        "showFilterStatsOnNoStreams"
+      ],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 0,
+          "total": 1
+        },
+        "labs": {
+          "active": 0,
+          "total": 3
+        }
+      },
+      "templates": 0,
+      "smart": true,
+      "decision": {
+        "status": "candidate",
+        "why": "Off everywhere. It can show why nothing appeared (showFilterStatsOnNoStreams); worth turning on for empty results only.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "tmdbAccessToken",
+      "kind": "string",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 0,
+          "total": 1
+        },
+        "labs": {
+          "active": 0,
+          "total": 3
+        }
+      },
+      "templates": 51,
+      "smart": false,
+      "decision": {
+        "status": "used",
+        "why": "Static templates carry `<template_placeholder>` for the user's own token; never a real value.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "tmdbApiKey",
+      "kind": "string",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 0,
+          "total": 1
+        },
+        "labs": {
+          "active": 0,
+          "total": 3
+        }
+      },
+      "templates": 51,
+      "smart": false,
+      "decision": {
+        "status": "used",
+        "why": "Same as tmdbAccessToken.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "tvdbApiKey",
+      "kind": "string",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 0,
+          "total": 1
+        },
+        "labs": {
+          "active": 0,
+          "total": 3
+        }
+      },
+      "templates": 0,
+      "smart": false,
+      "decision": {
+        "status": "not-applicable",
+        "why": "A personal credential or poster-service setting; never written into a template.",
+        "source": "pattern (ApiKey|AccessToken|ProfileId)$|^openposterdb|^topPoster|^aioratings"
+      },
+      "flags": []
+    },
+    {
+      "key": "pmdbApiKey",
+      "kind": "string",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 0,
+          "total": 1
+        },
+        "labs": {
+          "active": 0,
+          "total": 3
+        }
+      },
+      "templates": 0,
+      "smart": false,
+      "decision": {
+        "status": "not-applicable",
+        "why": "A personal credential or poster-service setting; never written into a template.",
+        "source": "pattern (ApiKey|AccessToken|ProfileId)$|^openposterdb|^topPoster|^aioratings"
+      },
+      "flags": []
+    },
+    {
+      "key": "yearMatching",
+      "kind": "object",
+      "keys": [
+        "enabled",
+        "tolerance",
+        "strict",
+        "strictTypes",
+        "useInitialAirDate",
+        "requestTypes",
+        "addons"
+      ],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 0,
+          "total": 1
+        },
+        "labs": {
+          "active": 0,
+          "total": 3
+        }
+      },
+      "templates": 51,
+      "smart": true,
+      "decision": {
+        "status": "used",
+        "why": "Static templates match the release year; generators leave AIOStreams' default.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "titleMatching",
+      "kind": "object",
+      "keys": [
+        "mode",
+        "matchYear",
+        "yearTolerance",
+        "similarityThreshold",
+        "enabled",
+        "ambiguousResults",
+        "requestTypes",
+        "addons"
+      ],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 0,
+          "total": 1
+        },
+        "labs": {
+          "active": 0,
+          "total": 3
+        }
+      },
+      "templates": 51,
+      "smart": true,
+      "decision": {
+        "status": "used",
+        "why": "Off in generated configs (default contains, 0.75): strict title matching drops foreign and alternate titles. Static templates enable it.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "seasonEpisodeMatching",
+      "kind": "object",
+      "keys": [
+        "enabled",
+        "strict",
+        "requestTypes",
+        "addons"
+      ],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 15,
+          "total": 15
+        },
+        "balanced": {
+          "active": 1,
+          "total": 1
+        },
+        "advanced": {
+          "active": 1,
+          "total": 1
+        },
+        "labs": {
+          "active": 3,
+          "total": 3
+        }
+      },
+      "templates": 54,
+      "smart": true,
+      "decision": {
+        "status": "used",
+        "why": "On, non-strict: drops wrong-episode results while letting packs through for AIOStreams to verify.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "episodeTitleMatching",
+      "kind": "object",
+      "keys": [
+        "enabled",
+        "similarityThreshold",
+        "requestTypes",
+        "addons"
+      ],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 0,
+          "total": 1
+        },
+        "labs": {
+          "active": 0,
+          "total": 3
+        }
+      },
+      "templates": 0,
+      "smart": false,
+      "decision": {
+        "status": "candidate",
+        "why": "Matches episodes by title when numbering differs between sources; could recover anime, specials and absolute-numbered shows.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "languageInference",
+      "kind": "object",
+      "keys": [
+        "enabled",
+        "sources"
+      ],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 0,
+          "total": 1
+        },
+        "labs": {
+          "active": 0,
+          "total": 3
+        }
+      },
+      "templates": 0,
+      "smart": false,
+      "decision": {
+        "status": "candidate",
+        "why": "Infers language from the title or episode title when the filename has none, so language filters drop fewer unlabelled releases.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "deduplicator",
+      "kind": "object",
+      "keys": [
+        "enabled",
+        "excludeAddons",
+        "multiGroupBehaviour",
+        "keys",
+        "cached",
+        "uncached",
+        "p2p",
+        "http",
+        "live",
+        "youtube",
+        "external",
+        "smartDetectAttributes",
+        "smartDetectRounding",
+        "libraryBehaviour",
+        "tiebreakers",
+        "merge"
+      ],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 15,
+          "total": 15
+        },
+        "balanced": {
+          "active": 1,
+          "total": 1
+        },
+        "advanced": {
+          "active": 1,
+          "total": 1
+        },
+        "labs": {
+          "active": 3,
+          "total": 3
+        }
+      },
+      "templates": 54,
+      "smart": true,
+      "decision": {
+        "status": "used",
+        "why": "Filename, infoHash and smartDetect keys; one cached result per release, uncached per service.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "autoPlay",
+      "kind": "object",
+      "keys": [
+        "enabled",
+        "method",
+        "attributes"
+      ],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 1,
+          "total": 1
+        },
+        "advanced": {
+          "active": 1,
+          "total": 1
+        },
+        "labs": {
+          "active": 3,
+          "total": 3
+        }
+      },
+      "templates": 52,
+      "smart": true,
+      "decision": {
+        "status": "used",
+        "why": "Next-episode autoplay by matching attributes; Core Stable turns it off.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "areYouStillThere",
+      "kind": "object",
+      "keys": [
+        "enabled",
+        "episodesBeforeCheck",
+        "cooldownMinutes"
+      ],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 0,
+          "total": 1
+        },
+        "labs": {
+          "active": 0,
+          "total": 3
+        }
+      },
+      "templates": 0,
+      "smart": true,
+      "decision": {
+        "status": "used",
+        "why": "Smart template only.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "precacheNextEpisode",
+      "kind": "boolean",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 1,
+          "total": 1
+        },
+        "labs": {
+          "active": 3,
+          "total": 3
+        }
+      },
+      "templates": 51,
+      "smart": true,
+      "decision": {
+        "status": "used",
+        "why": "Advanced/Labs: asks the service to cache the next episode while this one plays.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "alwaysPrecache",
+      "kind": "boolean",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 0,
+          "total": 1
+        },
+        "labs": {
+          "active": 0,
+          "total": 3
+        }
+      },
+      "templates": 0,
+      "smart": false,
+      "decision": {
+        "status": "off-by-design",
+        "why": "Deprecated upstream in favour of precacheSelector.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "precacheCondition",
+      "kind": "other",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 0,
+          "total": 1
+        },
+        "labs": {
+          "active": 0,
+          "total": 3
+        }
+      },
+      "templates": 0,
+      "smart": false,
+      "decision": {
+        "status": "off-by-design",
+        "why": "Deprecated upstream in favour of precacheSelector.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "precacheSelector",
+      "kind": "other",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 1,
+          "total": 1
+        },
+        "labs": {
+          "active": 3,
+          "total": 3
+        }
+      },
+      "templates": 50,
+      "smart": false,
+      "decision": {
+        "status": "used",
+        "why": "Which stream to precache (replaces the deprecated alwaysPrecache/precacheCondition).",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "precacheSingleStream",
+      "kind": "boolean",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 1,
+          "total": 1
+        },
+        "labs": {
+          "active": 3,
+          "total": 3
+        }
+      },
+      "templates": 51,
+      "smart": false,
+      "decision": {
+        "status": "used",
+        "why": "Precache only the first selected stream.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "preloadStreams",
+      "kind": "object",
+      "keys": [
+        "enabled",
+        "selector",
+        "singleStream"
+      ],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 1,
+          "total": 1
+        },
+        "labs": {
+          "active": 3,
+          "total": 3
+        }
+      },
+      "templates": 51,
+      "smart": true,
+      "decision": {
+        "status": "used",
+        "why": "Advanced/Labs: pings the top stream so it starts faster. Off on Core Stable.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "services",
+      "kind": "array",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 12,
+          "total": 15
+        },
+        "balanced": {
+          "active": 1,
+          "total": 1
+        },
+        "advanced": {
+          "active": 1,
+          "total": 1
+        },
+        "labs": {
+          "active": 3,
+          "total": 3
+        }
+      },
+      "templates": 54,
+      "smart": true,
+      "decision": {
+        "status": "used",
+        "why": "The user's debrid/usenet services (credentials stripped from shared links).",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "presets",
+      "kind": "array",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 15,
+          "total": 15
+        },
+        "balanced": {
+          "active": 1,
+          "total": 1
+        },
+        "advanced": {
+          "active": 1,
+          "total": 1
+        },
+        "labs": {
+          "active": 3,
+          "total": 3
+        }
+      },
+      "templates": 54,
+      "smart": true,
+      "decision": {
+        "status": "used",
+        "why": "The addons. Core Stable emits three torrent sources on TorBox (StremThru Torz, Meteor, Comet); Balanced and above add Zilean, MediaFusion, EZTV, Torrent Galaxy and Knaben.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "addonCategoryColors",
+      "kind": "record",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 15,
+          "total": 15
+        },
+        "balanced": {
+          "active": 1,
+          "total": 1
+        },
+        "advanced": {
+          "active": 1,
+          "total": 1
+        },
+        "labs": {
+          "active": 3,
+          "total": 3
+        }
+      },
+      "templates": 45,
+      "smart": true,
+      "decision": {
+        "status": "used",
+        "why": "Colours the addon categories in AIOStreams' own UI so the generated build reads clearly.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "catalogModifications",
+      "kind": "array",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 0,
+          "total": 1
+        },
+        "labs": {
+          "active": 0,
+          "total": 3
+        }
+      },
+      "templates": 24,
+      "smart": false,
+      "decision": {
+        "status": "used",
+        "why": "Static templates hide or reorder catalogs; generated configs leave catalogs alone.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "newCatalogsDisabled",
+      "kind": "array",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 0,
+          "total": 1
+        },
+        "labs": {
+          "active": 0,
+          "total": 3
+        }
+      },
+      "templates": 0,
+      "smart": false,
+      "decision": {
+        "status": "not-applicable",
+        "why": "Catalog layout; outside what a stream template should change.",
+        "source": "pattern ^(newCatalogsDisabled|upstreamCatalogOrder|catalogModifications|mergedCatalogs)$"
+      },
+      "flags": []
+    },
+    {
+      "key": "upstreamCatalogOrder",
+      "kind": "array",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 0,
+          "total": 1
+        },
+        "labs": {
+          "active": 0,
+          "total": 3
+        }
+      },
+      "templates": 0,
+      "smart": false,
+      "decision": {
+        "status": "not-applicable",
+        "why": "Catalog layout; outside what a stream template should change.",
+        "source": "pattern ^(newCatalogsDisabled|upstreamCatalogOrder|catalogModifications|mergedCatalogs)$"
+      },
+      "flags": []
+    },
+    {
+      "key": "mergedCatalogs",
+      "kind": "array",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 0,
+          "total": 1
+        },
+        "labs": {
+          "active": 0,
+          "total": 3
+        }
+      },
+      "templates": 0,
+      "smart": true,
+      "decision": {
+        "status": "used",
+        "why": "Smart template only.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "externalDownloads",
+      "kind": "boolean",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 0,
+          "total": 1
+        },
+        "labs": {
+          "active": 0,
+          "total": 3
+        }
+      },
+      "templates": 0,
+      "smart": true,
+      "decision": {
+        "status": "used",
+        "why": "Smart template only.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "cacheAndPlay",
+      "kind": "object",
+      "keys": [
+        "enabled",
+        "streamTypes"
+      ],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 1,
+          "total": 1
+        },
+        "labs": {
+          "active": 3,
+          "total": 3
+        }
+      },
+      "templates": 31,
+      "smart": true,
+      "decision": {
+        "status": "used",
+        "why": "Advanced/Labs: plays an uncached torrent or NZB once the service has it. Off on Core Stable.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "autoRemoveDownloads",
+      "kind": "boolean",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 0,
+          "total": 1
+        },
+        "labs": {
+          "active": 0,
+          "total": 3
+        }
+      },
+      "templates": 0,
+      "smart": true,
+      "decision": {
+        "status": "used",
+        "why": "Smart template only.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "checkOwned",
+      "kind": "boolean",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 0,
+          "total": 1
+        },
+        "labs": {
+          "active": 0,
+          "total": 3
+        }
+      },
+      "templates": 0,
+      "smart": true,
+      "decision": {
+        "status": "used",
+        "why": "Smart template only.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "failover",
+      "kind": "object",
+      "keys": [
+        "enabled",
+        "contentTypes",
+        "allowCrossType",
+        "maxAttempts",
+        "parallel",
+        "staggerMs",
+        "preferredGraceMs",
+        "maxWaitMs",
+        "position",
+        "precacheFailover",
+        "includeExternalFailover",
+        "sameReleaseLimit",
+        "duplicateStaggerMs",
+        "onlySameReleaseFailover"
+      ],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 0,
+          "total": 1
+        },
+        "labs": {
+          "active": 0,
+          "total": 3
+        }
+      },
+      "templates": 25,
+      "smart": true,
+      "decision": {
+        "status": "candidate",
+        "why": "Off in generated configs; 25 static templates enable it. 2.35 added onlySameReleaseFailover, which makes it safe to turn on: a failed link falls over to the same release on another source.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "serviceWrap",
+      "kind": "object",
+      "keys": [
+        "enabled",
+        "presets",
+        "services",
+        "reconfigureService"
+      ],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 0,
+          "total": 1
+        },
+        "labs": {
+          "active": 0,
+          "total": 3
+        }
+      },
+      "templates": 0,
+      "smart": false,
+      "decision": {
+        "status": "candidate",
+        "why": "Runs P2P-only presets' torrents through the user's debrid service, so sources like Torrentio, Knaben and Zilean can return cached results on a debrid build. Likely the cheapest gain in sources found; measure before shipping.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "jellyfin",
+      "kind": "ref",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 0,
+          "total": 1
+        },
+        "labs": {
+          "active": 0,
+          "total": 3
+        }
+      },
+      "templates": 0,
+      "smart": false,
+      "decision": {
+        "status": "not-applicable",
+        "why": "AIOStreams' Jellyfin server mode; not a Stremio stream setting.",
+        "source": "pattern ^jellyfin$"
+      },
+      "flags": []
+    },
+    {
+      "key": "remuxDb",
+      "kind": "object",
+      "keys": [
+        "enabled"
+      ],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 0,
+          "total": 1
+        },
+        "labs": {
+          "active": 0,
+          "total": 3
+        }
+      },
+      "templates": 0,
+      "smart": false,
+      "decision": {
+        "status": "candidate",
+        "why": "RemuxDB lookups (on by default upstream since 2.36) fill real audio and subtitle tracks from probes. We rely on the default; decide whether to set it explicitly.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
+      "key": "customPosterUrl",
+      "kind": "preprocess",
+      "keys": [],
+      "inPin": false,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 0,
+          "total": 1
+        },
+        "labs": {
+          "active": 0,
+          "total": 3
+        }
+      },
+      "templates": 0,
+      "smart": false,
+      "decision": {
+        "status": "not-applicable",
+        "why": "Poster service setting added in 2.38.0 (custom poster URL); posters are the user's choice, not part of a stream template.",
+        "source": "option"
+      },
+      "flags": [
+        "new upstream after 2.36.0"
+      ]
+    }
+  ],
+  "attention": [],
+  "presets": {
+    "added": [
+      "cinemeta",
+      "xtream"
+    ],
+    "removed": [],
+    "upstream": [
+      "ai-companion",
+      "ai-search",
+      "aiostreams",
+      "aiosubtitle",
+      "anime-catalogs",
+      "anime-kitsu",
+      "anime-tosho-new",
+      "animetosho",
+      "argentina-tv",
+      "astream",
+      "baguettio",
+      "bitmagnet",
+      "brazuca-torrents",
+      "cinemeta",
+      "comet",
+      "content-deep-dive",
+      "custom",
+      "davex",
+      "dc-universe",
+      "debridio",
+      "debridio-ic4a",
+      "debridio-tmdb",
+      "debridio-tv",
+      "debridio-tvdb",
+      "debridio-watchtower",
+      "dmm-cast",
+      "doctor-who-universe",
+      "easynews",
+      "easynews-search",
+      "easynewsPlus",
+      "easynewsPlusPlus",
+      "eztv",
+      "fkstream",
+      "flix-streams",
+      "hdhub",
+      "jackett",
+      "jackettio",
+      "knaben",
+      "library",
+      "marvel-universe",
+      "mediafusion",
+      "meteor",
+      "more-like-this",
+      "neko-bt",
+      "newznab",
+      "nuvio-streams",
+      "nzbhydra",
+      "opensubtitles",
+      "opensubtitles-v3-plus",
+      "orion",
+      "peerflix",
+      "penguplay",
+      "prowlarr",
+      "rpdb-catalogs",
+      "seadex",
+      "sootio",
+      "star-wars-universe",
+      "streamasia",
+      "streamfusion",
+      "streaming-catalogs",
+      "streamnzb",
+      "stremio-gdrive",
+      "stremthruStore",
+      "stremthruTorz",
+      "subdl",
+      "subhero",
+      "subsource",
+      "the-pirate-bay",
+      "therarbg",
+      "tmdb-addon",
+      "tmdb-collections",
+      "torbox",
+      "torbox-search",
+      "torrent-catalogs",
+      "torrent-galaxy",
+      "torrentio",
+      "torrents-db",
+      "torznab",
+      "tsukihime",
+      "usa-tv",
+      "usa-tv-next",
+      "usenet-streamer",
+      "webstreamr",
+      "xtream",
+      "yastream",
+      "zilean"
+    ],
+    "ours": {
+      "library": [
+        "advanced",
+        "balanced",
+        "labs",
+        "smart",
+        "stable",
+        "templates"
+      ],
+      "seadex": [
+        "advanced",
+        "balanced",
+        "labs",
+        "smart",
+        "stable",
+        "templates"
+      ],
+      "stremthruStore": [
+        "smart",
+        "stable",
+        "templates"
+      ],
+      "meteor": [
+        "advanced",
+        "balanced",
+        "labs",
+        "smart",
+        "stable",
+        "templates"
+      ],
+      "comet": [
+        "advanced",
+        "balanced",
+        "labs",
+        "smart",
+        "stable",
+        "templates"
+      ],
+      "opensubtitles-v3-plus": [
+        "advanced",
+        "balanced",
+        "labs",
+        "smart",
+        "stable",
+        "templates"
+      ],
+      "tmdb-addon": [
+        "advanced",
+        "balanced",
+        "labs",
+        "smart",
+        "stable",
+        "templates"
+      ],
+      "stremthruTorz": [
+        "advanced",
+        "balanced",
+        "labs",
+        "smart",
+        "stable",
+        "templates"
+      ],
+      "zilean": [
+        "advanced",
+        "balanced",
+        "labs",
+        "templates"
+      ],
+      "mediafusion": [
+        "advanced",
+        "balanced",
+        "labs",
+        "smart",
+        "templates"
+      ],
+      "eztv": [
+        "advanced",
+        "balanced",
+        "labs",
+        "templates"
+      ],
+      "torrent-galaxy": [
+        "advanced",
+        "balanced",
+        "labs",
+        "templates"
+      ],
+      "knaben": [
+        "advanced",
+        "balanced",
+        "labs",
+        "templates"
+      ],
+      "easynewsPlusPlus": [
+        "smart",
+        "stable",
+        "templates"
+      ],
+      "easynews-search": [
+        "smart",
+        "stable",
+        "templates"
+      ],
+      "peerflix": [
+        "smart",
+        "stable"
+      ],
+      "hdhub": [
+        "smart",
+        "stable",
+        "templates"
+      ],
+      "torrentio": [
+        "smart",
+        "stable"
+      ],
+      "torrents-db": [
+        "templates"
+      ],
+      "anime-tosho-new": [
+        "smart",
+        "templates"
+      ],
+      "neko-bt": [
+        "templates"
+      ],
+      "newznab": [
+        "templates"
+      ],
+      "easynews": [
+        "templates"
+      ]
+    }
+  },
+  "sel": {
+    "added": [],
+    "removed": [],
+    "use": {
+      "addon": 418,
+      "age": 92,
+      "audioChannels": 0,
+      "audioTag": 135,
+      "audioTrack": 0,
+      "avg": 0,
+      "bitrate": 1650,
+      "cached": 1894,
+      "container": 0,
+      "count": 2096,
+      "editions": 0,
+      "encode": 211,
+      "extension": 0,
+      "folderSize": 0,
+      "health": 0,
+      "idMatched": 0,
+      "indexer": 0,
+      "iqr": 233,
+      "keyword": 253,
+      "keywords": 0,
+      "kurtosis": 0,
+      "language": 69,
+      "library": 3099,
+      "max": 421,
+      "mean": 0,
+      "mediaInfoQuality": 0,
+      "median": 171,
+      "merge": 5355,
+      "message": 60,
+      "min": 120,
+      "mode": 0,
+      "multiEpisode": 168,
+      "negate": 3424,
+      "network": 0,
+      "passthrough": 330,
+      "perGroup": 222,
+      "percentile": 90,
+      "pin": 54,
+      "q1": 207,
+      "q2": 91,
+      "q3": 112,
+      "quality": 5745,
+      "range": 0,
+      "regexMatched": 0,
+      "regexMatchedInRange": 0,
+      "regexScore": 0,
+      "releaseGroup": 325,
+      "resolution": 6316,
+      "rseMatched": 0,
+      "seMatched": 0,
+      "seMatchedInRange": 0,
+      "seScore": 0,
+      "seadex": 2319,
+      "seasonPack": 168,
+      "seeders": 405,
+      "service": 14,
+      "size": 80,
+      "skewness": 0,
+      "slice": 2950,
+      "stddev": 0,
+      "streamExpressionScore": 12,
+      "subtitle": 0,
+      "subtitleTrack": 0,
+      "subtitles": 6,
+      "sum": 0,
+      "type": 3343,
+      "uncached": 3085,
+      "values": 1129,
+      "variance": 0,
+      "visualTag": 667
+    }
+  },
+  "changelog": [
+    {
+      "version": "2.38.1",
+      "date": "2026-11-14",
+      "entries": []
+    },
+    {
+      "version": "2.38.0",
+      "date": "2026-11-14",
+      "entries": [
+        {
+          "kind": "Features",
+          "scope": "core",
+          "text": "add a background lane and an abort signal to catalog walks"
+        },
+        {
+          "kind": "Features",
+          "scope": "core",
+          "text": "add an Xtream builtin"
+        },
+        {
+          "kind": "Features",
+          "scope": "core",
+          "text": "combine back-to-back variant selectors"
+        },
+        {
+          "kind": "Features",
+          "scope": "core",
+          "text": "look up a film's anime ids from the anime database"
+        },
+        {
+          "kind": "Features",
+          "scope": "core",
+          "text": "replace variant length and instruction limits with a work budget"
+        },
+        {
+          "kind": "Features",
+          "scope": "presets/newznab",
+          "text": "add SearchNZB indexer"
+        },
+        {
+          "kind": "Features",
+          "scope": "presets",
+          "text": "add cinemeta preset"
+        },
+        {
+          "kind": "Features",
+          "scope": "server",
+          "text": "mark and explain a title no addon has details for"
+        },
+        {
+          "kind": "Features",
+          "scope": "server",
+          "text": "mount the Xtream builtin"
+        },
+        {
+          "kind": "Features",
+          "scope": "server",
+          "text": "send the variant work budget in status"
+        },
+        {
+          "kind": "Features",
+          "scope": "variants",
+          "text": "add a move instruction"
+        },
+        {
+          "kind": "Bug Fixes",
+          "scope": "core",
+          "text": "only set indexer/addon mediaInfoQuality when languages were returned"
+        },
+        {
+          "kind": "Bug Fixes",
+          "scope": "core",
+          "text": "read OpenSubtitles' Chinese bilingual codes as Chinese"
+        },
+        {
+          "kind": "Bug Fixes",
+          "scope": "core",
+          "text": "skip stream metadata for ids the parser can't read"
+        },
+        {
+          "kind": "Bug Fixes",
+          "scope": "knaben",
+          "text": "dedupe hits, use upload date for age, include subcategories"
+        },
+        {
+          "kind": "Bug Fixes",
+          "scope": "parser",
+          "text": "resolve ISO 639-2/B codes in convertISO6392ToLanguage"
+        },
+        {
+          "kind": "Bug Fixes",
+          "scope": "presets/meteor",
+          "text": "migrate to current config format and improve stream parsing"
+        },
+        {
+          "kind": "Bug Fixes",
+          "scope": "presets/meteor",
+          "text": "skip \"donate\" placeholder stream"
+        },
+        {
+          "kind": "Bug Fixes",
+          "scope": "presets/meteor",
+          "text": "skip \"no results\" placeholder stream"
+        },
+        {
+          "kind": "Bug Fixes",
+          "scope": "presets",
+          "text": "update Doctor Who URL and add missing Torrentio/TorrentsDB providers"
+        },
+        {
+          "kind": "Bug Fixes",
+          "scope": "server",
+          "text": "allow the Range header in cross-origin requests"
+        },
+        {
+          "kind": "Bug Fixes",
+          "scope": "therarbg,torrent-galaxy",
+          "text": "normalise imdb ids, keep keywords first in URLs, share code"
+        },
+        {
+          "kind": "Bug Fixes",
+          "scope": "torrent-galaxy",
+          "text": "use torrentgalaxy.online as default domain"
+        },
+        {
+          "kind": "Performance Improvements",
+          "scope": "core",
+          "text": "remember item id hashes"
+        }
+      ]
+    },
+    {
+      "version": "2.37.0",
+      "date": "2026-10-23",
+      "entries": [
+        {
+          "kind": "Features",
+          "scope": "core",
+          "text": "add a sharedId to episodes whose own id is hashed"
+        },
+        {
+          "kind": "Features",
+          "scope": "core",
+          "text": "name a country the same from any code or spelling"
+        },
+        {
+          "kind": "Features",
+          "scope": "core",
+          "text": "name the language a tag stands for, with its region"
+        },
+        {
+          "kind": "Bug Fixes",
+          "scope": "config",
+          "text": "decrypt string and URL credentials set by the environment"
+        },
+        {
+          "kind": "Bug Fixes",
+          "scope": "metadata/tvdb",
+          "text": "tag the original-language title with its language"
+        },
+        {
+          "kind": "Bug Fixes",
+          "scope": "",
+          "text": "skip merged catalog sources that don't declare a requested extra"
+        },
+        {
+          "kind": "Performance Improvements",
+          "scope": "core",
+          "text": "reject values that can't be encrypted before parsing them"
+        }
+      ]
+    }
+  ]
+}
