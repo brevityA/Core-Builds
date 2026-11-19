@@ -317,6 +317,14 @@ python3 scripts/template_builder.py --only stream  # filter by name
 
 ---
 
+## Feature rundown — what we use from AIOStreams, and why
+
+`node scripts/feature-rundown/rundown.mjs` writes `reports/FEATURE-RUNDOWN.md` (+ `.json`): every config option AIOStreams accepts at the pin and at the newest release, which output profiles (from the goldens' `coreBuildsProfile`), static templates and the smart template use it, the reason from `scripts/feature-rundown/decisions.json`, new or removed presets and SEL functions, and stream-related changelog entries since the pin.
+
+- **Every option needs a decision.** Status `used`, `candidate`, `off-by-design` or `not-applicable`, with a reason. Options upstream adds arrive as `no decision` in the report's *Needs attention* table and in the weekly `feature-rundown` issue.
+- **Keep decisions true.** The report flags a decision the configs contradict (`used` but nothing sets it, or `off-by-design` but a config does). When a generator change turns an option on or off, update its entry in the same PR and re-run the report.
+- **Bumping the pin:** run the rundown first; anything `removed upstream` must be handled before the bump.
+
 ## aios-regen — AIOStreams Contract Watcher
 
 `scripts/aios-regen/` watches the AIOStreams codebase for schema changes that break Core Builds templates. Sibling of `scripts/check_upstream_drift.mjs` (which watches Vidhin05 regex). This one watches **AIOStreams code**.
@@ -381,6 +389,7 @@ scripts/aios-regen/
 | `docs-changelog-gate.yml` | PRs | Blocks merges without changelog update |
 | `upstream-drift-watch.yml` | daily cron | Detects Vidhin05 regex/expression changes |
 | `watch-aiostreams.yml` | 6h cron + push | AIOStreams contract drift detection (aios-regen) |
+| `feature-rundown.yml` | weekly + push + PRs | Every AIOStreams option, preset and SEL function vs what our profiles use, why (`scripts/feature-rundown/decisions.json`), and stream-related upstream changes since the pin; opens/updates one `feature-rundown` issue when something needs a decision |
 | `configurator-ci.yml` | PRs | Runs `npm test` + `npm run validate` + `npm run build` |
 | `configurator-e2e.yml` | PRs | Playwright E2E tests |
 | `aio-save-test.yml` | PRs + push to main | Saves every matrix config into a real AIOStreams at the `UPSTREAM.pin` release (open + ElfHosted-allowlist variants); fails on any refusal. See `scripts/aio-save-test/README.md` |

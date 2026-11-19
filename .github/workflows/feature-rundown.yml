@@ -1,0 +1,117 @@
+name: AIOStreams feature rundown
+
+# A full list of every AIOStreams config option, preset and SEL function, which of our
+# output profiles use each, why (scripts/feature-rundown/decisions.json), and what upstream
+# added since the pin. Weekly and on demand it opens or updates one tracking issue when
+# something needs a decision: an option upstream added, an option with no decision, or a
+# decision the generated configs contradict. On PRs it only tests and reports.
+
+on:
+  schedule:
+    - cron: "41 7 * * 1"  # Mondays 07:41 UTC
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "scripts/feature-rundown/**"
+      - "configurator/UPSTREAM.pin"
+      - "configurator/e2e/golden/**"
+      - "Templates/**"
+      - ".github/workflows/feature-rundown.yml"
+  push:
+    branches: [main]
+    paths:
+      - "scripts/feature-rundown/**"
+      - "configurator/UPSTREAM.pin"
+      - "configurator/e2e/golden/**"
+      - "Templates/**"
+      - ".github/workflows/feature-rundown.yml"
+
+concurrency:
+  group: feature-rundown-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  rundown:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "20"
+      - name: Test the rundown tooling (offline)
+        run: node --test scripts/feature-rundown/tests/*.test.mjs
+      - name: Build the rundown against the pin and the newest upstream release
+        id: rundown
+        run: node scripts/feature-rundown/rundown.mjs --out "$RUNNER_TEMP/FEATURE-RUNDOWN.md" --json "$RUNNER_TEMP/feature-rundown.json"
+      - name: Show the rundown on the run page
+        if: always() && steps.rundown.outcome == 'success'
+        run: cat "$RUNNER_TEMP/FEATURE-RUNDOWN.md" >> "$GITHUB_STEP_SUMMARY"
+      - name: Upload the rundown
+        if: always() && steps.rundown.outcome == 'success'
+        uses: actions/upload-artifact@v7
+        with:
+          name: feature-rundown
+          path: |
+            ${{ runner.temp }}/FEATURE-RUNDOWN.md
+            ${{ runner.temp }}/feature-rundown.json
+      - name: Open, update or close the tracking issue
+        # main only: a manual run from another branch must not update or close main's issue.
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main' && steps.rundown.outcome == 'success'
+        uses: actions/github-script@v9
+        env:
+          REPORT: ${{ runner.temp }}/FEATURE-RUNDOWN.md
+          ATTENTION: ${{ steps.rundown.outputs.attention }}
+          BEHIND: ${{ steps.rundown.outputs.behind }}
+          PIN: ${{ steps.rundown.outputs.pin }}
+          LATEST: ${{ steps.rundown.outputs.latest }}
+        with:
+          script: |
+            const fs = require('fs');
+            const marker = '<!-- feature-rundown -->';
+            const attention = Number(process.env.ATTENTION || 0);
+            const behind = process.env.BEHIND === 'true';
+            const run = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            let report = fs.readFileSync(process.env.REPORT, 'utf8');
+            // Issue bodies cap at 65,536 characters; the full report is on the run page and in the artifact.
+            const limit = 60000;
+            if (report.length > limit) report = report.slice(0, limit) + `\n\n… cut here. The full rundown is on the [run page](${run}).`;
+            const title = attention
+              ? `AIOStreams feature rundown: ${attention} option${attention === 1 ? '' : 's'} need a decision`
+              : `AIOStreams feature rundown: ${process.env.LATEST} is out (pinned to ${process.env.PIN})`;
+            const intro = [
+              marker,
+              attention
+                ? `**${attention} need a decision.** Add or correct their entries in \`scripts/feature-rundown/decisions.json\`, then re-run this workflow.`
+                : `Every option has a decision. Upstream is ahead of the pin; the stream-related changes are listed below.`,
+              '',
+              `Re-run locally: \`node scripts/feature-rundown/rundown.mjs\` · [this run](${run})`,
+              '', '---', '',
+            ].join('\n');
+            const { data: open } = await github.rest.issues.listForRepo({ ...context.repo, state: 'open', labels: 'feature-rundown', per_page: 10 });
+            const existing = open.find(i => (i.body || '').includes(marker));
+            if (!attention && !behind) {
+              if (existing) {
+                await github.rest.issues.createComment({ ...context.repo, issue_number: existing.number, body: `Nothing needs a decision and the pin is current. Closing. ([run](${run}))` });
+                await github.rest.issues.update({ ...context.repo, issue_number: existing.number, state: 'closed', state_reason: 'completed' });
+              }
+              core.notice('Feature rundown: nothing needs attention.');
+              return;
+            }
+            const body = intro + report;
+            if (existing) {
+              await github.rest.issues.update({ ...context.repo, issue_number: existing.number, title, body });
+              core.notice(`Updated #${existing.number}`);
+            } else {
+              try { await github.rest.issues.getLabel({ ...context.repo, name: 'feature-rundown' }); }
+              catch { await github.rest.issues.createLabel({ ...context.repo, name: 'feature-rundown', color: '0e8a9a', description: 'AIOStreams features to review' }); }
+              const { data: issue } = await github.rest.issues.create({ ...context.repo, title, body, labels: ['feature-rundown'] });
+              core.notice(`Opened #${issue.number}`);
+            }
