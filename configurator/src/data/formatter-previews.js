@@ -6,7 +6,7 @@ export const FORMATTER_PREVIEWS = {
  "family-v3": {
   "default": {
    "4k": {
-    "n": "Source A | {stream.title::exists[\"\"Example Feature\"\"||\"\"]}",
+    "n": "Source A | “Example Feature”",
     "d": [
      "✅ Plays Fast  🥇 Good Stream",
      "🖥️ Highest Resolution 4k",
@@ -14,11 +14,11 @@ export const FORMATTER_PREVIEWS = {
      "🔊 7.1 • TrueHD, Atmos",
      "💾 62 GB",
      "🏞️ torbox • debrid",
-     "🗣️ "
+     "🗣️ English"
     ]
    },
    "1080p": {
-    "n": "Source B | {stream.title::exists[\"\"Example Feature\"\"||\"\"]}",
+    "n": "Source B | “Example Feature”",
     "d": [
      "✅ Plays Fast ",
      "🖥️ Great Resolution 1080p",
@@ -26,11 +26,11 @@ export const FORMATTER_PREVIEWS = {
      "🔊 5.1 • DD+",
      "💾 6.4 GB",
      "🏞️ torbox • debrid",
-     "🗣️ "
+     "🗣️ English"
     ]
    },
    "uncached": {
-    "n": "Source C | {stream.title::exists[\"\"Example Feature\"\"||\"\"]}",
+    "n": "Source C | “Example Feature”",
     "d": [
      " ❌ Uncached",
      "🖥️ Highest Resolution 4k",
@@ -38,7 +38,7 @@ export const FORMATTER_PREVIEWS = {
      "🔊 5.1 • DTS-HD MA",
      "💾 24 GB",
      "🏞️ torbox • debrid",
-     "🗣️ "
+     "🗣️ English"
     ]
    }
   }
@@ -53,7 +53,7 @@ export const FORMATTER_PREVIEWS = {
      "🔊 7.1 • TrueHD, Atmos  ⚡ 72 Mbps",
      "💾 62 GB",
      "🏞 torbox • debrid",
-     "🗣 "
+     "🗣 English"
     ]
    },
    "1080p": {
@@ -64,7 +64,7 @@ export const FORMATTER_PREVIEWS = {
      "🔊 5.1 • DD+  ⚡ 9.5 Mbps",
      "💾 6.4 GB",
      "🏞 torbox • debrid",
-     "🗣 "
+     "🗣 English"
     ]
    },
    "uncached": {
@@ -75,7 +75,7 @@ export const FORMATTER_PREVIEWS = {
      "🔊 5.1 • DTS-HD MA  ⚡ 28 Mbps",
      "💾 24 GB • 🌱 41",
      "🏞 torbox • debrid",
-     "🗣 "
+     "🗣 English"
     ]
    }
   }
@@ -86,7 +86,7 @@ export const FORMATTER_PREVIEWS = {
     "n": "4K · ⚡ TB · REMUX · EXAMPLE FEATURE   Core 87",
     "d": [
      "🎥 HEVC  DV | HDR10",
-     "🎧 TRUEHD  7.1  🌍 MULTI",
+     "🎧 TRUEHD  7.1  🌍 🇬🇧",
      "💾 62 GB  🏷 GROUP  "
     ]
    },
@@ -94,7 +94,7 @@ export const FORMATTER_PREVIEWS = {
     "n": "1080p · ⚡ TB · WEB-DL · EXAMPLE FEATURE   Core 64",
     "d": [
      "🎥 AVC  SDR",
-     "🎧 DD+  5.1  🌍 MULTI",
+     "🎧 DD+  5.1  🌍 🇬🇧",
      "💾 6.4 GB  🏷 GROUP  "
     ]
    },
@@ -102,7 +102,7 @@ export const FORMATTER_PREVIEWS = {
     "n": "4K · ⏳ TB · BLURAY · EXAMPLE FEATURE   Core 52",
     "d": [
      "🎥 HEVC  HDR10",
-     "🎧 DTS-HD MA  5.1  🌍 MULTI",
+     "🎧 DTS-HD MA  5.1  🌍 🇬🇧",
      "💾 24 GB  🏷 GROUP  🌱 41  "
     ]
    }
@@ -115,7 +115,7 @@ export const FORMATTER_PREVIEWS = {
     "d": [
      " 🚀 INSTANT  💎 ELITE  ✦ 87  🏷️ ɢʀᴏᴜᴘ  ",
      " 🎬 💎 REMUX  ʜᴇᴠᴄ  72 ᴍʙᴘꜱ  👁️ DV 🌟 🌟 HDR¹⁰  ",
-     " 🎛️ 💎 TRUEHD 🔮 ATMOS  🔊 7.1  🌍 MULTI",
+     " 🎛️ 💎 TRUEHD 🔮 ATMOS  🔊 7.1  🌍 🇬🇧  📝 🇬🇧",
      " 62 GB  🔌 ᴅᴇʙʀɪᴅ"
     ]
    },
@@ -124,7 +124,7 @@ export const FORMATTER_PREVIEWS = {
     "d": [
      " 🚀 INSTANT  ✦ 64  🏷️ ɢʀᴏᴜᴘ  ",
      " 🎬 🍿 WEB-DL  ᴀᴠᴄ  9.5 ᴍʙᴘꜱ  ☀️ SDR  ",
-     " 🎛️ 🎶 DD+  🔉 5.1  🌍 MULTI",
+     " 🎛️ 🎶 DD+  🔉 5.1  🌍 🇬🇧  📝 🇬🇧",
      " 6.4 GB  🔌 ᴅᴇʙʀɪᴅ"
     ]
    },
@@ -133,7 +133,7 @@ export const FORMATTER_PREVIEWS = {
     "d": [
      " ⚠️ UNCACHED  ✦ 52  🏷️ ɢʀᴏᴜᴘ  ",
      " 🎬 💿 BLURAY  ʜᴇᴠᴄ  28 ᴍʙᴘꜱ  🌟 🌟 HDR¹⁰  ",
-     " 🎛️ 🔷 DTS-HD MA  🔉 5.1  🌍 MULTI",
+     " 🎛️ 🔷 DTS-HD MA  🔉 5.1  🌍 🇬🇧",
      " 24 GB  🌱 41  🔌 ᴅᴇʙʀɪᴅ"
     ]
    }
@@ -146,7 +146,7 @@ export const FORMATTER_PREVIEWS = {
     "d": [
      "『 💎 ELITE 』 『 ✦ QUALITY 』 『 🚀 INSTANT 』 『 🏷️ ɢʀᴏᴜᴘ 』 ",
      "「 🎬 💎 REMUX 」 「 ʜᴇᴠᴄ 」 「 72 ᴍʙᴘꜱ 」 「 👁️ ᴅᴠ | 🌟 ʜᴅʀ¹⁰ 」  ",
-     "「 🎛️ 💎 TRUEHD | 🔮 ATMOS 」 🔊 7.1  🌍 MULTI",
+     "「 🎛️ 💎 TRUEHD | 🔮 ATMOS 」 🔊 7.1  🌍 🇬🇧",
      "「 62 GB 」 "
     ]
    },
@@ -155,7 +155,7 @@ export const FORMATTER_PREVIEWS = {
     "d": [
      "『 ✦ QUALITY 』 『 🚀 INSTANT 』 『 🏷️ ɢʀᴏᴜᴘ 』 ",
      "「 🎬 🍿 WEB-DL 」 「 ᴀᴠᴄ 」 「 9.5 ᴍʙᴘꜱ 」  ",
-     "「 🎛️ 🎶 DD+ 」 🔉 5.1  🌍 MULTI",
+     "「 🎛️ 🎶 DD+ 」 🔉 5.1  🌍 🇬🇧",
      "「 6.4 GB 」 "
     ]
    },
@@ -164,7 +164,7 @@ export const FORMATTER_PREVIEWS = {
     "d": [
      "『 ✦ QUALITY 』 『 ⚠️ UNCACHED 』 『 🏷️ ɢʀᴏᴜᴘ 』 ",
      "「 🎬 💿 BLURAY 」 「 ʜᴇᴠᴄ 」 「 28 ᴍʙᴘꜱ 」 「 🌟 ʜᴅʀ¹⁰ 」  ",
-     "「 🎛️ 🔷 DTS-HD MA 」 🔉 5.1  🌍 MULTI",
+     "「 🎛️ 🔷 DTS-HD MA 」 🔉 5.1  🌍 🇬🇧",
      "「 24 GB 」 「 🌱 41 」 "
     ]
    }
@@ -205,7 +205,7 @@ export const FORMATTER_PREVIEWS = {
     "d": [
      " 🚀 INSTANT  💎 ELITE  🏷️ ɢʀᴏᴜᴘ  ",
      " 🎬 BLURAY REMUX  ʜᴇᴠᴄ  DV HDR10  72 ᴍʙᴘꜱ  ",
-     " 🎛️ TRUEHD ATMOS  🔊 7.1  🌍 MULTI",
+     " 🎛️ TRUEHD ATMOS  🔊 7.1  🌍 🇬🇧",
      " 💾 62 GB  🔌 ᴅᴇʙʀɪᴅ"
     ]
    },
@@ -214,7 +214,7 @@ export const FORMATTER_PREVIEWS = {
     "d": [
      " 🚀 INSTANT  🏷️ ɢʀᴏᴜᴘ  ",
      " 🎬 WEB-DL  ᴀᴠᴄ  9.5 ᴍʙᴘꜱ  ",
-     " 🎛️ DD+  🔉 5.1  🌍 MULTI",
+     " 🎛️ DD+  🔉 5.1  🌍 🇬🇧",
      " 💾 6.4 GB  🔌 ᴅᴇʙʀɪᴅ"
     ]
    },
@@ -223,7 +223,7 @@ export const FORMATTER_PREVIEWS = {
     "d": [
      " ⚠️ UNCACHED  🏷️ ɢʀᴏᴜᴘ  ",
      " 🎬 BLURAY  ʜᴇᴠᴄ  HDR10  28 ᴍʙᴘꜱ  ",
-     " 🎛️ DTS-HD MA  🔉 5.1  🌍 MULTI",
+     " 🎛️ DTS-HD MA  🔉 5.1  🌍 🇬🇧",
      " 💾 24 GB  🌱 41  🔌 ᴅᴇʙʀɪᴅ"
     ]
    }
@@ -236,7 +236,7 @@ export const FORMATTER_PREVIEWS = {
     "d": [
      " 🚀 INSTANT  💎 ELITE       ",
      " 🎬 BLURAY REMUX   HEVC   DV HDR10   72 MBPS   62 GB ",
-     " 🔊 TRUEHD ATMOS    🔊  7.1   🌍 MULTI  ",
+     " 🔊 TRUEHD ATMOS    🔊  7.1   🌍 🇬🇧  ",
      " 🔌 DEBRID      "
     ]
    },
@@ -245,7 +245,7 @@ export const FORMATTER_PREVIEWS = {
     "d": [
      " 🚀 INSTANT       ",
      " 🎬 WEB-DL   AVC   SDR   9.5 MBPS   6.4 GB ",
-     " 🔊 DD+   🔉   5.1   🌍 MULTI  ",
+     " 🔊 DD+   🔉   5.1   🌍 🇬🇧  ",
      " 🔌 DEBRID      "
     ]
    },
@@ -254,7 +254,7 @@ export const FORMATTER_PREVIEWS = {
     "d": [
      " ⚠️ UNCACHED       ",
      " 🎬 BLURAY   HEVC   HDR10   28 MBPS   24 GB ",
-     " 🔊 DTS-HD MA   🔉   5.1   🌍 MULTI  ",
+     " 🔊 DTS-HD MA   🔉   5.1   🌍 🇬🇧  ",
      " 🔌 DEBRID   🌱 41     "
     ]
    }
@@ -267,7 +267,7 @@ export const FORMATTER_PREVIEWS = {
     "d": [
      " 🚀 INSTANT  💎 ELITE  ✦ QUALITY  🏷️ ɢʀᴏᴜᴘ  ",
      " 🎬 💎 REMUX  ʜᴇᴠᴄ  👁️ DV 🌟 🌟 HDR¹⁰  72 ᴍʙᴘꜱ  ",
-     " 🎛️ 💎 TRUEHD 🔮 ATMOS  🔊 7.1  🌍 MULTI",
+     " 🎛️ 💎 TRUEHD 🔮 ATMOS  🔊 7.1  🌍 🇬🇧",
      " 62 GB  🔌 ᴅᴇʙʀɪᴅ"
     ]
    },
@@ -276,7 +276,7 @@ export const FORMATTER_PREVIEWS = {
     "d": [
      " 🚀 INSTANT  ✦ QUALITY  🏷️ ɢʀᴏᴜᴘ  ",
      " 🎬 🍿 WEB-DL  ᴀᴠᴄ  ☀️ SDR  9.5 ᴍʙᴘꜱ  ",
-     " 🎛️ 🎶 DD+  🔉 5.1  🌍 MULTI",
+     " 🎛️ 🎶 DD+  🔉 5.1  🌍 🇬🇧",
      " 6.4 GB  🔌 ᴅᴇʙʀɪᴅ"
     ]
    },
@@ -285,7 +285,7 @@ export const FORMATTER_PREVIEWS = {
     "d": [
      " ⚠️ UNCACHED  ✦ QUALITY  🏷️ ɢʀᴏᴜᴘ  ",
      " 🎬 💿 BLURAY  ʜᴇᴠᴄ  🌟 🌟 HDR¹⁰  28 ᴍʙᴘꜱ  ",
-     " 🎛️ 🔷 DTS-HD MA  🔉 5.1  🌍 MULTI",
+     " 🎛️ 🔷 DTS-HD MA  🔉 5.1  🌍 🇬🇧",
      " 24 GB  🌱 41  🔌 ᴅᴇʙʀɪᴅ"
     ]
    }
@@ -298,7 +298,7 @@ export const FORMATTER_PREVIEWS = {
     "d": [
      " 🚀 INSTANT  💎 87  🏷️ ɢʀᴏᴜᴘ  ",
      " 🎬 💎 REMUX  ʜᴇᴠᴄ  👁️ DV 🌟 🌟 HDR¹⁰  72 ᴍʙᴘꜱ  ",
-     " 🎛️ 💎 TRUEHD 🔮 ATMOS  🔊 7.1  🌍 MULTI",
+     " 🎛️ 💎 TRUEHD 🔮 ATMOS  🔊 7.1  🌍 🇬🇧  📝 🇬🇧",
      " 💾 62 GB  🔌 ᴅᴇʙʀɪᴅ"
     ]
    },
@@ -307,7 +307,7 @@ export const FORMATTER_PREVIEWS = {
     "d": [
      " 🚀 INSTANT  🏷️ ɢʀᴏᴜᴘ  ",
      " 🎬 🍿 WEB-DL  ᴀᴠᴄ  ☀️ SDR  9.5 ᴍʙᴘꜱ  ",
-     " 🎛️ 🎶 DD+  🔉 5.1  🌍 MULTI",
+     " 🎛️ 🎶 DD+  🔉 5.1  🌍 🇬🇧  📝 🇬🇧",
      " 💾 6.4 GB  🔌 ᴅᴇʙʀɪᴅ"
     ]
    },
@@ -316,7 +316,7 @@ export const FORMATTER_PREVIEWS = {
     "d": [
      " ⚠️ UNCACHED  🏷️ ɢʀᴏᴜᴘ  ",
      " 🎬 💿 BLURAY  ʜᴇᴠᴄ  🌟 🌟 HDR¹⁰  28 ᴍʙᴘꜱ  ",
-     " 🎛️ 🔷 DTS-HD MA  🔉 5.1  🌍 MULTI",
+     " 🎛️ 🔷 DTS-HD MA  🔉 5.1  🌍 🇬🇧",
      " 💾 24 GB  🌱 41  🔌 ᴅᴇʙʀɪᴅ"
     ]
    }
@@ -329,7 +329,7 @@ export const FORMATTER_PREVIEWS = {
     "d": [
      " 🚀 INSTANT  💎 ELITE  🏷️ ɢʀᴏᴜᴘ  ",
      " 🎬 BLURAY REMUX  ʜᴇᴠᴄ  DV HDR10  72 ᴍʙᴘꜱ",
-     " 🎛️ TRUEHD ATMOS  🔊 7.1  🌍 MULTI",
+     " 🎛️ TRUEHD ATMOS  🔊 7.1  🌍 🇬🇧",
      " 💾 62 GB  🔌 ᴅᴇʙʀɪᴅ"
     ]
    },
@@ -338,7 +338,7 @@ export const FORMATTER_PREVIEWS = {
     "d": [
      " 🚀 INSTANT  🏷️ ɢʀᴏᴜᴘ  ",
      " 🎬 WEB-DL  ᴀᴠᴄ  9.5 ᴍʙᴘꜱ",
-     " 🎛️ DD+  🔉 5.1  🌍 MULTI",
+     " 🎛️ DD+  🔉 5.1  🌍 🇬🇧",
      " 💾 6.4 GB  🔌 ᴅᴇʙʀɪᴅ"
     ]
    },
@@ -347,7 +347,7 @@ export const FORMATTER_PREVIEWS = {
     "d": [
      " ⚠️ UNCACHED  🏷️ ɢʀᴏᴜᴘ  ",
      " 🎬 BLURAY  ʜᴇᴠᴄ  HDR10  28 ᴍʙᴘꜱ",
-     " 🎛️ DTS-HD MA  🔉 5.1  🌍 MULTI",
+     " 🎛️ DTS-HD MA  🔉 5.1  🌍 🇬🇧",
      " 💾 24 GB  🔌 ᴅᴇʙʀɪᴅ"
     ]
    }
@@ -361,7 +361,7 @@ export const FORMATTER_PREVIEWS = {
      "「 ◼ SOURCE A 」 「 ⬤ DEBRID 」 「 ► ɴᴇᴡ 」",
      "「 ▤ 62 ɢʙ 」 「 ▼ 72 ᴍʙᴘꜱ 」 ",
      "▶ Vɪᴅᴇᴏ: 「 ᴅᴠ | ʜᴅʀ¹⁰ 」 「 ▣ ʜᴇᴠᴄ 」",
-     "⚑ Lᴀɴɢ: ",
+     "⚑ Lᴀɴɢ: 「 ᴇɴɢʟɪꜱʜ » ᴍᴜʟᴛɪ 」 「 💬 ꜱᴜʙꜱ: ᴇɴɢʟɪꜱʜ » ᴍᴜʟᴛɪ 」",
      "◆ Rᴇʟᴇᴀsᴇ: 『 ★ Group 』"
     ]
    },
@@ -371,7 +371,7 @@ export const FORMATTER_PREVIEWS = {
      "「 ◼ SOURCE B 」 「 ⬤ DEBRID 」 「 ► ɴᴇᴡ 」",
      "「 ▤ 6.4 ɢʙ 」 「 ▼ 9.5 ᴍʙᴘꜱ 」 ",
      "▶ Vɪᴅᴇᴏ: 「  」 「 ▣ ᴀᴠᴄ 」",
-     "⚑ Lᴀɴɢ: ",
+     "⚑ Lᴀɴɢ: 「 ᴇɴɢʟɪꜱʜ » ᴍᴜʟᴛɪ 」 「 💬 ꜱᴜʙꜱ: ᴇɴɢʟɪꜱʜ » ᴍᴜʟᴛɪ 」",
      "◆ Rᴇʟᴇᴀsᴇ: 『 ★ Group 』"
     ]
    },
@@ -381,7 +381,7 @@ export const FORMATTER_PREVIEWS = {
      "「 ◼ SOURCE C 」 「 ⬤ DEBRID 」 「 ► ɴᴇᴡ 」",
      "「 ▤ 24 ɢʙ 」 「 ▼ 28 ᴍʙᴘꜱ 」 「 ▲ 41 ꜱᴇᴇᴅᴇʀꜱ 」 ",
      "▶ Vɪᴅᴇᴏ: 「 ʜᴅʀ¹⁰ 」 「 ▣ ʜᴇᴠᴄ 」",
-     "⚑ Lᴀɴɢ: ",
+     "⚑ Lᴀɴɢ: 「 ᴇɴɢʟɪꜱʜ » ᴍᴜʟᴛɪ 」 ",
      "◆ Rᴇʟᴇᴀsᴇ: 『 ★ Group 』"
     ]
    }
@@ -390,22 +390,22 @@ export const FORMATTER_PREVIEWS = {
  "syntax-v3": {
   "default": {
    "4k": {
-    "n": "✦ Example Feature 「 TB 」 「 4K UHD 」 「 REMUX 」 「 ᴛʀᴜᴇʜᴅ | ᴀᴛᴍᴏꜱ 」 「 7.1 」 ",
+    "n": "✦ Example Feature 「 TB 」 「 4K UHD 」 「 REMUX 」 「 ᴛʀᴜᴇʜᴅ | ᴀᴛᴍᴏꜱ 」 「 SUB 」 「 7.1 」 ",
     "d": [
      " 「 ◼ SOURCE A 」 「 ⬤ DEBRID 」 「 ► ɴᴇᴡ 」 「 ◈ ELITE 」 ",
      " 「 ▤ 62 ɢʙ 」 「 ▼ 72 ᴍʙᴘꜱ 」 ",
      " ▶ Vɪᴅᴇᴏ: 「 ᴅᴠ | ʜᴅʀ¹⁰ 」 「 ▣ ʜᴇᴠᴄ 」",
-     " ⚑ Lᴀɴɢ: ",
+     " ⚑ Lᴀɴɢ: 「 ᴇɴɢʟɪꜱʜ » ᴍᴜʟᴛɪ 」 「 Sᴜʙꜱ: ᴇɴ 」",
      " ◆ Rᴇʟᴇᴀsᴇ: 『 ★ Group 』"
     ]
    },
    "1080p": {
-    "n": "✦ Example Feature 「 TB 」 「 1080P 」 「 WEB-DL 」 「 ᴅᴅ+ 」 「 5.1 」 『 JBL Sᴘᴀᴛɪᴀʟ 』 ",
+    "n": "✦ Example Feature 「 TB 」 「 1080P 」 「 WEB-DL 」 「 ᴅᴅ+ 」 「 SUB 」 「 5.1 」 『 JBL Sᴘᴀᴛɪᴀʟ 』 ",
     "d": [
      " 「 ◼ SOURCE B 」 「 ⬤ DEBRID 」 「 ► ɴᴇᴡ 」 ",
      " 「 ▤ 6.4 ɢʙ 」 「 ▼ 9.5 ᴍʙᴘꜱ 」 ",
      " ▶ Vɪᴅᴇᴏ: 「 ▣ ᴀᴠᴄ 」",
-     " ⚑ Lᴀɴɢ: ",
+     " ⚑ Lᴀɴɢ: 「 ᴇɴɢʟɪꜱʜ » ᴍᴜʟᴛɪ 」 「 Sᴜʙꜱ: ᴇɴ 」",
      " ◆ Rᴇʟᴇᴀsᴇ: 『 ★ Group 』"
     ]
    },
@@ -415,7 +415,7 @@ export const FORMATTER_PREVIEWS = {
      " 「 ◼ SOURCE C 」 「 ⬤ DEBRID 」 「 ► ɴᴇᴡ 」 ",
      " 「 ▤ 24 ɢʙ 」 「 ▼ 28 ᴍʙᴘꜱ 」 「 ▲ 41 ꜱᴇᴇᴅᴇʀꜱ 」 ",
      " ▶ Vɪᴅᴇᴏ: 「 ʜᴅʀ¹⁰ 」 「 ▣ ʜᴇᴠᴄ 」",
-     " ⚑ Lᴀɴɢ: ",
+     " ⚑ Lᴀɴɢ: 「 ᴇɴɢʟɪꜱʜ » ᴍᴜʟᴛɪ 」 ",
      " ◆ Rᴇʟᴇᴀsᴇ: 『 ★ Group 』"
     ]
    }
@@ -428,8 +428,8 @@ export const FORMATTER_PREVIEWS = {
     "d": [
      "☰ Example Feature (2024)",
      "🔘 💎 ʀᴇᴍᴜx • ⚙️ ʜᴇᴠᴄ • ⚡ 72 Mbps • 💾 62 GB • 🌱 0 • 🗓️ Nᴇᴡ",
-     "🎶 💎 ᴛʀᴜᴇʜᴅ • ᴀᴛᴍᴏꜱ • 🔊 7.1 {invalid_expression(stream.audioTags::~(?i)(EAC3|DDP|DD[\\+])[\"🔊 JBL Sᴘᴀᴛɪᴀʟ \"||\"\"])}",
-     "🌍 Uɴᴋɴᴏᴡɴ • 🎯 ɢʀᴏᴜᴘ • 📛 "
+     "🎶 💎 ᴛʀᴜᴇʜᴅ • ᴀᴛᴍᴏꜱ • 🔊 7.1 ",
+     "🌍 ᴇɴɢʟɪsʜ 🔹 🗣️ ᴍᴜʟᴛɪ • 🎯 ɢʀᴏᴜᴘ • 📛 "
     ]
    },
    "1080p": {
@@ -437,8 +437,8 @@ export const FORMATTER_PREVIEWS = {
     "d": [
      "☰ Example Feature (2024)",
      "🔘 🍿 ᴡᴇʙ-ᴅʟ • ⚙️ ᴀᴠᴄ • ⚡ 9.5 Mbps • 💾 6.4 GB • 🌱 0 • 🗓️ Nᴇᴡ",
-     "🎶 ᴅᴅ+ • 🔊 5.1 {invalid_expression(stream.audioTags::~(?i)(EAC3|DDP|DD[\\+])[\"🔊 JBL Sᴘᴀᴛɪᴀʟ \"||\"\"])}",
-     "🌍 Uɴᴋɴᴏᴡɴ • 🎯 ɢʀᴏᴜᴘ • 📛 "
+     "🎶 ᴅᴅ+ • 🔊 5.1 🔊 JBL Sᴘᴀᴛɪᴀʟ ",
+     "🌍 ᴇɴɢʟɪsʜ 🔹 🗣️ ᴍᴜʟᴛɪ • 🎯 ɢʀᴏᴜᴘ • 📛 "
     ]
    },
    "uncached": {
@@ -446,8 +446,8 @@ export const FORMATTER_PREVIEWS = {
     "d": [
      "☰ Example Feature (2024)",
      "🔘 💿 ʙʟᴜʀᴀʏ • ⚙️ ʜᴇᴠᴄ • ⚡ 28 Mbps • 💾 24 GB • 🌱 41 • 🗓️ Nᴇᴡ",
-     "🎶 🔷 ᴅᴛꜱ-ʜᴅ ᴍᴀ • 🔊 5.1 {invalid_expression(stream.audioTags::~(?i)(EAC3|DDP|DD[\\+])[\"🔊 JBL Sᴘᴀᴛɪᴀʟ \"||\"\"])}",
-     "🌍 Uɴᴋɴᴏᴡɴ • 🎯 ɢʀᴏᴜᴘ • 📛 "
+     "🎶 🔷 ᴅᴛꜱ-ʜᴅ ᴍᴀ • 🔊 5.1 ",
+     "🌍 ᴇɴɢʟɪsʜ 🔹 🗣️ ᴍᴜʟᴛɪ • 🎯 ɢʀᴏᴜᴘ • 📛 "
     ]
    }
   }
@@ -459,16 +459,16 @@ export const FORMATTER_PREVIEWS = {
     "d": [
      "🗓️ ✨ Nᴇᴡ🔹 ☁️ ᴅᴇʙʀɪᴅ🔹 🧩 ꜱᴏᴜʀᴄᴇ ᴀ",
      "⚡ 72 ᴍʙᴘꜱ🔹 💾 62 ɢʙ",
-     "🎞️ Vɪᴅᴇᴏ: ✨ ᴅᴠ🔹 🌟 ʜᴅʀ¹⁰🔹 ⚙️ ʜᴇᴠᴄ🔹 🌍 Lᴀɴɢ: Uɴᴋɴᴏᴡɴ",
+     "🎞️ Vɪᴅᴇᴏ: ✨ ᴅᴠ🔹 🌟 ʜᴅʀ¹⁰🔹 ⚙️ ʜᴇᴠᴄ🔹 🌍 Lᴀɴɢ: 🗣️ ᴍᴜʟᴛɪ",
      "🎯 Rᴇʟᴇᴀsᴇ: 👑 ɢʀᴏᴜᴘ"
     ]
    },
    "1080p": {
-    "n": "⚡ Iɴsᴛᴀɴᴛ • TB🔹 🔵 1080ᴘ • 🍿 ᴡᴇʙ-ᴅʟ🔹 🎶 🎵 ᴅᴅ+ • 🔊 5.1",
+    "n": "⚡ Iɴsᴛᴀɴᴛ • TB🔹 🔵 1080ᴘ • 🍿 ᴡᴇʙ-ᴅʟ🔹 🎶 🎵 ᴅᴅ+ • 🔊 5.1🔹 🔊 JBL Sᴘᴀᴛɪᴀʟ",
     "d": [
      "🗓️ ✨ Nᴇᴡ🔹 ☁️ ᴅᴇʙʀɪᴅ🔹 🧩 ꜱᴏᴜʀᴄᴇ ʙ",
      "⚡ 9.5 ᴍʙᴘꜱ🔹 💾 6.4 ɢʙ",
-     "🎞️ Vɪᴅᴇᴏ: ☀️ SDR🔹 ⚙️ ᴀᴠᴄ🔹 🌍 Lᴀɴɢ: Uɴᴋɴᴏᴡɴ",
+     "🎞️ Vɪᴅᴇᴏ: ☀️ SDR🔹 ⚙️ ᴀᴠᴄ🔹 🌍 Lᴀɴɢ: 🗣️ ᴍᴜʟᴛɪ",
      "🎯 Rᴇʟᴇᴀsᴇ: 👑 ɢʀᴏᴜᴘ"
     ]
    },
@@ -477,7 +477,7 @@ export const FORMATTER_PREVIEWS = {
     "d": [
      "🗓️ ✨ Nᴇᴡ🔹 ☁️ ᴅᴇʙʀɪᴅ🔹 🧩 ꜱᴏᴜʀᴄᴇ ᴄ",
      "⚡ 28 ᴍʙᴘꜱ🔹 💾 24 ɢʙ🔹 🌱 41 Sᴇᴇᴅᴇʀs",
-     "🎞️ Vɪᴅᴇᴏ: 🌟 ʜᴅʀ¹⁰🔹 ⚙️ ʜᴇᴠᴄ🔹 🌍 Lᴀɴɢ: Uɴᴋɴᴏᴡɴ",
+     "🎞️ Vɪᴅᴇᴏ: 🌟 ʜᴅʀ¹⁰🔹 ⚙️ ʜᴇᴠᴄ🔹 🌍 Lᴀɴɢ: 🗣️ ᴍᴜʟᴛɪ",
      "🎯 Rᴇʟᴇᴀsᴇ: 👑 ɢʀᴏᴜᴘ"
     ]
    }
@@ -490,16 +490,16 @@ export const FORMATTER_PREVIEWS = {
     "d": [
      "🗓️ ✨ Nᴇᴡ 🔸 ☁️ ᴅᴇʙʀɪᴅ 🔹 💾 62 ɢʙ 🔸 📈 72 ᴍʙᴘꜱ",
      "🎞️ Vɪᴅᴇᴏ: ✨ ᴅᴠ 🔸 🌟 ʜᴅʀ¹⁰",
-     "🌍 Lᴀɴɢ: Uɴᴋɴᴏᴡɴ",
+     "🌍 Lᴀɴɢ: ᴇɴɢʟɪꜱʜ 🔸 ғʀᴇɴᴄʜ",
      "🐅 Rᴇʟᴇᴀsᴇ: ɢʀᴏᴜᴘ"
     ]
    },
    "1080p": {
-    "n": "⚡ Iɴsᴛᴀɴᴛ 🔸 TB 🔸 🔵 1080ᴘ 🔸 🍿 ᴡᴇʙ-ᴅʟ 🔸 ⚙️ ᴀᴠᴄ 🔸 🎶 ᴅᴅ⁺ 🔸 🔊 5.1",
+    "n": "⚡ Iɴsᴛᴀɴᴛ 🔸 TB 🔸 🔵 1080ᴘ 🔸 🍿 ᴡᴇʙ-ᴅʟ 🔸 ⚙️ ᴀᴠᴄ 🔸 🎶 ᴅᴅ⁺ 🔸 🔊 5.1 🔸 🔊 JBL Sᴘᴀᴛɪᴀʟ",
     "d": [
      "🗓️ ✨ Nᴇᴡ 🔸 ☁️ ᴅᴇʙʀɪᴅ 🔹 💾 6.4 ɢʙ 🔸 📈 9.5 ᴍʙᴘꜱ",
      "🎞️ Vɪᴅᴇᴏ: ☀️ SDR",
-     "🌍 Lᴀɴɢ: Uɴᴋɴᴏᴡɴ",
+     "🌍 Lᴀɴɢ: ᴇɴɢʟɪꜱʜ",
      "🐅 Rᴇʟᴇᴀsᴇ: ɢʀᴏᴜᴘ"
     ]
    },
@@ -508,7 +508,7 @@ export const FORMATTER_PREVIEWS = {
     "d": [
      "🗓️ ✨ Nᴇᴡ 🔸 ☁️ ᴅᴇʙʀɪᴅ 🔹 💾 24 ɢʙ 🔸 📈 28 ᴍʙᴘꜱ 🔹 🌱 41 Sᴇᴇᴅᴇʀs",
      "🎞️ Vɪᴅᴇᴏ: 🌟 ʜᴅʀ¹⁰",
-     "🌍 Lᴀɴɢ: Uɴᴋɴᴏᴡɴ",
+     "🌍 Lᴀɴɢ: ᴇɴɢʟɪꜱʜ",
      "🐅 Rᴇʟᴇᴀsᴇ: ɢʀᴏᴜᴘ"
     ]
    }
@@ -521,16 +521,16 @@ export const FORMATTER_PREVIEWS = {
     "d": [
      "◼ source a ⬤ debrid ⧗ ► ɴᴇᴡ",
      "▼ 72 ᴍʙᴘꜱ ▤ 62 ɢʙ ▲ 0",
-     "▶ Vɪᴅᴇᴏ: ᴅᴠ ʜᴅʀ¹⁰ ▣ ʜᴇᴠᴄ ⚑ Lᴀɴɢ: Uɴᴋɴᴏᴡɴ",
+     "▶ Vɪᴅᴇᴏ: ᴅᴠ ʜᴅʀ¹⁰ ▣ ʜᴇᴠᴄ ⚑ Lᴀɴɢ: ᴇɴɢʟɪꜱʜ » ᴍᴜʟᴛɪ",
      "◆ Rᴇʟᴇᴀsᴇ: ★ Group"
     ]
    },
    "1080p": {
-    "n": "✦ Example Feature [TB] 1080P WEB-DL ᴅᴅ+ 5.1",
+    "n": "✦ Example Feature [TB] 1080P WEB-DL ᴅᴅ+ 5.1 JBL Sᴘᴀᴛɪᴀʟ",
     "d": [
      "◼ source b ⬤ debrid ⧗ ► ɴᴇᴡ",
      "▼ 9.5 ᴍʙᴘꜱ ▤ 6.4 ɢʙ ▲ 0",
-     "▶ Vɪᴅᴇᴏ: ꜱᴅʀ ▣ ᴀᴠᴄ ⚑ Lᴀɴɢ: Uɴᴋɴᴏᴡɴ",
+     "▶ Vɪᴅᴇᴏ: ꜱᴅʀ ▣ ᴀᴠᴄ ⚑ Lᴀɴɢ: ᴇɴɢʟɪꜱʜ » ᴍᴜʟᴛɪ",
      "◆ Rᴇʟᴇᴀsᴇ: ★ Group"
     ]
    },
@@ -539,7 +539,7 @@ export const FORMATTER_PREVIEWS = {
     "d": [
      "◼ source c ⬤ debrid ⧗ ► ɴᴇᴡ",
      "▼ 28 ᴍʙᴘꜱ ▤ 24 ɢʙ ▲ 41 ꜱᴇᴇᴅᴇʀꜱ",
-     "▶ Vɪᴅᴇᴏ: ʜᴅʀ¹⁰ ▣ ʜᴇᴠᴄ ⚑ Lᴀɴɢ: Uɴᴋɴᴏᴡɴ",
+     "▶ Vɪᴅᴇᴏ: ʜᴅʀ¹⁰ ▣ ʜᴇᴠᴄ ⚑ Lᴀɴɢ: ᴇɴɢʟɪꜱʜ » ᴍᴜʟᴛɪ",
      "◆ Rᴇʟᴇᴀsᴇ: ★ Group"
     ]
    }
@@ -553,6 +553,7 @@ export const FORMATTER_PREVIEWS = {
      "📁 Example Feature (2024)",
      "  ⁞  🎬 DV｜HDR10   💿 x265 ",
      "  ⁞  🔊 7.1   🎧 TrueHD｜Atmos  ",
+     "  ⁞  🌐 ᴇɴ｜ғʀ",
      "  ⁞  📦 62 GB   〽️ 72 Mbps ",
      "  ⁞  🧩 Source A"
     ]
@@ -563,6 +564,7 @@ export const FORMATTER_PREVIEWS = {
      "📁 Example Feature (2024)",
      "  ⁞  💿 x264 ",
      "  ⁞  🔊 5.1   🎧 DD+  ",
+     "  ⁞  🌐 ᴇɴ",
      "  ⁞  📦 6.4 GB   〽️ 10 Mbps ",
      "  ⁞  🧩 Source B"
     ]
@@ -573,6 +575,7 @@ export const FORMATTER_PREVIEWS = {
      "📁 Example Feature (2024)",
      "  ⁞  🎬 HDR10   💿 x265 ",
      "  ⁞  🔊 5.1   🎧 DTS-HD MA  ",
+     "  ⁞  🌐 ᴇɴ",
      "  ⁞  📦 24 GB   〽️ 28 Mbps ",
      "  ⁞  🌱 41   🧩 Source C"
     ]
@@ -586,16 +589,16 @@ export const FORMATTER_PREVIEWS = {
     "d": [
      "🦅 ✨ Nᴇᴡ 🔸 ☁️ ᴅᴇʙʀɪᴅ 🔹 💾 62 ɢʙ 🔸 📈 72 ᴍʙᴘꜱ",
      "🐅 Vɪᴅᴇᴏ: ✨ ᴅᴠ 🔸 🌟 ʜᴅʀ¹⁰",
-     "🦅 Lᴀɴɢ: Uɴᴋɴᴏᴡɴ",
+     "🦅 Lᴀɴɢ: ᴇɴɢʟɪꜱʜ 🔸 ғʀᴇɴᴄʜ",
      "🐅 Rᴇʟᴇᴀsᴇ: ɢʀᴏᴜᴘ"
     ]
    },
    "1080p": {
-    "n": "⚡ Iɴsᴛᴀɴᴛ 🔸 TB 🔸 🔵 1080ᴘ 🔸 🍿 ᴡᴇʙ-ᴅʟ 🔸 ⚙️ ᴀᴠᴄ 🔸 🎶 ᴅᴅ⁺ 🔸 🔊 5.1",
+    "n": "⚡ Iɴsᴛᴀɴᴛ 🔸 TB 🔸 🔵 1080ᴘ 🔸 🍿 ᴡᴇʙ-ᴅʟ 🔸 ⚙️ ᴀᴠᴄ 🔸 🎶 ᴅᴅ⁺ 🔸 🔊 5.1 🔸 🔊 JBL Sᴘᴀᴛɪᴀʟ",
     "d": [
      "🦅 ✨ Nᴇᴡ 🔸 ☁️ ᴅᴇʙʀɪᴅ 🔹 💾 6.4 ɢʙ 🔸 📈 9.5 ᴍʙᴘꜱ",
      "🐅 Vɪᴅᴇᴏ: ☀️ SDR",
-     "🦅 Lᴀɴɢ: Uɴᴋɴᴏᴡɴ",
+     "🦅 Lᴀɴɢ: ᴇɴɢʟɪꜱʜ",
      "🐅 Rᴇʟᴇᴀsᴇ: ɢʀᴏᴜᴘ"
     ]
    },
@@ -604,7 +607,7 @@ export const FORMATTER_PREVIEWS = {
     "d": [
      "🦅 ✨ Nᴇᴡ 🔸 ☁️ ᴅᴇʙʀɪᴅ 🔹 💾 24 ɢʙ 🔸 📈 28 ᴍʙᴘꜱ 🔹 🌱 41 Sᴇᴇᴅᴇʀs",
      "🐅 Vɪᴅᴇᴏ: 🌟 ʜᴅʀ¹⁰",
-     "🦅 Lᴀɴɢ: Uɴᴋɴᴏᴡɴ",
+     "🦅 Lᴀɴɢ: ᴇɴɢʟɪꜱʜ",
      "🐅 Rᴇʟᴇᴀsᴇ: ɢʀᴏᴜᴘ"
     ]
    }
