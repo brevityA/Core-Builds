@@ -17,9 +17,28 @@ test('no built-in formatter prints template text', () => {
   assert.deepEqual(raw, []);
 });
 
+// An emoji or a "Lang:" label (any small-caps spelling) with nothing after it.
+const EMPTY_LANGUAGE = /(^\s*(🗣️?|🌐|💬)\s*$)|(L(ang|ᴀɴɢ):[\s\u2002\u2003]*([🔹🔸•»|]|$))/u;
+
 test('language lines show a language in every sample', () => {
-  const empty = lines().filter(({ line }) => /^\s*(🗣️?|🌐|💬)\s*$/u.test(line));
+  for (const bad of ['🗣️ ', '⚑ Lᴀɴɢ: ', '🌍 Lᴀɴɢ: 🔹 ⚙️ ʜᴇᴠᴄ', 'Lang:\u2002']) assert.match(bad, EMPTY_LANGUAGE, bad);
+  for (const ok of ['🗣️ English', '⚑ Lᴀɴɢ:\u2002ᴇɴɢʟɪꜱʜ', '🌍 Lᴀɴɢ: 🗣️ ᴍᴜʟᴛɪ']) assert.doesNotMatch(ok, EMPTY_LANGUAGE, ok);
+  const empty = lines().filter(({ line }) => EMPTY_LANGUAGE.test(line));
   assert.deepEqual(empty, []);
+});
+
+test('MULTI shows only for two or more languages', () => {
+  // `languages::>1` compares the array as a string ('English' > '1'), so one
+  // language printed MULTI; the count is `languages::length::>1`.
+  for (const [id, variants] of Object.entries(FORMATTER_PREVIEWS)) {
+    for (const samples of Object.values(variants)) {
+      for (const key of ['1080p', 'uncached']) {
+        const c = samples[key]; if (!c) continue;
+        assert.doesNotMatch([c.n, ...c.d].join('\n'), /ᴍᴜʟᴛɪ|MULTI/, `${id} ${key} has one language`);
+      }
+    }
+  }
+  assert.doesNotMatch(FORMATTERS.map(f => `${f.name}${f.d}`).join(''), /stream\.(languages|subtitles)::(>|==)\d/);
 });
 
 test('`~` is a plain contains check, never a regex', () => {

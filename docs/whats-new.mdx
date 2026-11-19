@@ -14,16 +14,16 @@ For the template-suite release log, see the [Changelog](https://corebuilds-docs.
 
 <CardGroup cols={2}>
   <Card title="Update my setup saves again" icon="sparkles">
-    saving always failed with “Not saved. Not Found”: the configurator sent an update request AIOStreams does not have. It now uses the one AIOStreams provides (2.32 and later), so the update lands on your existing config and your Stremio link keeps working.
+    saving always failed with “Not saved. Not Found”: the configurator sent an update request AIOStreams does not have. It now uses the one AIOStreams provides (2.32 and later), so the update lands on your existing config and your Stremio link keeps working. If the connection drops mid-save it now says the update may or may not have landed, instead of claiming nothing changed.
   </Card>
   <Card title="Reinstalling keeps the same config" icon="bolt">
-    Get Install Link with a saved UUID ran into the same failed update and quietly created a new config, so each reinstall gave you a new Stremio link. It now updates the config you have; the link it shows carries the encrypted password AIOStreams expects.
+    Get Install Link with a saved UUID ran into the same failed update and quietly created a new config, so each reinstall gave you a new Stremio link. It now updates the config you have, creates a new one only when AIOStreams says the saved one does not open with that password, and the link it shows carries the encrypted password AIOStreams expects.
   </Card>
   <Card title="Full-stack install signs in properly" icon="shield-check">
     after adding AIOStreams to Stremio, the AIOMetadata install, the Cinemeta patch and the addon reorder ran without your Stremio session, and “Already installed” never showed. They now use the session, and AIOMetadata is never added on top of an addon list that failed to load.
   </Card>
   <Card title="Stream cards that printed code" icon="sliders">
-    Family v3 showed template text in place of the title, and Omni Diamond printed an “invalid expression” on every stream. Both are fixed, and the DD+ badge in Omni Diamond, Zenith Diamond, Auburn Tiger, Midnight Slate and RB3 now shows on DD+ streams (it never matched before). Previews also show the stream’s language again.
+    Family v3 showed template text in place of the title, and Omni Diamond printed an “invalid expression” on every stream. Both are fixed, and the DD+ badge in Omni Diamond, Zenith Diamond, Auburn Tiger, Midnight Slate and RB3 now shows on DD+ streams (it never matched before). Cards in Core Syntax, Core Syntax V3, Omni Diamond, Zenith Diamond and Midnight Slate also said MULTI for a stream with one language or one subtitle; they now name it. Previews also show the stream’s language again.
   </Card>
   <Card title="Quick install stays in Quick install" icon="gauge">
     How results look, the rows under Defaults we’ll use and Customize every setting used to leave Quick install for the full builder, with its own menu, and open Fine-Tune there. Fine-Tune now opens over Quick install, and closing it (or pressing Back) takes you straight back with your choices and anything you changed in Fine-Tune.
@@ -32,7 +32,7 @@ For the template-suite release log, see the [Changelog](https://corebuilds-docs.
     the WuPlay Genie header no longer wraps its tagline, Template Inspector’s Import JSON File is a proper button and its hint text shows line breaks, and Account Tools drops the buttons the site menu already covers.
   </Card>
   <Card title="Generated output unchanged" icon="layers">
-    all 20 reference configs are byte-for-byte what 3.35 produced apart from the version stamp. Only a build that uses Family v3, Omni Diamond, Zenith Diamond, Auburn Tiger, Midnight Slate or RB3 changes, and only in that stream-card text.
+    all 20 reference configs are byte-for-byte what 3.35 produced apart from the version stamp. Only a build that uses Family v3, Core Syntax, Core Syntax V3, Omni Diamond, Zenith Diamond, Auburn Tiger, Midnight Slate or RB3 changes, and only in that stream-card text.
   </Card>
 </CardGroup>
 

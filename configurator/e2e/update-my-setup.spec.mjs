@@ -35,7 +35,9 @@ async function mockHost(page, calls, { updateStatus = 200 } = {}) {
       }
       if (request.method() === 'PUT' && path === '/api/v1/user') {
         if (!basic.startsWith(`${UUID}:`)) return route.fulfill({ status: 400, contentType: 'application/json', body: JSON.stringify({ success: false, error: { message: 'Authorization header (Basic) is required' } }) });
-        if (updateStatus !== 200) return route.fulfill({ status: updateStatus, contentType: 'application/json', body: JSON.stringify({ success: false, error: { message: 'Invalid password' } }) });
+        // AIOStreams' own refusal for a wrong UUID or password; anything else stands in for a proxy or server failure.
+        if (updateStatus === 400) return route.fulfill({ status: 400, contentType: 'application/json', body: JSON.stringify({ success: false, error: { code: 'USER_INVALID_DETAILS', message: 'Invalid UUID or password' } }) });
+        if (updateStatus !== 200) return route.fulfill({ status: updateStatus, contentType: 'application/json', body: JSON.stringify({ error: 'upstream failed' }) });
         return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ success: true, data: { uuid: UUID, userData: body.config } }) });
       }
       return route.fulfill({ status: 404, contentType: 'application/json', body: JSON.stringify({ success: false, error: { message: 'Not Found' } }) });
@@ -118,13 +120,26 @@ test('a changed choice shows up before saving', async ({ page }) => {
 test('a refused update leaves the config alone and offers the paste method', async ({ page }) => {
   test.setTimeout(90_000);
   const calls = [];
-  await installOnce(page, calls, { updateStatus: 401 });
+  await installOnce(page, calls, { updateStatus: 400 });
   await page.locator('[data-action="update-my-setup"]').click();
   const modal = page.locator('#updateSetupModal');
   await modal.locator('#updSetupGo').click();
   await expect(modal.locator('#updSetupResult')).toContainText('Not saved.');
-  await expect(modal.locator('#updSetupResult')).toContainText('Invalid password. Your existing config is unchanged.');
+  await expect(modal.locator('#updSetupResult')).toContainText('Invalid UUID or password. Your existing config is unchanged.');
   expect(calls.filter(c => c.method === 'POST'), 'no fallback to a new config').toHaveLength(1);
   await modal.locator('[data-upd-paste]').click();
   await expect(page.locator('#updateTplModal')).toBeVisible();
+});
+
+test('a proxy or server failure is not reported as unchanged', async ({ page }) => {
+  test.setTimeout(90_000);
+  const calls = [];
+  await installOnce(page, calls, { updateStatus: 502 });
+  await page.locator('[data-action="update-my-setup"]').click();
+  const modal = page.locator('#updateSetupModal');
+  await modal.locator('#updSetupGo').click();
+  await expect(modal.locator('#updSetupResult')).toContainText('Not confirmed.');
+  await expect(modal.locator('#updSetupResult')).toContainText('may or may not have been saved');
+  await expect(modal.locator('#updSetupResult')).not.toContainText('unchanged');
+  expect(calls.filter(c => c.method === 'POST'), 'no fallback to a new config').toHaveLength(1);
 });

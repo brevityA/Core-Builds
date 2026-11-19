@@ -873,7 +873,11 @@ function updateMySetup() {
     try {
       const res = await aioUserWrite(rec.host, { uuid: rec.uuid, password: S.instancePassword, config: cfg }, 10000);
       const data = await res.json().catch(() => ({}));
-      if (!res.ok || data?.success === false) throw new Error(data?.error?.message || data?.message || data?.detail || `Server returned ${res.status}`);
+      if (!res.ok || data?.success === false) {
+        const refusal = new Error(data?.error?.message || data?.message || data?.detail || `Server returned ${res.status}`);
+        refusal.refused = aioHostRefused(res, data);
+        throw refusal;
+      }
       recordSavedConfig(rec.host, rec.uuid, cfg);
       saveLastGen();
       go.textContent = 'Saved';
@@ -883,12 +887,15 @@ function updateMySetup() {
     } catch(err) {
       logError('deploy', 'Update in place failed', { host: S.instanceHost, error: err?.message });
       go.disabled = false; go.textContent = 'Try again';
-      // A timeout can land after the host applied the update; only a refusal is known to change nothing.
-      // Retrying is safe: it saves the same config to the same UUID.
-      const timedOut = err?.name === 'AbortError';
-      out.innerHTML = timedOut
-        ? `<div class="upd-err"><b>No answer.</b> The host did not reply in time, so the update may or may not have been saved. Try again to be sure.</div>${pasteBtn}`
-        : `<div class="upd-err"><b>Not saved.</b> ${escHtml(sentence(String(err?.message || err)))} Your existing config is unchanged.</div>${pasteBtn}`;
+      // Only a refusal from AIOStreams itself is known to change nothing. A timeout,
+      // a network or proxy failure, or a 5xx can land after the host applied the
+      // update. Retrying is safe: it saves the same config to the same UUID.
+      const msg = escHtml(sentence(String(err?.message || err)));
+      out.innerHTML = err?.refused
+        ? `<div class="upd-err"><b>Not saved.</b> ${msg} Your existing config is unchanged.</div>${pasteBtn}`
+        : err?.name === 'AbortError'
+          ? `<div class="upd-err"><b>No answer.</b> The host did not reply in time, so the update may or may not have been saved. Try again to be sure.</div>${pasteBtn}`
+          : `<div class="upd-err"><b>Not confirmed.</b> ${msg} The update may or may not have been saved. Try again to be sure.</div>${pasteBtn}`;
     }
   });
 }
@@ -9055,6 +9062,12 @@ function sentence(msg) {
   const t = String(msg || '').trim();
   return !t || /[.!?…]$/.test(t) ? t : `${t}.`;
 }
+// A refusal AIOStreams itself sent: a 4xx carrying its error shape { error: { code } }.
+// Only then is it known that nothing was written. A timeout, a network failure, a
+// 5xx or a proxy error can come after the host applied the write.
+function aioHostRefused(res, data) {
+  return !!res && res.status >= 400 && res.status < 500 && typeof data?.error?.code === 'string';
+}
 function aioBasicAuth(uuid, password) {
   let bin = '';
   new TextEncoder().encode(`${uuid}:${password}`).forEach(b => { bin += String.fromCharCode(b); });
@@ -9231,13 +9244,20 @@ async function openInAIOStreams() {
         return { host: fastest, uuid: id || data?.data?.uuid || data?.uuid || data?.user?.uuid || data?.id, epwd, updated: !!id };
       }
       const apiMsg = data?.error?.message || data?.message || data?.detail || `Server returned ${res.status}`;
-      throw new Error(`API_ERROR:${apiMsg}`);
+      const failure = new Error(`API_ERROR:${apiMsg}`);
+      failure.refused = aioHostRefused(res, data);
+      failure.code = data?.error?.code;
+      throw failure;
     };
     try {
       let winner;
       try { winner = await attempt(existingUuid); }
       catch(err) {
-        if (existingUuid) winner = await attempt(null);
+        // Create a new config only when AIOStreams answered that this UUID and
+        // password do not open a config (nothing was written). After a timeout,
+        // network or proxy failure or a 5xx the update may have landed, so keep
+        // the saved UUID and report instead of minting a second config.
+        if (existingUuid && err?.refused && err.code === 'USER_INVALID_DETAILS') winner = await attempt(null);
         else throw err;
       }
       if (winner.uuid) { S.instanceUuid = winner.uuid; saveState(); recordSavedConfig(winner.host, winner.uuid, cfg); }

@@ -65,7 +65,27 @@ test('values read back from storage are escaped on the first screen', () => {
 
 test('a timeout is not reported as unchanged, and a custom host is stored without a trailing slash', () => {
   const body = fn('updateMySetup');
-  assert.match(body, /timedOut\s*\n?\s*\? `<div class="upd-err"><b>No answer\.<\/b> The host did not reply in time, so the update may or may not have been saved\./);
+  assert.match(body, /err\?\.name === 'AbortError'\s*\n?\s*\? `<div class="upd-err"><b>No answer\.<\/b> The host did not reply in time, so the update may or may not have been saved\./);
   assert.match(body, /bindModalEsc\(overlay, close\)/);
   assert.match(fn('recordSavedConfig'), /String\(host \|\| ''\)\.trim\(\)\.replace\(\/\\\/\+\$\/, ''\)/);
+});
+
+// CodeRabbit review on #845: an uncertain failure (timeout, network, proxy, 5xx)
+// can come after the host applied the update, so it must not read "unchanged" and
+// must never fall through to creating a second config.
+test('only an AIOStreams refusal counts as "nothing changed"', () => {
+  const refused = new Function(`${fn('aioHostRefused')}; return aioHostRefused;`)();
+  assert.equal(refused({ status: 400 }, { error: { code: 'USER_INVALID_DETAILS' } }), true);
+  assert.equal(refused({ status: 502 }, { error: { code: 'INTERNAL_SERVER_ERROR' } }), false, 'a 5xx is uncertain');
+  assert.equal(refused({ status: 403 }, { error: 'host not allowed' }), false, 'a proxy refusal is not the host');
+  assert.equal(refused({ status: 404 }, {}), false);
+  const body = fn('updateMySetup');
+  assert.match(body, /refusal\.refused = aioHostRefused\(res, data\)/);
+  assert.match(body, /err\?\.refused\s*\?\s*`<div class="upd-err"><b>Not saved\.<\/b>/);
+  assert.match(body, /<b>Not confirmed\.<\/b> \$\{msg\} The update may or may not have been saved\./);
+});
+
+test('install never creates a second config after an uncertain update failure', () => {
+  assert.match(app, /if \(existingUuid && err\?\.refused && err\.code === 'USER_INVALID_DETAILS'\) winner = await attempt\(null\);\s*else throw err;/);
+  assert.doesNotMatch(app, /if \(existingUuid\) winner = await attempt\(null\);/);
 });
