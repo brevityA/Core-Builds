@@ -2211,6 +2211,10 @@ function openAdvancedDrawer(trigger) {
   requestAnimationFrame(() => { overlay.classList.add('active'); syncFtJump(); });
 }
 
+// Set while Fine-Tune is open from Quick install: closing it goes back there, with
+// the lane rebuilt from saved state so a change made in Fine-Tune shows in it.
+let _ftFromQuick = null;
+
 function closeAdvancedDrawer() {
   const overlay = document.getElementById('advancedDrawer');
   showAdvanced = false;
@@ -2221,6 +2225,15 @@ function closeAdvancedDrawer() {
   }
   render();
   _advancedTrigger = null;
+  if (_ftFromQuick) {
+    const back = _ftFromQuick; _ftFromQuick = null;
+    S.simpleMode = back.simpleMode; S.quickStart = back.quickStart; saveState();
+    // Drop the hidden lane without touching history (its entry is reused), then
+    // rebuild it from S so picks changed in Fine-Tune show.
+    back.lane?._closeLane?.(true);
+    showExpressLane({ target: back.target, mode: back.mode });
+    return;
+  }
   setTimeout(() => document.querySelector('[data-action="open-advanced"]')?.focus(), 200);
 }
 
@@ -3262,6 +3275,8 @@ document.addEventListener('DOMContentLoaded', () => {
   window.addEventListener('popstate', (e) => {
     // The Express lane's own history entry: Back closes the lane and leaves the page as it was.
     if (_expressLanePop) { _expressLanePop = false; return; }
+    // Back inside Fine-Tune opened from Quick install returns to Quick install.
+    if (_ftFromQuick && document.getElementById('advancedDrawer')) { closeAdvancedDrawer(); return; }
     const lane = document.getElementById('expressLaneModal');
     if (lane?._closeLane) { lane._closeLane(true); return; }
     const m = document.getElementById('manifestModal'); if (m) m.remove();
@@ -7919,11 +7934,12 @@ function pillSelectHtml(id, title, choices, value) {
   return `<fieldset class="ux-pill-field"><legend>${escHtml(title)}</legend><div class="ux-pill-grid" id="${id}Pills" role="radiogroup" aria-label="${escHtml(title)}" data-pill-select="${id}">${choices.map(([v, n]) => `<button type="button" class="chip-btn${v===value?' active':''}" role="radio" aria-checked="${v===value}" tabindex="${v===value?'0':'-1'}" data-pill-value="${escHtml(v)}">${escHtml(n)}</button>`).join('')}</div><select id="${id}" hidden aria-hidden="true" tabindex="-1">${choices.map(([v,n]) => `<option value="${escHtml(v)}"${v===value?' selected':''}>${escHtml(n)}</option>`).join('')}</select></fieldset>`;
 }
 
-function showExpressLane() {
+function showExpressLane(resume = null) {
   document.getElementById('expressLaneModal')?.remove();
   const gh = window.__genieHandoff; window.__genieHandoff = null; // one-shot seed: read both fields, then clear (review P4)
   const svc = gh?.service || ((S.service && EXPRESS_SERVICES.some(([v]) => v === S.service)) ? S.service : 'torbox-pro');
-  const state = { service: svc, target: gh?.app || 'app', mode:S.installMode === 'manifest' ? 'manifest' : 'direct', profile:S.quickProfile || 'balanced', device:S.device || 'generic', resolution:S.resolution || '4k', extras:(S.multiServices||[]).filter(v=>CAROUSEL_SVCS.includes(v) && v!==svc), scrapers:[...(S.optionalScrapers||[])],
+  // `resume` carries the two lane-only picks (app and delivery) back from Fine-Tune.
+  const state = { service: svc, target: gh?.app || resume?.target || 'app', mode: resume?.mode || (S.installMode === 'manifest' ? 'manifest' : 'direct'), profile:S.quickProfile || 'balanced', device:S.device || 'generic', resolution:S.resolution || '4k', extras:(S.multiServices||[]).filter(v=>CAROUSEL_SVCS.includes(v) && v!==svc), scrapers:[...(S.optionalScrapers||[])],
     // A language already chosen (Custom build or an earlier Quick install) wins, English
     // included; only a never-chosen list falls back to the browser's language.
     lang: (S.langsSet && S.langs?.[0]) || ((S.langs?.[0] && S.langs[0] !== 'English') ? S.langs[0] : browserLang()) };
@@ -8071,7 +8087,8 @@ function showExpressLane() {
     </aside></div>
   </div>`;
   document.body.appendChild(overlay);
-  try { history.pushState({ ...(history.state || {}), expressLane: true }, ''); } catch(e) {}
+  // Coming back from Fine-Tune, the lane's entry may still be current: reuse it.
+  if (!history.state?.expressLane) { try { history.pushState({ ...(history.state || {}), expressLane: true }, ''); } catch(e) {} }
   const syncRadioGroup = (selector, value, key) => {
     overlay.querySelectorAll(selector).forEach(button => {
       const active = button.dataset[key] === String(value);
@@ -8271,17 +8288,18 @@ function showExpressLane() {
       const hostSel = document.getElementById('expressHost');
       if (hostSel) S.instanceHost = hostSel.value;
       applyExpressChoices(expressPayload());
+      // Fine-Tune opens over the landing, not the builder, and closing it returns
+      // to Quick install: no second screen with its own menu in between.
+      // The lane stays, hidden, so its history entry still catches the phone's Back.
+      _ftFromQuick = { simpleMode: S.simpleMode, quickStart: S.quickStart, target: state.target, mode: state.mode, lane: overlay };
       S.simpleMode = false; S.quickStart = false;
-      closeLane(true);
-      // Replace the lane's history entry with the builder's, so Back from here returns to the landing.
-      step = STEPS;
-      try { history.replaceState({ step }, ''); } catch(err) {}
-      saveState(); render(); window.scrollTo(0, 0);
-      openAdvancedDrawer(document.querySelector('[data-action="open-advanced"]'));
+      overlay.hidden = true;
+      saveState();
+      openAdvancedDrawer(customizeBtn);
       // Same landing as the section chips: just under the pinned header and bar.
       const sectionId = customizeBtn.dataset.expressCustomize;
       if (sectionId) requestAnimationFrame(() => ftJumpTo(sectionId, false));
-      showToast('Your Quick install choices are kept — change anything, then install from Review');
+      showToast('Your Quick install choices are kept — close Fine-Tune to go back and install');
       return;
     }
     if (e.target.closest('#expressGo')) {

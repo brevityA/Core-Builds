@@ -77,10 +77,11 @@ test('other dialogs keep their own close button on a phone', async ({ page }, te
   expect(box.y).toBeGreaterThan(0); // still a bottom sheet, not full screen
 });
 
-// Quick → Custom hand-off (v3.22): a "Defaults we'll use" row carries what Quick
-// install collected into the builder, opens Fine-Tune at that section, and lands
-// on Review so the install happens there.
-test('a Defaults row opens Custom build with the Quick picks kept', async ({ page }) => {
+// Quick install → Fine-Tune and back (v3.36): a "Defaults we'll use" row opens
+// Fine-Tune at that section over Quick install, keeps what Quick install
+// collected, and closing it returns to Quick install. There is no stop in the
+// builder, which has its own menu, on the way.
+test('a Defaults row opens Fine-Tune and closing it returns to Quick install', async ({ page }) => {
   await fresh(page);
   await page.locator('#splashStart [data-action="open-express-lane"]').click();
   await page.locator('[data-express-service="realdebrid"]').click();
@@ -88,20 +89,37 @@ test('a Defaults row opens Custom build with the Quick picks kept', async ({ pag
   await page.locator('#expressAdvanced > summary').click();
   await page.locator('[data-express-customize="ft-layout"]').click();
 
-  await expect(page.locator('#expressLaneModal')).toHaveCount(0);
+  await expect(page.locator('#expressLaneModal')).toBeHidden();
   await expect(page.locator('#advancedDrawer')).toBeVisible();
   await expect(page.locator('#advancedDrawer #ft-layout')).toBeInViewport();
   const saved = await page.evaluate(() => JSON.parse(localStorage.getItem('coreBuild') || '{}'));
   expect(saved.service).toBe('realdebrid');
   expect(saved.multiServices).toContain('realdebrid');
-  expect(saved.simpleMode).toBe(false);
   expect(saved.creds?.realdebrid).toBe('rd-test-key');
 
   await page.locator('#advancedDrawer [data-action="close-advanced"]').click();
   await expect(page.locator('#advancedDrawer')).toHaveCount(0);
-  await expect(page.locator('#btnNext, [data-action="auto-create"], #btnAutoCreate').first()).toBeAttached();
+  await expect(page.locator('#expressLaneModal')).toBeVisible();
+  await expect(page.locator('#expressLaneModal')).toHaveCount(1);
+  await expect(page.locator('[data-express-service="realdebrid"]')).toHaveClass(/active/);
+  await expect(page.locator('[data-express-cred="realdebrid"]')).toHaveValue('rd-test-key');
+  // Underneath is still the landing, not a builder step.
+  await expect(page.locator('#splashStart')).toBeAttached();
+  // One Back closes Quick install: reopening it did not stack a second history entry.
   await page.goBack();
+  await expect(page.locator('#expressLaneModal')).toHaveCount(0);
   await expect(page.locator('#splashStart')).toBeVisible();
+});
+
+test('Back inside Fine-Tune from Quick install returns to Quick install', async ({ page }) => {
+  await fresh(page);
+  await page.locator('#splashStart [data-action="open-express-lane"]').click();
+  await page.locator('#expressAdvanced > summary').click();
+  await page.locator('#expressLaneModal .fastlane-customize').click();
+  await expect(page.locator('#advancedDrawer')).toBeVisible();
+  await page.goBack();
+  await expect(page.locator('#advancedDrawer')).toHaveCount(0);
+  await expect(page.locator('#expressLaneModal')).toBeVisible();
 });
 
 test('Customize every setting opens Fine-Tune at the top', async ({ page }) => {
