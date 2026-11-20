@@ -6,6 +6,7 @@ import {
   TEMPLATE_HOST_ROUTING,
 } from '../src/data/template-host-routing.js';
 import {
+  allowedInlinePatterns,
   evaluateTemplate,
   hasTemplateDirectives,
   resolveCompatibleHosts,
@@ -139,4 +140,11 @@ test('every routing entry names a real template and changes something', () => {
       `routing entry "${id}" is the same as the default`,
     );
   }
+});
+
+test('a regex-restricted host that publishes no source allows no inline pattern', () => {
+  assert.deepEqual([...allowedInlinePatterns({ regexAccess: 'none', allowedRegexUrls: [] })], []);
+  assert.deepEqual([...allowedInlinePatterns({ regexAccess: 'none' })], []);
+  // Published but not pinned here: nothing to compare against, so the check is skipped.
+  assert.equal(allowedInlinePatterns({ regexAccess: 'none', allowedRegexUrls: ['https://example.invalid/regexes.json'] }), null);
 });

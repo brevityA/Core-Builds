@@ -6,12 +6,16 @@ on:
       - 'configurator/**'
       # The template host check reads the repo's Templates/ folder.
       - 'Templates/**'
+      # ...and the pinned regex allowlist snapshot.
+      - 'Filtering/upstream/vidhin05-regexes.snapshot.json'
   push:
     branches: [main]
     paths:
       - 'configurator/**'
       # The template host check reads the repo's Templates/ folder.
       - 'Templates/**'
+      # ...and the pinned regex allowlist snapshot.
+      - 'Filtering/upstream/vidhin05-regexes.snapshot.json'
 
 permissions:
   contents: read

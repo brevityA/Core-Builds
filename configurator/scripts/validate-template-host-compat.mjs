@@ -50,9 +50,15 @@ function loadSnapshotPatterns(url) {
   return snapshotCache.get(url);
 }
 
-/** Patterns a host accepts inline, or null when no allowlisted source has a pinned copy. */
+/**
+ * Patterns a host accepts inline: none when it publishes no source, or null (skip
+ * the check) when it publishes sources but none has a pinned copy here.
+ */
 export function allowedInlinePatterns(capability) {
-  const sets = (capability.allowedRegexUrls || []).map(loadSnapshotPatterns).filter(Boolean);
+  const urls = capability.allowedRegexUrls || [];
+  // A host that publishes no source allows no inline pattern at all.
+  if (!urls.length) return new Set();
+  const sets = urls.map(loadSnapshotPatterns).filter(Boolean);
   if (!sets.length) return null;
   return new Set(sets.flatMap((set) => [...set]));
 }
