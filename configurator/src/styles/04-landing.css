@@ -29,13 +29,13 @@
 [data-theme="light"] .sup-row{border-color:#eaedf0;background:#f6f8fa}
 
 /* Copy button inside support row */
-.sup-row-copy{flex-shrink:0;padding:4px 8px;background:rgba(0,212,255,.08);border:1px solid rgba(0,212,255,.2);border-radius:4px;color:var(--th-accent);font-size:.7rem;font-weight:700;cursor:pointer;white-space:nowrap;transition:all .15s}
+.sup-row-copy{flex-shrink:0;padding:4px 8px;background:rgba(0,212,255,.08);border:1px solid rgba(0,212,255,.2);border-radius:4px;color:var(--th-accent);font-size:.7rem;font-weight:700;cursor:pointer;white-space:nowrap;transition:.15s;transition-property:var(--ui-tp)}
 .sup-row-copy:hover{background:rgba(0,212,255,.18);border-color:rgba(0,212,255,.35)}
 [data-theme="light"] .sup-row-copy{background:rgba(9,105,218,.05);border-color:rgba(9,105,218,.25);color:#0969da}
 [data-theme="light"] .sup-row-copy:hover{background:rgba(9,105,218,.12);border-color:rgba(9,105,218,.4)}
 
 /* OSRS and Kofi button styles */
-.sup-kofi-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:11px;border-radius:10px;font-weight:800;font-size:.88rem;cursor:pointer;border:1px solid rgba(168,85,247,.35);background:rgba(168,85,247,.04);color:#a78bfa;transition:all .15s;text-decoration:none;margin-bottom:14px;box-shadow:0 4px 12px rgba(168,85,247,.04)}
+.sup-kofi-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:11px;border-radius:10px;font-weight:800;font-size:.88rem;cursor:pointer;border:1px solid rgba(168,85,247,.35);background:rgba(168,85,247,.04);color:#a78bfa;transition:.15s;transition-property:var(--ui-tp);text-decoration:none;margin-bottom:14px;box-shadow:0 4px 12px rgba(168,85,247,.04)}
 .sup-kofi-btn:hover{background:rgba(168,85,247,.12);border-color:rgba(168,85,247,.55);box-shadow:0 6px 18px rgba(168,85,247,.1)}
 [data-theme="light"] .sup-kofi-btn{border-color:rgba(124,58,237,.35);background:rgba(124,58,237,.04);color:#7c3aed;box-shadow:0 4px 12px rgba(124,58,237,.04)}
 [data-theme="light"] .sup-kofi-btn:hover{background:rgba(124,58,237,.08);border-color:rgba(124,58,237,.5);box-shadow:0 6px 18px rgba(124,58,237,.08)}

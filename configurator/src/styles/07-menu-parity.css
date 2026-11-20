@@ -302,9 +302,9 @@ html body:has(.hybrid-splash) #themeToggle{display:none}
 ::view-transition-old(root){animation:cbPageOut .18s ease both}::view-transition-new(root){animation:cbPageIn .26s cubic-bezier(.2,.8,.2,1) both}
 .hybrid-splash .lp-rows>*{animation:cbRise .42s cubic-bezier(.2,.8,.2,1) both}
 .hybrid-splash .lp-rows>:nth-child(2){animation-delay:.04s}.hybrid-splash .lp-rows>:nth-child(3){animation-delay:.08s}.hybrid-splash .lp-rows>:nth-child(4){animation-delay:.12s}.hybrid-splash .lp-rows>:nth-child(5){animation-delay:.16s}.hybrid-splash .lp-rows>:nth-child(6){animation-delay:.2s}
-#expressLaneModal.fastlane-overlay{animation:cbFade .2s ease both}
+#expressLaneModal.fastlane-overlay{animation:cbFade var(--sheet-dur) ease both}
 }
-@media(prefers-reduced-motion:no-preference) and (min-width:641px){#expressLaneModal .fastlane-panel{animation:cbRise .32s cubic-bezier(.2,.8,.2,1) both}}
+@media(prefers-reduced-motion:no-preference) and (min-width:641px){#expressLaneModal .fastlane-panel{animation:cbRise var(--sheet-dur) var(--sheet-ease) both}}
 @keyframes cbPageOut{to{opacity:0;transform:translateY(-6px)}}@keyframes cbPageIn{from{opacity:0;transform:translateY(10px)}}
 @keyframes cbRise{from{opacity:0;transform:translateY(12px)}}@keyframes cbFade{from{opacity:0}}
 
@@ -401,3 +401,68 @@ html body:has(.hybrid-splash) #themeToggle{display:none}
 #advancedDrawer .ft-info{flex:none;width:20px;height:20px;min-width:0;min-height:0;padding:0;border-radius:50%;line-height:1}
 #advancedDrawer .ft-close{flex:none;white-space:nowrap;min-height:36px}
 #advancedDrawer .ft-title{font-family:var(--font-display);font-size:1.25rem;font-weight:700;letter-spacing:-.02em;color:var(--th-tx)}
+
+/* ── Review without folds (v3.37) ─────────────────────────────────────────
+   Install stays on the page; four rows open one sheet each. Sheets share one
+   motion with every other panel: a 200 ms slide up, instant under Reduce Motion. */
+:root{--sheet-dur:.2s;--sheet-ease:cubic-bezier(.2,.8,.2,1)}
+.rv-install{margin:14px 0 12px;padding:14px 16px 12px;border-radius:13px;border:1px solid var(--th-accent-border);background:var(--th-card-alt)}
+.card .rv-install-title{font-family:inherit;text-shadow:none;display:flex;align-items:center;gap:8px;margin:0 0 12px;font-size:.74rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--th-accent)}
+.rv-install .btn-td{margin-top:12px;margin-bottom:0}
+.rv-rows{display:flex;flex-direction:column;gap:8px;margin:0 0 4px}
+.rv-rows .rv-cards-row{margin:0}
+.rv-mini-card{display:flex;flex-direction:column;gap:2px;margin-top:6px;padding:7px 9px;border-radius:8px;background:var(--th-input-bg);border:1px solid var(--th-border);font-size:.68rem;line-height:1.35;color:var(--th-tx2);white-space:normal}
+.rv-mini-card:empty{display:none}
+.rv-mini-n{font-weight:700;color:var(--th-tx)}
+.rv-mini-d{color:var(--th-tx3)}
+html.rv-sheet-on{overflow:hidden}
+.rv-sheet{position:fixed;inset:0;z-index:9000;display:flex;align-items:flex-end;justify-content:center}
+.rv-sheet[hidden]{display:none}
+.rv-sheet-scrim{position:absolute;inset:0;background:rgba(2,5,8,.62);opacity:0;transition:opacity var(--sheet-dur) ease}
+.rv-sheet-panel{position:relative;width:min(640px,100vw);max-height:min(88dvh,900px);display:flex;flex-direction:column;border-radius:18px 18px 0 0;border:1px solid var(--th-border-strong);border-bottom:0;background:#0b121b;box-shadow:0 -18px 50px rgba(0,0,0,.45);transform:translateY(100%);transition:transform var(--sheet-dur) var(--sheet-ease);will-change:transform}
+.rv-sheet.open .rv-sheet-scrim{opacity:1}
+.rv-sheet.open .rv-sheet-panel{transform:translateY(0)}
+.rv-sheet.rv-sheet-instant .rv-sheet-scrim,.rv-sheet.rv-sheet-instant .rv-sheet-panel{transition:none}
+.rv-sheet-hdr{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:16px 16px 12px;border-bottom:1px solid var(--th-border)}
+.rv-sheet-title{font-family:Georgia,'Times New Roman',serif;letter-spacing:-.02em;margin:0;font-size:1.02rem;font-weight:800;color:var(--th-tx);text-wrap:balance}
+.rv-sheet-sub{margin:3px 0 0;font-size:.76rem;line-height:1.45;color:var(--th-tx3)}
+.rv-sheet-done{flex:0 0 auto;min-height:40px;padding:0 16px;border-radius:10px;border:1px solid var(--th-accent-border);background:var(--th-accent-bg);color:var(--th-accent);font:inherit;font-size:.82rem;font-weight:800;cursor:pointer}
+.rv-sheet-done:focus-visible,.rv-sheet-copy:focus-visible{outline:2px solid var(--th-accent);outline-offset:2px}
+.rv-sheet-body{overflow-y:auto;overscroll-behavior:contain;padding:14px 16px max(18px,env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:14px}
+.rv-sheet-body>*{margin-top:0}
+.rv-sheet-block{display:flex;flex-direction:column;gap:8px}
+.rv-sheet-block+.rv-sheet-block{padding-top:14px;border-top:1px solid var(--th-border)}
+.rv-sheet-h{font-family:inherit;margin:0;font-size:.72rem;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--th-tx3)}
+.rv-sheet-note{margin:0;font-size:.76rem;line-height:1.5;color:var(--th-tx3)}
+.rv-sheet-tag{margin-left:4px;font-weight:600;text-transform:none;letter-spacing:0;color:var(--th-purple)}
+.rv-sheet-row{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.rv-sheet-copy{font:inherit;font-size:.74rem;font-weight:700;color:var(--th-accent);background:var(--th-accent-bg);border:1px solid var(--th-accent-border);border-radius:6px;padding:4px 11px;cursor:pointer}
+.rv-json{margin:0;padding:12px 14px;border-radius:10px;background:var(--th-card-alt);border:1px solid var(--th-border);overflow:auto;max-height:260px;font-size:.68rem;line-height:1.5;color:var(--th-tx2);font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+.rv-sheet .rv-action-dock{margin:0}
+@media(min-width:720px){
+  .rv-sheet{align-items:center}
+  .rv-sheet-panel{border-radius:18px;border-bottom:1px solid var(--th-border-strong);transform:translateY(24px);opacity:0;transition:transform var(--sheet-dur) var(--sheet-ease),opacity var(--sheet-dur) ease}
+  .rv-sheet.open .rv-sheet-panel{opacity:1}
+  .rv-sheet-scrim{backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+}
+[data-theme='light'] .rv-sheet-scrim{background:rgba(30,41,59,.36)}
+[data-theme='light'] .rv-sheet-panel{background:#f7fbff;box-shadow:0 -12px 40px rgba(15,23,42,.18)}
+@media(prefers-reduced-motion:reduce){.rv-sheet-scrim,.rv-sheet-panel{transition:none}}
+
+/* Phones: solid panels instead of frosted glass (v3.37). backdrop-filter
+   re-blurs everything behind a layer on every scroll frame; at these opacities
+   (.72–.94) a solid tint looks nearly the same. Desktop keeps the blur. */
+@media (max-width:719px){
+  .card:not(.splash),.card.splash,.card.splash.hybrid-splash,.modal-overlay,.sup-overlay,#apiReminder,#pwdPrompt,
+  .fastlane-overlay,.advanced-drawer-overlay,.advanced-drawer-content>.card>div:first-child,
+  #expressLaneModal .fastlane-express,.rv-sheet-scrim{-webkit-backdrop-filter:none;backdrop-filter:none}
+  .card:not(.splash){background:#0f1822}
+  #expressLaneModal .fastlane-express{background:var(--th-card)}
+}
+
+/* One panel motion everywhere (v3.37): Fine-Tune, Quick install and the Review
+   sheets all move in var(--sheet-dur) on the same curve (on phones Fine-Tune
+   already rises from below); Reduce Motion makes every one instant. */
+.advanced-drawer-overlay{transition:opacity var(--sheet-dur) ease}
+.advanced-drawer-panel{transition:transform var(--sheet-dur) var(--sheet-ease)}
+@media(prefers-reduced-motion:reduce){.advanced-drawer-overlay,.advanced-drawer-panel{transition:none}}

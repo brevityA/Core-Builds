@@ -3,7 +3,7 @@
  *
  * Covers:
  * - Full Review: default unchecked & visible placement above Export (outside
- *   collapsed Customize), check/uncheck persistence across reload, clean-preflight
+ *   Export & share sheet), check/uncheck persistence across reload, clean-preflight
  *   Export payload & zero key leaks, explicit blocker-modal Export path, unrelated
  *   Review actions silent, Web Vitals negative & positive (deterministic
  *   ?cb-e2e=1 hook), and paste upload working with consent off.
@@ -140,8 +140,10 @@ async function fresh(page, rec, state, { query = '?cb-e2e=1', savedStep = '6', e
   await reloadAndSettle(page, rec, { expectVisit });
 }
 
+// v3.37: Export lives in Review's Export & share sheet, consent right above it.
 async function goReview(page) {
   await page.getByRole('button', { name: 'Resume' }).click();
+  await page.locator('.rv-row[data-sheet="export"]').click();
   await expect(page.locator('.btn-dl')).toBeVisible();
 }
 
@@ -192,7 +194,7 @@ async function assertConsentLayout(page, targetSelector) {
 
 // ── Full Review Tests (9) ──────────────────────────────────────────────────
 
-test('default state is unchecked, visible above Export outside collapsed Customize, approved wording, ZERO outbound counter requests', async ({ page }) => {
+test('default state is unchecked, visible above Export in the Export & share sheet, approved wording, ZERO outbound counter requests', async ({ page }) => {
   const rec = await attachCounterSpy(page);
   await fresh(page, rec, CLEAN_STATE);
   await goReview(page);
@@ -201,10 +203,8 @@ test('default state is unchecked, visible above Export outside collapsed Customi
   await expect(cb).not.toBeChecked();
   await assertConsentLayout(page, '.btn-dl');
 
-  const customizeDetails = page.locator('details.rv-section:has(summary:has-text("Customize"))');
-  await expect(customizeDetails).toBeVisible();
-  expect(await customizeDetails.getAttribute('open')).toBeNull();
-  await expect(customizeDetails.locator('input[data-action="toggle-telemetry"]')).toHaveCount(0);
+  await expect(page.locator('#rvSheet-export input[data-action="toggle-telemetry"]')).toHaveCount(1);
+  await expect(page.locator('#main details')).toHaveCount(0);
 
   expect(rec.visit).toEqual([]);
   expect(rec.generate).toEqual([]);
@@ -311,9 +311,12 @@ test('unrelated Review actions send zero counter requests when consent is off', 
   await fresh(page, rec, CLEAN_STATE);
   await goReview(page);
 
-  const customizeDetails = page.locator('details.rv-section:has(summary:has-text("Customize"))');
-  await customizeDetails.locator('summary.rv-section-hdr').click();
-  await expect(customizeDetails).toHaveAttribute('open', '');
+  await page.locator('#rvSheet-export .rv-sheet-done').click();
+  await expect(page.locator('#rvSheet-export')).toBeHidden();
+  await page.locator('.rv-row-cards').click();
+  await expect(page.locator('#rvSheet-cards')).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(page.locator('#rvSheet-cards')).toBeHidden();
 
   await page.locator('.size-btn', { hasText: '20GB' }).click();
   expect(rec.visit).toEqual([]);

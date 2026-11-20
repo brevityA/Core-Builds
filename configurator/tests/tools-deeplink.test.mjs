@@ -14,8 +14,9 @@ test('handleDeepLink exists and is invoked once after initial render', () => {
 });
 
 test('handleDeepLink maps the two Tools-page anchors and leaves #cfg= to the share-link path', () => {
-  assert.match(app, /if \(hash === '#troubleshooter'\) \{ setTimeout\(showTroubleshooter, 300\); return; \}/,
-    '#troubleshooter not mapped to showTroubleshooter()');
+  // Through DEEP_ACTIONS (v3.37), which clears the hash so the menu link works twice.
+  assert.match(app, /'#troubleshooter':'open-troubleshooter'/, '#troubleshooter not mapped to the troubleshooter action');
+  assert.match(app, /if \(action === 'open-troubleshooter'\) showTroubleshooter\(\);/);
   assert.match(app, /if \(hash === '#health-score'\) \{ step = STEPS; pushStep\(\); render\(\); window\.scrollTo\(0, 0\); return; \}/,
     '#health-score not mapped to the review step');
   assert.match(app, /if \(!hash \|\| hash\.startsWith\('#cfg='\)\) return;/,

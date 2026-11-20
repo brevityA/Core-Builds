@@ -53,7 +53,7 @@ const STEPS = 6;
 // workflow) the raw x.y here expands to x.y.0 in package.json / versions.json and
 // the release tag; the built badge drops the trailing .0. At the 2026-09-06
 // audit the release tag was v3.7.0 while this said 3.1 — they must move together.
-const CONFIGURATOR_VERSION = '3.36';
+const CONFIGURATOR_VERSION = '3.37';
 // Set to a collector endpoint to enable the opt-in anonymous usage ping (service+device+resolution only).
 // Leave empty to keep the feature fully disabled and hidden.
 const USAGE_BEACON_URL = '';
@@ -1143,7 +1143,7 @@ function renderOpts(def) {
     return `<div class="device-grid" role="radiogroup" aria-label="Your device">${cards}</div>${banner}`;
   }
   if (def.layout === 'formatter-picker') return fmtDropdownHtml() +
-    `<button data-action="import-formatter" style="margin-top:10px;width:100%;padding:10px;border-radius:8px;border:1.5px dashed rgba(167,139,250,.3);background:transparent;color:#a78bfa;font-size:.78rem;font-weight:600;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='rgba(167,139,250,.6)'" onmouseout="this.style.borderColor='rgba(167,139,250,.3)'">${S.customFormatter ? '⟳ Replace Custom Formatter' : ICO.folder(14,'#a78bfa')+' Import Custom Formatter'}</button>` +
+    `<button data-action="import-formatter" style="margin-top:10px;width:100%;padding:10px;border-radius:8px;border:1.5px dashed rgba(167,139,250,.3);background:transparent;color:#a78bfa;font-size:.78rem;font-weight:600;cursor:pointer;transition:.15s;transition-property:var(--ui-tp)" onmouseover="this.style.borderColor='rgba(167,139,250,.6)'" onmouseout="this.style.borderColor='rgba(167,139,250,.3)'">${S.customFormatter ? '⟳ Replace Custom Formatter' : ICO.folder(14,'#a78bfa')+' Import Custom Formatter'}</button>` +
     `<div style="font-size:.65rem;color:#4b5563;margin-top:6px;text-align:center">Want to build your own custom formatter? Design one visually at <a href="https://crispyduck.xyz" target="_blank" rel="noopener noreferrer" style="color:#a78bfa;text-decoration:none;font-weight:700">crispyduck.xyz</a></div>`;
   if (def.layout === 'list') return `<div class="opts list">${def.opts.map(o => std(o)).join('')}</div>`;
   if (def.layout === 'pills') return `<div class="opts pills">${def.opts.map(o => std(o)).join('')}</div>`;
@@ -1568,6 +1568,8 @@ function updateFmtFeatured() {
 /** Re-render the preview after the score display changes. */
 function updateCorePreviews() {
   refreshFmtStage();
+  const mini = document.getElementById('rvMiniCard');
+  if (mini) mini.innerHTML = rvMiniCardHtml();
   document.querySelectorAll('input[data-action="set-fmt-score"]').forEach(input => { input.checked = input.value === S.fmtScore; });
 }
 
@@ -1581,8 +1583,10 @@ function updateDeviceScroll() {
 }
 function updateFmtReceiptRow() {
   const fmtLbl = label('formatter', S.formatter);
-  const fmtSummary = document.querySelector('#fmtPickerDetails > summary span:first-child');
-  if (fmtSummary) fmtSummary.innerHTML = `<span>${ICO.palette(14,'#8b949e')}</span> Stream Formatter <span style="font-weight:600;color:#374151;text-transform:none;letter-spacing:0;font-size:.72rem">— ${fmtLbl}</span>`;
+  const cardsVal = document.getElementById('rvCardsVal');
+  if (cardsVal) cardsVal.textContent = fmtLabelText();
+  const mini = document.getElementById('rvMiniCard');
+  if (mini) mini.innerHTML = rvMiniCardHtml();
   document.querySelectorAll('.receipt-row').forEach(row => {
     const lbl2 = row.querySelector('.receipt-row-lbl');
     if (lbl2 && lbl2.textContent.trim() === 'formatter') {
@@ -1667,7 +1671,7 @@ function renderMatchMode() {
   const cur = S.matchMode || 'balanced';
   const pills = modes.map(m => {
     const on = cur === m.v;
-    return `<button data-action="set-match-mode" data-val="${m.v}" data-active="${on}" style="flex:1;padding:8px 4px;border-radius:8px;border:1.5px solid ${on?'rgba(0,212,255,.4)':'rgba(255,255,255,.07)'};background:${on?'rgba(0,212,255,.1)':'transparent'};color:${on?'#00d4ff':'#6b7280'};font-size:.8rem;font-weight:${on?'700':'500'};cursor:pointer;transition:all .15s;line-height:1.3">
+    return `<button data-action="set-match-mode" data-val="${m.v}" data-active="${on}" style="flex:1;padding:8px 4px;border-radius:8px;border:1.5px solid ${on?'rgba(0,212,255,.4)':'rgba(255,255,255,.07)'};background:${on?'rgba(0,212,255,.1)':'transparent'};color:${on?'#00d4ff':'#6b7280'};font-size:.8rem;font-weight:${on?'700':'500'};cursor:pointer;transition:.15s;transition-property:var(--ui-tp);line-height:1.3">
       <div style="display:flex;align-items:center;justify-content:center;gap:4px">${m.icon}<span>${m.label}</span></div>
       <div style="font-size:.62rem;opacity:.7;margin-top:2px">${m.desc}</div>
     </button>`;
@@ -1693,7 +1697,7 @@ function renderCacheMode() {
   const cur = S.cacheMode || 'mixed';
   const pills = modes.map(m => {
     const on = cur === m.v;
-    return `<button data-action="set-cache-mode" data-val="${m.v}" data-active="${on}" style="flex:1;padding:8px 4px;border-radius:8px;border:1.5px solid ${on?'rgba(0,212,255,.4)':'rgba(255,255,255,.07)'};background:${on?'rgba(0,212,255,.1)':'transparent'};color:${on?'#00d4ff':'#6b7280'};font-size:.8rem;font-weight:${on?'700':'500'};cursor:pointer;transition:all .15s;line-height:1.3">
+    return `<button data-action="set-cache-mode" data-val="${m.v}" data-active="${on}" style="flex:1;padding:8px 4px;border-radius:8px;border:1.5px solid ${on?'rgba(0,212,255,.4)':'rgba(255,255,255,.07)'};background:${on?'rgba(0,212,255,.1)':'transparent'};color:${on?'#00d4ff':'#6b7280'};font-size:.8rem;font-weight:${on?'700':'500'};cursor:pointer;transition:.15s;transition-property:var(--ui-tp);line-height:1.3">
       <div style="display:flex;align-items:center;justify-content:center;gap:4px">${m.icon}<span>${m.label}</span></div>
       <div style="font-size:.62rem;opacity:.7;margin-top:2px">${m.desc}</div>
     </button>`;
@@ -1789,7 +1793,7 @@ function renderOutputProfilePicker({ compact=false } = {}) {
     const [color, bg, border] = palette[profile];
     const info = OUTPUT_PROFILE_INFO[profile];
     const on = active === profile;
-    return `<button type="button" data-action="set-output-profile" data-val="${profile}" aria-pressed="${on}" style="text-align:left;padding:9px 10px;border-radius:9px;border:1px solid ${on ? border : 'var(--th-border-strong)'};background:${on ? bg : 'var(--th-input-bg)'};color:var(--th-tx);cursor:pointer;min-width:0;flex:1;transition:all .15s">
+    return `<button type="button" data-action="set-output-profile" data-val="${profile}" aria-pressed="${on}" style="text-align:left;padding:9px 10px;border-radius:9px;border:1px solid ${on ? border : 'var(--th-border-strong)'};background:${on ? bg : 'var(--th-input-bg)'};color:var(--th-tx);cursor:pointer;min-width:0;flex:1;transition:.15s;transition-property:var(--ui-tp)">
       <span style="display:block;font-size:.73rem;font-weight:800;color:${on ? color : 'var(--th-tx2)'}">${info.label}${on ? ' ✓' : ''}</span>
       <span style="display:block;font-size:.62rem;line-height:1.35;color:${on ? 'var(--th-tx)' : 'var(--th-tx3)'};margin-top:3px">${info.description}</span>
     </button>`;
@@ -1958,7 +1962,10 @@ function syncFtJump(forced) {
     current = FT_SECTIONS[0][0];
     for (const [id] of FT_SECTIONS) {
       const el = drawer.querySelector(`#${id}`);
-      if (el && el.getBoundingClientRect().top <= line) current = id;
+      // Measure the section box, not its heading: a heading inside a section that
+      // is still skipped (content-visibility) would force that section's layout.
+      const box = el && (el.closest('.ft-sections > *') || el);
+      if (box && box.getBoundingClientRect().top <= line) current = id;
     }
   }
   drawer.querySelectorAll('.ft-jump-chip').forEach(chip => {
@@ -1997,7 +2004,7 @@ function renderAdvancedPanel() {
   const sizePills = sizeOpts.map(v => {
     const on = (S.sizeLimit || 'unlimited') === v;
     const lbl = v === 'unlimited' ? 'Unlimited' : v + 'GB';
-    return `<button data-action="set-size-limit" data-val="${v}" class="size-btn${on?' size-btn-active':''}" style="flex:1;padding:8px 4px;border-radius:8px;border:1.5px solid ${on?'rgba(0,212,255,.4)':'var(--th-border)'};background:${on?'rgba(0,212,255,.1)':'transparent'};color:${on?'var(--th-accent)':'var(--th-tx3)'};font-size:.8rem;font-weight:${on?'700':'500'};cursor:pointer;transition:all .15s">${lbl}</button>`;
+    return `<button data-action="set-size-limit" data-val="${v}" class="size-btn${on?' size-btn-active':''}" style="flex:1;padding:8px 4px;border-radius:8px;border:1.5px solid ${on?'rgba(0,212,255,.4)':'var(--th-border)'};background:${on?'rgba(0,212,255,.1)':'transparent'};color:${on?'var(--th-accent)':'var(--th-tx3)'};font-size:.8rem;font-weight:${on?'700':'500'};cursor:pointer;transition:.15s;transition-property:var(--ui-tp)">${lbl}</button>`;
   }).join('');
 
   const prefCard = (key, title, desc) => {
@@ -2011,7 +2018,7 @@ function renderAdvancedPanel() {
   return `<div class="card" style="padding:0">
     <div class="ft-top">
     <div style="display:flex;align-items:center;gap:12px;padding:18px 20px 12px">
-      <button type="button" class="ft-close" data-action="close-advanced" style="background:var(--th-input-bg);border:1px solid var(--th-border-strong);border-radius:8px;color:var(--th-tx2);font-size:.9rem;padding:6px 11px;cursor:pointer;transition:all .15s" onmouseover="this.style.background='var(--th-accent-bg)'" onmouseout="this.style.background='var(--th-input-bg)'">${backText}</button>
+      <button type="button" class="ft-close" data-action="close-advanced" style="background:var(--th-input-bg);border:1px solid var(--th-border-strong);border-radius:8px;color:var(--th-tx2);font-size:.9rem;padding:6px 11px;cursor:pointer;transition:.15s;transition-property:var(--ui-tp)" onmouseover="this.style.background='var(--th-accent-bg)'" onmouseout="this.style.background='var(--th-input-bg)'">${backText}</button>
       <div>
         <div class="ft-title">Fine-Tune</div>
         <div style="font-size:.72rem;color:var(--th-tx3);margin-top:1px">Every setting Quick install leaves at its default</div>
@@ -2019,13 +2026,13 @@ function renderAdvancedPanel() {
     </div>
     ${ftJumpHtml()}
     </div>
-    <div style="padding:18px 20px;display:flex;flex-direction:column;gap:20px">
+    <div class="ft-sections" style="padding:18px 20px;display:flex;flex-direction:column;gap:20px">
       <div id="ft-profile">${renderOutputProfilePicker()}</div>
 
       <div>
         <div class="ft-head" id="ft-layout">${ICO.palette(16,'#a78bfa')} Stream cards <span class="ft-head-alt">(formatter)</span> ${ftTip('Controls how streams appear in Stremio. The <strong>formatter</strong> defines the layout of each stream result &mdash; what info is shown (codec, resolution, size, etc.) and how it&apos;s arranged. You can import custom formatters for different visual styles.')}</div>
         ${fmtDropdownHtml()}
-        <button data-action="import-formatter" style="margin-top:10px;width:100%;padding:10px;border-radius:8px;border:1.5px dashed rgba(167,139,250,.3);background:transparent;color:#a78bfa;font-size:.78rem;font-weight:600;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='rgba(167,139,250,.6)'" onmouseout="this.style.borderColor='rgba(167,139,250,.3)'">${S.customFormatter ? '⟳ Replace Custom Formatter' : ICO.folder(14,'#a78bfa')+' Import Custom Formatter'}</button>
+        <button data-action="import-formatter" style="margin-top:10px;width:100%;padding:10px;border-radius:8px;border:1.5px dashed rgba(167,139,250,.3);background:transparent;color:#a78bfa;font-size:.78rem;font-weight:600;cursor:pointer;transition:.15s;transition-property:var(--ui-tp)" onmouseover="this.style.borderColor='rgba(167,139,250,.6)'" onmouseout="this.style.borderColor='rgba(167,139,250,.3)'">${S.customFormatter ? '⟳ Replace Custom Formatter' : ICO.folder(14,'#a78bfa')+' Import Custom Formatter'}</button>
       </div>
 
       <div>
@@ -2049,7 +2056,7 @@ function renderAdvancedPanel() {
             <span class="u-micro">${streamPoolSummary()}</span>
           </div>
           <div class="u-row5">
-            ${streamPoolChoices().map(([v,l,c]) => `<button data-action="set-pool" data-val="${v}" style="flex:1;padding:8px 8px 6px;border-radius:6px;font-size:.72rem;font-weight:700;cursor:pointer;transition:all .15s;border:1px solid ${(S.streamPool||'normal')===v?'rgba(0,212,255,.4)':'var(--th-border-strong)'};background:${(S.streamPool||'normal')===v?'rgba(0,212,255,.1)':'transparent'};color:${(S.streamPool||'normal')===v?'var(--th-accent)':'var(--th-tx3)'};line-height:1.3">${l}<br><span style="font-size:.6rem;font-weight:600;opacity:.7">${c}</span></button>`).join('')}
+            ${streamPoolChoices().map(([v,l,c]) => `<button data-action="set-pool" data-val="${v}" style="flex:1;padding:8px 8px 6px;border-radius:6px;font-size:.72rem;font-weight:700;cursor:pointer;transition:.15s;transition-property:var(--ui-tp);border:1px solid ${(S.streamPool||'normal')===v?'rgba(0,212,255,.4)':'var(--th-border-strong)'};background:${(S.streamPool||'normal')===v?'rgba(0,212,255,.1)':'transparent'};color:${(S.streamPool||'normal')===v?'var(--th-accent)':'var(--th-tx3)'};line-height:1.3">${l}<br><span style="font-size:.6rem;font-weight:600;opacity:.7">${c}</span></button>`).join('')}
           </div>
           <div style="font-size:.65rem;color:var(--th-tx4);margin-top:6px;line-height:1.4">More streams = better quality picks but slower load times</div>
         </div>
@@ -2059,7 +2066,7 @@ function renderAdvancedPanel() {
           </div>
           <div style="font-size:.65rem;color:var(--th-tx4);margin-bottom:10px;line-height:1.4">How stream quality tiers are built. Standard uses simple resolution/quality filters. Apex IQR uses statistical bitrate analysis matching the flagship Apex template.</div>
           <div class="u-row5">
-            ${[['standard','Standard','Simple quality tiers'],['iqr','Apex IQR','Statistical bitrate filtering'],['apex-mixed','Apex Mixed','IQR + adaptive · niche-friendly']].map(([v,l,d]) => { const on=(S.pseArch||'standard')===v; return `<button data-action="set-pse-arch" data-val="${v}" data-active="${on}" style="flex:1;padding:8px 8px 6px;border-radius:6px;font-size:.72rem;font-weight:700;cursor:pointer;transition:all .15s;border:1px solid ${on?'rgba(0,212,255,.4)':'var(--th-border-strong)'};background:${on?'rgba(0,212,255,.1)':'transparent'};color:${on?'var(--th-accent)':'var(--th-tx3)'};line-height:1.3">${l}<br><span style="font-size:.6rem;font-weight:600;opacity:.7">${d}</span></button>`; }).join('')}
+            ${[['standard','Standard','Simple quality tiers'],['iqr','Apex IQR','Statistical bitrate filtering'],['apex-mixed','Apex Mixed','IQR + adaptive · niche-friendly']].map(([v,l,d]) => { const on=(S.pseArch||'standard')===v; return `<button data-action="set-pse-arch" data-val="${v}" data-active="${on}" style="flex:1;padding:8px 8px 6px;border-radius:6px;font-size:.72rem;font-weight:700;cursor:pointer;transition:.15s;transition-property:var(--ui-tp);border:1px solid ${on?'rgba(0,212,255,.4)':'var(--th-border-strong)'};background:${on?'rgba(0,212,255,.1)':'transparent'};color:${on?'var(--th-accent)':'var(--th-tx3)'};line-height:1.3">${l}<br><span style="font-size:.6rem;font-weight:600;opacity:.7">${d}</span></button>`; }).join('')}
           </div>
         </div>` : ''}
         ${(S.service !== 'http' && S.service !== 'p2p') ? `<div class="ft-box u-mt8">
@@ -2068,7 +2075,7 @@ function renderAdvancedPanel() {
           </div>
           <div style="font-size:.65rem;color:var(--th-tx4);margin-bottom:10px;line-height:1.4">How much priority your existing library items get in results</div>
           <div class="u-row5">
-            ${[['none','None','Sorted normally'],['default','Default','First within tier'],['strong','Strong','Always top']].map(([v,l,dd]) => { const on=(S.libraryBoost||'default')===v; return `<button data-action="set-library-boost" data-val="${v}" style="flex:1;padding:8px 8px 6px;border-radius:6px;font-size:.72rem;font-weight:700;cursor:pointer;transition:all .15s;border:1px solid ${on?'rgba(0,212,255,.4)':'var(--th-border-strong)'};background:${on?'rgba(0,212,255,.1)':'transparent'};color:${on?'var(--th-accent)':'var(--th-tx3)'};line-height:1.3">${l}<br><span style="font-size:.6rem;font-weight:600;opacity:.7">${dd}</span></button>`; }).join('')}
+            ${[['none','None','Sorted normally'],['default','Default','First within tier'],['strong','Strong','Always top']].map(([v,l,dd]) => { const on=(S.libraryBoost||'default')===v; return `<button data-action="set-library-boost" data-val="${v}" style="flex:1;padding:8px 8px 6px;border-radius:6px;font-size:.72rem;font-weight:700;cursor:pointer;transition:.15s;transition-property:var(--ui-tp);border:1px solid ${on?'rgba(0,212,255,.4)':'var(--th-border-strong)'};background:${on?'rgba(0,212,255,.1)':'transparent'};color:${on?'var(--th-accent)':'var(--th-tx3)'};line-height:1.3">${l}<br><span style="font-size:.6rem;font-weight:600;opacity:.7">${dd}</span></button>`; }).join('')}
           </div>
         </div>` : ''}
         ${(S.service !== 'http' && S.service !== 'p2p' && (S.multiServices.includes('easynews') || S.multiServices.includes('nzbgeek') || S.multiServices.includes('streamnzb') || S.service === 'easynews' || S.service === 'nzbgeek' || S.service === 'streamnzb')) ? `<div class="ft-box u-mt8">
@@ -2097,7 +2104,7 @@ function renderAdvancedPanel() {
           <div style="display:flex;flex-direction:column;gap:5px">
             ${[['opensubtitles-v3-plus','OpenSubtitles v3+','Largest database · default'],['subdl','SubDL','Needs a free SubDL API key']].map(([id,name,desc])=>{
               const on=(S.subtitleAddons||['opensubtitles-v3-plus']).includes(id);
-              return `<div data-action="toggle-sub-addon" data-val="${id}" style="cursor:pointer;display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;border:1px solid ${on?'rgba(6,182,212,.35)':'var(--th-border)'};background:${on?'rgba(6,182,212,.05)':'transparent'};transition:all .15s">
+              return `<div data-action="toggle-sub-addon" data-val="${id}" style="cursor:pointer;display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;border:1px solid ${on?'rgba(6,182,212,.35)':'var(--th-border)'};background:${on?'rgba(6,182,212,.05)':'transparent'};transition:.15s;transition-property:var(--ui-tp)">
                 <div class="chk-box" style="width:16px;height:16px;border-radius:4px;border:1.5px solid ${on?'#06b6d4':'#374151'};display:flex;align-items:center;justify-content:center;flex-shrink:0;background:${on?'#06b6d4':'transparent'}">${on?'<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#0d1117" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>':''}</div>
                 <div class="u-flex1"><div class="opt-nm" style="font-size:.8rem;font-weight:600;color:${on?'#06b6d4':'var(--th-tx2)'}">${name}</div><div class="u-micro">${desc}</div></div>
               </div>`;
@@ -2125,7 +2132,7 @@ function renderAdvancedPanel() {
             ${['en','es','fr','de','it','pt','nl','pl','ru','ar','ja','ko','zh','hi','tr','sv','da','no','fi','cs','hu','ro','el','he','th','vi','id','ms','uk','bg'].map(l=>{
               const on=(S.subtitleLangs||['en']).includes(l);
               const names={en:'English',es:'Spanish',fr:'French',de:'German',it:'Italian',pt:'Portuguese',nl:'Dutch',pl:'Polish',ru:'Russian',ar:'Arabic',ja:'Japanese',ko:'Korean',zh:'Chinese',hi:'Hindi',tr:'Turkish',sv:'Swedish',da:'Danish',no:'Norwegian',fi:'Finnish',cs:'Czech',hu:'Hungarian',ro:'Romanian',el:'Greek',he:'Hebrew',th:'Thai',vi:'Vietnamese',id:'Indonesian',ms:'Malay',uk:'Ukrainian',bg:'Bulgarian'};
-              return `<button data-action="toggle-sub-lang" data-val="${l}" style="padding:4px 8px;border-radius:6px;font-size:.68rem;font-weight:${on?'700':'500'};border:1px solid ${on?'rgba(6,182,212,.4)':'var(--th-border)'};background:${on?'rgba(6,182,212,.1)':'transparent'};color:${on?'#06b6d4':'var(--th-tx3)'};cursor:pointer;transition:all .15s" title="${names[l]||l}">${l.toUpperCase()}</button>`;
+              return `<button data-action="toggle-sub-lang" data-val="${l}" style="padding:4px 8px;border-radius:6px;font-size:.68rem;font-weight:${on?'700':'500'};border:1px solid ${on?'rgba(6,182,212,.4)':'var(--th-border)'};background:${on?'rgba(6,182,212,.1)':'transparent'};color:${on?'#06b6d4':'var(--th-tx3)'};cursor:pointer;transition:.15s;transition-property:var(--ui-tp)" title="${names[l]||l}">${l.toUpperCase()}</button>`;
             }).join('')}
           </div>
         </div>
@@ -2138,7 +2145,7 @@ function renderAdvancedPanel() {
           <div style="display:flex;flex-direction:column;gap:5px">
             ${[['tmdb-addon','TMDB Addon','Popular & trending movies/series'],['streaming-catalogs','Streaming Catalogs','Netflix, Disney+, etc.'],['anime-catalogs','Anime Catalogs','MAL, AniList, Kitsu'],['rpdb-catalogs','RPDB Catalogs','Release tracking & ratings'],['torrent-catalogs','Torrent Catalogs','Top seeded torrents']].map(([id,name,desc])=>{
               const on=(S.catalogs||['tmdb-addon']).includes(id);
-              return `<div data-action="toggle-catalog" data-val="${id}" style="cursor:pointer;display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;border:1px solid ${on?'rgba(249,115,22,.35)':'var(--th-border)'};background:${on?'rgba(249,115,22,.05)':'transparent'};transition:all .15s">
+              return `<div data-action="toggle-catalog" data-val="${id}" style="cursor:pointer;display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;border:1px solid ${on?'rgba(249,115,22,.35)':'var(--th-border)'};background:${on?'rgba(249,115,22,.05)':'transparent'};transition:.15s;transition-property:var(--ui-tp)">
                 <div class="chk-box" style="width:16px;height:16px;border-radius:4px;border:1.5px solid ${on?'#f97316':'#374151'};display:flex;align-items:center;justify-content:center;flex-shrink:0;background:${on?'#f97316':'transparent'}">${on?'<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#0d1117" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>':''}</div>
                 <div class="u-flex1"><div class="opt-nm" style="font-size:.8rem;font-weight:600;color:${on?'#f97316':'var(--th-tx2)'}">${name}</div><div class="u-micro">${desc}</div></div>
               </div>`;
@@ -2174,7 +2181,7 @@ function renderAdvancedPanel() {
       </div>
 
     </div>
-    ${S.multiServices.length > 0 ? `<div style="position:sticky;bottom:0;padding:14px 20px;border-top:1px solid var(--th-border);background:linear-gradient(to top,var(--th-bg) 60%,transparent)"><button data-action="close-and-next" style="width:100%;padding:14px 20px;border-radius:12px;border:none;background:linear-gradient(135deg,#0891b2,#00d4ff);color:#0d1017;font-size:.92rem;font-weight:800;cursor:pointer;letter-spacing:.02em;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .18s;box-shadow:0 4px 20px rgba(0,212,255,.3)" onmouseover="this.style.boxShadow='0 6px 28px rgba(0,212,255,.5)';this.style.transform='translateY(-1px)'" onmouseout="this.style.boxShadow='0 4px 20px rgba(0,212,255,.3)';this.style.transform='none'">Save &amp; Continue<span style="font-size:1.1rem">→</span></button></div>` : ''}
+    ${S.multiServices.length > 0 ? `<div style="position:sticky;bottom:0;padding:14px 20px;border-top:1px solid var(--th-border);background:linear-gradient(to top,var(--th-bg) 60%,transparent)"><button data-action="close-and-next" style="width:100%;padding:14px 20px;border-radius:12px;border:none;background:linear-gradient(135deg,#0891b2,#00d4ff);color:#0d1017;font-size:.92rem;font-weight:800;cursor:pointer;letter-spacing:.02em;display:flex;align-items:center;justify-content:center;gap:8px;transition:.18s;transition-property:var(--ui-tp);box-shadow:0 4px 20px rgba(0,212,255,.3)" onmouseover="this.style.boxShadow='0 6px 28px rgba(0,212,255,.5)';this.style.transform='translateY(-1px)'" onmouseout="this.style.boxShadow='0 4px 20px rgba(0,212,255,.3)';this.style.transform='none'">Save &amp; Continue<span style="font-size:1.1rem">→</span></button></div>` : ''}
   </div>`;
 }
 
@@ -2221,6 +2228,7 @@ function openAdvancedDrawer(trigger) {
 // Set while Fine-Tune is open from Quick install: closing it goes back there, with
 // the lane rebuilt from saved state so a change made in Fine-Tune shows in it.
 let _ftFromQuick = null;
+let _renderAfterLane = false;   // the page behind Quick install is stale until the lane closes
 
 function closeAdvancedDrawer() {
   const overlay = document.getElementById('advancedDrawer');
@@ -2230,7 +2238,9 @@ function closeAdvancedDrawer() {
     overlay.classList.remove('active');
     setTimeout(() => overlay.remove(), 180);
   }
-  render();
+  // Back to Quick install: the page behind the lane is not visible, so rebuild it
+  // once when the lane closes instead of in the frame that closes Fine-Tune.
+  if (!_ftFromQuick) render();
   _advancedTrigger = null;
   if (_ftFromQuick) {
     const back = _ftFromQuick; _ftFromQuick = null;
@@ -2238,6 +2248,7 @@ function closeAdvancedDrawer() {
     // Drop the hidden lane without touching history (its entry is reused), then
     // rebuild it from S so picks changed in Fine-Tune show.
     back.lane?._closeLane?.(true);
+    _renderAfterLane = true;
     showExpressLane({ target: back.target, mode: back.mode });
     return;
   }
@@ -2264,16 +2275,122 @@ function openStreamCards(trigger) {
     setTimeout(() => { if (!document.querySelector('.hybrid-splash')) openStreamCards(trigger); }, 300);
     return;
   }
-  const review = document.getElementById('fmtPickerDetails');
-  if (review && !document.getElementById('advancedDrawer')) {
-    for (let d = review; d; d = d.parentElement && d.parentElement.closest('details')) d.open = true;
-    const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    review.scrollIntoView({ block: 'start', behavior: reduced ? 'auto' : 'smooth' });
-    review.querySelector('summary')?.focus({ preventScroll: true });
+  if (document.getElementById('rvSheet-cards') && !document.getElementById('advancedDrawer')) {
+    openRvSheet('cards', trigger);
     return;
   }
   if (!document.getElementById('advancedDrawer')) openAdvancedDrawer(trigger || document.querySelector('[data-action="open-advanced"]'));
   requestAnimationFrame(() => ftJumpTo('ft-layout', false));
+}
+
+// ── Review sheets ───────────────────────────────────────────────────────────
+// Review has no folded panels: each setting group opens one sheet that slides
+// up over it and closes back to it. The sheets are rendered with Review (so
+// every input keeps its id for the handlers) and moved to <body> after each
+// render, out of #main's animated subtree, so position:fixed is the viewport.
+let _rvSheet = null;          // id of the open sheet, kept across re-renders
+let _rvSheetTrigger = null;   // the row that opened it, for focus on close
+let _rvSheetScroll = 0;
+
+function rvAioSummary() {
+  const host = S.instanceHost === 'auto' || !S.instanceHost ? 'Auto host'
+    : S.instanceHost === 'custom' ? 'Self-hosted' : hostPickerLabel(S.instanceHost);
+  const target = S.instanceUuid ? 'updates your config' : 'new config';
+  return `${host} · ${target}${S.baseUuid ? ' · base config' : ''}`;
+}
+
+function rvChecksSummary() {
+  const issues = templateHealthCheck().length;
+  const r = calculateHealthScore(_cachedBuildResult);
+  const hosts = hostCompatCheck();
+  const kinds = Object.keys(hosts);
+  const ok = kinds.filter(k => hosts[k].status === 'ok').length;
+  return `Score ${r.score} (${r.grade}) · ${ok} of ${kinds.length} host types OK${issues ? ` · ${issues} to fix` : ''}`;
+}
+
+/** The selected stream card, small, from the same engine render the picker shows. */
+function rvMiniCardHtml() {
+  const p = enginePreview(S.formatter || 'family-v4', '4k');
+  if (!p) return '';
+  return `<span class="rv-mini-n">${p.n}</span><span class="rv-mini-d">${p.d.slice(0, 2).join('<br>')}</span>`;
+}
+
+function rvSheetEl(id) { return document.getElementById(`rvSheet-${id}`); }
+
+function fillRvSheet(id) {
+  if (id === 'export') {
+    const pre = document.getElementById('jsonPreview');
+    if (pre) pre.textContent = JSON.stringify(buildFinal(), null, 2);
+  }
+}
+
+function openRvSheet(id, trigger, { instant = false, scroll = 0, focus = true } = {}) {
+  const sheet = rvSheetEl(id);
+  if (!sheet) return;
+  if (_rvSheet && _rvSheet !== id) closeRvSheet({ restoreFocus: false, fromHistory: true });
+  const already = _rvSheet === id && !sheet.hidden;
+  _rvSheet = id;
+  if (trigger) _rvSheetTrigger = trigger;
+  fillRvSheet(id);
+  if (already) return;
+  sheet.hidden = false;
+  document.documentElement.classList.add('rv-sheet-on');
+  const body = sheet.querySelector('.rv-sheet-body');
+  if (body) body.scrollTop = scroll;
+  if (instant) sheet.classList.add('open', 'rv-sheet-instant');
+  else requestAnimationFrame(() => sheet.classList.add('open'));
+  // One history entry per opened sheet, so Back on a phone closes it.
+  if (!instant && !(history.state && history.state.rvSheet)) {
+    try { history.pushState({ ...(history.state || {}), step, rvSheet: id }, ''); } catch (e) { /* closes by button */ }
+  }
+  // Skip the focus if the sheet was closed again before the timer ran.
+  if (focus) setTimeout(() => { if (_rvSheet === id) sheet.querySelector('.rv-sheet-done')?.focus({ preventScroll: true }); }, instant ? 0 : 60);
+}
+
+function closeRvSheet({ restoreFocus = true, fromHistory = false } = {}) {
+  const id = _rvSheet;
+  _rvSheet = null;
+  document.documentElement.classList.remove('rv-sheet-on');
+  const sheet = id && rvSheetEl(id);
+  if (sheet) {
+    sheet.classList.remove('open', 'rv-sheet-instant');
+    const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const hide = () => { if (_rvSheet !== id) sheet.hidden = true; };
+    reduced ? hide() : setTimeout(hide, 220);
+  }
+  if (!fromHistory && history.state && history.state.rvSheet) {
+    _rvSheetPop = true;
+    try { history.back(); } catch (e) { _rvSheetPop = false; }
+  }
+  // Rows show what the sheet changed without rebuilding the page.
+  const aio = document.getElementById('rvAioVal'); if (aio) aio.textContent = rvAioSummary();
+  const chk = document.getElementById('rvChecksVal'); if (chk) chk.textContent = rvChecksSummary();
+  if (restoreFocus) {
+    const t = _rvSheetTrigger && _rvSheetTrigger.isConnected ? _rvSheetTrigger
+      : document.querySelector(`.rv-row[data-sheet="${id}"]`) || (id === 'cards' ? document.querySelector('.rv-row-cards') : null);
+    t?.focus({ preventScroll: true });
+  }
+  _rvSheetTrigger = null;
+}
+let _rvSheetPop = false;
+let _rvSheetPending = null;
+
+function detachRvSheets() {
+  const open = _rvSheet && rvSheetEl(_rvSheet);
+  _rvSheetScroll = open ? (open.querySelector('.rv-sheet-body')?.scrollTop || 0) : 0;
+  _rvSheetPending = open ? _rvSheet : null;
+  _rvSheet = null;
+  document.querySelectorAll('body > .rv-sheet').forEach(s => s.remove());
+  document.documentElement.classList.remove('rv-sheet-on');
+}
+
+/** After Review renders: move its sheets out of #main and reopen one that was open. */
+function mountRvSheets(main) {
+  const sheets = [...main.querySelectorAll('.rv-sheet')];
+  sheets.forEach(s => document.body.appendChild(s));
+  const id = _rvSheetPending;
+  _rvSheetPending = null;
+  if (id && rvSheetEl(id)) openRvSheet(id, null, { instant: true, scroll: _rvSheetScroll, focus: false });
 }
 
 function refreshAdvancedDrawer() {
@@ -2466,6 +2583,8 @@ function render() {
   _persistOpenDetails = _main
     ? [..._main.querySelectorAll('details[data-persist-open][open]')].map(d => d.id).filter(Boolean)
     : [];
+  // Review's sheets live in <body>; drop the old ones before Review renders new ones.
+  if (typeof detachRvSheets === 'function') detachRvSheets();
   renderCore();
   if (!_persistOpenDetails.length) return;
   for (const id of _persistOpenDetails) {
@@ -2554,54 +2673,22 @@ function renderCore() {
         ${renderOutputProfilePicker()}
         ${outputProfileAuditHtml()}
         ${(() => { const d = lastGenDiff(); return d.length ? `<div style="margin-top:2px;padding:8px 12px;border-radius:8px;background:rgba(245,158,11,.04);border:1px solid rgba(245,158,11,.12)"><div style="font-size:.68rem;font-weight:700;color:#f59e0b;margin-bottom:3px;letter-spacing:.04em;text-transform:uppercase">Changed since last download</div><div style="font-size:.72rem;color:#8b949e;line-height:1.5">${d.map(c=>'<span style="display:inline-block;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.15);border-radius:4px;padding:1px 7px;margin:2px 3px 2px 0;font-size:.68rem;font-weight:600;color:#fbbf24">'+c+'</span>').join('')}</div></div>` : ''; })()}
-        ${(() => { const h = templateHealthCheck(); return h.length ? `<div class="th-alert th-alert-red" style="margin-top:6px"><div style="font-size:.68rem;font-weight:700;color:var(--th-red);margin-bottom:3px;letter-spacing:.04em;text-transform:uppercase">Health check</div><div style="font-size:.72rem;color:var(--th-tx2);line-height:1.6">${h.map(w=>`<div style="display:flex;align-items:baseline;gap:5px;margin-bottom:2px"><span style="color:var(--th-red);flex-shrink:0">${ICO.warn(12,'currentColor')}</span><span>${w}</span></div>`).join('')}</div></div>` : `<div class="th-alert th-alert-green" style="margin-top:6px;font-weight:600">${ICO.check(12,'currentColor')} Template looks good</div>`; })()}
-        ${healthScoreHtml()}
         ${versionBannerHtml()}
-        ${resolutionLockNote()}
-        ${hostCompatHtml()}
-        ${backupTimelineHtml()}
-        <details class="u-mt10 rv-accord">
-          <summary class="rv-accord-hdr"><span class="rv-accord-ico"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span> Tools<span class="rv-arr">›</span></summary>
-          <div class="rv-accord-body" style="display:flex;flex-direction:column;gap:8px">
-            <button data-action="open-troubleshooter" style="width:100%;padding:10px;font-size:.78rem;font-weight:700;border-radius:10px;border:1px solid var(--th-yellow-border);background:var(--th-yellow-bg);color:var(--th-yellow);cursor:pointer;transition:background .15s;display:flex;align-items:center;justify-content:center;gap:6px">🔧 Troubleshooter — Fix Common Issues</button>
-            <button data-action="open-feedback-report" style="width:100%;padding:10px;font-size:.78rem;font-weight:700;border-radius:10px;border:1px solid rgba(0,212,255,.24);background:rgba(0,212,255,.05);color:#00d4ff;cursor:pointer;transition:background .15s;display:flex;align-items:center;justify-content:center;gap:6px">🧾 Copy Safe Feedback Report</button>
-            <button class="btn-td" data-action="test-drive">${ICO.eye(15,'currentColor')} Test Drive — Preview Your Streams</button>
-            <button data-action="open-recommended-stack" style="width:100%;padding:10px;font-size:.78rem;font-weight:700;border-radius:10px;border:1px solid rgba(168,85,247,.22);background:rgba(168,85,247,.05);color:#a78bfa;cursor:pointer;transition:background .15s;display:flex;align-items:center;justify-content:center;gap:6px">⭐ Recommended Stack — Best Add-ons</button>
-          </div>
-        </details>
         <div class="name-row">
           <label>Template name (optional)</label>
           <input class="name-input" id="nameIn" type="text" placeholder="${escH(auto)}"
             value="${escH(S.name)}" data-action="update-name" maxlength="60">
         </div>
         ${sizeLimitHtml()}
-        ${livePayloadHtml()}
-        <div class="rv-action-dock">
-        ${telemetryHtml()}
-        <button type="button" id="btn-dl" class="btn-dl" data-action="generate-dl">${ICO.download(14,'currentColor')} Export Template JSON</button>
-        <div class="action-help">Writes a JSON file in your browser. If you added debrid keys, they're in the file in plain text — keep it private.</div>
-        <div id="exportCredNotice"></div>
-        <button type="button" data-action="open-feedback-report" class="rv-tool-btn">🧾 Need help? Copy a safe feedback report</button>
-        <div class="rv-actions-row">
-          <button type="button" data-action="share-config" class="rv-secondary-btn"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg> Share Link</button>
-          <button type="button" class="btn-aio" data-action="create-import" id="btnImport">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
-            Import to AIOStreams
-          </button>
-        </div>
-        <div class="action-help">Uploads your template (debrid keys stripped) to a paste service, then gives you an import link to open in AIOStreams.</div>
-        <div id="importUrlResult"></div>
-        </div>
-        <details class="rv-section" open>
-          <summary class="rv-section-hdr"><span class="rv-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg> Deploy</span><span class="rv-arr">›</span></summary>
-          <div class="rv-section-body">
+        <section class="rv-install" aria-labelledby="rvInstallTitle">
+          <h2 class="rv-install-title" id="rvInstallTitle">${ICO.rocket(14,'currentColor')} Install</h2>
             ${S.service === 'p2p' || S.service === 'http' ? `
             <div style="margin-bottom:14px;font-size:.8rem;color:#8b949e;line-height:1.5">Free templates need manual import — we'll create a link and open AIOStreams for you.</div>
             <button class="u-mb8 btn-manifest" id="btnAutoCreate" data-action="simple-install" data-target="app">${ICO.link(18,'currentColor')} Import to AIOStreams</button>
             <div id="aioResult"></div>` : `
             <div class="install-toggle" style="display:flex;border-radius:10px;border:1px solid var(--th-input-border);background:var(--th-input-bg);padding:3px;margin-bottom:14px;gap:2px">
-              <button data-action="set-install-mode" data-mode="direct" class="install-toggle-btn${S.installMode==='direct'?' active':''}" style="flex:1;padding:8px 10px;border-radius:8px;border:none;font-size:.78rem;font-weight:700;cursor:pointer;transition:all .15s;${S.installMode==='direct'?'background:var(--th-accent-bg);color:var(--th-accent)':'background:transparent;color:var(--th-tx3)'}">${ICO.rocket(13,'currentColor')} Direct Install</button>
-              <button data-action="set-install-mode" data-mode="manifest" class="install-toggle-btn${S.installMode==='manifest'?' active':''}" style="flex:1;padding:8px 10px;border-radius:8px;border:none;font-size:.78rem;font-weight:700;cursor:pointer;transition:all .15s;${S.installMode==='manifest'?'background:var(--th-accent-bg);color:var(--th-accent)':'background:transparent;color:var(--th-tx3)'}">${ICO.link(13,'currentColor')} Get Manifest URL</button>
+              <button data-action="set-install-mode" data-mode="direct" class="install-toggle-btn${S.installMode==='direct'?' active':''}" style="flex:1;padding:8px 10px;border-radius:8px;border:none;font-size:.78rem;font-weight:700;cursor:pointer;transition:.15s;transition-property:var(--ui-tp);${S.installMode==='direct'?'background:var(--th-accent-bg);color:var(--th-accent)':'background:transparent;color:var(--th-tx3)'}">${ICO.rocket(13,'currentColor')} Direct Install</button>
+              <button data-action="set-install-mode" data-mode="manifest" class="install-toggle-btn${S.installMode==='manifest'?' active':''}" style="flex:1;padding:8px 10px;border-radius:8px;border:none;font-size:.78rem;font-weight:700;cursor:pointer;transition:.15s;transition-property:var(--ui-tp);${S.installMode==='manifest'?'background:var(--th-accent-bg);color:var(--th-accent)':'background:transparent;color:var(--th-tx3)'}">${ICO.link(13,'currentColor')} Get Manifest URL</button>
             </div>
             ${S.installMode === 'direct' ? `
             <div style="margin-bottom:14px;font-size:.8rem;color:#8b949e;line-height:1.5">Enter your Stremio credentials to install the addon directly to your library.</div>
@@ -2638,12 +2725,46 @@ function renderCore() {
             </div>
             <div id="aioResult"></div>
             `}`}
-            <details id="manualSetupDetails" data-persist-open style="margin-top:16px;border-top:1px solid rgba(255,255,255,.06);padding-top:14px">
-              <summary style="list-style:none;display:flex;align-items:center;justify-content:space-between;cursor:pointer;color:#4b5563;font-size:.79rem;font-weight:600;letter-spacing:.02em;user-select:none">
-                <span>Manual setup (existing config / self-hosted)</span>
-                <span style="font-size:.75rem;color:#374151">›</span>
-              </summary>
-              <div class="u-mt12">
+          <button type="button" class="btn-td" data-action="test-drive">${ICO.eye(15,'currentColor')} Test streams first</button>
+        </section>
+        <div class="rv-rows">
+          <button type="button" class="rv-cards-row rv-row" data-action="rv-sheet-open" data-sheet="aio" aria-haspopup="dialog">
+            <span class="rv-cards-ico" aria-hidden="true">${ICO.plug(16,'currentColor')}</span>
+            <span class="rv-cards-text"><span class="rv-cards-label">Your AIOStreams</span><span class="rv-cards-val" id="rvAioVal">${escHtml(rvAioSummary())}</span></span>
+            <span class="rv-cards-go" aria-hidden="true">›</span>
+          </button>
+          <button type="button" class="rv-cards-row rv-row rv-row-cards" data-action="show-stream-cards" aria-haspopup="dialog">
+            <span class="rv-cards-ico" aria-hidden="true">${ICO.palette(16,'currentColor')}</span>
+            <span class="rv-cards-text"><span class="rv-cards-label">Stream cards</span><span class="rv-cards-val" id="rvCardsVal">${escHtml(fmtLabelText())}</span><span class="rv-mini-card" id="rvMiniCard" aria-hidden="true">${rvMiniCardHtml()}</span></span>
+            <span class="rv-cards-go">Change<span aria-hidden="true"> ›</span></span>
+          </button>
+          <button type="button" class="rv-cards-row rv-row" data-action="rv-sheet-open" data-sheet="checks" aria-haspopup="dialog">
+            <span class="rv-cards-ico" aria-hidden="true">${ICO.check(16,'currentColor')}</span>
+            <span class="rv-cards-text"><span class="rv-cards-label">Checks</span><span class="rv-cards-val" id="rvChecksVal">${escHtml(rvChecksSummary())}</span></span>
+            <span class="rv-cards-go" aria-hidden="true">›</span>
+          </button>
+          <button type="button" class="rv-cards-row rv-row" data-action="rv-sheet-open" data-sheet="export" aria-haspopup="dialog">
+            <span class="rv-cards-ico" aria-hidden="true">${ICO.download(16,'currentColor')}</span>
+            <span class="rv-cards-text"><span class="rv-cards-label">Export &amp; share</span><span class="rv-cards-val" id="rvExportVal">JSON file, copy JSON, share link, import link</span></span>
+            <span class="rv-cards-go" aria-hidden="true">›</span>
+          </button>
+        </div>
+        <div class="rv-sheet" id="rvSheet-aio" role="dialog" aria-modal="true" aria-labelledby="rvSheetTitle-aio" hidden>
+          <div class="rv-sheet-scrim" data-action="rv-sheet-close"></div>
+          <div class="rv-sheet-panel">
+            <div class="rv-sheet-hdr"><div><h2 class="rv-sheet-title" id="rvSheetTitle-aio">Your AIOStreams</h2><p class="rv-sheet-sub">Where your config is saved, and the password that protects it.</p></div><button type="button" class="rv-sheet-done" data-action="rv-sheet-close">Done</button></div>
+            <div class="rv-sheet-body">
+              <div class="rv-sheet-block" id="pasteManifestBlock">
+                <h3 class="rv-sheet-h">Already have a manifest URL?</h3>
+                <div style="color:#6b7280;font-size:.76rem;margin-bottom:8px;line-height:1.45">Paste a manifest URL for instant install links:</div>
+                <div class="input-action-wrap"><input class="name-input" id="pasteManifest" type="url"
+                  placeholder="https://aiostreams.elfhosted.com/stremio/uuid/password/manifest.json"
+                  data-action="paste-manifest" style="font-size:.8rem;font-family:monospace"><button type="button" class="input-paste-btn" data-action="paste-input" data-target="pasteManifest">Paste</button></div>
+                <div id="pasteManifestResult"></div>
+              </div>
+              <div class="rv-sheet-block">
+                <h3 class="rv-sheet-h">Host and config</h3>
+                <p class="rv-sheet-note">Leave the host on Auto for a new config. To update a config you already have, pick its host and enter its password and config ID (UUID).</p>
             <div class="aio-fields" style="display:grid;gap:10px">
               <div class="name-row" style="margin-bottom:0">
                 <label>AIOStreams Host</label>
@@ -2687,14 +2808,14 @@ function renderCore() {
                 <div id="uuidStatus" role="status" aria-live="polite" style="font-size:.73rem;margin-top:4px;min-height:18px"></div>
               </div>
             </div>
-            <details id="baseConfigDetails" data-persist-open style="margin-top:12px;border:1px solid var(--th-purple-border);border-radius:10px;padding:10px 13px;background:var(--th-purple-bg)">
-              <summary style="list-style:none;display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none;outline:none">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--th-purple)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
-                <span style="font-size:.74rem;font-weight:700;color:var(--th-purple);letter-spacing:.03em">Base Config</span>
-                <span style="font-size:.65rem;color:var(--th-tx3);margin-left:2px">${S.baseUuid ? '· active' : '· optional'}</span>
-                <span style="margin-left:auto;font-size:.72rem;color:var(--th-tx3)">›</span>
-              </summary>
-              <div class="u-mt10">
+            <button class="btn-manifest" id="btnAio" data-action="install-stremio" style="margin-top:14px">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+              Get Install Link
+            </button>
+            <div id="manualAioResult"></div>
+              </div>
+              <div class="rv-sheet-block rv-sheet-base">
+                <h3 class="rv-sheet-h">Base config <span class="rv-sheet-tag">${S.baseUuid ? 'active' : 'optional'}</span></h3>
                 <div style="font-size:.72rem;color:var(--th-tx3);line-height:1.5;margin-bottom:10px">
                   If you've imported <strong style="color:var(--th-purple)">Core Builds Base — TorBox</strong>, enter its UUID here.
                   Your generated template will inherit all shared config from the parent — smaller JSON, instant propagation of base updates.
@@ -2715,52 +2836,63 @@ function renderCore() {
                 </div>
                 ${S.baseUuid ? `<div style="font-size:.7rem;color:#a855f7;margin-top:8px;display:flex;align-items:center;gap:5px"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Generated template will use parentConfig — formatter, sort, presets inherited from base.</div>` : ''}
               </div>
-            </details>
-            <button class="btn-manifest" id="btnAio" data-action="install-stremio" style="margin-top:14px">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-              Get Install Link
-            </button>
-            <div id="manualAioResult"></div>
-              </div>
-            </details>
-            <details id="pasteManifestDetails" data-persist-open style="margin-top:16px;border-top:1px solid rgba(255,255,255,.06);padding-top:14px" ${pasteMode ? 'open' : ''}>
-              <summary style="list-style:none;display:flex;align-items:center;justify-content:space-between;cursor:pointer;color:#4b5563;font-size:.79rem;font-weight:600;letter-spacing:.02em;user-select:none">
-                <span>Already have a manifest URL?</span>
-                <span style="font-size:.75rem;color:#374151">›</span>
-              </summary>
-              <div class="u-mt10">
-                <div style="color:#6b7280;font-size:.76rem;margin-bottom:8px;line-height:1.45">Paste a manifest URL for instant install links:</div>
-                <div class="input-action-wrap"><input class="name-input" id="pasteManifest" type="url"
-                  placeholder="https://aiostreams.elfhosted.com/stremio/uuid/password/manifest.json"
-                  data-action="paste-manifest" style="font-size:.8rem;font-family:monospace"><button type="button" class="input-paste-btn" data-action="paste-input" data-target="pasteManifest">Paste</button></div>
-                <div id="pasteManifestResult"></div>
-              </div>
-            </details>
+            </div>
           </div>
-        </details>
-        <button type="button" class="rv-cards-row" data-action="show-stream-cards">
-          <span class="rv-cards-ico" aria-hidden="true">${ICO.palette(16,'currentColor')}</span>
-          <span class="rv-cards-text"><span class="rv-cards-label">Stream cards</span><span class="rv-cards-val">${escHtml(fmtLabelText())}</span></span>
-          <span class="rv-cards-go">Change<span aria-hidden="true"> ›</span></span>
-        </button>
-        <details class="rv-section">
-          <summary class="rv-section-hdr"><span class="rv-ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg> Customize</span><span class="rv-arr">›</span></summary>
-          <div class="rv-section-body">
-            ${insightsHtml()}
-            <details id="fmtPickerDetails" data-persist-open class="rv-accord" style="margin-top:0;margin-bottom:12px">
-              <summary class="rv-accord-hdr">
-                <span class="u-rowc8"><span>${ICO.palette(14,'currentColor')}</span> Stream cards <span style="font-weight:600;color:var(--th-tx5);text-transform:none;letter-spacing:0;font-size:.72rem">— ${label('formatter', S.formatter)}</span></span><span class="rv-arr">›</span>
-              </summary>
-              <div class="rv-accord-body">${formatterPickerHtml()}</div>
-            </details>
-            <details id="jsonPreviewDetails" data-persist-open class="rv-accord" style="margin-top:0;margin-bottom:12px">
-              <summary class="rv-accord-hdr">
-                <span>Preview JSON</span><span style="display:flex;align-items:center;gap:10px"><button type="button" data-action="copy-json" style="font-size:.74rem;font-weight:700;color:var(--th-accent);background:var(--th-accent-bg);border:1px solid var(--th-accent-border);border-radius:6px;padding:3px 11px;cursor:pointer;text-transform:none;letter-spacing:0">Copy JSON</button><span class="rv-arr">›</span></span>
-              </summary>
-              <pre id="jsonPreview" style="margin:0;padding:12px 16px;background:var(--th-card-alt);overflow-x:auto;font-size:.68rem;color:var(--th-tx2);font-family:monospace;line-height:1.5;max-height:260px;overflow-y:auto"></pre>
-            </details>
+        </div>
+        <div class="rv-sheet" id="rvSheet-cards" role="dialog" aria-modal="true" aria-labelledby="rvSheetTitle-cards" hidden>
+          <div class="rv-sheet-scrim" data-action="rv-sheet-close"></div>
+          <div class="rv-sheet-panel">
+            <div class="rv-sheet-hdr"><div><h2 class="rv-sheet-title" id="rvSheetTitle-cards">Stream cards</h2><p class="rv-sheet-sub">How each result looks in your app.</p></div><button type="button" class="rv-sheet-done" data-action="rv-sheet-close">Done</button></div>
+            <div class="rv-sheet-body">
+              <div id="fmtPickerDetails" class="rv-sheet-block">${formatterPickerHtml()}</div>
+              <div class="rv-sheet-block">
+                <h3 class="rv-sheet-h">What this build does</h3>
+              ${insightsHtml()}
+              </div>
+            </div>
           </div>
-        </details>
+        </div>
+        <div class="rv-sheet" id="rvSheet-checks" role="dialog" aria-modal="true" aria-labelledby="rvSheetTitle-checks" hidden>
+          <div class="rv-sheet-scrim" data-action="rv-sheet-close"></div>
+          <div class="rv-sheet-panel">
+            <div class="rv-sheet-hdr"><div><h2 class="rv-sheet-title" id="rvSheetTitle-checks">Checks</h2><p class="rv-sheet-sub">Health score and which AIOStreams hosts accept this build.</p></div><button type="button" class="rv-sheet-done" data-action="rv-sheet-close">Done</button></div>
+            <div class="rv-sheet-body">
+        ${(() => { const h = templateHealthCheck(); return h.length ? `<div class="th-alert th-alert-red" style="margin-top:6px"><div style="font-size:.68rem;font-weight:700;color:var(--th-red);margin-bottom:3px;letter-spacing:.04em;text-transform:uppercase">Health check</div><div style="font-size:.72rem;color:var(--th-tx2);line-height:1.6">${h.map(w=>`<div style="display:flex;align-items:baseline;gap:5px;margin-bottom:2px"><span style="color:var(--th-red);flex-shrink:0">${ICO.warn(12,'currentColor')}</span><span>${w}</span></div>`).join('')}</div></div>` : `<div class="th-alert th-alert-green" style="margin-top:6px;font-weight:600">${ICO.check(12,'currentColor')} Template looks good</div>`; })()}
+        ${healthScoreHtml()}
+        ${resolutionLockNote()}
+        ${hostCompatHtml()}
+            </div>
+          </div>
+        </div>
+        <div class="rv-sheet" id="rvSheet-export" role="dialog" aria-modal="true" aria-labelledby="rvSheetTitle-export" hidden>
+          <div class="rv-sheet-scrim" data-action="rv-sheet-close"></div>
+          <div class="rv-sheet-panel">
+            <div class="rv-sheet-hdr"><div><h2 class="rv-sheet-title" id="rvSheetTitle-export">Export &amp; share</h2><p class="rv-sheet-sub">Save the template, copy it, or share your settings.</p></div><button type="button" class="rv-sheet-done" data-action="rv-sheet-close">Done</button></div>
+            <div class="rv-sheet-body">
+        <div class="rv-action-dock">
+        ${telemetryHtml()}
+        <button type="button" id="btn-dl" class="btn-dl" data-action="generate-dl">${ICO.download(14,'currentColor')} Export Template JSON</button>
+        <div class="action-help">Writes a JSON file in your browser. If you added debrid keys, they're in the file in plain text — keep it private.</div>
+        <div id="exportCredNotice"></div>
+        <div class="rv-actions-row">
+          <button type="button" data-action="share-config" class="rv-secondary-btn"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg> Share Link</button>
+          <button type="button" class="btn-aio" data-action="create-import" id="btnImport">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+            Import to AIOStreams
+          </button>
+        </div>
+        <div class="action-help">Uploads your template (debrid keys stripped) to a paste service, then gives you an import link to open in AIOStreams.</div>
+        <div id="importUrlResult"></div>
+        </div>
+        ${livePayloadHtml()}
+              <div class="rv-sheet-block" id="jsonPreviewDetails">
+                <div class="rv-sheet-row"><h3 class="rv-sheet-h">Preview JSON</h3><button type="button" class="rv-sheet-copy" data-action="copy-json">Copy JSON</button></div>
+                <pre id="jsonPreview" class="rv-json"></pre>
+              </div>
+        ${backupTimelineHtml()}
+            </div>
+          </div>
+        </div>
         <div style="margin-top:16px;padding-top:14px;border-top:1px solid rgba(255,255,255,.06);text-align:center">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
             <div style="font-size:.61rem;font-weight:700;color:#374151;letter-spacing:.09em;text-transform:uppercase">More from Core Builds</div>
@@ -2800,21 +2932,16 @@ function renderCore() {
     _rb.style.visibility = 'visible';
     _rb.innerHTML = '← Edit Config';
     document.getElementById('btnNext').style.display = 'none';
+    mountRvSheets(main);
     if (pasteMode) {
+      // Menu › Import a config: the paste field sits at the top of Your AIOStreams.
       pasteMode = false;
       setTimeout(() => {
-        const details = document.getElementById('pasteManifestDetails');
-        const input = document.getElementById('pasteManifest');
-        if (details) details.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        if (input) setTimeout(() => input.focus(), 300);
+        openRvSheet('aio', null, { focus: false });
+        setTimeout(() => document.getElementById('pasteManifest')?.focus({ preventScroll: true }), 240);
       }, 100);
     }
     updateUuidValidation(S.instanceUuid);
-    const jpd = document.getElementById('jsonPreviewDetails');
-    if (jpd) jpd.addEventListener('toggle', () => {
-      const pre = document.getElementById('jsonPreview');
-      if (jpd.open && pre) pre.textContent = JSON.stringify(buildFinal(), null, 2);
-    });
 
   } else if (def.id === 'apis') {
     const debridInputs = getDebridInputs();
@@ -2859,19 +2986,19 @@ function renderCore() {
           <div style="padding:12px 14px;border-top:1px solid rgba(255,255,255,.05)">
             <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:7px 6px;margin-bottom:12px">
               ${LANG_OPTS.map(l => `
-              <label style="display:flex;align-items:center;gap:7px;cursor:pointer;padding:7px 9px;border-radius:8px;border:1px solid ${S.langs.includes(l.v)?'rgba(0,212,255,.4)':'rgba(255,255,255,.06)'};background:${S.langs.includes(l.v)?'rgba(0,212,255,.07)':'transparent'};transition:all .15s">
+              <label style="display:flex;align-items:center;gap:7px;cursor:pointer;padding:7px 9px;border-radius:8px;border:1px solid ${S.langs.includes(l.v)?'rgba(0,212,255,.4)':'rgba(255,255,255,.06)'};background:${S.langs.includes(l.v)?'rgba(0,212,255,.07)':'transparent'};transition:.15s;transition-property:var(--ui-tp)">
                 <input type="checkbox" value="${l.v}" ${S.langs.includes(l.v)?'checked':''} data-action="toggle-lang" style="accent-color:#00d4ff;flex-shrink:0">
                 <span style="font-size:.75rem;color:${S.langs.includes(l.v)?'#e6edf3':'#8b949e'};font-weight:${S.langs.includes(l.v)?'600':'400'}">${l.v}</span>
               </label>`).join('')}
             </div>
-            <label style="display:flex;align-items:center;gap:9px;cursor:pointer;padding:9px 11px;border-radius:8px;border:1px solid ${S.langExclusive?'rgba(0,212,255,.35)':'rgba(255,255,255,.06)'};background:${S.langExclusive?'rgba(0,212,255,.06)':'transparent'};transition:all .15s">
+            <label style="display:flex;align-items:center;gap:9px;cursor:pointer;padding:9px 11px;border-radius:8px;border:1px solid ${S.langExclusive?'rgba(0,212,255,.35)':'rgba(255,255,255,.06)'};background:${S.langExclusive?'rgba(0,212,255,.06)':'transparent'};transition:.15s;transition-property:var(--ui-tp)">
               <input type="checkbox" ${S.langExclusive?'checked':''} data-action="toggle-lang-exclusive" style="accent-color:#00d4ff;flex-shrink:0">
               <div>
                 <div style="font-size:.79rem;font-weight:700;color:${S.langExclusive?'#e6edf3':'#8b949e'}">Exclusive mode</div>
                 <div style="font-size:.67rem;color:#4b5563;margin-top:1px">Only include streams in selected languages — Multi, Dubbed &amp; Original always pass</div>
               </div>
             </label>
-            <label style="display:flex;align-items:center;gap:9px;cursor:pointer;padding:9px 11px;border-radius:8px;margin-top:7px;border:1px solid ${S.foreignLangKill!==false?'rgba(239,68,68,.35)':'rgba(255,255,255,.06)'};background:${S.foreignLangKill!==false?'rgba(239,68,68,.06)':'transparent'};transition:all .15s">
+            <label style="display:flex;align-items:center;gap:9px;cursor:pointer;padding:9px 11px;border-radius:8px;margin-top:7px;border:1px solid ${S.foreignLangKill!==false?'rgba(239,68,68,.35)':'rgba(255,255,255,.06)'};background:${S.foreignLangKill!==false?'rgba(239,68,68,.06)':'transparent'};transition:.15s;transition-property:var(--ui-tp)">
               <input type="checkbox" ${S.foreignLangKill!==false?'checked':''} data-action="toggle-foreign-kill" style="accent-color:#ef4444;flex-shrink:0">
               <div>
                 <div style="font-size:.79rem;font-weight:700;color:${S.foreignLangKill!==false?'#e6edf3':'#8b949e'}">Foreign language kill</div>
@@ -3240,7 +3367,7 @@ document.addEventListener('DOMContentLoaded', () => {
       root: new URL('../', location.href),
       anchor: document.querySelector('.wrap > .hdr'),
       markCurrent: false,
-      hideOn: () => !!document.querySelector('.hybrid-splash, #expressLaneModal, .modal-overlay, .fastlane-overlay'),
+      hideOn: () => !!document.querySelector('.hybrid-splash, #expressLaneModal, .modal-overlay, .fastlane-overlay, .rv-sheet.open'),
     });
   } catch(e) { logError('core-nav', e.message); }
   if (_genieRoute) {
@@ -3282,6 +3409,9 @@ document.addEventListener('DOMContentLoaded', () => {
   window.addEventListener('popstate', (e) => {
     // The Express lane's own history entry: Back closes the lane and leaves the page as it was.
     if (_expressLanePop) { _expressLanePop = false; return; }
+    // Back with a Review sheet open closes the sheet; closing by button pops its entry.
+    if (_rvSheetPop) { _rvSheetPop = false; return; }
+    if (_rvSheet) { closeRvSheet({ fromHistory: true }); return; }
     // Back inside Fine-Tune opened from Quick install returns to Quick install.
     if (_ftFromQuick && document.getElementById('advancedDrawer')) { closeAdvancedDrawer(); return; }
     const lane = document.getElementById('expressLaneModal');
@@ -3308,6 +3438,21 @@ document.addEventListener('DOMContentLoaded', () => {
         const focusable = modal.querySelectorAll('button,a,[tabindex]:not([tabindex="-1"]),input,select,textarea');
         if (focusable.length) {
           const first = focusable[0], last = focusable[focusable.length - 1];
+          if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+          else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+        }
+      }
+      return;
+    }
+
+    // An open Review sheet: Escape closes it and Tab stays inside it.
+    const rvSheet = _rvSheet && rvSheetEl(_rvSheet);
+    if (rvSheet && !rvSheet.hidden) {
+      if (e.key === 'Escape') { e.preventDefault(); closeRvSheet(); return; }
+      if (e.key === 'Tab') {
+        const items = [...rvSheet.querySelectorAll('button,a[href],input,select,textarea,[tabindex]:not([tabindex="-1"])')].filter(n => !n.disabled && n.offsetParent !== null);
+        if (items.length) {
+          const first = items[0], last = items[items.length - 1];
           if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
           else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
         }
@@ -3603,10 +3748,9 @@ document.addEventListener('DOMContentLoaded', () => {
         step = n; pushStep(); saveState(); render(); window.scrollTo(0,0);
       }
     }
-    if (action === 'open-fmt-picker') {
-      const d = document.getElementById('fmtPickerDetails');
-      if (d) { d.open = true; d.scrollIntoView({ behavior:'smooth', block:'center' }); }
-    }
+    if (action === 'open-fmt-picker') { openStreamCards(el); return; }
+    if (action === 'rv-sheet-open') { openRvSheet(el.dataset.sheet, el); return; }
+    if (action === 'rv-sheet-close') { closeRvSheet(); return; }
     if (action === 'open-advanced') openAdvancedDrawer(el);
     if (action === 'ft-jump') { ftJumpTo(el.dataset.target); return; }
     if (action === 'show-stream-cards') { openStreamCards(el); return; }
@@ -5505,7 +5649,7 @@ function showChangelog() {
   overlay.setAttribute('role', 'dialog');
   overlay.setAttribute('aria-modal', 'true');
   overlay.setAttribute('aria-label', 'Changelog');
-  overlay.style.cssText = 'position:fixed;inset:0;z-index:10000;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);animation:fadeIn .15s ease';
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:10000;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.6);animation:fadeIn .15s ease';
   overlay.innerHTML = `
     <div style="background:${_bg};border-radius:14px;border:1px solid ${_bdr};width:min(560px,92vw);max-height:82vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,.4);animation:scaleIn .2s ease">
       <div style="display:flex;align-items:center;gap:10px;padding:16px 20px;border-bottom:1px solid ${_bdr};flex-shrink:0">
@@ -5637,11 +5781,11 @@ function showFormatterImport() {
       <div class="modal-sub" style="margin-bottom:12px">Paste a formatter JSON with <code style="background:rgba(255,255,255,.08);padding:1px 5px;border-radius:4px;font-size:.78rem">name</code> and <code style="background:rgba(255,255,255,.08);padding:1px 5px;border-radius:4px;font-size:.78rem">description</code> fields, or load a .json file.</div>
       <textarea id="fmtImInput" rows="6" placeholder='{"name": "...", "description": "..."}' style="width:100%;box-sizing:border-box;background:#111720;border:1.5px solid rgba(255,255,255,.08);border-radius:8px;padding:10px 12px;color:#e6edf3;font-family:monospace;font-size:.78rem;resize:vertical;outline:none"></textarea>
       <div style="display:flex;gap:8px;margin-top:10px">
-        <label style="flex:1;padding:9px;border-radius:8px;border:1.5px dashed rgba(167,139,250,.3);background:transparent;color:#a78bfa;font-size:.8rem;font-weight:600;cursor:pointer;text-align:center;transition:all .15s">
+        <label style="flex:1;padding:9px;border-radius:8px;border:1.5px dashed rgba(167,139,250,.3);background:transparent;color:#a78bfa;font-size:.8rem;font-weight:600;cursor:pointer;text-align:center;transition:.15s;transition-property:var(--ui-tp)">
           ${ICO.folder(14,'#a78bfa')} Load File
           <input type="file" accept=".json,application/json" id="fmtImFile" style="display:none">
         </label>
-        <button id="fmtImApply" style="flex:2;padding:9px;border-radius:8px;border:1.5px solid rgba(0,212,255,.4);background:rgba(0,212,255,.08);color:#00d4ff;font-size:.85rem;font-weight:700;cursor:pointer;transition:all .15s">Apply Formatter</button>
+        <button id="fmtImApply" style="flex:2;padding:9px;border-radius:8px;border:1.5px solid rgba(0,212,255,.4);background:rgba(0,212,255,.08);color:#00d4ff;font-size:.85rem;font-weight:700;cursor:pointer;transition:.15s;transition-property:var(--ui-tp)">Apply Formatter</button>
       </div>
       <div id="fmtImErr" style="margin-top:8px;font-size:.76rem;color:#ef4444;display:none"></div>
     </div>`;
@@ -6172,11 +6316,11 @@ function showUpdateTemplateModal() {
       </div>
       <textarea id="updTplInput" rows="8" placeholder='Paste your full template JSON here...' style="width:100%;box-sizing:border-box;background:#111720;border:1.5px solid rgba(255,255,255,.08);border-radius:8px;padding:10px 12px;color:#e6edf3;font-family:monospace;font-size:.72rem;resize:vertical;outline:none;line-height:1.4"></textarea>
       <div style="display:flex;gap:8px;margin-top:10px">
-        <label style="flex:1;padding:9px;border-radius:8px;border:1.5px dashed rgba(0,212,255,.25);background:transparent;color:#00d4ff;font-size:.8rem;font-weight:600;cursor:pointer;text-align:center;transition:all .15s">
+        <label style="flex:1;padding:9px;border-radius:8px;border:1.5px dashed rgba(0,212,255,.25);background:transparent;color:#00d4ff;font-size:.8rem;font-weight:600;cursor:pointer;text-align:center;transition:.15s;transition-property:var(--ui-tp)">
           ${ICO.folder(14,'#00d4ff')} Load File
           <input type="file" accept=".json,application/json" id="updTplFile" style="display:none">
         </label>
-        <button id="updTplApply" style="flex:2;padding:9px;border-radius:8px;border:1.5px solid rgba(0,212,255,.4);background:rgba(0,212,255,.08);color:#00d4ff;font-size:.85rem;font-weight:700;cursor:pointer;transition:all .15s">Update & Review</button>
+        <button id="updTplApply" style="flex:2;padding:9px;border-radius:8px;border:1.5px solid rgba(0,212,255,.4);background:rgba(0,212,255,.08);color:#00d4ff;font-size:.85rem;font-weight:700;cursor:pointer;transition:.15s;transition-property:var(--ui-tp)">Update & Review</button>
       </div>
       <div id="updTplErr" style="margin-top:8px;font-size:.76rem;color:#ef4444;display:none"></div>
       <div id="updTplInfo" style="margin-top:8px;font-size:.76rem;color:#34d399;display:none"></div>
@@ -6585,7 +6729,7 @@ function showManifestModal(manifestUrl, password, hostLabel, initialTab) {
         <div style="margin-top:10px;display:flex;flex-direction:column;gap:8px">
           <input class="ft-input" id="stremioEmail" type="email" placeholder="Stremio email" autocomplete="email" inputmode="email" enterkeyhint="next">
           <input class="ft-input" id="stremioPassword" type="password" placeholder="Stremio password" autocomplete="current-password" enterkeyhint="go" autocapitalize="none">
-          <button id="stremioInstallBtn" style="width:100%;padding:10px;border-radius:8px;border:1.5px solid rgba(0,212,255,.3);background:rgba(0,212,255,.07);color:#00d4ff;font-size:.9rem;font-weight:700;cursor:pointer;transition:all .15s">${ICO.download(14,'#00d4ff')} Log in &amp; Install</button>
+          <button id="stremioInstallBtn" style="width:100%;padding:10px;border-radius:8px;border:1.5px solid rgba(0,212,255,.3);background:rgba(0,212,255,.07);color:#00d4ff;font-size:.9rem;font-weight:700;cursor:pointer;transition:.15s;transition-property:var(--ui-tp)">${ICO.download(14,'#00d4ff')} Log in &amp; Install</button>
           <div id="stremioInstallResult" style="font-size:.75rem"></div>
         </div>
       </details>
@@ -7015,19 +7159,19 @@ function simpleFinishHtml() {
           <div>
             <div style="font-size:.72rem;font-weight:700;color:#8b949e;margin-bottom:6px">Formatter</div>
             <div style="display:flex;flex-wrap:wrap;gap:6px">
-              ${FORMATTERS.slice(0,5).map(f => `<button data-action="set-simple-fmt" data-val="${f.id}" data-active="${S.formatter===f.id}" style="padding:5px 12px;border-radius:7px;font-size:.72rem;font-weight:700;cursor:pointer;transition:all .15s;border:1px solid ${S.formatter===f.id?'rgba(0,212,255,.4)':'rgba(255,255,255,.08)'};background:${S.formatter===f.id?'rgba(0,212,255,.1)':'transparent'};color:${S.formatter===f.id?'#00d4ff':'#6b7280'}">${f.label}</button>`).join('')}
+              ${FORMATTERS.slice(0,5).map(f => `<button data-action="set-simple-fmt" data-val="${f.id}" data-active="${S.formatter===f.id}" style="padding:5px 12px;border-radius:7px;font-size:.72rem;font-weight:700;cursor:pointer;transition:.15s;transition-property:var(--ui-tp);border:1px solid ${S.formatter===f.id?'rgba(0,212,255,.4)':'rgba(255,255,255,.08)'};background:${S.formatter===f.id?'rgba(0,212,255,.1)':'transparent'};color:${S.formatter===f.id?'#00d4ff':'#6b7280'}">${f.label}</button>`).join('')}
             </div>
           </div>
           <div>
             <div style="font-size:.72rem;font-weight:700;color:#8b949e;margin-bottom:6px">Dedup matching</div>
             <div class="u-row6">
-              ${[['strict','Strict'],['balanced','Balanced'],['relaxed','Relaxed']].map(([v,l]) => `<button data-action="set-simple-match" data-val="${v}" data-active="${S.matchMode===v}" style="flex:1;padding:5px 10px;border-radius:7px;font-size:.72rem;font-weight:700;cursor:pointer;transition:all .15s;border:1px solid ${S.matchMode===v?'rgba(0,212,255,.4)':'rgba(255,255,255,.08)'};background:${S.matchMode===v?'rgba(0,212,255,.1)':'transparent'};color:${S.matchMode===v?'#00d4ff':'#6b7280'}">${l}</button>`).join('')}
+              ${[['strict','Strict'],['balanced','Balanced'],['relaxed','Relaxed']].map(([v,l]) => `<button data-action="set-simple-match" data-val="${v}" data-active="${S.matchMode===v}" style="flex:1;padding:5px 10px;border-radius:7px;font-size:.72rem;font-weight:700;cursor:pointer;transition:.15s;transition-property:var(--ui-tp);border:1px solid ${S.matchMode===v?'rgba(0,212,255,.4)':'rgba(255,255,255,.08)'};background:${S.matchMode===v?'rgba(0,212,255,.1)':'transparent'};color:${S.matchMode===v?'#00d4ff':'#6b7280'}">${l}</button>`).join('')}
             </div>
           </div>
           <div>
             <div style="font-size:.72rem;font-weight:700;color:#8b949e;margin-bottom:6px">Cache mode</div>
             <div class="u-row6">
-              ${[['mixed','Mixed'],['cached','Cached only'],['uncached','Uncached only']].map(([v,l]) => `<button data-action="set-simple-cache" data-val="${v}" data-active="${S.cacheMode===v}" style="flex:1;padding:5px 10px;border-radius:7px;font-size:.72rem;font-weight:700;cursor:pointer;transition:all .15s;border:1px solid ${S.cacheMode===v?'rgba(0,212,255,.4)':'rgba(255,255,255,.08)'};background:${S.cacheMode===v?'rgba(0,212,255,.1)':'transparent'};color:${S.cacheMode===v?'#00d4ff':'#6b7280'}">${l}</button>`).join('')}
+              ${[['mixed','Mixed'],['cached','Cached only'],['uncached','Uncached only']].map(([v,l]) => `<button data-action="set-simple-cache" data-val="${v}" data-active="${S.cacheMode===v}" style="flex:1;padding:5px 10px;border-radius:7px;font-size:.72rem;font-weight:700;cursor:pointer;transition:.15s;transition-property:var(--ui-tp);border:1px solid ${S.cacheMode===v?'rgba(0,212,255,.4)':'rgba(255,255,255,.08)'};background:${S.cacheMode===v?'rgba(0,212,255,.1)':'transparent'};color:${S.cacheMode===v?'#00d4ff':'#6b7280'}">${l}</button>`).join('')}
             </div>
           </div>
           ${['advanced', 'labs'].includes(activeOutputProfile()) ? `          <div>
@@ -7036,19 +7180,19 @@ function simpleFinishHtml() {
               <span style="font-size:.6rem;color:#4b5563;font-weight:600">${streamPoolSummary()}</span>
             </div>
             <div class="u-row6">
-              ${streamPoolChoices().map(([v,l,c]) => `<button data-action="set-simple-pool" data-val="${v}" data-active="${(S.streamPool||'normal')===v}" style="flex:1;padding:7px 10px 5px;border-radius:7px;font-size:.72rem;font-weight:700;cursor:pointer;transition:all .15s;border:1px solid ${(S.streamPool||'normal')===v?'rgba(0,212,255,.4)':'rgba(255,255,255,.08)'};background:${(S.streamPool||'normal')===v?'rgba(0,212,255,.1)':'transparent'};color:${(S.streamPool||'normal')===v?'#00d4ff':'#6b7280'};line-height:1.3">${l}<br><span style="font-size:.6rem;font-weight:600;opacity:.7">${c}</span></button>`).join('')}
+              ${streamPoolChoices().map(([v,l,c]) => `<button data-action="set-simple-pool" data-val="${v}" data-active="${(S.streamPool||'normal')===v}" style="flex:1;padding:7px 10px 5px;border-radius:7px;font-size:.72rem;font-weight:700;cursor:pointer;transition:.15s;transition-property:var(--ui-tp);border:1px solid ${(S.streamPool||'normal')===v?'rgba(0,212,255,.4)':'rgba(255,255,255,.08)'};background:${(S.streamPool||'normal')===v?'rgba(0,212,255,.1)':'transparent'};color:${(S.streamPool||'normal')===v?'#00d4ff':'#6b7280'};line-height:1.3">${l}<br><span style="font-size:.6rem;font-weight:600;opacity:.7">${c}</span></button>`).join('')}
             </div>
             <div style="font-size:.65rem;color:#4b5563;margin-top:4px;line-height:1.4">More streams = better quality picks but slower load</div>
           </div>` : ''}
           <div>
-            <button data-action="set-simple-quality" data-active="${!!S.qualityFirst}" style="width:100%;padding:8px 12px;border-radius:7px;font-size:.72rem;font-weight:700;cursor:pointer;transition:all .15s;border:1px solid ${S.qualityFirst?'rgba(0,212,255,.4)':'rgba(255,255,255,.08)'};background:${S.qualityFirst?'rgba(0,212,255,.1)':'transparent'};color:${S.qualityFirst?'#00d4ff':'#6b7280'};display:flex;align-items:center;justify-content:space-between">
+            <button data-action="set-simple-quality" data-active="${!!S.qualityFirst}" style="width:100%;padding:8px 12px;border-radius:7px;font-size:.72rem;font-weight:700;cursor:pointer;transition:.15s;transition-property:var(--ui-tp);border:1px solid ${S.qualityFirst?'rgba(0,212,255,.4)':'rgba(255,255,255,.08)'};background:${S.qualityFirst?'rgba(0,212,255,.1)':'transparent'};color:${S.qualityFirst?'#00d4ff':'#6b7280'};display:flex;align-items:center;justify-content:space-between">
               <span>Quality over resolution</span>
               <span>${S.qualityFirst?ICO.check(13,'currentColor'):''}</span>
             </button>
             <div style="font-size:.65rem;color:#4b5563;margin-top:4px;line-height:1.4">A 1080p REMUX ranks above a 4K WEB-DL when enabled</div>
           </div>
           <div>
-            <button data-action="set-simple-resfirst" data-active="${!!S.resolutionFirst}" style="width:100%;padding:8px 12px;border-radius:7px;font-size:.72rem;font-weight:700;cursor:pointer;transition:all .15s;border:1px solid ${S.resolutionFirst?'rgba(0,212,255,.4)':'rgba(255,255,255,.08)'};background:${S.resolutionFirst?'rgba(0,212,255,.1)':'transparent'};color:${S.resolutionFirst?'#00d4ff':'#6b7280'};display:flex;align-items:center;justify-content:space-between">
+            <button data-action="set-simple-resfirst" data-active="${!!S.resolutionFirst}" style="width:100%;padding:8px 12px;border-radius:7px;font-size:.72rem;font-weight:700;cursor:pointer;transition:.15s;transition-property:var(--ui-tp);border:1px solid ${S.resolutionFirst?'rgba(0,212,255,.4)':'rgba(255,255,255,.08)'};background:${S.resolutionFirst?'rgba(0,212,255,.1)':'transparent'};color:${S.resolutionFirst?'#00d4ff':'#6b7280'};display:flex;align-items:center;justify-content:space-between">
               <span>Resolution first</span>
               <span>${S.resolutionFirst?ICO.check(13,'currentColor'):''}</span>
             </button>
@@ -7066,8 +7210,8 @@ function simpleFinishHtml() {
       <div style="font-size:.74rem;color:#6b7280;text-align:center;margin-top:8px;line-height:1.5">Free templates need manual import — we'll create a link and open AIOStreams for you.</div>
       <div id="aioResult"></div>` : `
       <div class="install-toggle" style="display:flex;border-radius:10px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.02);padding:3px;margin-bottom:12px;gap:2px">
-        <button data-action="set-install-mode" data-mode="direct" class="install-toggle-btn${S.installMode==='direct'?' active':''}" style="flex:1;padding:7px 8px;border-radius:8px;border:none;font-size:.72rem;font-weight:700;cursor:pointer;transition:all .15s;${S.installMode==='direct'?'background:var(--th-accent-bg);color:var(--th-accent)':'background:transparent;color:var(--th-tx3)'}">${ICO.rocket(12,'currentColor')} Direct Install</button>
-        <button data-action="set-install-mode" data-mode="manifest" class="install-toggle-btn${S.installMode==='manifest'?' active':''}" style="flex:1;padding:7px 8px;border-radius:8px;border:none;font-size:.72rem;font-weight:700;cursor:pointer;transition:all .15s;${S.installMode==='manifest'?'background:var(--th-accent-bg);color:var(--th-accent)':'background:transparent;color:var(--th-tx3)'}">${ICO.link(12,'currentColor')} Manifest URL</button>
+        <button data-action="set-install-mode" data-mode="direct" class="install-toggle-btn${S.installMode==='direct'?' active':''}" style="flex:1;padding:7px 8px;border-radius:8px;border:none;font-size:.72rem;font-weight:700;cursor:pointer;transition:.15s;transition-property:var(--ui-tp);${S.installMode==='direct'?'background:var(--th-accent-bg);color:var(--th-accent)':'background:transparent;color:var(--th-tx3)'}">${ICO.rocket(12,'currentColor')} Direct Install</button>
+        <button data-action="set-install-mode" data-mode="manifest" class="install-toggle-btn${S.installMode==='manifest'?' active':''}" style="flex:1;padding:7px 8px;border-radius:8px;border:none;font-size:.72rem;font-weight:700;cursor:pointer;transition:.15s;transition-property:var(--ui-tp);${S.installMode==='manifest'?'background:var(--th-accent-bg);color:var(--th-accent)':'background:transparent;color:var(--th-tx3)'}">${ICO.link(12,'currentColor')} Manifest URL</button>
       </div>
       ${S.installMode === 'direct' ? `
       <div style="display:flex;flex-direction:column;gap:7px;margin-bottom:10px">
@@ -7598,7 +7742,7 @@ function troubleshootHtml() {
   const back = _tsHistory.length ? `<button data-action="ts-back" style="padding:4px 12px;font-size:.7rem;font-weight:600;border-radius:6px;border:1px solid rgba(255,255,255,.1);background:transparent;color:#8b949e;cursor:pointer;margin-bottom:8px">← Back</button>` : '';
   let body = `<div style="font-size:.82rem;font-weight:600;color:#c9d1d9;margin-bottom:10px">${node.q}</div>`;
   if (node.opts) {
-    body += node.opts.map((o, i) => `<button data-action="ts-choose" data-next="${o.next}" style="display:block;width:100%;text-align:left;padding:10px 14px;margin-bottom:6px;font-size:.78rem;font-weight:600;border-radius:8px;border:1px solid rgba(0,212,255,.12);background:rgba(0,212,255,.03);color:#8bb8c9;cursor:pointer;transition:all .12s" onmouseover="this.style.background='rgba(0,212,255,.1)';this.style.borderColor='rgba(0,212,255,.3)'" onmouseout="this.style.background='rgba(0,212,255,.03)';this.style.borderColor='rgba(0,212,255,.12)'">${o.label}</button>`).join('');
+    body += node.opts.map((o, i) => `<button data-action="ts-choose" data-next="${o.next}" style="display:block;width:100%;text-align:left;padding:10px 14px;margin-bottom:6px;font-size:.78rem;font-weight:600;border-radius:8px;border:1px solid rgba(0,212,255,.12);background:rgba(0,212,255,.03);color:#8bb8c9;cursor:pointer;transition:.12s;transition-property:var(--ui-tp)" onmouseover="this.style.background='rgba(0,212,255,.1)';this.style.borderColor='rgba(0,212,255,.3)'" onmouseout="this.style.background='rgba(0,212,255,.03)';this.style.borderColor='rgba(0,212,255,.12)'">${o.label}</button>`).join('');
   }
   if (node.tips) {
     body += `<div style="display:flex;flex-direction:column;gap:8px">` + node.tips.map(t => `<div style="padding:8px 12px;border-radius:8px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);font-size:.74rem;color:#8b949e;line-height:1.5">${t}</div>`).join('') + `</div>`;
@@ -7606,7 +7750,7 @@ function troubleshootHtml() {
   if (node.action && node.action.key !== '_regen') {
     const current = S[node.action.key];
     const alreadySet = current === node.action.val;
-    body += `<button data-action="ts-fix" data-key="${node.action.key}" data-val="${node.action.val}" style="margin-top:10px;padding:9px 16px;font-size:.76rem;font-weight:700;border-radius:8px;border:1px solid ${alreadySet?'rgba(52,211,153,.3)':'rgba(0,212,255,.25)'};background:${alreadySet?'rgba(52,211,153,.08)':'rgba(0,212,255,.08)'};color:${alreadySet?'#34d399':'#00d4ff'};cursor:pointer;transition:all .12s" ${alreadySet?'disabled':''}>${alreadySet ? '✓ Already applied' : '⚡ ' + node.action.label}</button><div style="font-size:.65rem;color:#6b7280;margin-top:3px">${node.action.desc}</div>`;
+    body += `<button data-action="ts-fix" data-key="${node.action.key}" data-val="${node.action.val}" style="margin-top:10px;padding:9px 16px;font-size:.76rem;font-weight:700;border-radius:8px;border:1px solid ${alreadySet?'rgba(52,211,153,.3)':'rgba(0,212,255,.25)'};background:${alreadySet?'rgba(52,211,153,.08)':'rgba(0,212,255,.08)'};color:${alreadySet?'#34d399':'#00d4ff'};cursor:pointer;transition:.12s;transition-property:var(--ui-tp)" ${alreadySet?'disabled':''}>${alreadySet ? '✓ Already applied' : '⚡ ' + node.action.label}</button><div style="font-size:.65rem;color:#6b7280;margin-top:3px">${node.action.desc}</div>`;
   }
   return back + body;
 }
@@ -7617,12 +7761,11 @@ function runDeepAction(action) {
 }
 function handleDeepLink(hash) {
   if (!hash || hash.startsWith('#cfg=')) return;
-  if (hash === '#troubleshooter') { setTimeout(showTroubleshooter, 300); return; }
   if (hash === '#health-score') { step = STEPS; pushStep(); render(); window.scrollTo(0, 0); return; }
   // Entry deep-links (used by the Genie pages + tools landing). Splash stays the base view;
   // these call the same handlers the splash doors use, so behavior can't drift apart.
   // A deep link runs the same delegated handler a button would, without needing that button on screen.
-  const DEEP_ACTIONS = { '#express':'open-express-lane', '#advanced':'custom-start', '#guided':'easy-start', '#update':'update-template', '#import':'paste-manifest-splash', '#tour':'open-tutorial', '#compare':'compare-templates', '#report':'open-diagnostics', '#support':'open-support', '#cards':'show-stream-cards' };
+  const DEEP_ACTIONS = { '#express':'open-express-lane', '#advanced':'custom-start', '#guided':'easy-start', '#update':'update-template', '#import':'paste-manifest-splash', '#tour':'open-tutorial', '#compare':'compare-templates', '#report':'open-diagnostics', '#support':'open-support', '#cards':'show-stream-cards', '#troubleshooter':'open-troubleshooter', '#feedback':'open-feedback-report', '#stack':'open-recommended-stack' };
   if (DEEP_ACTIONS[hash]) {
     // Clear the link once it has run, so a reload does not reopen the dialog and the same link works again.
     try { history.replaceState(history.state, '', location.pathname + location.search); } catch (e) { /* the action still runs */ }
@@ -7644,7 +7787,7 @@ function showTroubleshooter() {
   modal.setAttribute('role', 'dialog');
   modal.setAttribute('aria-modal', 'true');
   modal.setAttribute('aria-label', 'Troubleshooter');
-  modal.style.cssText = 'position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.7);backdrop-filter:blur(4px)';
+  modal.style.cssText = 'position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.7)';
   modal.innerHTML = `<div style="width:min(480px,90vw);max-height:80vh;overflow-y:auto;background:#0d1117;border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:20px 22px;box-shadow:0 20px 60px rgba(0,0,0,.6)"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px"><div style="font-size:.88rem;font-weight:700;color:#c9d1d9">🔧 Troubleshooter</div><button data-action="ts-close" aria-label="Close troubleshooter" style="padding:4px 8px;font-size:.9rem;background:none;border:none;color:#8b949e;cursor:pointer">✕</button></div><div id="tsBody">${troubleshootHtml()}</div></div>`;
   const closeModal = () => { modal.remove(); if (trigger && trigger.focus) trigger.focus(); };
   modal.addEventListener('keydown', e => {
@@ -7994,7 +8137,9 @@ function showExpressLane(resume = null) {
   // rather than leave the site: opening pushes a history entry, popstate closes the lane.
   const closeLane = (fromHistory = false) => {
     if (!overlay.isConnected) return;   // two click listeners can both ask; close once
-    _expressLaneService = null; overlay.remove(); document.removeEventListener('keydown', expressLaneEscKey); if (prevFocus && prevFocus.focus) prevFocus.focus();
+    _expressLaneService = null; overlay.remove(); document.removeEventListener('keydown', expressLaneEscKey);
+    if (_renderAfterLane) { _renderAfterLane = false; render(); }
+    if (prevFocus && prevFocus.focus) prevFocus.focus();
     if (!fromHistory && history.state?.expressLane) { _expressLanePop = true; try { history.back(); } catch(e) { _expressLanePop = false; } }
   };
   overlay._closeLane = closeLane;
