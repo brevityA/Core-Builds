@@ -5,13 +5,18 @@
     "description": "Speed-optimised 1080p cached build for Hotack L007CM. TorBox Pro. Slim source stack. Stops fetching when 8+ cached 1080p streams found or after 12 s. SDR · WEB-DL · DD+/AAC · HEVC/AVC.",
     "source": "external",
     "author": "Personal",
-    "version": "1.2.4",
+    "version": "1.2.5",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
     "sourceUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Personal/core-personal-speed.json",
     "changelogUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md",
     "changelog": [
+      {
+        "date": "2026-11-21",
+        "version": "1.2.5",
+        "content": "Add-on options AIOStreams 2.38.1 no longer has are removed (Meteor usenet and others); saved behaviour is unchanged."
+      },
       {
         "date": "2026-11-18",
         "version": "1.2.4",
@@ -772,10 +777,7 @@
         "enabled": true,
         "options": {
           "name": "Zilean",
-          "timeout": 2000,
-          "resources": [
-            "stream"
-          ]
+          "timeout": 2000
         }
       },
       {
