@@ -1956,18 +1956,31 @@ function ftJumpHtml() {
 
 let _ftJumpSeq = 0;
 /** Scroll the open Fine-Tune drawer to a section and mark its chip. */
-function ftJumpTo(id, smooth = true) {
-  flushFtSections();
+function ftJumpTo(id, smooth = true, { initial = false } = {}) {
+  // The landing jump as Fine-Tune opens (Stream cards, Quick install's rows): the
+  // target is already in the page, so the held sections stay held and nothing
+  // else is laid out. Sections above keep their estimated height while off
+  // screen, and scroll anchoring holds the place when they come into view.
+  const held = initial && document.querySelector(`#advancedDrawer #${id}`);
+  if (!held) flushFtSections();
   const target = document.querySelector(`#advancedDrawer #${id}`);
   if (!target) return false;
   // Land the section just under the sticky header and section bar, whatever their height.
   const bar = document.querySelector('#advancedDrawer .ft-top');
   // Sections off screen are skipped (content-visibility) and sized by estimate;
-  // lay them all out before jumping so a long jump lands where it is aimed.
-  document.getElementById('advancedDrawer')?.classList.add('ft-all-laid-out');
-  target.style.scrollMarginTop = `${(bar ? bar.offsetHeight : 0) + 12}px`;
-  const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  target.scrollIntoView({ block: 'start', behavior: smooth && !reduced ? 'smooth' : 'auto' });
+  // a chip jump lays them all out first so a long jump lands where it is aimed.
+  if (!held) document.getElementById('advancedDrawer')?.classList.add('ft-all-laid-out');
+  const panel = target.closest('.advanced-drawer-panel');
+  if (held && panel) {
+    // One measurement, then a plain scroll: setting scroll-margin and calling
+    // scrollIntoView laid the panel out twice inside the opening frame.
+    const top = target.getBoundingClientRect().top - panel.getBoundingClientRect().top + panel.scrollTop;
+    panel.scrollTop = top - ((bar ? bar.offsetHeight : 0) + 12);
+  } else {
+    target.style.scrollMarginTop = `${(bar ? bar.offsetHeight : 0) + 12}px`;
+    const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    target.scrollIntoView({ block: 'start', behavior: smooth && !reduced ? 'smooth' : 'auto' });
+  }
   syncFtJump(id);
   const jump = ++_ftJumpSeq;
   // A jump made while the drawer is still sliding in (Quick install, #cards) is
@@ -1975,7 +1988,6 @@ function ftJumpTo(id, smooth = true) {
   // A newer jump in the meantime wins: this correction is then dropped.
   if (!smooth) setTimeout(() => {
     if (jump !== _ftJumpSeq) return;
-    const panel = target.closest('.advanced-drawer-panel');
     if (!panel || !bar) return;
     const gap = target.getBoundingClientRect().top - bar.getBoundingClientRect().bottom;
     if (gap < 8) panel.scrollTop -= 8 - gap;
@@ -2343,7 +2355,7 @@ function openStreamCards(trigger) {
     return;
   }
   if (!document.getElementById('advancedDrawer')) openAdvancedDrawer(trigger || document.querySelector('[data-action="open-advanced"]'), 'ft-layout');
-  requestAnimationFrame(() => ftJumpTo('ft-layout', false));
+  requestAnimationFrame(() => ftJumpTo('ft-layout', false, { initial: true }));
 }
 
 // ── Review sheets ───────────────────────────────────────────────────────────
@@ -8523,8 +8535,9 @@ function showExpressLane(resume = null) {
       // Same landing as the section chips: just under the pinned header and bar.
       const sectionId = customizeBtn.dataset.expressCustomize;
       openAdvancedDrawer(customizeBtn, sectionId || undefined);
-      if (sectionId) requestAnimationFrame(() => ftJumpTo(sectionId, false));
-      showToast('Your Quick install choices are kept — close Fine-Tune to go back and install');
+      if (sectionId) requestAnimationFrame(() => ftJumpTo(sectionId, false, { initial: true }));
+      // After the panel is up: a toast built in this tap is one more layout before the first frame.
+      setTimeout(() => showToast('Your Quick install choices are kept — close Fine-Tune to go back and install'), 300);
       return;
     }
     if (e.target.closest('#expressGo')) {

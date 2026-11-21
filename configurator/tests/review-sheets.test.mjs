@@ -79,7 +79,10 @@ test('review fixes: sheets sit under modals and toasts, keys defer to a dialog a
 test('v3.38: Fine-Tune opens with sections up to its target, then attaches the rest', () => {
   assert.match(app, /const keep = Math\.max\(target, 0\) \+ 1;/);
   assert.match(app, /setTimeout\(\(\) => \{ if \(overlay\.isConnected\) flushFtSections\(\); \}, 0\);/, 'rest attached after the first paint');
-  assert.match(app, /function ftJumpTo\(id, smooth = true\) \{\n  flushFtSections\(\);/, 'a jump attaches every section first');
+  assert.match(app, /function ftJumpTo\(id, smooth = true, \{ initial = false \} = \{\}\) \{[\s\S]{0,400}?if \(!held\) flushFtSections\(\);/, 'a chip jump attaches every section first');
+  // The landing jump as Fine-Tune opens keeps the rest held (CodeRabbit #848).
+  assert.match(app, /requestAnimationFrame\(\(\) => ftJumpTo\('ft-layout', false, \{ initial: true \}\)\)/);
+  assert.match(app, /requestAnimationFrame\(\(\) => ftJumpTo\(sectionId, false, \{ initial: true \}\)\)/);
   assert.match(app, /openAdvancedDrawer\(customizeBtn, sectionId \|\| undefined\)/, 'Quick install opens at its section');
 });
 

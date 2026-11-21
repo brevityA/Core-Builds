@@ -1,6 +1,6 @@
 export const CHANGELOG = [
   { v:'3.38', date:'Nov 21 2026', items:[
-    'Fine-Tune opens without a freeze — it now opens with only the section you are heading to in the page and adds the rest just after it appears. On a phone simulated at a quarter of desktop speed, the longest freeze when opening it from Quick install fell from 133 ms in 3.36 (94 ms in 3.37) to under 50 ms, the point where frames start to drop (median of 10 runs). Opening Quick install itself still takes about the same as in 3.36, around 55 ms.',
+    'Fine-Tune opens without a freeze — it now opens with only the section you are heading to in the page and adds the rest just after it appears. On a phone simulated at a quarter of desktop speed, the longest freeze when opening it from Quick install, or straight at Stream cards, fell from 124–133 ms in 3.36 (94 ms in 3.37) to under 50 ms, the point where frames start to drop (median of 10 runs). Opening Quick install itself still takes about the same as in 3.36, around 55 ms.',
     'Share link with a QR code — Share Link in Export & share now also shows a QR code to scan on another device and the link itself, ready to copy. If the browser refuses the copy, the link is selected on screen and a message says so; before, nothing happened. The link still carries settings only, never keys or passwords.',
     'Generated output unchanged — every reference config is byte-for-byte what 3.37 produced apart from the version stamp; only Fine-Tune opening and the share link changed.',
   ]},

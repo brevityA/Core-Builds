@@ -112,7 +112,9 @@ test('the Health Score link opens Checks', async ({ page }) => {
 
 test('Share Link shows a scannable QR code and the link itself', async ({ page, context }) => {
   await context.grantPermissions(['clipboard-read', 'clipboard-write']);
-  await openReview(page);
+  // Placeholder secrets, so the "no secrets in the link" checks below have something to leak.
+  await openReview(page, { creds: { torbox: 'placeholder-torbox-key' }, instancePassword: 'placeholder-password' });
+  expect(await page.evaluate(() => JSON.parse(localStorage.getItem('coreBuild')).creds.torbox)).toBe('placeholder-torbox-key');
   await page.locator('.rv-row[data-sheet="export"]').click();
   await expect(page.locator('#shareQr')).toBeHidden();
   await page.locator('#rvSheet-export [data-action="share-config"]').click();
@@ -123,6 +125,7 @@ test('Share Link shows a scannable QR code and the link itself', async ({ page, 
   const shared = JSON.parse(Buffer.from(decodeURIComponent(url.split('#cfg=')[1]), 'base64').toString('utf8'));
   expect(Object.keys(shared)).not.toContain('creds');
   expect(Object.keys(shared)).not.toContain('instancePassword');
+  expect(JSON.stringify(shared)).not.toContain('placeholder-');
   expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(url);
 });
 
