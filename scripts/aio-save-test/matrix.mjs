@@ -14,6 +14,8 @@ import { withDummyCredentials, save } from './save-test.mjs';
 
 const DIST = process.env.DIST || ROOT + 'dist/web';
 const spec = readFileSync(ROOT + 'e2e/golden-configs.spec.mjs', 'utf8');
+// BASE in the golden spec reads its target from the pin; the copy evaluated here needs the same name.
+const PINNED_AIOSTREAMS = JSON.parse(readFileSync(ROOT + 'UPSTREAM.pin', 'utf8')).version;
 const BASE = eval('(' + spec.slice(spec.indexOf('const BASE = ') + 13, spec.indexOf('};', spec.indexOf('const BASE = ')) + 1) + ')');
 const required = JSON.parse(readFileSync(new URL('./required.json', import.meta.url), 'utf8'));
 const DUMMY_CREDS = { torbox: 'k', realdebrid: 'k', alldebrid: 'k', premiumize: 'k', debridlink: 'k', offcloud: 'k', offcloudEmail: 'e@x.invalid', offcloudPass: 'p',
