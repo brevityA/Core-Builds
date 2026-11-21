@@ -33,11 +33,11 @@ test('every public host carries a known AIOStreams version', () => {
   }
 });
 
-test('registry versions match the 2026-10-22 audit of the live fleet', () => {
-  // Re-audited 2026-10-22 against each host's own /api/v1/status.
+test('registry versions match the 2026-11-21 audit of the live fleet', () => {
+  // Re-audited 2026-11-21 against each host's own /api/v1/status.
   const expected = {
-    elfhosted: '2.36.0', fortheweak: '2.36.0', midnight: '2.36.0', kuu: '2.36.0', viren: '2.36.0',
-    atbp: '2.36.0', wizaardd: '2.36.0', omni: '2.35.9',
+    elfhosted: '2.38.1', fortheweak: '2.38.1', midnight: '2.38.1', kuu: '2.37.0', viren: '2.38.1',
+    atbp: '2.36.0', wizaardd: '2.38.1', omni: '2.37.0',
   };
   for (const [key, version] of Object.entries(expected)) assert.equal(HOST_META[key].aiostreamsVersion, version, key);
 });
@@ -80,13 +80,25 @@ test('saved sessions on the old 2.35.7 default target move to the pin, once', as
   assert.equal(migrate({ _schema: 6, aiostreamsVersion: '2.35.7' }).aiostreamsVersion, '2.35.7', 'a 2.35.7 picked after the move is kept');
 });
 
+test('saved sessions on the old 2.36.0 default target move to the 2.38.1 pin, once', async () => {
+  const { readFile } = await import('node:fs/promises');
+  const app = await readFile(new URL('../src/js/app.js', import.meta.url), 'utf8');
+  const src = app.match(/const STATE_SCHEMA = \d+;\nfunction migrateState\(input\) \{[\s\S]*?\n\}/)[0];
+  const migrate = new Function('DEVICE_FORCE_LIMITED_AUDIO', 'DEVICE_AUDIO_DEFAULTS', 'OUTPUT_PROFILES', 'AIOSTREAMS_COMPATIBILITY_TARGETS', 'DEFAULT_AIOSTREAMS_VERSION',
+    `${src}\nreturn migrateState;`)(new Set(), {}, [], AIOSTREAMS_COMPATIBILITY_TARGETS, DEFAULT_AIOSTREAMS_VERSION);
+  assert.equal(DEFAULT_AIOSTREAMS_VERSION, '2.38.1');
+  assert.equal(migrate({ _schema: 6, aiostreamsVersion: '2.36.0' }).aiostreamsVersion, '2.38.1');
+  assert.equal(migrate({ _schema: 7, aiostreamsVersion: '2.36.0' }).aiostreamsVersion, '2.36.0', 'a 2.36.0 picked after the move is kept');
+  assert.equal(migrate({ _schema: 6, aiostreamsVersion: '2.32.0' }).aiostreamsVersion, '2.32.0', 'any other target was picked on purpose');
+});
+
 test('resolveHostCapabilities falls back to the registry version when the probe is blocked', () => {
-  assert.equal(resolveHostCapabilities('elfhosted', null).version, '2.36.0');
-  assert.equal(resolveHostCapabilities('midnight', null).version, '2.36.0');
+  assert.equal(resolveHostCapabilities('elfhosted', null).version, '2.38.1');
+  assert.equal(resolveHostCapabilities('midnight', null).version, '2.38.1');
   // keep hosts on different versions here, or this stops proving the
   // fallback reads the registry rather than a constant
-  assert.equal(resolveHostCapabilities('omni', null).version, '2.35.9');
-  assert.equal(resolveHostCapabilities('wizaardd', null).version, '2.36.0');
+  assert.equal(resolveHostCapabilities('omni', null).version, '2.37.0');
+  assert.equal(resolveHostCapabilities('atbp', null).version, '2.36.0');
   // a live probe still wins
   const probed = resolveHostCapabilities('elfhosted', { reachable: true, version: '9.9.9', regexAccess: 'trusted', disabledPresetIds: [], blockedStreamTypes: [] });
   assert.equal(probed.version, '9.9.9');
@@ -107,11 +119,13 @@ test('full-service hosts state Debrid + P2P + HTTP', () => {
 });
 
 test('every picker label carries the host\'s AIOStreams version', () => {
-  assert.match(hostPickerLabel('elfhosted'), /ElfHosted .*Debrid only — no P2P\/HTTP.*v2\.36\.0/);
-  assert.match(hostPickerLabel('fortheweak'), /v2\.36\.0/);
-  assert.match(hostPickerLabel('midnight'), /v2\.36\.0/);
-  assert.match(hostPickerLabel('wizaardd'), /v2\.36\.0/);
-  assert.match(hostPickerLabel('omni'), /\(legacy\).*v2\.35\.9/);
+  assert.match(hostPickerLabel('elfhosted'), /ElfHosted .*Debrid only — no P2P\/HTTP.*v2\.38\.1/);
+  assert.match(hostPickerLabel('fortheweak'), /v2\.38\.1/);
+  assert.match(hostPickerLabel('midnight'), /v2\.38\.1/);
+  assert.match(hostPickerLabel('wizaardd'), /v2\.38\.1/);
+  assert.match(hostPickerLabel('atbp'), /v2\.36\.0/);
+  assert.match(hostPickerLabel('omni'), /v2\.37\.0/);
+  assert.doesNotMatch(hostPickerLabel('omni'), /legacy/, 'Omni runs 2.37.0, at or above the pinned contract');
   assert.match(hostPickerLabel('viren'), /nightly/);
 });
 
@@ -171,13 +185,14 @@ test('a config needing 2.33.2+ is blocked on an older host', () => {
   assert.equal(hostRoutingDecision({ service: 'torbox-pro', config }, capsFor('omni')).status, 'ok', 'a 2.35.9 host satisfies the 2.33.2 floor');
 });
 
-test('an Anime build carrying anime-tosho-new is blocked on Omni\'s and routes to the 2.36.0 hosts', () => {
-  // The real preset floor over the REAL registry hosts — no injected table.
+test('an Anime build carrying anime-tosho-new is blocked below 2.36.0 and routes to every registry host', () => {
+  // The real preset floor. Since the 2026-11-21 audit no registry host is below
+  // it (Omni's moved from 2.35.9 to 2.37.0), so a probed self-hosted 2.35.9 shows the block.
   const request = { service: 'torbox-pro', config: { presets: [{ type: 'anime-tosho-new', instanceId: 'nx-at-01', enabled: true, options: {} }] } };
-  const decision = hostRoutingDecision(request, capsFor('omni'));
+  const decision = hostRoutingDecision(request, capsFor('custom', '2.35.9'));
   assert.equal(decision.status, 'blocked');
   assert.match(decision.reasons[0], /needs 2\.36\.0\+/);
-  for (const key of ['elfhosted', 'fortheweak', 'viren', 'kuu', 'midnight', 'atbp', 'wizaardd']) {
+  for (const key of ['elfhosted', 'fortheweak', 'viren', 'kuu', 'midnight', 'atbp', 'wizaardd', 'omni']) {
     assert.equal(hostRoutingDecision(request, capsFor(key)).status, 'ok', key);
   }
 });
@@ -202,13 +217,17 @@ test('auto routing excludes ElfHosted for P2P and keeps the capable hosts', () =
 });
 
 test('auto routing excludes every older host for a config above its version', () => {
-  // A hypothetical 2.36.1 floor (injected) drops the whole fleet; the real
-  // anime-tosho-new floor drops only Omni's.
-  const min = { ...FEATURE_MIN_VERSIONS, futureOption: '2.36.1' };
-  assert.deepEqual(autoRoutableHostKeys({ service: 'torbox-pro', config: { futureOption: true } }, { minVersions: min }), []);
+  // Hypothetical floors (injected): 2.38.2 drops the whole fleet; 2.38.0 drops
+  // the hosts still on 2.36/2.37 (ATBP, Kuu's, Omni's). The real anime-tosho-new
+  // floor (2.36.0) drops none of them since the 2026-11-21 audit.
+  const above = { ...FEATURE_MIN_VERSIONS, futureOption: '2.38.2' };
+  assert.deepEqual(autoRoutableHostKeys({ service: 'torbox-pro', config: { futureOption: true } }, { minVersions: above }), []);
+  const mid = { ...FEATURE_MIN_VERSIONS, futureOption: '2.38.0' };
+  const newer = autoRoutableHostKeys({ service: 'torbox-pro', config: { futureOption: true } }, { minVersions: mid });
+  for (const key of ['atbp', 'kuu', 'omni']) assert.ok(!newer.includes(key), `${key} runs below 2.38.0`);
+  for (const key of ['elfhosted', 'fortheweak', 'midnight', 'wizaardd']) assert.ok(newer.includes(key), `${key} runs 2.38.1`);
   const anime = autoRoutableHostKeys({ service: 'torbox-pro', config: { presets: [{ type: 'anime-tosho-new', instanceId: 'nx-at-01', options: {} }] } });
-  assert.ok(!anime.includes('omni'), 'omni (2.35.9) must not receive anime-tosho-new');
-  for (const key of ['elfhosted', 'fortheweak', 'viren', 'kuu', 'midnight', 'atbp', 'wizaardd']) assert.ok(anime.includes(key), `${key} should stay routable`);
+  for (const key of ['elfhosted', 'fortheweak', 'viren', 'kuu', 'midnight', 'atbp', 'wizaardd', 'omni']) assert.ok(anime.includes(key), `${key} should stay routable`);
 });
 
 test('auto routing keeps every host for a config with no gated keys', () => {

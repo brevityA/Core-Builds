@@ -1,8 +1,8 @@
 {
-  "note": "SUPPORTED_RESOURCES, the resources option choices, and METADATA.DISABLED.removed of every preset, read from a public host's /api/v1/status running the pinned release. Re-capture when UPSTREAM.pin moves (configurator/tests/preset-resources.test.mjs fails until then).",
-  "version": "2.36.0",
-  "commit": "ce624445",
-  "capturedAt": "2026-10-22",
+  "note": "SUPPORTED_RESOURCES, the resources option choices, and METADATA.DISABLED.removed of every preset, read from a public host's /api/v1/status running the pinned release. Re-capture when UPSTREAM.pin moves (configurator/tests/preset-resources.test.mjs fails until then). Captured from ElfHosted; its host-only presets (elfcache, elfsymlinks) are left out.",
+  "version": "2.38.1",
+  "commit": "113ab6bf",
+  "capturedAt": "2026-11-21",
   "presets": {
     "ai-companion": {
       "supported": [
@@ -120,6 +120,16 @@
       ],
       "resourcesOption": [
         "stream"
+      ]
+    },
+    "cinemeta": {
+      "supported": [
+        "catalog",
+        "meta"
+      ],
+      "resourcesOption": [
+        "catalog",
+        "meta"
       ]
     },
     "comet": {
@@ -245,12 +255,14 @@
       "supported": [
         "catalog",
         "meta",
-        "stream"
+        "stream",
+        "subtitles"
       ],
       "resourcesOption": [
         "catalog",
         "meta",
-        "stream"
+        "stream",
+        "subtitles"
       ]
     },
     "easynews": {
@@ -755,6 +767,18 @@
         "stream"
       ],
       "resourcesOption": [
+        "stream"
+      ]
+    },
+    "xtream": {
+      "supported": [
+        "catalog",
+        "meta",
+        "stream"
+      ],
+      "resourcesOption": [
+        "catalog",
+        "meta",
         "stream"
       ]
     },

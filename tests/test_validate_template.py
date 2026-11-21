@@ -617,8 +617,9 @@ def _write_at_lane(tmp_path, data, lane):
 
 
 class TestCurrentHostAcceptanceGates:
-    def test_removed_preset_list_matches_the_pinned_2_36_fixture(self):
-        fixture_path = Path(__file__).resolve().parents[1] / "configurator/tests/upstream/preset-resources-2.36.0.json"
+    def test_removed_preset_list_matches_the_pinned_fixture(self):
+        # The pinned release's own preset list (2.38.1 removes the same 15 as 2.36.0).
+        fixture_path = Path(__file__).resolve().parents[1] / "configurator/tests/upstream/preset-resources-2.38.1.json"
         fixture = json.loads(fixture_path.read_text(encoding="utf-8"))
         removed = {
             preset_id for preset_id, details in fixture["presets"].items()

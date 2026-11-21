@@ -11,14 +11,14 @@ Generated from `src/data/hosts.js` and `src/data/host-capabilities.js`. Run `npm
 
 | Host | Endpoint | Channel | AIOStreams | P2P | HTTP | Debrid | Nuvio Instant | Regex access | Restrictions |
 |---|---|---|---:|---:|---:|---:|---:|---|---|
-| ElfHosted | https://aiostreams.elfhosted.com | stable | 2.36.0 | No | No | Yes | No | none | bitmagnet, torrentio, anime-kitsu, torrent-catalogs |
-| Yeb's / ForTheWeak | https://aiostreams.fortheweak.cloud | stable | 2.36.0 | Yes | Yes | Yes | Yes | trusted | None |
-| Midnight's | https://aiostreamsfortheweebsstable.midnightignite.me | stable | 2.36.0 | Yes | Yes | Yes | Yes | trusted | None |
-| Kuu's | https://aiostreams.stremio.ru | stable | 2.36.0 | Yes | Yes | Yes | Yes | trusted | None |
+| ElfHosted | https://aiostreams.elfhosted.com | stable | 2.38.1 | No | No | Yes | No | none | bitmagnet, torrentio, anime-kitsu, torrent-catalogs |
+| Yeb's / ForTheWeak | https://aiostreams.fortheweak.cloud | stable | 2.38.1 | Yes | Yes | Yes | Yes | trusted | None |
+| Midnight's | https://aiostreamsfortheweebsstable.midnightignite.me | stable | 2.38.1 | Yes | Yes | Yes | Yes | trusted | None |
+| Kuu's | https://aiostreams.stremio.ru | stable | 2.37.0 | Yes | Yes | Yes | Yes | trusted | None |
 | ATBP | https://aio.atbphosting.com | stable | 2.36.0 | Yes | Yes | Yes | Yes | all | bitmagnet |
-| Wizaardd | https://aiostreams-stable.forthewizards.uk | stable | 2.36.0 | Yes | Yes | Yes | Yes | all | bitmagnet |
-| Viren's Nightly | https://aiostreams.viren070.me | nightly | 2.36.0 | Yes | Yes | Yes | Yes | all | torrentio |
-| Omni's (legacy) | https://aiostreams.12312023.xyz | stable | 2.35.9 | Yes | Yes | Yes | Yes | trusted | bitmagnet |
+| Wizaardd | https://aiostreams-stable.forthewizards.uk | stable | 2.38.1 | Yes | Yes | Yes | Yes | all | bitmagnet |
+| Viren's Nightly | https://aiostreams.viren070.me | nightly | 2.38.1 | Yes | Yes | Yes | Yes | all | torrentio |
+| Omni's | https://aiostreams.12312023.xyz | stable | 2.37.0 | Yes | Yes | Yes | Yes | trusted | bitmagnet |
 
 ## Internal profiles
 

@@ -135,8 +135,8 @@ function collectPresetReferences(value, references = []) {
   return references;
 }
 
-export function resolveCompatibleHosts(templateId) {
-  const routing = TEMPLATE_HOST_ROUTING[templateId] || DEFAULT_TEMPLATE_ROUTING;
+export function resolveCompatibleHosts(templateId, routingTable = TEMPLATE_HOST_ROUTING) {
+  const routing = routingTable[templateId] || DEFAULT_TEMPLATE_ROUTING;
   const includedHosts = routing.hosts === 'all' ? PUBLIC_HOST_IDS : routing.hosts;
   const excluded = new Set(routing.excludedHosts || []);
 

@@ -1,3 +1,4 @@
+import { HOST_BASE_URLS } from '../src/data/hosts.js';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import test from 'node:test';
@@ -43,20 +44,21 @@ test('default routing includes every public host', () => {
 });
 
 test('explicit routing can exclude a host', () => {
-  // anime-tosho-new needs AIOStreams 2.36.0; Omni's runs 2.35.9.
-  const hosts = resolveCompatibleHosts('brevity.core-nexus-anime');
-  assert.equal(hosts.length, 7);
+  // No live entry needs one since Omni's moved to 2.37.0, so pass a table.
+  const table = { 'brevity.core-nexus-anime': { hosts: 'all', excludedHosts: ['omni'] } };
+  const hosts = resolveCompatibleHosts('brevity.core-nexus-anime', table);
+  assert.equal(hosts.length, Object.keys(HOST_BASE_URLS).length - 1);
   assert.ok(!hosts.includes('omni'));
   assert.ok(hosts.includes('elfhosted'));
 });
 
-test('an excluded host would otherwise report the version gap', () => {
-  const template = {
-    metadata: { id: 'test-template' },
-    config: { presets: [{ type: 'anime-tosho-new' }] },
-  };
-  const issues = evaluateTemplate(template, 'omni');
-  assert.ok(issues.some((issue) => issue.includes('"anime-tosho-new" requires AIOStreams 2.36.0')));
+test('anime templates route to every public host now that none is below 2.36.0', () => {
+  const hosts = resolveCompatibleHosts('brevity.core-nexus-anime');
+  assert.equal(hosts.length, Object.keys(HOST_BASE_URLS).length);
+  const template = { metadata: { id: 'test-template' }, config: { presets: [{ type: 'anime-tosho-new' }] } };
+  for (const host of hosts) {
+    assert.ok(!evaluateTemplate(template, host).some((issue) => issue.includes('requires AIOStreams')), `${host} reports a version gap`);
+  }
 });
 
 test('disabled presets are rejected for the target host', () => {

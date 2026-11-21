@@ -1,12 +1,8 @@
 {
-  "pin": "2.36.0",
+  "pin": "2.38.1",
   "latest": "2.38.1",
-  "behind": true,
-  "releasesSincePin": [
-    "2.38.1",
-    "2.38.0",
-    "2.37.0"
-  ],
+  "behind": false,
+  "releasesSincePin": [],
   "profiles": [
     "stable",
     "balanced",
@@ -3913,6 +3909,39 @@
       "flags": []
     },
     {
+      "key": "customPosterUrl",
+      "kind": "preprocess",
+      "keys": [],
+      "inPin": true,
+      "inLatest": true,
+      "byProfile": {
+        "stable": {
+          "active": 0,
+          "total": 15
+        },
+        "balanced": {
+          "active": 0,
+          "total": 1
+        },
+        "advanced": {
+          "active": 0,
+          "total": 1
+        },
+        "labs": {
+          "active": 0,
+          "total": 3
+        }
+      },
+      "templates": 0,
+      "smart": false,
+      "decision": {
+        "status": "not-applicable",
+        "why": "Poster service setting added in 2.38.0 (custom poster URL); posters are the user's choice, not part of a stream template.",
+        "source": "option"
+      },
+      "flags": []
+    },
+    {
       "key": "posterService",
       "kind": "enum",
       "keys": [],
@@ -5482,49 +5511,11 @@
         "source": "option"
       },
       "flags": []
-    },
-    {
-      "key": "customPosterUrl",
-      "kind": "preprocess",
-      "keys": [],
-      "inPin": false,
-      "inLatest": true,
-      "byProfile": {
-        "stable": {
-          "active": 0,
-          "total": 15
-        },
-        "balanced": {
-          "active": 0,
-          "total": 1
-        },
-        "advanced": {
-          "active": 0,
-          "total": 1
-        },
-        "labs": {
-          "active": 0,
-          "total": 3
-        }
-      },
-      "templates": 0,
-      "smart": false,
-      "decision": {
-        "status": "not-applicable",
-        "why": "Poster service setting added in 2.38.0 (custom poster URL); posters are the user's choice, not part of a stream template.",
-        "source": "option"
-      },
-      "flags": [
-        "new upstream after 2.36.0"
-      ]
     }
   ],
   "attention": [],
   "presets": {
-    "added": [
-      "cinemeta",
-      "xtream"
-    ],
+    "added": [],
     "removed": [],
     "upstream": [
       "ai-companion",
@@ -5824,178 +5815,5 @@
       "visualTag": 667
     }
   },
-  "changelog": [
-    {
-      "version": "2.38.1",
-      "date": "2026-11-14",
-      "entries": []
-    },
-    {
-      "version": "2.38.0",
-      "date": "2026-11-14",
-      "entries": [
-        {
-          "kind": "Features",
-          "scope": "core",
-          "text": "add a background lane and an abort signal to catalog walks"
-        },
-        {
-          "kind": "Features",
-          "scope": "core",
-          "text": "add an Xtream builtin"
-        },
-        {
-          "kind": "Features",
-          "scope": "core",
-          "text": "combine back-to-back variant selectors"
-        },
-        {
-          "kind": "Features",
-          "scope": "core",
-          "text": "look up a film's anime ids from the anime database"
-        },
-        {
-          "kind": "Features",
-          "scope": "core",
-          "text": "replace variant length and instruction limits with a work budget"
-        },
-        {
-          "kind": "Features",
-          "scope": "presets/newznab",
-          "text": "add SearchNZB indexer"
-        },
-        {
-          "kind": "Features",
-          "scope": "presets",
-          "text": "add cinemeta preset"
-        },
-        {
-          "kind": "Features",
-          "scope": "server",
-          "text": "mark and explain a title no addon has details for"
-        },
-        {
-          "kind": "Features",
-          "scope": "server",
-          "text": "mount the Xtream builtin"
-        },
-        {
-          "kind": "Features",
-          "scope": "server",
-          "text": "send the variant work budget in status"
-        },
-        {
-          "kind": "Features",
-          "scope": "variants",
-          "text": "add a move instruction"
-        },
-        {
-          "kind": "Bug Fixes",
-          "scope": "core",
-          "text": "only set indexer/addon mediaInfoQuality when languages were returned"
-        },
-        {
-          "kind": "Bug Fixes",
-          "scope": "core",
-          "text": "read OpenSubtitles' Chinese bilingual codes as Chinese"
-        },
-        {
-          "kind": "Bug Fixes",
-          "scope": "core",
-          "text": "skip stream metadata for ids the parser can't read"
-        },
-        {
-          "kind": "Bug Fixes",
-          "scope": "knaben",
-          "text": "dedupe hits, use upload date for age, include subcategories"
-        },
-        {
-          "kind": "Bug Fixes",
-          "scope": "parser",
-          "text": "resolve ISO 639-2/B codes in convertISO6392ToLanguage"
-        },
-        {
-          "kind": "Bug Fixes",
-          "scope": "presets/meteor",
-          "text": "migrate to current config format and improve stream parsing"
-        },
-        {
-          "kind": "Bug Fixes",
-          "scope": "presets/meteor",
-          "text": "skip \"donate\" placeholder stream"
-        },
-        {
-          "kind": "Bug Fixes",
-          "scope": "presets/meteor",
-          "text": "skip \"no results\" placeholder stream"
-        },
-        {
-          "kind": "Bug Fixes",
-          "scope": "presets",
-          "text": "update Doctor Who URL and add missing Torrentio/TorrentsDB providers"
-        },
-        {
-          "kind": "Bug Fixes",
-          "scope": "server",
-          "text": "allow the Range header in cross-origin requests"
-        },
-        {
-          "kind": "Bug Fixes",
-          "scope": "therarbg,torrent-galaxy",
-          "text": "normalise imdb ids, keep keywords first in URLs, share code"
-        },
-        {
-          "kind": "Bug Fixes",
-          "scope": "torrent-galaxy",
-          "text": "use torrentgalaxy.online as default domain"
-        },
-        {
-          "kind": "Performance Improvements",
-          "scope": "core",
-          "text": "remember item id hashes"
-        }
-      ]
-    },
-    {
-      "version": "2.37.0",
-      "date": "2026-10-23",
-      "entries": [
-        {
-          "kind": "Features",
-          "scope": "core",
-          "text": "add a sharedId to episodes whose own id is hashed"
-        },
-        {
-          "kind": "Features",
-          "scope": "core",
-          "text": "name a country the same from any code or spelling"
-        },
-        {
-          "kind": "Features",
-          "scope": "core",
-          "text": "name the language a tag stands for, with its region"
-        },
-        {
-          "kind": "Bug Fixes",
-          "scope": "config",
-          "text": "decrypt string and URL credentials set by the environment"
-        },
-        {
-          "kind": "Bug Fixes",
-          "scope": "metadata/tvdb",
-          "text": "tag the original-language title with its language"
-        },
-        {
-          "kind": "Bug Fixes",
-          "scope": "",
-          "text": "skip merged catalog sources that don't declare a requested extra"
-        },
-        {
-          "kind": "Performance Improvements",
-          "scope": "core",
-          "text": "reject values that can't be encrypted before parsing them"
-        }
-      ]
-    }
-  ]
+  "changelog": []
 }

@@ -53,7 +53,7 @@ const STEPS = 6;
 // workflow) the raw x.y here expands to x.y.0 in package.json / versions.json and
 // the release tag; the built badge drops the trailing .0. At the 2026-09-06
 // audit the release tag was v3.7.0 while this said 3.1 — they must move together.
-const CONFIGURATOR_VERSION = '3.38';
+const CONFIGURATOR_VERSION = '3.39';
 // Set to a collector endpoint to enable the opt-in anonymous usage ping (service+device+resolution only).
 // Leave empty to keep the feature fully disabled and hidden.
 const USAGE_BEACON_URL = '';
@@ -664,7 +664,7 @@ const RADIO_ALLOWED = (() => {
 })();
 
 /* STATE MANAGEMENT */
-const STATE_SCHEMA = 6;
+const STATE_SCHEMA = 7;
 function migrateState(input) {
   const d={...(input||{})}, schema=Number(d._schema||0);
   if(schema<1){
@@ -702,6 +702,12 @@ function migrateState(input) {
       const rest=d.subtitleAddons.filter(v=>v!=='aiosubtitle');
       d.subtitleAddons=rest.length?rest:['opensubtitles-v3-plus'];
     }
+  }
+  if(schema<7){
+    // 2.36.0 was the default target until 3.39 (the pin moved to 2.38.1). Builds are
+    // the same on both, so this only keeps the picker on the current pin; a 2.36.0
+    // picked from 3.39 on is kept.
+    if(d.aiostreamsVersion==='2.36.0') d.aiostreamsVersion=DEFAULT_AIOSTREAMS_VERSION;
   }
   d._schema=STATE_SCHEMA; return d;
 }
@@ -1836,8 +1842,9 @@ function renderOutputProfilePicker({ compact=false } = {}) {
     '2.33.2': 'v2.33.2 lane: config variants with path-param selector variants supported. No public host runs it any more — kept so saved sessions keep resolving.',
     '2.34.0': 'v2.34.0 lane: an earlier pinned release. No public host runs it any more — kept so saved sessions keep resolving.',
     '2.34.1': 'v2.34.1 lane: the previous schema pin. Builds are the same as on 2.35.7; no public host runs it any more.',
-    '2.35.7': 'v2.35.7 lane: the previous schema pin, for a 2.35.x host such as Omni\u2019s. Anime builds keep the archived Anime Tosho source, because the community feed (anime-tosho-new) needs an API key before 2.36.0.',
-    '2.36.0': 'v2.36.0 lane (default): the release this configurator\u2019s schema is pinned to (ce62444). Anime builds use the community Anime Tosho feed; Omni\u2019s runs 2.35.9 and does not receive them. Every other public host runs 2.36.0.',
+    '2.35.7': 'v2.35.7 lane: an earlier schema pin, for a self-hosted 2.35.x. Anime builds keep the archived Anime Tosho source, because the community feed (anime-tosho-new) needs an API key before 2.36.0. No public host runs 2.35.x any more.',
+    '2.36.0': 'v2.36.0 lane: the previous schema pin. Builds are the same as on 2.38.1; ATBP still runs 2.36.0.',
+    '2.38.1': 'v2.38.1 lane (default): the release this configurator\u2019s schema is pinned to (113ab6b). Builds are the same as on 2.36.0, so they also save on the hosts still running 2.36 or 2.37 (ATBP, Kuu\u2019s, Omni\u2019s). Anime builds use the community Anime Tosho feed on every public host.',
     'unknown': 'Unknown target: old TorBox Search is removed rather than assumed portable.',
   };
   const targetNote = TARGET_NOTES[target] || TARGET_NOTES.unknown;

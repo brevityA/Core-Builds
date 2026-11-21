@@ -37,7 +37,9 @@ def test_pages_match_the_host_registry():
 def test_every_link_opens_an_existing_template_on_a_listed_host():
     hosts = _hosts()
     bases = set(hosts["b"].values())
-    pin = json.loads((ROOT / "configurator/UPSTREAM.pin").read_text())["version"]
+    pin_file = json.loads((ROOT / "configurator/UPSTREAM.pin").read_text())
+    # Hosts are listed from the oldest release that accepts the pinned output, not the pin.
+    pin = pin_file.get("sameContractSince") or pin_file["version"]
     for page in PAGES:
         links = _links(page)
         assert links, f"{page} has no import links"
