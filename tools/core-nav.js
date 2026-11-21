@@ -34,6 +34,9 @@ const SECTIONS = [
   ['Help', [
     ["What's new", 'configurator/#changelog', 'spark'],
     ['Take the tour', 'configurator/#tour', 'route'],
+    ['Troubleshooter', 'configurator/#troubleshooter', 'wrench'],
+    ['Copy a safe feedback report', 'configurator/#feedback', 'clip'],
+    ['Recommended add-ons', 'configurator/#stack', 'star'],
     ['Report an issue', 'configurator/#report', 'flag'],
     ['Support Core Builds', 'configurator/#support', 'heart'],
   ]],
@@ -62,6 +65,9 @@ const ICONS = {
   spark: 'M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5L18 18M18 6l-2.5 2.5M8.5 15.5L6 18',
   route: 'M6 19a2 2 0 100-4 2 2 0 000 4zM18 9a2 2 0 100-4 2 2 0 000 4zM6 15V9a4 4 0 014-4h6M18 9v6a4 4 0 01-4 4H8',
   flag: 'M5 21V4h11l-2 4 2 4H5',
+  wrench: 'M14.5 6.5a4 4 0 00-5.2 5.2L4 17l3 3 5.3-5.3a4 4 0 005.2-5.2l-2.5 2.5-2.5-.5-.5-2.5z',
+  clip: 'M8 4h8v3H8zM6 6H5v15h14V6h-1M8 12h8M8 16h5',
+  star: 'M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z',
   heart: 'M12 20s-7-4.4-7-10a4 4 0 017-2.6A4 4 0 0119 10c0 5.6-7 10-7 10z',
   book: 'M4 5a2 2 0 012-2h13v16H6a2 2 0 00-2 2zM4 5v16',
   chat: 'M4 5h16v11H9l-5 4z',
@@ -219,7 +225,8 @@ function mountCoreNav({ root, hideOn, anchor, markCurrent = true } = {}) {
       if (hide) close(false);
     };
     sync();
-    new MutationObserver(sync).observe(document.body, { childList: true, subtree: true });
+    // Attributes too: a panel can open by class or [hidden] without adding nodes.
+    new MutationObserver(sync).observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['class', 'hidden'] });
   }
   return { open, close };
 }

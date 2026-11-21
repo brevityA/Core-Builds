@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-test('review screen produces a compact safe feedback report without credentials or URLs', async ({ page }) => {
+test('the menu opens a compact safe feedback report from Review, without credentials or URLs', async ({ page }) => {
   await page.goto('/');
   await page.evaluate(() => {
     localStorage.clear();
@@ -20,9 +20,11 @@ test('review screen produces a compact safe feedback report without credentials 
   });
   await page.reload();
   await page.getByRole('button', { name: 'Resume' }).click();
-  const feedbackButton = page.getByRole('button', { name: /need help\? copy a safe feedback report/i });
-  await expect(feedbackButton).toBeVisible();
-  await feedbackButton.click();
+  // v3.37: the report lives in the site menu's Help section, not on Review.
+  await expect(page.locator('.rv-install')).toBeVisible();
+  // Menu › Help › Copy a safe feedback report links to #feedback (the link itself is
+  // pinned in tests/review-sheets.test.mjs; here the app is served from /, not /configurator/).
+  await page.evaluate(() => { location.hash = '#feedback'; });
   await expect(page.locator('#feedbackReportModal')).toBeVisible();
 
   await page.locator('#feedbackTitleEpisode').fill('Example Title S02E03');

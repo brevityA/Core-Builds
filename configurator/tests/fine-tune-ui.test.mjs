@@ -50,7 +50,9 @@ test('Fine-Tune and the profile picker take their colours from the theme', () =>
 test('every way to the stream-card picker uses one action', () => {
   assert.match(app, /if \(action === 'show-stream-cards'\) \{ openStreamCards\(el\); return; \}/);
   assert.match(app, /'#cards':'show-stream-cards'/, 'deep link');
-  assert.match(app, /class="rv-cards-row" data-action="show-stream-cards"/, 'Review row');
+  assert.match(app, /class="rv-cards-row rv-row rv-row-cards" data-action="show-stream-cards"/, 'Review row');
+  assert.match(app, /if \(document\.getElementById\('rvSheet-cards'\) && !document\.getElementById\('advancedDrawer'\)\) \{\s*openRvSheet\('cards', trigger\);/, 'on Review it opens the Stream cards sheet');
+  assert.match(app, /if \(action === 'open-fmt-picker'\) \{ openStreamCards\(el\); return; \}/, 'receipt row');
   assert.match(app, /data-action="show-stream-cards" class="fine-tune-btn fine-tune-cards"/, 'Custom build button');
   assert.match(nav, /\['Stream cards', 'configurator\/#cards', 'cards'\]/, 'site menu');
 });

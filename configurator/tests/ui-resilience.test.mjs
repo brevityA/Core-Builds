@@ -28,7 +28,8 @@ test('render() is wrapped so persisted panels keep [open] across re-renders', ()
 });
 
 test('the wizard panels that re-render under user interaction opt into persistence', () => {
-  for (const id of ['manualSetupDetails', 'baseConfigDetails', 'pasteManifestDetails', 'fmtPickerDetails', 'jsonPreviewDetails', 'langDetails', 'tmdbDetails']) {
+  // Review's folds became sheets in v3.37; the remaining wizard panels still opt in.
+  for (const id of ['langDetails', 'tmdbDetails']) {
     assert.match(app, new RegExp(`<details id="${id}" data-persist-open`), `${id} must carry data-persist-open`);
   }
 });

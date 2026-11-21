@@ -20,7 +20,9 @@ test('Other app target keeps and displays the raw manifest URL', () => {
 
 test('successful Express install closes its overlay before opening the result modal', () => {
   // Express (.fastlane-overlay, z 10020) would otherwise cover the z 200 manifest modal.
-  assert.ok(app.includes("document.getElementById('expressLaneModal')?.remove();\n      showManifestModal(manifestUrl, pwd, hostLbl, target);"));
+  assert.match(app, /document\.getElementById\('expressLaneModal'\)\?\.remove\(\);\n[\s\S]{0,200}?showManifestModal\(manifestUrl, pwd, hostLbl, target\);/);
+  // The page behind the lane, left stale by Fine-Tune, is rebuilt before the modal opens.
+  assert.match(app, /\?\.remove\(\);\n\s*\/\/[^\n]*\n\s*if \(_renderAfterLane\) \{ _renderAfterLane = false; render\(\); \}\n\s*showManifestModal/);
   assert.ok(!app.includes("getElementById('fastLaneModal')"), 'the retired Fast Lane id closes nothing');
 });
 

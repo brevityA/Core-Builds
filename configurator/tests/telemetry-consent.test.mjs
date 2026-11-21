@@ -194,13 +194,11 @@ test('9. the full-Review consent control is always rendered with the approved wo
     'full-Review telemetryHtml() must sit outside any <details>',
   );
 
-  // Confirm Customize collapsed section has zero telemetryHtml() calls inside it
-  const customizeDetails = detailsBlock(renderBody, 'Customize</span>');
-  assert.equal(
-    customizeDetails.includes('telemetryHtml()'),
-    false,
-    'Customize <details> must not contain telemetryHtml()',
-  );
+  // v3.37: Review has no folds; consent sits in the Export & share sheet,
+  // immediately above the Export button and outside any <details>.
+  assert.equal(renderBody.includes('Customize</span>'), false, 'the Customize fold is gone');
+  const sheetPos = renderBody.indexOf('id="rvSheet-export"');
+  assert.ok(sheetPos !== -1 && sheetPos < telemetryPos, 'consent is inside the Export & share sheet');
   assert.ok(customizeMarker.length > 0);
 });
 

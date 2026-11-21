@@ -88,7 +88,7 @@ test('jump-step is back-only and never touches the selection state', () => {
 
 test('browser back/forward restores the step without clearing selections', () => {
   // The window covers the lane and Fine-Tune-from-Quick-install checks that run first.
-  assert.match(app, /window\.addEventListener\('popstate'[\s\S]{0,700}?step = \(e\.state && typeof e\.state\.step === 'number'\) \? e\.state\.step : 0;/);
+  assert.match(app, /window\.addEventListener\('popstate'[\s\S]{0,1000}?step = \(e\.state && typeof e\.state\.step === 'number'\) \? e\.state\.step : 0;/);
   // popstate handler must saveState+render, not reinitialise S
   const m = app.match(/addEventListener\('popstate'[\s\S]*?\}\);/);
   assert.doesNotMatch(m[0], /replaceState\(\{\}/, 'history state must carry the step');
