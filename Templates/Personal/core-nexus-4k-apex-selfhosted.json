@@ -5,7 +5,7 @@
     "description": "Self-hosted variant of the 4K Apex flagship. Identical ESE/PSE/ISE stack. Uses synced ranked regex URL instead of inline patterns — auto-updates, 27 KB lighter. Requires Core Builds regex URL whitelisted on instance.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "0.1.5",
+    "version": "0.1.6",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
@@ -17,6 +17,11 @@
       "v232Action": "remove legacy preset; configure the separate Newznab endpoint only after validation"
     },
     "changelog": [
+      {
+        "date": "2026-11-21",
+        "version": "0.1.6",
+        "content": "Meteor's Usenet search is back on for AIOStreams 2.36 and 2.37 hosts: the last version removed its option, which those releases still use (2.38 and later ignore it)."
+      },
       {
         "date": "2026-11-21",
         "version": "0.1.5",
@@ -1596,6 +1601,10 @@
             ],
             "showStreams": true,
             "enabled": true
+          },
+          "usenet": {
+            "enabled": true,
+            "customSearchEngines": true
           },
           "url": "https://meteorfortheweebs.midnightignite.me",
           "resources": [

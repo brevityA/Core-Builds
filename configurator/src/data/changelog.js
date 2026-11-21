@@ -1,4 +1,8 @@
 export const CHANGELOG = [
+  { v:'3.40', date:'Nov 21 2026', items:[
+    'Update my setup steps aside once you are up to date — after a successful save the dialog folded nothing away: the list of changes and the Save button stayed up, and the Update my setup card stayed on the first screen as if there were still something to do. Now the dialog folds down to “Updated on …” and closes itself, and the card only appears when there is something to update: a newer Core Builds release, or a choice you changed since the last save. Setups saved before 3.40 still show the card until their next save.',
+    'Generated output unchanged — every reference config is byte-for-byte what 3.39 produced apart from the version stamp; only the Update my setup card and dialog changed.',
+  ]},
   { v:'3.39', date:'Nov 21 2026', items:[
     'Built for AIOStreams 2.38.1 — the configurator now targets 2.38.1, the release most public hosts run, instead of 2.36.0. The builds themselves are the same: 2.37 and 2.38 only added things Core Builds does not use (a custom poster URL and the Cinemeta and Xtream addons), so a build still saves on hosts running 2.36 or 2.37. Each build’s metadata now names 2.38.1 as its target. A setup saved on the old 2.36.0 default moves to 2.38.1 once; 2.36.0 can still be picked in Review.',
     'Host list brought up to date — the host picker showed 2.36.0 for seven hosts and 2.35.9 for Omni’s. Checked against each host on 21 November: ElfHosted, ForTheWeak, Midnight’s, Wizaardd and Viren’s nightly run 2.38.1, Kuu’s and Omni’s run 2.37.0, ATBP runs 2.36.0. Omni’s is no longer marked legacy, and Anime builds are offered there again.',

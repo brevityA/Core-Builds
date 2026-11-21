@@ -114,7 +114,10 @@ test('Share Link shows a scannable QR code and the link itself', async ({ page, 
   await context.grantPermissions(['clipboard-read', 'clipboard-write']);
   // Placeholder secrets, so the "no secrets in the link" checks below have something to leak.
   await openReview(page, { creds: { torbox: 'placeholder-torbox-key' }, instancePassword: 'placeholder-password' });
-  expect(await page.evaluate(() => JSON.parse(localStorage.getItem('coreBuild')).creds.torbox)).toBe('placeholder-torbox-key');
+  // Both secrets are really held locally (CodeRabbit #848), so their absence below proves the link drops them.
+  const stored = await page.evaluate(() => JSON.parse(localStorage.getItem('coreBuild')));
+  expect(stored.creds.torbox).toBe('placeholder-torbox-key');
+  expect(stored.instancePassword).toBe('placeholder-password');
   await page.locator('.rv-row[data-sheet="export"]').click();
   await expect(page.locator('#shareQr')).toBeHidden();
   await page.locator('#rvSheet-export [data-action="share-config"]').click();

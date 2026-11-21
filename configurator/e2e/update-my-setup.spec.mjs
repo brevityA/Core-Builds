@@ -76,20 +76,43 @@ async function installOnce(page, calls, opts) {
   return errors;
 }
 
+// Stand in for a newer Core Builds release: the record says an older one saved it.
+async function savedByOlderRelease(page) {
+  await page.evaluate(() => {
+    const rec = JSON.parse(localStorage.getItem('coreBuildLastSaved'));
+    rec.ver = '3.0';
+    localStorage.setItem('coreBuildLastSaved', JSON.stringify(rec));
+  });
+  await page.reload();
+}
+
 test('the first screen offers Update my setup and saves over the same config', async ({ page }) => {
   test.setTimeout(90_000);
   const calls = [];
   const errors = await installOnce(page, calls);
   const card = page.locator('[data-action="update-my-setup"]');
+  // Just saved by this release from these choices: nothing to update, so no card.
+  await expect(page.locator('[data-action="open-express-lane"]')).toBeVisible();
+  await expect(card).toHaveCount(0);
+  await savedByOlderRelease(page);
   await expect(card).toBeVisible();
+  await expect(card).toContainText('with v3.0');
   await expect(card).toContainText('Your Stremio link keeps working');
   await card.click();
   const modal = page.locator('#updateSetupModal');
   await expect(modal).toBeVisible();
-  // Same choices, same release: nothing differs from what was saved.
+  // Same choices: nothing differs from what was saved.
   await expect(modal).toContainText('No changes');
   await modal.locator('#updSetupGo').click();
   await expect(modal.locator('#updSetupResult')).toContainText('Streams use it straight away');
+  // Once saved it folds to the result, closes itself, and the card goes with it.
+  await expect(modal.locator('.upd-list')).toBeHidden();
+  await expect(modal.locator('#updSetupGo')).toBeHidden();
+  await expect(modal).toHaveCount(0, { timeout: 5000 });
+  await expect(card).toHaveCount(0);
+  await page.reload();
+  await expect(page.locator('[data-action="open-express-lane"]')).toBeVisible();
+  await expect(card, 'still up to date after a reload').toHaveCount(0);
   const updates = calls.filter(c => c.method === 'PUT');
   expect(updates).toHaveLength(1);
   expect(new URL(updates[0].url).pathname).toMatch(/\/api\/v1\/user$/);
@@ -121,6 +144,7 @@ test('a refused update leaves the config alone and offers the paste method', asy
   test.setTimeout(90_000);
   const calls = [];
   await installOnce(page, calls, { updateStatus: 400 });
+  await savedByOlderRelease(page);
   await page.locator('[data-action="update-my-setup"]').click();
   const modal = page.locator('#updateSetupModal');
   await modal.locator('#updSetupGo').click();
@@ -135,6 +159,7 @@ test('a proxy or server failure is not reported as unchanged', async ({ page }) 
   test.setTimeout(90_000);
   const calls = [];
   await installOnce(page, calls, { updateStatus: 502 });
+  await savedByOlderRelease(page);
   await page.locator('[data-action="update-my-setup"]').click();
   const modal = page.locator('#updateSetupModal');
   await modal.locator('#updSetupGo').click();
