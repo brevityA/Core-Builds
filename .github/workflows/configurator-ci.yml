@@ -4,10 +4,18 @@ on:
   pull_request:
     paths:
       - 'configurator/**'
+      # The template host check reads the repo's Templates/ folder.
+      - 'Templates/**'
+      # ...and the pinned regex allowlist snapshot.
+      - 'Filtering/upstream/vidhin05-regexes.snapshot.json'
   push:
     branches: [main]
     paths:
       - 'configurator/**'
+      # The template host check reads the repo's Templates/ folder.
+      - 'Templates/**'
+      # ...and the pinned regex allowlist snapshot.
+      - 'Filtering/upstream/vidhin05-regexes.snapshot.json'
 
 permissions:
   contents: read
@@ -38,6 +46,14 @@ jobs:
       - name: Run tests
         working-directory: configurator
         run: npm test
+
+      - name: Check host compatibility report
+        working-directory: configurator
+        run: npm run host-report:check
+
+      - name: Validate template host compatibility
+        working-directory: configurator
+        run: npm run validate:template-hosts
 
       - name: Validate modules
         working-directory: configurator
