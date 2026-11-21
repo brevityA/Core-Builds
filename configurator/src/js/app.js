@@ -821,17 +821,6 @@ function saveLastGen() {
 // went to, and the config with credentials stripped (the same scrub the import link
 // uses). "Update my setup" diffs a fresh build against it, then saves over that UUID.
 const LAST_SAVED_KEY = 'coreBuildLastSaved';
-const LAST_SAVED_SIG_KEY = 'coreBuildLastSavedSig';
-// A short fingerprint of the choices that shape the build (SHARE_KEYS: no keys or
-// passwords). Saved with the record, so the first screen can tell "already up to
-// date" (same release, same choices) from "there is something to update". Kept under
-// its own key, next to the record rather than inside it.
-function setupSignature() {
-  const text = JSON.stringify(SHARE_KEYS.map(k => S[k] === undefined ? null : S[k]));
-  let h = 5381;
-  for (let i = 0; i < text.length; i++) h = ((h << 5) + h + text.charCodeAt(i)) | 0;
-  return (h >>> 0).toString(36) + '.' + text.length.toString(36);
-}
 function recordSavedConfig(host, uuid, config) {
   try {
     // A custom URL can arrive with a trailing slash; lastSavedConfig compares without one.
@@ -839,7 +828,6 @@ function recordSavedConfig(host, uuid, config) {
     if (!base || !validateUuid(uuid)) return;
     const scrubbed = sanitizeTemplateForRemoteImport({ metadata: {}, config }).config;
     localStorage.setItem(LAST_SAVED_KEY, JSON.stringify({ host: base, uuid, ver: CONFIGURATOR_VERSION, ts: Date.now(), config: scrubbed }));
-    localStorage.setItem(LAST_SAVED_SIG_KEY, setupSignature());
   } catch(e) {}
 }
 // Only offered while the saved password and UUID still match the record, and only
@@ -858,13 +846,14 @@ function savedHostLabel(host) {
   const id = Object.keys(HOST_BASE_URLS).find(k => HOST_BASE_URLS[k] === host);
   return id ? (HOST_LABEL_MAP[id] || id) : String(host).replace(/^https?:\/\//, '').split('/')[0];
 }
-// Up to date when this release saved it from the same choices: then a rebuild is the
-// same config, so the card stays away until a release or a changed choice gives it
-// something to do. Records from before v3.40 carry no signature and keep the card.
+// Up to date when a fresh build from the current choices matches what was saved:
+// the same comparison the dialog shows as "No changes", so the card stays away until
+// a release or a changed choice (formatter, proxy, add-ons, anything the build reads)
+// gives it something to do. If the build cannot run, the card shows as before.
 function savedSetupIsCurrent(rec) {
-  let sig = '';
-  try { sig = localStorage.getItem(LAST_SAVED_SIG_KEY) || ''; } catch(e) {}
-  return !!rec && rec.ver === CONFIGURATOR_VERSION && !!sig && sig === setupSignature();
+  if (!rec || !S.service) return false;
+  try { return diffConfigSections(rec.config, sanitizeTemplateForRemoteImport(buildFinal()).config).length === 0; }
+  catch(e) { return false; }
 }
 function splashUpdateCard() {
   const rec = lastSavedConfig();

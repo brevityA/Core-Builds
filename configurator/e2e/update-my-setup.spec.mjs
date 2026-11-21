@@ -76,10 +76,14 @@ async function installOnce(page, calls, opts) {
   return errors;
 }
 
-// Stand in for something to update: the stored fingerprint no longer matches the
-// choices, as after a newer release or a changed choice.
-async function savedByOlderRelease(page) {
-  await page.evaluate(() => localStorage.setItem('coreBuildLastSavedSig', 'stale'));
+// Give the card something to do: a choice that changes the build, as a newer release
+// or a change in the builder would.
+async function changeAChoice(page) {
+  await page.evaluate(() => {
+    const st = JSON.parse(localStorage.getItem('coreBuild'));
+    st.resolution = '1080p';
+    localStorage.setItem('coreBuild', JSON.stringify(st));
+  });
   await page.reload();
 }
 
@@ -88,17 +92,17 @@ test('the first screen offers Update my setup and saves over the same config', a
   const calls = [];
   const errors = await installOnce(page, calls);
   const card = page.locator('[data-action="update-my-setup"]');
-  // Just saved by this release from these choices: nothing to update, so no card.
+  // Just saved from these choices: a rebuild is the same config, so no card.
   await expect(page.locator('[data-action="open-express-lane"]')).toBeVisible();
   await expect(card).toHaveCount(0);
-  await savedByOlderRelease(page);
+  await changeAChoice(page);
   await expect(card).toBeVisible();
   await expect(card).toContainText('Your Stremio link keeps working');
   await card.click();
   const modal = page.locator('#updateSetupModal');
   await expect(modal).toBeVisible();
-  // Same choices: nothing differs from what was saved.
-  await expect(modal).toContainText('No changes');
+  await expect(modal.locator('.upd-sec').first()).toBeVisible();
+  await expect(modal.locator('#updSetupGo')).toHaveText('Save to my AIOStreams');
   await modal.locator('#updSetupGo').click();
   await expect(modal.locator('#updSetupResult')).toContainText('Streams use it straight away');
   // Once saved it folds to the result, closes itself, and the card goes with it.
@@ -124,12 +128,7 @@ test('a changed choice shows up before saving', async ({ page }) => {
   test.setTimeout(90_000);
   const calls = [];
   await installOnce(page, calls);
-  await page.evaluate(() => {
-    const st = JSON.parse(localStorage.getItem('coreBuild'));
-    st.resolution = '1080p';
-    localStorage.setItem('coreBuild', JSON.stringify(st));
-  });
-  await page.reload();
+  await changeAChoice(page);
   await page.locator('[data-action="update-my-setup"]').click();
   const modal = page.locator('#updateSetupModal');
   await expect(modal.locator('.upd-sec').first()).toBeVisible();
@@ -140,7 +139,7 @@ test('a refused update leaves the config alone and offers the paste method', asy
   test.setTimeout(90_000);
   const calls = [];
   await installOnce(page, calls, { updateStatus: 400 });
-  await savedByOlderRelease(page);
+  await changeAChoice(page);
   await page.locator('[data-action="update-my-setup"]').click();
   const modal = page.locator('#updateSetupModal');
   await modal.locator('#updSetupGo').click();
@@ -155,7 +154,7 @@ test('a proxy or server failure is not reported as unchanged', async ({ page }) 
   test.setTimeout(90_000);
   const calls = [];
   await installOnce(page, calls, { updateStatus: 502 });
-  await savedByOlderRelease(page);
+  await changeAChoice(page);
   await page.locator('[data-action="update-my-setup"]').click();
   const modal = page.locator('#updateSetupModal');
   await modal.locator('#updSetupGo').click();

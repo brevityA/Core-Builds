@@ -1,6 +1,6 @@
 export const CHANGELOG = [
   { v:'3.40', date:'Nov 21 2026', items:[
-    'Update my setup steps aside once you are up to date — after a successful save the dialog folded nothing away: the list of changes and the Save button stayed up, and the Update my setup card stayed on the first screen as if there were still something to do. Now the dialog folds down to “Updated on …” and closes itself, and the card only appears when there is something to update: a newer Core Builds release, or a choice you changed since the last save. Setups saved before 3.40 still show the card until their next save.',
+    'Update my setup steps aside once you are up to date — after a successful save the dialog folded nothing away: the list of changes and the Save button stayed up, and the Update my setup card stayed on the first screen as if there were still something to do. Now the dialog folds down to “Updated on …” and closes itself, and the card only appears when there is something to update: when rebuilding from your current choices gives a different config from the one last saved, because of a newer Core Builds release or a choice you changed (stream cards, add-ons, proxy, anything the build uses). It is the same comparison the dialog shows as “No changes”.',
     'Generated output unchanged — every reference config is byte-for-byte what 3.39 produced apart from the version stamp; only the Update my setup card and dialog changed.',
   ]},
   { v:'3.39', date:'Nov 21 2026', items:[
