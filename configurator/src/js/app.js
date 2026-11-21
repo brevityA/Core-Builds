@@ -2221,8 +2221,13 @@ function openAdvancedDrawer(trigger) {
   // Keep the section bar's chip on the section being read (any descendant scrolls).
   let ftRaf = 0;
   overlay.addEventListener('scroll', () => { if (!ftRaf) ftRaf = requestAnimationFrame(() => { ftRaf = 0; syncFtJump(); }); }, { capture: true, passive: true });
-  overlay.querySelector('[data-action="close-advanced"]')?.focus();
-  requestAnimationFrame(() => { overlay.classList.add('active'); syncFtJump(); });
+  // Focus in the first frame, not here: focusing now forces a full layout of the
+  // new panel inside the click task, then the frame lays it out again.
+  requestAnimationFrame(() => {
+    overlay.classList.add('active');
+    overlay.querySelector('[data-action="close-advanced"]')?.focus({ preventScroll: true });
+    syncFtJump();
+  });
 }
 
 // Set while Fine-Tune is open from Quick install: closing it goes back there, with
@@ -8466,7 +8471,16 @@ function showExpressLane(resume = null) {
       runExpressInstall(payload).finally(() => { if (goBtn) { goBtn.disabled = false; refreshDeliveryMode(); } });
     }
   });
-  document.getElementById('expressClose').focus();
+  // Focus in the first frame: focusing inside this task forced a full style and
+  // layout pass of the new lane before it was ever drawn. On phones the close
+  // button is hidden, so the dialog itself takes focus (Escape and Tab need it inside).
+  requestAnimationFrame(() => {
+    if (!overlay.isConnected || overlay.contains(document.activeElement)) return;
+    const close = document.getElementById('expressClose');
+    if (close && close.offsetParent) { close.focus({ preventScroll: true }); return; }
+    const panel = overlay.querySelector('.fastlane-panel');
+    if (panel) { panel.setAttribute('tabindex', '-1'); panel.focus({ preventScroll: true }); }
+  });
 }
 
 // Quick install picks → builder state. Shared by the install itself and by the

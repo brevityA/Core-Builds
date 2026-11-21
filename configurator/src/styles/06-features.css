@@ -193,3 +193,7 @@ a.core-tool-door:focus-visible{outline:2px solid #67e8f9;outline-offset:3px}
 /* Fine-Tune opens with only the sections on screen laid out (v3.37): the rest
    are skipped until scrolled near, and keep their measured height once seen. */
 .ft-sections>*{content-visibility:auto;contain-intrinsic-size:auto 360px}
+/* The stream-card list is ~20 rows; lay out only the ones on screen. */
+.fmt-row{content-visibility:auto;contain-intrinsic-size:auto 58px}
+/* Quick install opens on step 1; steps further down are laid out as they near the screen. */
+#expressLaneModal .ux-step,#expressLaneModal .ux-advanced{content-visibility:auto;contain-intrinsic-size:auto 600px}
