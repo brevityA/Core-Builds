@@ -1,6 +1,6 @@
-// DO NOT EDIT — generated from AIOStreams ce6244454ee131bf0945b2bd6abc670a449b224d
-// Source: https://github.com/Viren070/AIOStreams/tree/ce6244454ee131bf0945b2bd6abc670a449b224d
-// Upstream version: 2.36.0
+// DO NOT EDIT — generated from AIOStreams 113ab6bfd5888f494f78370e2b7fe5ee39897e1d
+// Source: https://github.com/Viren070/AIOStreams/tree/113ab6bfd5888f494f78370e2b7fe5ee39897e1d
+// Upstream version: 2.38.1
 // Regenerate with: npm run sync:upstream   (see configurator/README.md)
 /** Required options beyond name,timeout,resources,url for each preset at the pinned ref. */
 
@@ -105,6 +105,11 @@ export const AIO_PRESET_REQUIRED_OPTIONS = Object.freeze({
   ],
   "usenet-streamer": [
     "manifestUrl"
+  ],
+  "xtream": [
+    "password",
+    "server",
+    "username"
   ]
 });
 

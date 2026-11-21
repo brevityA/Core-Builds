@@ -17,6 +17,9 @@ import { unknownConfigKeys } from '../src/config/generated/aiostreams-config-sch
 
 const GOLDEN_DIR = resolve(dirname(fileURLToPath(import.meta.url)), 'golden');
 const UPDATE = !!process.env.UPDATE_GOLDEN;
+// The primary matrix follows the pinned release, read from the pin itself so a
+// pin bump can never leave the goldens on the previous target.
+const PINNED_AIOSTREAMS = JSON.parse(readFileSync(resolve(dirname(fileURLToPath(import.meta.url)), '..', 'UPSTREAM.pin'), 'utf8')).version;
 
 // Every field the pipeline reads that could otherwise vary by browser/viewport.
 const BASE = {
@@ -58,7 +61,7 @@ const BASE = {
   quickStart: false,
   simpleMode: false,
   outputProfile: 'auto',
-  aiostreamsVersion: '2.36.0',
+  aiostreamsVersion: PINNED_AIOSTREAMS,
   tmdbToken: '',
   tmdbApiKey: '',
 };

@@ -16,7 +16,7 @@ import { generateTemplate } from '../../packages/core/src/generate-template.js';
 import { OPTIONAL_SCRAPER_DEFS } from '../src/data/scrapers.js';
 import { PRESETS_REMOVED_IN_2_36, applyOutputProfile } from '../src/core/output-profile-policy.js';
 
-const upstream = JSON.parse(await readFile(new URL('./upstream/preset-resources-2.36.0.json', import.meta.url), 'utf8'));
+const upstream = JSON.parse(await readFile(new URL('./upstream/preset-resources-2.38.1.json', import.meta.url), 'utf8'));
 const pin = JSON.parse(await readFile(new URL('../UPSTREAM.pin', import.meta.url), 'utf8'));
 
 // Presets whose job includes something beyond streams. Anything else that would

@@ -15,18 +15,7 @@ export const DEFAULT_TEMPLATE_ROUTING = Object.freeze({
   excludedHosts: [],
 });
 
-// Anime templates use `anime-tosho-new`, which needs AIOStreams 2.36.0
-// (PRESET_MIN_VERSIONS). Omni's runs 2.35.9 (HOST_META), so they are not routed
-// there. Drop the exclusion once HOST_META.omni reports 2.36.0 or later.
-const ANIME_TOSHO_NEW_ROUTING = Object.freeze({ hosts: 'all', excludedHosts: ['omni'] });
-
-export const TEMPLATE_HOST_ROUTING = Object.freeze({
-  'brevity.core-nexus-anime': ANIME_TOSHO_NEW_ROUTING,
-  'brevity.core-nexus-anime-lite': ANIME_TOSHO_NEW_ROUTING,
-  'brevity.core-nexus-anime-4k': ANIME_TOSHO_NEW_ROUTING,
-  'brevity.core-nexus-anime-4k-lite': ANIME_TOSHO_NEW_ROUTING,
-  'brevity.core-nexus-anime-dub': ANIME_TOSHO_NEW_ROUTING,
-  'brevity.core-nexus-anime-dub-lite': ANIME_TOSHO_NEW_ROUTING,
-  'brevity.core-nexus-anime-dub-4k': ANIME_TOSHO_NEW_ROUTING,
-  'core-nexus-anime-4k-labs': ANIME_TOSHO_NEW_ROUTING,
-});
+// No template needs an exclusion today. Anime templates use `anime-tosho-new`
+// (AIOStreams 2.36.0+, PRESET_MIN_VERSIONS) and were kept off Omni's while it ran
+// 2.35.9; it runs 2.37.0 since the 2026-11-21 audit (HOST_META).
+export const TEMPLATE_HOST_ROUTING = Object.freeze({});

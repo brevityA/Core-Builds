@@ -1,4 +1,9 @@
 export const CHANGELOG = [
+  { v:'3.39', date:'Nov 21 2026', items:[
+    'Built for AIOStreams 2.38.1 — the configurator now targets 2.38.1, the release most public hosts run, instead of 2.36.0. The builds themselves are the same: 2.37 and 2.38 only added things Core Builds does not use (a custom poster URL and the Cinemeta and Xtream addons), so a build still saves on hosts running 2.36 or 2.37. Each build’s metadata now names 2.38.1 as its target. A setup saved on the old 2.36.0 default moves to 2.38.1 once; 2.36.0 can still be picked in Review.',
+    'Host list brought up to date — the host picker showed 2.36.0 for seven hosts and 2.35.9 for Omni’s. Checked against each host on 21 November: ElfHosted, ForTheWeak, Midnight’s, Wizaardd and Viren’s nightly run 2.38.1, Kuu’s and Omni’s run 2.37.0, ATBP runs 2.36.0. Omni’s is no longer marked legacy, and Anime builds are offered there again.',
+    'Stream cards unchanged — every card was re-rendered with AIOStreams 2.38.1’s formatter engine and looks exactly as it did under 2.36.0.',
+  ]},
   { v:'3.38', date:'Nov 21 2026', items:[
     'Fine-Tune opens without a freeze — it now opens with only the section you are heading to in the page and adds the rest just after it appears. On a phone simulated at a quarter of desktop speed, the longest freeze when opening it from Quick install, or straight at Stream cards, fell from 124–133 ms in 3.36 (94 ms in 3.37) to under 50 ms, the point where frames start to drop (median of 10 runs). Opening Quick install itself still takes about the same as in 3.36, around 55 ms.',
     'Share link with a QR code — Share Link in Export & share now also shows a QR code to scan on another device and the link itself, ready to copy. If the browser refuses the copy, the link is selected on screen and a message says so; before, nothing happened. The link still carries settings only, never keys or passwords.',

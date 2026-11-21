@@ -157,7 +157,7 @@ test('enabling every extra at once still yields one instance per preset', () => 
 
 test('emitted options stay inside the base set every preset accepts at the pinned ref', () => {
   // name/timeout come from baseOptions() for all four; mediaTypes exists on neko-bt. Sootio and
-  // YaStream also declare `resources` (tests/upstream/preset-resources-2.36.0.json) and carry it
+  // YaStream also declare `resources` (tests/upstream/preset-resources-2.38.1.json) and carry it
   // since v3.18, so they serve streams only. Anything beyond this needs reading the preset source
   // first — a bare `apiKey` is the exact bug the debridio/jackett regressions were.
   const allowed = { 'neko-bt': ['name', 'timeout', 'mediaTypes'], sootio: ['name', 'timeout', 'resources'], webstreamr: ['name', 'timeout'], yastream: ['name', 'timeout', 'resources'] };

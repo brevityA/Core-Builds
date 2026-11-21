@@ -1,6 +1,6 @@
 # AIOStreams feature rundown
 
-Generated 2026-11-19 by `node scripts/feature-rundown/rundown.mjs`. Pinned to **2.36.0**; newest upstream release **2.38.1** (3 releases ahead of the pin).
+Generated 2026-11-21 by `node scripts/feature-rundown/rundown.mjs`. Pinned to **2.38.1**; newest upstream release **2.38.1** (the pin is current).
 
 Usage comes from 20 golden configs (profiles: stable, balanced, advanced, labs), 54 static templates and the smart template. A golden counts as using an option when the option switches something on (an `enabled: true` object, a non-empty list or a set value). Reasons come from `scripts/feature-rundown/decisions.json`.
 
@@ -21,59 +21,14 @@ Usage comes from 20 golden configs (profiles: stable, balanced, advanced, labs),
 
 Nothing: every option has a decision that matches what the configs do.
 
-## New upstream since 2.36.0
+## New upstream since 2.38.1
 
-- **Config options added:** `customPosterUrl`
+- **Config options added:** none
 - **Config options removed:** none
-- **Presets added:** `cinemeta`, `xtream`
+- **Presets added:** none
 - **Presets removed:** none
 - **SEL functions added:** none
 - **SEL functions removed:** none
-
-### Stream-related changelog entries
-
-Web player, Jellyfin, UI, desktop, Android, TV and watch-state entries are left out.
-
-**2.38.1** (2026-11-14)
-
-- nothing stream-related
-
-**2.38.0** (2026-11-14)
-
-- _Features_ · **core:** add a background lane and an abort signal to catalog walks
-- _Features_ · **core:** add an Xtream builtin
-- _Features_ · **core:** combine back-to-back variant selectors
-- _Features_ · **core:** look up a film's anime ids from the anime database
-- _Features_ · **core:** replace variant length and instruction limits with a work budget
-- _Features_ · **presets/newznab:** add SearchNZB indexer
-- _Features_ · **presets:** add cinemeta preset
-- _Features_ · **server:** mark and explain a title no addon has details for
-- _Features_ · **server:** mount the Xtream builtin
-- _Features_ · **server:** send the variant work budget in status
-- _Features_ · **variants:** add a move instruction
-- _Bug Fixes_ · **core:** only set indexer/addon mediaInfoQuality when languages were returned
-- _Bug Fixes_ · **core:** read OpenSubtitles' Chinese bilingual codes as Chinese
-- _Bug Fixes_ · **core:** skip stream metadata for ids the parser can't read
-- _Bug Fixes_ · **knaben:** dedupe hits, use upload date for age, include subcategories
-- _Bug Fixes_ · **parser:** resolve ISO 639-2/B codes in convertISO6392ToLanguage
-- _Bug Fixes_ · **presets/meteor:** migrate to current config format and improve stream parsing
-- _Bug Fixes_ · **presets/meteor:** skip "donate" placeholder stream
-- _Bug Fixes_ · **presets/meteor:** skip "no results" placeholder stream
-- _Bug Fixes_ · **presets:** update Doctor Who URL and add missing Torrentio/TorrentsDB providers
-- _Bug Fixes_ · **server:** allow the Range header in cross-origin requests
-- _Bug Fixes_ · **therarbg,torrent-galaxy:** normalise imdb ids, keep keywords first in URLs, share code
-- _Bug Fixes_ · **torrent-galaxy:** use torrentgalaxy.online as default domain
-- _Performance Improvements_ · **core:** remember item id hashes
-
-**2.37.0** (2026-10-23)
-
-- _Features_ · **core:** add a sharedId to episodes whose own id is hashed
-- _Features_ · **core:** name a country the same from any code or spelling
-- _Features_ · **core:** name the language a tag stands for, with its region
-- _Bug Fixes_ · **config:** decrypt string and URL credentials set by the environment
-- _Bug Fixes_ · **metadata/tvdb:** tag the original-language title with its language
-- _Bug Fixes_ · skip merged catalog sources that don't declare a requested extra
-- _Performance Improvements_ · **core:** reject values that can't be encrypted before parsing them
 
 ## Used (68)
 
@@ -249,13 +204,13 @@ Web player, Jellyfin, UI, desktop, Android, TV and watch-state entries are left 
 | `openposterdbApiKey` | · | · | · | · | · | · | A personal credential or poster-service setting; never written into a template. |
 | `openposterdbUrl` | · | · | · | · | · | · | A personal credential or poster-service setting; never written into a template. |
 | `openposterdbParameters` | · | · | · | · | · | · | A personal credential or poster-service setting; never written into a template. |
+| `customPosterUrl` | · | · | · | · | · | · | Poster service setting added in 2.38.0 (custom poster URL); posters are the user's choice, not part of a stream template. |
 | `tvdbApiKey` | · | · | · | · | · | · | A personal credential or poster-service setting; never written into a template. |
 | `pmdbApiKey` | · | · | · | · | · | · | A personal credential or poster-service setting; never written into a template. |
 | `newCatalogsDisabled` | · | · | · | · | · | · | Catalog layout; outside what a stream template should change. |
 | `upstreamCatalogOrder` | · | · | · | · | · | · | Catalog layout; outside what a stream template should change. |
 | `mergedCatalogs` | · | · | · | · | · | · | Catalog layout; outside what a stream template should change. Generated configs and the smart template write it at the AIOStreams default so an import shows no change. |
 | `jellyfin` | · | · | · | · | · | · | AIOStreams' Jellyfin server mode; not a Stremio stream setting. |
-| `customPosterUrl` | · | · | · | · | · | · | Poster service setting added in 2.38.0 (custom poster URL); posters are the user's choice, not part of a stream template. |
 
 Profile columns: ✓ every golden of that profile sets it, n/m some do, · none do. Smart: ✓ when at least one answer switches it on.
 

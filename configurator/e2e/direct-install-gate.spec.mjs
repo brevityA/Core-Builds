@@ -132,20 +132,22 @@ test.describe('truthful host picker', () => {
     const elf = page.locator('#expressHost option[value="elfhosted"]');
     await expect(elf).toHaveAttribute('value', 'elfhosted');
     expect(await elf.textContent()).toContain('Debrid only — no P2P/HTTP');
-    expect(await elf.textContent()).toContain('v2.36.0');
+    expect(await elf.textContent()).toContain('v2.38.1');
     const midnight = page.locator('#expressHost option[value="midnight"]');
     expect(await midnight.textContent()).toContain('Debrid + P2P + HTTP');
-    expect(await midnight.textContent()).toContain('v2.36.0');
+    expect(await midnight.textContent()).toContain('v2.38.1');
     const ftw = page.locator('#expressHost option[value="fortheweak"]');
-    expect(await ftw.textContent()).toContain('v2.36.0');
+    expect(await ftw.textContent()).toContain('v2.38.1');
     const wiz = page.locator('#expressHost option[value="wizaardd"]');
-    expect(await wiz.textContent()).toContain('v2.36.0');
-    // Keep a host on a different version in this row (registry, 2026-10-22).
-    // Without it every asserted option reads one value and the test stops
+    expect(await wiz.textContent()).toContain('v2.38.1');
+    // Keep hosts on different versions in this row (registry, 2026-11-21).
+    // Without them every asserted option reads one value and the test stops
     // proving the label renders the registry's version rather than a constant.
     const omni = page.locator('#expressHost option[value="omni"]');
-    expect(await omni.textContent()).toContain('(legacy)');
-    expect(await omni.textContent()).toContain('v2.35.9');
+    expect(await omni.textContent()).toContain('v2.37.0');
+    expect(await omni.textContent()).not.toContain('(legacy)');
+    const atbp = page.locator('#expressHost option[value="atbp"]');
+    expect(await atbp.textContent()).toContain('v2.36.0');
   });
 
   test('the chip flags a pick the capability matrix blocks (P2P on ElfHosted)', async ({ page }) => {

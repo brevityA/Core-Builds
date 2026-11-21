@@ -20,12 +20,12 @@ export const OUTPUT_PROFILES = Object.freeze(['stable', 'balanced', 'advanced', 
 // 2.35.7 is the schema pin (#770): by the 2026-10-02 audit every public host ran
 // 2.35.4 or later, and the 2.34.1 -> 2.35.7 contract drift was additive only.
 // Older entries stay so existing saved sessions and shared links keep resolving.
-export const AIOSTREAMS_COMPATIBILITY_TARGETS = Object.freeze(['2.31.1', '2.32.0', '2.33.2', '2.34.0', '2.34.1', '2.35.7', '2.36.0', 'unknown']);
+export const AIOSTREAMS_COMPATIBILITY_TARGETS = Object.freeze(['2.31.1', '2.32.0', '2.33.2', '2.34.0', '2.34.1', '2.35.7', '2.36.0', '2.38.1', 'unknown']);
 
 // The target a fresh session gets: the AIOStreams release this configurator is
 // pinned against (see UPSTREAM.pin). Single source of truth — app.js imports it
 // for the state default and every fallback that used to hard-code '2.32.0'.
-export const DEFAULT_AIOSTREAMS_VERSION = '2.36.0';
+export const DEFAULT_AIOSTREAMS_VERSION = '2.38.1';
 
 export const OUTPUT_PROFILE_INFO = Object.freeze({
   stable: Object.freeze({
@@ -457,8 +457,8 @@ function useAnimeToshoForTarget(config, target) {
 //
 // Where a preset supports more than the role Core Builds gives it, the hint becomes
 // the options.resources restriction AIOStreams applies. Read from the pinned
-// release's /api/v1/status (2.36.0, 2026-10-22; held by
-// configurator/tests/upstream/preset-resources-2.36.0.json): without it Torrentio,
+// release's /api/v1/status (2.38.1, 2026-11-21; held by
+// configurator/tests/upstream/preset-resources-2.38.1.json): without it Torrentio,
 // StremThru Store and Peerflix add debrid-library catalogs, Sootio and Flix-Streams
 // catalogs, YaStream catalogs and subtitles, and TMDB Collections streams.
 // MediaFusion and Meteor set options.resources in the generators directly.

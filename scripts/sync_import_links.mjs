@@ -4,9 +4,10 @@
 //
 // For each import block (a CardGroup of "Import on …" cards followed by the raw
 // template URL) this rewrites two buttons and an "Also on" line that links every
-// other host, all built from the raw URL. A host is listed only if it runs the pinned AIOStreams
-// release or newer (configurator/UPSTREAM.pin): older hosts cannot load the
-// templates (Anime ones need anime-tosho-new, added in 2.36.0).
+// other host, all built from the raw URL. A host is listed only if it runs the oldest
+// release that accepts the pinned output or newer (configurator/UPSTREAM.pin
+// sameContractSince, 2.36.0): older hosts cannot load the templates (Anime ones
+// need anime-tosho-new, added in 2.36.0). The pin itself can be newer than that.
 //
 //   node scripts/sync_import_links.mjs           rewrite the pages
 //   node scripts/sync_import_links.mjs --check   exit 1 if a page is out of date
@@ -82,7 +83,7 @@ async function main() {
   const check = process.argv.includes('--check');
   const hostsModule = await import(resolve(ROOT, 'configurator/src/data/hosts.js'));
   const pin = JSON.parse(readFileSync(resolve(ROOT, 'configurator/UPSTREAM.pin'), 'utf8'));
-  const hosts = eligibleHosts(hostsModule, pin.version);
+  const hosts = eligibleHosts(hostsModule, pin.sameContractSince || pin.version);
   let stale = false;
   for (const page of PAGES) {
     const path = resolve(ROOT, page);
