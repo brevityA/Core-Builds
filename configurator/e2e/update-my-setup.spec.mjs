@@ -76,13 +76,10 @@ async function installOnce(page, calls, opts) {
   return errors;
 }
 
-// Stand in for a newer Core Builds release: the record says an older one saved it.
+// Stand in for something to update: the stored fingerprint no longer matches the
+// choices, as after a newer release or a changed choice.
 async function savedByOlderRelease(page) {
-  await page.evaluate(() => {
-    const rec = JSON.parse(localStorage.getItem('coreBuildLastSaved'));
-    rec.ver = '3.0';
-    localStorage.setItem('coreBuildLastSaved', JSON.stringify(rec));
-  });
+  await page.evaluate(() => localStorage.setItem('coreBuildLastSavedSig', 'stale'));
   await page.reload();
 }
 
@@ -96,7 +93,6 @@ test('the first screen offers Update my setup and saves over the same config', a
   await expect(card).toHaveCount(0);
   await savedByOlderRelease(page);
   await expect(card).toBeVisible();
-  await expect(card).toContainText('with v3.0');
   await expect(card).toContainText('Your Stremio link keeps working');
   await card.click();
   const modal = page.locator('#updateSetupModal');

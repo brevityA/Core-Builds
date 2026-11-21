@@ -821,9 +821,11 @@ function saveLastGen() {
 // went to, and the config with credentials stripped (the same scrub the import link
 // uses). "Update my setup" diffs a fresh build against it, then saves over that UUID.
 const LAST_SAVED_KEY = 'coreBuildLastSaved';
+const LAST_SAVED_SIG_KEY = 'coreBuildLastSavedSig';
 // A short fingerprint of the choices that shape the build (SHARE_KEYS: no keys or
 // passwords). Saved with the record, so the first screen can tell "already up to
-// date" (same release, same choices) from "there is something to update".
+// date" (same release, same choices) from "there is something to update". Kept under
+// its own key, next to the record rather than inside it.
 function setupSignature() {
   const text = JSON.stringify(SHARE_KEYS.map(k => S[k] === undefined ? null : S[k]));
   let h = 5381;
@@ -836,7 +838,8 @@ function recordSavedConfig(host, uuid, config) {
     const base = String(host || '').trim().replace(/\/+$/, '');
     if (!base || !validateUuid(uuid)) return;
     const scrubbed = sanitizeTemplateForRemoteImport({ metadata: {}, config }).config;
-    localStorage.setItem(LAST_SAVED_KEY, JSON.stringify({ host: base, uuid, ver: CONFIGURATOR_VERSION, sig: setupSignature(), ts: Date.now(), config: scrubbed }));
+    localStorage.setItem(LAST_SAVED_KEY, JSON.stringify({ host: base, uuid, ver: CONFIGURATOR_VERSION, ts: Date.now(), config: scrubbed }));
+    localStorage.setItem(LAST_SAVED_SIG_KEY, setupSignature());
   } catch(e) {}
 }
 // Only offered while the saved password and UUID still match the record, and only
@@ -859,7 +862,9 @@ function savedHostLabel(host) {
 // same config, so the card stays away until a release or a changed choice gives it
 // something to do. Records from before v3.40 carry no signature and keep the card.
 function savedSetupIsCurrent(rec) {
-  return !!rec && rec.ver === CONFIGURATOR_VERSION && !!rec.sig && rec.sig === setupSignature();
+  let sig = '';
+  try { sig = localStorage.getItem(LAST_SAVED_SIG_KEY) || ''; } catch(e) {}
+  return !!rec && rec.ver === CONFIGURATOR_VERSION && !!sig && sig === setupSignature();
 }
 function splashUpdateCard() {
   const rec = lastSavedConfig();
