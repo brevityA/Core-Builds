@@ -1,14 +1,30 @@
 ---
-title: "What's New — Configurator v3.37"
+title: "What's New — Configurator v3.38"
 sidebarTitle: "What's New"
-description: "Latest Core Builds Configurator releases (v3.37 and earlier), auto-generated from the in-app changelog."
+description: "Latest Core Builds Configurator releases (v3.38 and earlier), auto-generated from the in-app changelog."
 ---
 
 # What's New in the Configurator
 
-This page is regenerated from `configurator/src/data/changelog.js` by `scripts/sync-docs.py`, so it always reflects the latest shipped configurator version (currently **v3.37**).
+This page is regenerated from `configurator/src/data/changelog.js` by `scripts/sync-docs.py`, so it always reflects the latest shipped configurator version (currently **v3.38**).
 
 For the template-suite release log, see the [Changelog](https://corebuilds-docs.docsalot.dev/changelog).
+
+## Configurator v3.38 (Nov 21 2026)
+
+<CardGroup cols={2}>
+  <Card title="Fine-Tune opens without a freeze" icon="sparkles">
+    it now opens with only the section you are heading to in the page and adds the rest just after it appears. On a phone simulated at a quarter of desktop speed, the longest freeze when opening it from Quick install, or straight at Stream cards, fell from 124–133 ms in 3.36 (94 ms in 3.37) to under 50 ms, the point where frames start to drop (median of 10 runs). Opening Quick install itself still takes about the same as in 3.36, around 55 ms.
+  </Card>
+  <Card title="Share link with a QR code" icon="bolt">
+    Share Link in Export & share now also shows a QR code to scan on another device and the link itself, ready to copy. If the browser refuses the copy, the link is selected on screen and a message says so; before, nothing happened. The link still carries settings only, never keys or passwords.
+  </Card>
+  <Card title="Generated output unchanged" icon="shield-check">
+    every reference config is byte-for-byte what 3.37 produced apart from the version stamp; only Fine-Tune opening and the share link changed.
+  </Card>
+</CardGroup>
+
+---
 
 ## Configurator v3.37 (Nov 20 2026)
 
@@ -86,24 +102,5 @@ For the template-suite release log, see the [Changelog](https://corebuilds-docs.
   </Card>
   <Card title="Generated output unchanged" icon="sparkles">
     every config the configurator and the CLI build is byte-for-byte what 3.34 produced apart from the version stamp; only navigation and the settings screens changed.
-  </Card>
-</CardGroup>
-
----
-
-## Configurator v3.34 (Nov 18 2026)
-
-<CardGroup cols={2}>
-  <Card title="Three new stream cards" icon="sparkles">
-    Core Compact (two short lines: cache, resolution and service, then quality, size, audio and language), Core Detailed (up to six lines with title and episode, bitrate, subtitles, release group, source and file name) and Core Badges (the same facts as [TEXT LABELS]). Missing details are left out instead of shown as Unknown, empty brackets or a stray ·, and a result whose cache state AIOStreams does not know gets no icon rather than a guess.
-  </Card>
-  <Card title="Score display" icon="bolt">
-    the Core cards can show the stream score as ★ 87, in plain or bold-looking digits (Unicode characters, not font weight; a player without them shows boxes), or hide it. The score only exists with the Advanced and Labs profiles, and the setting says so.
-  </Card>
-  <Card title="Previews rendered by AIOStreams" icon="shield-check">
-    the Core cards are previewed with AIOStreams’ own formatter engine at the pinned release, and tests render every style through it for complete, sparse, P2P, episode, season-pack and long Unicode streams. Other cards are labelled illustrative.
-  </Card>
-  <Card title="Generated output unchanged" icon="sliders">
-    every config the configurator and the CLI build from existing settings is byte-for-byte what 3.33 produced apart from the version stamp; only choosing one of the new cards changes the formatter.
   </Card>
 </CardGroup>
