@@ -53,7 +53,7 @@ const STEPS = 6;
 // workflow) the raw x.y here expands to x.y.0 in package.json / versions.json and
 // the release tag; the built badge drops the trailing .0. At the 2026-09-06
 // audit the release tag was v3.7.0 while this said 3.1 — they must move together.
-const CONFIGURATOR_VERSION = '3.37';
+const CONFIGURATOR_VERSION = '3.38';
 // Set to a collector endpoint to enable the opt-in anonymous usage ping (service+device+resolution only).
 // Leave empty to keep the feature fully disabled and hidden.
 const USAGE_BEACON_URL = '';
@@ -726,14 +726,43 @@ function sanitizeCustomFormatter(value) {
 }
 // Only wizard selections are shareable — never credentials, tokens, UUIDs, or passwords
 const SHARE_KEYS = ['device','resolution','audio','content','name','multiServices','sizeLimit','formatter','fmtScore','p2pEnabled','qualityFirst','resolutionFirst','foreignLangKill','matchMode','exclude4K','excludeDV','quickStart','langs','langsSet','langExclusive','cacheMode','streamPool','instanceHost','simpleMode','outputProfile','aiostreamsVersion','pseArch','subtitleLangs','subtitleAddons','catalogs','dedupMerge','optionalScrapers','preloadEnabled','autoPlayMethod','addonTimeout','bandwidthMbps','patchCinemeta','installAIOMeta','libraryBoost','nzbFailover','nzbFailoverPosition','maxFailoverNzbs'];
-function shareConfig() {
+/** A QR code for a URL as an SVG data URL, or '' when the URL is too long for one. */
+function qrDataUrl(u) {
   try {
-    const pub = {};
-    SHARE_KEYS.forEach(k => { pub[k] = S[k]; });
-    const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(pub))));
-    const url = location.origin + location.pathname + '#cfg=' + encoded;
-    navigator.clipboard.writeText(url).then(() => showToast('Share link copied — settings only, no API keys or passwords included'));
-  } catch(e) { showToast('Failed to copy share link', true); }
+    const qr = qrcode(0, 'M'); qr.addData(u); qr.make();
+    let svg = qr.createSvgTag({ cellSize: 4, margin: 2 });
+    svg = svg.replace('fill="white"', 'fill="#0d1117"').replace(/fill="black"/g, 'fill="#00d4ff"');
+    return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+  } catch(e) { return ''; }
+}
+
+/** The share link: settings in SHARE_KEYS only, never keys or passwords. */
+function shareConfigUrl() {
+  const pub = {};
+  SHARE_KEYS.forEach(k => { pub[k] = S[k]; });
+  const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(pub))));
+  return location.origin + location.pathname + '#cfg=' + encoded;
+}
+
+function shareConfig() {
+  let url;
+  try { url = shareConfigUrl(); } catch(e) { showToast('Could not make a share link', true); return; }
+  // In the Export & share sheet the link also shows as a QR code and as text,
+  // so another device can scan it and a refused clipboard still leaves a way.
+  const box = document.getElementById('shareQr');
+  if (box) {
+    const src = qrDataUrl(url);
+    box.hidden = false;
+    box.innerHTML = `${src ? `<img src="${src}" width="168" height="168" alt="QR code for your share link">` : ''}
+      <div class="share-qr-text"><div class="share-qr-hint">${src ? 'Scan on another device, or copy the link:' : 'Too long for a QR code. Copy the link:'}</div>
+      <input class="name-input share-qr-url" id="shareQrUrl" type="text" readonly value="${escH(url)}" aria-label="Share link"></div>`;
+  }
+  const done = () => showToast('Share link copied — settings only, no API keys or passwords included');
+  const refused = () => {
+    showToast(box ? 'Could not copy — the link is shown below' : 'Could not copy the share link', true);
+    const input = document.getElementById('shareQrUrl'); if (input) { input.focus(); input.select(); }
+  };
+  try { navigator.clipboard.writeText(url).then(done, refused); } catch(e) { refused(); }
 }
 
 function sanitizeSharedConfig(d) {
@@ -1928,6 +1957,7 @@ function ftJumpHtml() {
 let _ftJumpSeq = 0;
 /** Scroll the open Fine-Tune drawer to a section and mark its chip. */
 function ftJumpTo(id, smooth = true) {
+  flushFtSections();
   const target = document.querySelector(`#advancedDrawer #${id}`);
   if (!target) return false;
   // Land the section just under the sticky header and section bar, whatever their height.
@@ -2189,7 +2219,22 @@ function renderAdvancedPanel() {
 }
 
 let _advancedTrigger = null;
-function openAdvancedDrawer(trigger) {
+/**
+ * Fine-Tune opens with its sections up to `upTo` (or just the first) in the page;
+ * the rest are held and attached right after the first paint, so opening lays
+ * out one screen instead of the whole panel. Anything that needs a later section
+ * (a chip jump, a re-render) attaches them first.
+ */
+function flushFtSections() {
+  const overlay = document.getElementById('advancedDrawer');
+  const rest = overlay && overlay._ftRest;
+  if (!rest) return;
+  overlay._ftRest = null;
+  const list = overlay.querySelector('.ft-sections');
+  if (list) list.append(...rest);
+}
+
+function openAdvancedDrawer(trigger, upTo) {
   document.getElementById('advancedDrawer')?.remove();
   _advancedTrigger = trigger || document.activeElement;
   let content;
@@ -2208,6 +2253,13 @@ function openAdvancedDrawer(trigger) {
   overlay.setAttribute('aria-modal', 'true');
   overlay.setAttribute('aria-label', 'Fine-Tune settings');
   overlay.innerHTML = `<div class="advanced-drawer-panel"><div class="advanced-drawer-content">${content}</div></div>`;
+  const list = overlay.querySelector('.ft-sections');
+  if (list) {
+    const parts = [...list.children];
+    const target = upTo ? parts.findIndex(part => part.id === upTo || part.querySelector(`#${upTo}`)) : -1;
+    const keep = Math.max(target, 0) + 1;
+    if (parts.length > keep) overlay._ftRest = parts.slice(keep).map(part => part.remove() || part);
+  }
   document.body.appendChild(overlay);
   document.body.classList.add('advanced-drawer-open');
   overlay.addEventListener('click', event => { if (event.target === overlay) closeAdvancedDrawer(); });
@@ -2229,6 +2281,9 @@ function openAdvancedDrawer(trigger) {
   requestAnimationFrame(() => {
     overlay.classList.add('active');
     overlay.querySelector('[data-action="close-advanced"]')?.focus({ preventScroll: true });
+    // After this frame paints: attach the held sections (off screen, so their
+    // layout is skipped until they scroll near).
+    setTimeout(() => { if (overlay.isConnected) flushFtSections(); }, 0);
     syncFtJump();
   });
 }
@@ -2287,7 +2342,7 @@ function openStreamCards(trigger) {
     openRvSheet('cards', trigger);
     return;
   }
-  if (!document.getElementById('advancedDrawer')) openAdvancedDrawer(trigger || document.querySelector('[data-action="open-advanced"]'));
+  if (!document.getElementById('advancedDrawer')) openAdvancedDrawer(trigger || document.querySelector('[data-action="open-advanced"]'), 'ft-layout');
   requestAnimationFrame(() => ftJumpTo('ft-layout', false));
 }
 
@@ -2407,6 +2462,7 @@ function mountRvSheets(main) {
 function refreshAdvancedDrawer() {
   const content = document.querySelector('#advancedDrawer .advanced-drawer-content');
   if (!content) return false;
+  const drawer = document.getElementById('advancedDrawer'); if (drawer) drawer._ftRest = null;
   try { content.innerHTML = renderAdvancedPanel(); syncFtJump(); }
   catch (error) {
     console.error('Fine-Tune refresh failed', error);
@@ -2892,6 +2948,7 @@ function renderCore() {
             Import to AIOStreams
           </button>
         </div>
+        <div class="share-qr" id="shareQr" hidden></div>
         <div class="action-help">Uploads your template (debrid keys stripped) to a paste service, then gives you an import link to open in AIOStreams.</div>
         <div id="importUrlResult"></div>
         </div>
@@ -6650,14 +6707,7 @@ function showManifestModal(manifestUrl, password, hostLabel, initialTab) {
   ];
   if (chillUrl) FMTS.push({ key:'chillio', label:'Chillio', getUrl: () => chillUrl, action:'copy', copyToast:'Copied! Paste into Chillio → Manage Account → Add Account → ChillLink Protocol' });
   FMTS.push({ key:'manifest',label:'Manifest URL', getUrl: u => u, action:'copy' });
-  const qrSrc = u => {
-    try {
-      const qr = qrcode(0, 'M'); qr.addData(u); qr.make();
-      let svg = qr.createSvgTag({ cellSize: 4, margin: 2 });
-      svg = svg.replace('fill="white"', 'fill="#0d1117"').replace(/fill="black"/g, 'fill="#00d4ff"');
-      return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
-    } catch(e) { return ''; }
-  };
+  const qrSrc = u => qrDataUrl(u);
   const esc  = s => (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
 
   // Extract password from AIOStreams URL format if not provided
@@ -8470,9 +8520,9 @@ function showExpressLane(resume = null) {
       S.simpleMode = false; S.quickStart = false;
       overlay.hidden = true;
       saveState();
-      openAdvancedDrawer(customizeBtn);
       // Same landing as the section chips: just under the pinned header and bar.
       const sectionId = customizeBtn.dataset.expressCustomize;
+      openAdvancedDrawer(customizeBtn, sectionId || undefined);
       if (sectionId) requestAnimationFrame(() => ftJumpTo(sectionId, false));
       showToast('Your Quick install choices are kept — close Fine-Tune to go back and install');
       return;

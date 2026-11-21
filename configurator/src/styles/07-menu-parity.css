@@ -468,3 +468,10 @@ html.rv-sheet-on{overflow:hidden}
 .advanced-drawer-overlay{transition:opacity var(--sheet-dur) ease}
 .advanced-drawer-panel{transition:transform var(--sheet-dur) var(--sheet-ease)}
 @media(prefers-reduced-motion:reduce){.advanced-drawer-overlay,.advanced-drawer-panel{transition:none}}
+/* Share link QR (v3.38): shown under Share Link once it is pressed. */
+.share-qr{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-top:10px;padding:12px;border-radius:12px;border:1px solid var(--th-border);background:var(--th-card-alt)}
+.share-qr[hidden]{display:none}
+.share-qr img{flex:0 0 auto;border-radius:8px;background:#0d1117}
+.share-qr-text{flex:1;min-width:180px;display:flex;flex-direction:column;gap:6px}
+.share-qr-hint{font-size:.74rem;color:var(--th-tx3)}
+.share-qr-url{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.72rem}

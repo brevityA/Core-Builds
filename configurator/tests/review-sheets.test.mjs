@@ -75,3 +75,19 @@ test('review fixes: sheets sit under modals and toasts, keys defer to a dialog a
   assert.match(app, /function rvChecksSummary\(\) \{[\s\S]{0,120}?const hosts = hostCompatCheck\(\);[\s\S]{0,120}?calculateHealthScore\(_cachedBuildResult\)/, 'build before reading the cache');
   assert.match(nav, /attributes: true, attributeFilter: \['class', 'hidden'\]/, 'menu notices a sheet opening by class');
 });
+
+test('v3.38: Fine-Tune opens with sections up to its target, then attaches the rest', () => {
+  assert.match(app, /const keep = Math\.max\(target, 0\) \+ 1;/);
+  assert.match(app, /setTimeout\(\(\) => \{ if \(overlay\.isConnected\) flushFtSections\(\); \}, 0\);/, 'rest attached after the first paint');
+  assert.match(app, /function ftJumpTo\(id, smooth = true\) \{\n  flushFtSections\(\);/, 'a jump attaches every section first');
+  assert.match(app, /openAdvancedDrawer\(customizeBtn, sectionId \|\| undefined\)/, 'Quick install opens at its section');
+});
+
+test('v3.38: Share Link shows a QR code and the link, and says so when copying is refused', () => {
+  assert.match(app, /function qrDataUrl\(u\)/);
+  assert.match(app, /const qrSrc = u => qrDataUrl\(u\);/, 'the manifest modal uses the same QR helper');
+  assert.match(review, /<div class="share-qr" id="shareQr" hidden><\/div>/);
+  assert.match(app, /navigator\.clipboard\.writeText\(url\)\.then\(done, refused\)/);
+  // The link carries SHARE_KEYS only: no keys or passwords.
+  assert.match(app, /function shareConfigUrl\(\) \{\n  const pub = \{\};\n  SHARE_KEYS\.forEach\(k => \{ pub\[k\] = S\[k\]; \}\);/);
+});

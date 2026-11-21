@@ -12,7 +12,7 @@ test('Fine-Tune actions use delegated closest lookup for nested click targets', 
 });
 
 test('Fine-Tune drawer has keyboard-safe open and close paths', () => {
-  assert.match(app, /function openAdvancedDrawer\(trigger\)/);
+  assert.match(app, /function openAdvancedDrawer\(trigger, upTo\)/);
   assert.match(app, /function closeAdvancedDrawer\(\)/);
   assert.ok(app.includes("overlay.addEventListener('keydown'"));
 });

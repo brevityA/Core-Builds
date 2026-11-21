@@ -109,3 +109,28 @@ test('the Health Score link opens Checks', async ({ page }) => {
   await page.evaluate(() => { location.hash = '#health-score'; });
   await expect(page.locator('#rvSheet-checks')).toBeVisible();
 });
+
+test('Share Link shows a scannable QR code and the link itself', async ({ page, context }) => {
+  await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+  await openReview(page);
+  await page.locator('.rv-row[data-sheet="export"]').click();
+  await expect(page.locator('#shareQr')).toBeHidden();
+  await page.locator('#rvSheet-export [data-action="share-config"]').click();
+  await expect(page.locator('#shareQr img')).toBeVisible();
+  const url = await page.locator('#shareQrUrl').inputValue();
+  expect(url).toContain('#cfg=');
+  // Settings only: no key or password travels in the link.
+  const shared = JSON.parse(Buffer.from(decodeURIComponent(url.split('#cfg=')[1]), 'base64').toString('utf8'));
+  expect(Object.keys(shared)).not.toContain('creds');
+  expect(Object.keys(shared)).not.toContain('instancePassword');
+  expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(url);
+});
+
+test('a refused clipboard leaves the share link selected on screen', async ({ page }) => {
+  await openReview(page);
+  await page.evaluate(() => { Object.defineProperty(navigator, 'clipboard', { configurable: true, value: { writeText: () => Promise.reject(new Error('denied')) } }); });
+  await page.locator('.rv-row[data-sheet="export"]').click();
+  await page.locator('#rvSheet-export [data-action="share-config"]').click();
+  await expect(page.locator('#shareQrUrl')).toBeFocused();
+  await expect(page.locator('.toast').first()).toContainText('Could not copy');
+});
