@@ -76,15 +76,16 @@ async function installOnce(page, calls, opts) {
   return errors;
 }
 
-// Give the card something to do: a choice that changes the build, as a newer release
-// or a change in the builder would.
+// Give the card something to do: pick another stream-card style in the real picker,
+// as someone changing a choice would. (Rewriting the saved state from the test
+// instead trips CodeQL's clear-text-storage check, which follows that key.)
 async function changeAChoice(page) {
-  await page.evaluate(() => {
-    const st = JSON.parse(localStorage.getItem('coreBuild'));
-    st.resolution = '1080p';
-    localStorage.setItem('coreBuild', JSON.stringify(st));
-  });
-  await page.reload();
+  await page.evaluate(() => { location.hash = '#cards'; });
+  const row = page.locator('#advancedDrawer .fmt-row[data-fmt="core-detailed"]');
+  await row.click();
+  await expect(row).toHaveAttribute('aria-pressed', 'true');
+  await expect.poll(() => page.evaluate(() => JSON.parse(localStorage.getItem('coreBuild') || '{}').formatter)).toBe('core-detailed');
+  await page.goto('/');
 }
 
 test('the first screen offers Update my setup and saves over the same config', async ({ page }) => {
