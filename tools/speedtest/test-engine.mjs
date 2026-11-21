@@ -131,7 +131,12 @@ const baselineMBps = await (async () => {
 const baselineMbps = baselineMBps * 8;
 console.log(`\n== live: baseline ${baselineMBps.toFixed(1)} MB/s (${baselineMbps.toFixed(0)} Mbps) @ ${LIVE_URL} ==`);
 const WINDOW_S = 6;
-const SLICE_BYTES = Math.min(125 * 1024 * 1024, Math.max(8 * 1024 * 1024, Math.round(baselineMBps * 10) * 1024 * 1024));
+// Sized after the windowed transfer below, from its sustained rate. The 2 MB
+// probe above reads the connection before it ramps up (42 Mbps on a runner
+// that then sustained 819 Mbps), which once made a 53 MB slice finish in
+// 0.6 s: under the engine's 0.5-0.8 s floors, so no rate at all.
+let SLICE_BYTES = 0;
+const SLICE_TARGET_S = 2;
 
 console.log('\n== live: ping + 6 s windowed 1 GB transfer ==');
 {
@@ -160,6 +165,8 @@ console.log('\n== live: ping + 6 s windowed 1 GB transfer ==');
     t('marks for sparkline', Array.isArray(done.marks) && done.marks.length >= 5, `marks=${done.marks.length}`);
     t('elapsed ≈ 6 s window', done.elapsedMs > WINDOW_S * 1000 - 200 && done.elapsedMs < WINDOW_S * 1000 + 6000, `elapsed=${done.elapsedMs}`);
   }
+  const sustainedMBps = (done && done.steadyMbps ? done.steadyMbps : baselineMbps) / 8;
+  SLICE_BYTES = Math.min(300 * 1024 * 1024, Math.max(8 * 1024 * 1024, Math.round(sustainedMBps * SLICE_TARGET_S) * 1024 * 1024));
   console.log(`  info: bytes=${done && (done.bytes / 1e6).toFixed(0)}MB steady=${done && done.steadyMbps && done.steadyMbps.toFixed(1)}Mbps avgFb=${done && done.avgFbMbps && done.avgFbMbps.toFixed(1)}Mbps ping=${ping && ping.ping && ping.ping.toFixed(0)}ms ttfb=${done && done.ttfb && done.ttfb.toFixed(0)}ms`);
 }
 
@@ -170,11 +177,12 @@ console.log(`\n== live: Range slice (${(SLICE_BYTES / 1048576).toFixed(0)} MB, c
   const done = await until(env.messages, 'done', 90000);
   t('slice done ok', !!done && done.ok === true, `status=${done && done.status} err=${done && done.err}`);
   t('slice bytes exact (±1 KB)', done && Math.abs(done.bytes - SLICE_BYTES) < 1024, `bytes=${done && done.bytes}`);
-  // A multi-second slice crosses the 800 ms mid-fallback threshold, so we
-  // expect a steady estimate (or, if it finishes very fast, a sane avgFb).
+  // Sized for ~2 s at the sustained rate, the slice crosses the engine's 800 ms
+  // mid-fallback threshold, so we expect a steady estimate (or a sane avgFb).
   const sliceRate = done ? (done.steadyMbps != null ? done.steadyMbps : done.avgFbMbps) : null;
+  const sliceS = done && done.elapsedMs ? (done.elapsedMs / 1000).toFixed(2) : '?';
   t('slice steady/avgFb sane (5–10 Gbps)', sliceRate != null && sliceRate > 5 && sliceRate < 10000,
-    `steady=${done && done.steadyMbps} avgFb=${done && done.avgFbMbps}`);
+    `steady=${done && done.steadyMbps} avgFb=${done && done.avgFbMbps} took=${sliceS}s (a slice under ~0.8 s is too short to rate: resize it)`);
 }
 
 console.log('\n== live: ping-only mode (no transfer) ==');
