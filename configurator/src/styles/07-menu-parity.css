@@ -402,7 +402,9 @@ html body:has(.hybrid-splash) #themeToggle{display:none}
 #advancedDrawer .ft-close{flex:none;white-space:nowrap;min-height:36px}
 #advancedDrawer .ft-title{font-family:var(--font-display);font-size:1.25rem;font-weight:700;letter-spacing:-.02em;color:var(--th-tx)}
 
-/* ── Review without folds (v3.37) ─────────────────────────────────────────
+/* Sheets sit at z-index 190: above the page, the step nav (10), sidebar (50) and
+   menu button (150), below every modal (200+) and toast (999) a sheet can open.
+   ── Review without folds (v3.37) ─────────────────────────────────────────
    Install stays on the page; four rows open one sheet each. Sheets share one
    motion with every other panel: a 200 ms slide up, instant under Reduce Motion. */
 :root{--sheet-dur:.2s;--sheet-ease:cubic-bezier(.2,.8,.2,1)}
@@ -416,7 +418,7 @@ html body:has(.hybrid-splash) #themeToggle{display:none}
 .rv-mini-n{font-weight:700;color:var(--th-tx)}
 .rv-mini-d{color:var(--th-tx3)}
 html.rv-sheet-on{overflow:hidden}
-.rv-sheet{position:fixed;inset:0;z-index:9000;display:flex;align-items:flex-end;justify-content:center}
+.rv-sheet{position:fixed;inset:0;z-index:190;display:flex;align-items:flex-end;justify-content:center}
 .rv-sheet[hidden]{display:none}
 .rv-sheet-scrim{position:absolute;inset:0;background:rgba(2,5,8,.62);opacity:0;transition:opacity var(--sheet-dur) ease}
 .rv-sheet-panel{position:relative;width:min(640px,100vw);max-height:min(88dvh,900px);display:flex;flex-direction:column;border-radius:18px 18px 0 0;border:1px solid var(--th-border-strong);border-bottom:0;background:#0b121b;box-shadow:0 -18px 50px rgba(0,0,0,.45);transform:translateY(100%);transition:transform var(--sheet-dur) var(--sheet-ease);will-change:transform}

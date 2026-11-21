@@ -192,8 +192,12 @@ a.core-tool-door:focus-visible{outline:2px solid #67e8f9;outline-offset:3px}
 @media(pointer:coarse){.skip-step-btn,.rv-tool-btn,.rv-secondary-btn{min-height:44px;display:flex;align-items:center;justify-content:center}.fine-tune-btn{min-height:48px}}
 /* Fine-Tune opens with only the sections on screen laid out (v3.37): the rest
    are skipped until scrolled near, and keep their measured height once seen. */
-.ft-sections>*{content-visibility:auto;contain-intrinsic-size:auto 360px}
+.ft-sections>*{content-visibility:auto;contain-intrinsic-size:auto 360px;padding:4px;margin:-4px}
+#advancedDrawer.ft-all-laid-out .ft-sections>*{content-visibility:visible}
 /* The stream-card list is ~20 rows; lay out only the ones on screen. */
 .fmt-row{content-visibility:auto;contain-intrinsic-size:auto 58px}
 /* Quick install opens on step 1; steps further down are laid out as they near the screen. */
 #expressLaneModal .ux-step,#expressLaneModal .ux-advanced{content-visibility:auto;contain-intrinsic-size:auto 600px}
+/* Side room, taken back by the margin, keeps focus rings and shadows on edge cards inside the containment.
+   (.ux-advanced already clips its content.) */
+#expressLaneModal .ux-main>.ux-step{padding-inline:4px;margin-inline:-4px}

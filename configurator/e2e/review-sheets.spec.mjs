@@ -81,3 +81,31 @@ test('Menu › Import a config opens Your AIOStreams at the paste field', async 
   await expect(page.locator('#rvSheet-aio')).toBeVisible();
   await expect(page.locator('#pasteManifest')).toBeFocused();
 });
+
+test('a modal or toast opened from inside a sheet shows on top of it', async ({ page, context }) => {
+  await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+  await openReview(page);
+  await page.locator('.rv-row[data-sheet="export"]').click();
+  await page.locator('#rvSheet-export [data-action="share-config"]').click();
+  const toast = page.locator('.toast').first();
+  await expect.poll(() => toast.evaluate(t => Number(getComputedStyle(t).opacity))).toBeGreaterThan(0.5);
+  // Toasts ignore the pointer, so compare stacking rather than hit-testing.
+  const [toastZ, sheetZ] = await page.evaluate(() => [document.querySelector('.toast'), document.getElementById('rvSheet-export')].map(n => Number(getComputedStyle(n).zIndex)));
+  expect(toastZ).toBeGreaterThan(sheetZ);
+  await page.locator('#rvSheet-export .rv-sheet-done').click();
+  await page.locator('.rv-row-cards').click();
+  await page.locator('#rvSheet-cards [data-action="import-formatter"]').click();
+  const modal = page.locator('.modal-overlay').last();
+  await expect(modal).toBeVisible();
+  // The dialog is the topmost thing in the middle of the screen, not the sheet.
+  const top = await page.evaluate(() => { const el = document.elementFromPoint(innerWidth / 2, innerHeight / 2); return !!el.closest('.modal-overlay') && !el.closest('.rv-sheet'); });
+  expect(top).toBe(true);
+  await page.keyboard.press('Escape');
+  await expect(page.locator('#rvSheet-cards')).toBeVisible(); // Escape belongs to the dialog above, not the sheet
+});
+
+test('the Health Score link opens Checks', async ({ page }) => {
+  await openReview(page);
+  await page.evaluate(() => { location.hash = '#health-score'; });
+  await expect(page.locator('#rvSheet-checks')).toBeVisible();
+});

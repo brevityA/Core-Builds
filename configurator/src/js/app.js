@@ -1932,6 +1932,9 @@ function ftJumpTo(id, smooth = true) {
   if (!target) return false;
   // Land the section just under the sticky header and section bar, whatever their height.
   const bar = document.querySelector('#advancedDrawer .ft-top');
+  // Sections off screen are skipped (content-visibility) and sized by estimate;
+  // lay them all out before jumping so a long jump lands where it is aimed.
+  document.getElementById('advancedDrawer')?.classList.add('ft-all-laid-out');
   target.style.scrollMarginTop = `${(bar ? bar.offsetHeight : 0) + 12}px`;
   const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   target.scrollIntoView({ block: 'start', behavior: smooth && !reduced ? 'smooth' : 'auto' });
@@ -2305,9 +2308,10 @@ function rvAioSummary() {
 }
 
 function rvChecksSummary() {
+  // hostCompatCheck builds the config, so read the cached build only after it.
+  const hosts = hostCompatCheck();
   const issues = templateHealthCheck().length;
   const r = calculateHealthScore(_cachedBuildResult);
-  const hosts = hostCompatCheck();
   const kinds = Object.keys(hosts);
   const ok = kinds.filter(k => hosts[k].status === 'ok').length;
   return `Score ${r.score} (${r.grade}) · ${ok} of ${kinds.length} host types OK${issues ? ` · ${issues} to fix` : ''}`;
@@ -2369,7 +2373,9 @@ function closeRvSheet({ restoreFocus = true, fromHistory = false } = {}) {
   }
   // Rows show what the sheet changed without rebuilding the page.
   const aio = document.getElementById('rvAioVal'); if (aio) aio.textContent = rvAioSummary();
-  const chk = document.getElementById('rvChecksVal'); if (chk) chk.textContent = rvChecksSummary();
+  // Only Your AIOStreams changes what Checks reports (the host). Rebuilding after
+  // the close frame keeps the build out of the tap.
+  if (id === 'aio') setTimeout(() => { const chk = document.getElementById('rvChecksVal'); if (chk) chk.textContent = rvChecksSummary(); }, 250);
   if (restoreFocus) {
     const t = _rvSheetTrigger && _rvSheetTrigger.isConnected ? _rvSheetTrigger
       : document.querySelector(`.rv-row[data-sheet="${id}"]`) || (id === 'cards' ? document.querySelector('.rv-row-cards') : null);
@@ -3452,10 +3458,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // An open Review sheet: Escape closes it and Tab stays inside it.
     const rvSheet = _rvSheet && rvSheetEl(_rvSheet);
+    // A dialog opened from inside a sheet (formatter import, a prompt, a confirm) owns its keys.
+    // Only one that is showing: some overlays stay in the page, hidden, between uses.
+    // Showing overlays only: some stay in the page between uses, hidden or with
+    // pointer-events off (the support panel). One fading in already counts.
+    const aboveSheet = [...document.querySelectorAll('.modal-overlay, .df-overlay, .sup-overlay, #pwdPrompt, #apiReminder, #tsModal, #feedbackReportModal, #recStackModal, #testDriveModal')]
+      .find(n => { if (n.hidden || !n.getClientRects().length) return false; const cs = getComputedStyle(n); return cs.visibility !== 'hidden' && cs.pointerEvents !== 'none'; });
+    if (rvSheet && !rvSheet.hidden && aboveSheet) {
+      // Escape closes that dialog (with its own close button) and never reaches
+      // the wizard's Escape = Back, which would leave Review under the sheet.
+      if (e.key === 'Escape') { e.preventDefault(); aboveSheet.querySelector('.modal-close, [data-action$="-close"], [aria-label="Close"]')?.click(); }
+      return;
+    }
     if (rvSheet && !rvSheet.hidden) {
       if (e.key === 'Escape') { e.preventDefault(); closeRvSheet(); return; }
       if (e.key === 'Tab') {
-        const items = [...rvSheet.querySelectorAll('button,a[href],input,select,textarea,[tabindex]:not([tabindex="-1"])')].filter(n => !n.disabled && n.offsetParent !== null);
+        const items = [...rvSheet.querySelectorAll('button,a[href],input,select,textarea,summary,[tabindex]:not([tabindex="-1"])')].filter(n => !n.disabled && n.offsetParent !== null);
         if (items.length) {
           const first = items[0], last = items[items.length - 1];
           if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
@@ -7766,7 +7784,7 @@ function runDeepAction(action) {
 }
 function handleDeepLink(hash) {
   if (!hash || hash.startsWith('#cfg=')) return;
-  if (hash === '#health-score') { step = STEPS; pushStep(); render(); window.scrollTo(0, 0); return; }
+  if (hash === '#health-score') { step = STEPS; pushStep(); render(); window.scrollTo(0, 0); setTimeout(() => openRvSheet('checks'), 100); return; }
   // Entry deep-links (used by the Genie pages + tools landing). Splash stays the base view;
   // these call the same handlers the splash doors use, so behavior can't drift apart.
   // A deep link runs the same delegated handler a button would, without needing that button on screen.
@@ -8878,6 +8896,8 @@ async function simpleInstall(target, { profile = '' } = {}) {
       // Express first or the URL the user came for opens hidden behind it.
       deployment.close();
       document.getElementById('expressLaneModal')?.remove();
+      // Fine-Tune may have left the page behind the lane stale (closeLane is skipped here).
+      if (_renderAfterLane) { _renderAfterLane = false; render(); }
       showManifestModal(manifestUrl, pwd, hostLbl, target);
       return;
     }

@@ -225,7 +225,8 @@ function mountCoreNav({ root, hideOn, anchor, markCurrent = true } = {}) {
       if (hide) close(false);
     };
     sync();
-    new MutationObserver(sync).observe(document.body, { childList: true, subtree: true });
+    // Attributes too: a panel can open by class or [hidden] without adding nodes.
+    new MutationObserver(sync).observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['class', 'hidden'] });
   }
   return { open, close };
 }

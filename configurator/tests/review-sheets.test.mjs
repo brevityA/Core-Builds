@@ -63,3 +63,15 @@ test('a sheet closes on Back, on Escape and with Done, and survives a re-render'
   assert.match(review, /mountRvSheets\(main\);/, 'Review reopens the sheet that was open');
   assert.match(app, /hideOn: \(\) => !!document\.querySelector\('[^']*\.rv-sheet\.open'\)/, 'the site menu hides under a sheet');
 });
+
+test('review fixes: sheets sit under modals and toasts, keys defer to a dialog above, Tab reaches summaries', () => {
+  const css = readFileSync(join(root, 'src/styles/07-menu-parity.css'), 'utf8');
+  const z = Number(css.match(/\.rv-sheet\{position:fixed;inset:0;z-index:(\d+);/)[1]);
+  assert.ok(z > 150 && z < 200, `sheet z-index ${z} must sit above the menu button (150) and below modals (200) and toasts (999)`);
+  assert.match(app, /const aboveSheet = \[\.\.\.document\.querySelectorAll\('\.modal-overlay, [^']*'\)\]\s*\.find\(n => \{ if \(n\.hidden \|\| !n\.getClientRects\(\)\.length\) return false;[^\n]*pointerEvents !== 'none'; \}\);/, 'only a showing dialog takes the keys');
+  assert.match(app, /if \(rvSheet && !rvSheet\.hidden && aboveSheet\) \{[\s\S]{0,300}?if \(e\.key === 'Escape'\) \{ e\.preventDefault\(\); aboveSheet\.querySelector\([^)]*\)\?\.click\(\); \}\s*return;/, 'Escape closes that dialog and stops there');
+  assert.match(app, /rvSheet\.querySelectorAll\('button,a\[href\],input,select,textarea,summary,/);
+  assert.match(app, /if \(id === 'aio'\) setTimeout\(\(\) => \{ const chk = document\.getElementById\('rvChecksVal'\)/, 'Checks row refreshes only after the AIOStreams sheet, off the tap');
+  assert.match(app, /function rvChecksSummary\(\) \{[\s\S]{0,120}?const hosts = hostCompatCheck\(\);[\s\S]{0,120}?calculateHealthScore\(_cachedBuildResult\)/, 'build before reading the cache');
+  assert.match(nav, /attributes: true, attributeFilter: \['class', 'hidden'\]/, 'menu notices a sheet opening by class');
+});
