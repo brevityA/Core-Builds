@@ -5,13 +5,18 @@
     "description": "Self-hosted variant of Core Personal. Synced regex scoring via Core Builds URL (requires self-hosted AIOStreams with TEMPLATE_URLS whitelist). Split cached/uncached sort criteria. SDR override neutralizes -25 penalty. TorBox Pro · WEB-DL · DD+/AAC · SDR · HEVC/AV1/AVC.",
     "source": "external",
     "author": "Personal",
-    "version": "1.0.4",
+    "version": "1.0.5",
     "category": "Debrid",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
     "sourceUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Personal/core-personal-selfhosted.json",
     "changelogUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md",
     "changelog": [
+      {
+        "date": "2026-11-21",
+        "version": "1.0.5",
+        "content": "Add-on options AIOStreams 2.38.1 no longer has are removed (Meteor usenet and others); saved behaviour is unchanged."
+      },
       {
         "date": "2026-11-18",
         "version": "1.0.4",
@@ -1195,10 +1200,7 @@
         "enabled": true,
         "options": {
           "name": "Zilean",
-          "timeout": 2000,
-          "resources": [
-            "stream"
-          ]
+          "timeout": 2000
         }
       },
       {
@@ -1277,10 +1279,6 @@
             "showStreams": true,
             "enabled": true
           },
-          "usenet": {
-            "enabled": true,
-            "customSearchEngines": true
-          },
           "resources": [
             "stream"
           ]
@@ -1340,7 +1338,6 @@
           "services": [
             "torbox"
           ],
-          "url": "https://api.nzbgeek.info",
           "api": {
             "url": "https://api.nzbgeek.info/api"
           }
@@ -1355,10 +1352,7 @@
           "name": "Knaben",
           "timeout": 3000,
           "mediaTypes": [],
-          "useMultipleInstances": false,
-          "resources": [
-            "stream"
-          ]
+          "useMultipleInstances": false
         },
         "category": "Debrid"
       },
@@ -1368,10 +1362,7 @@
         "enabled": true,
         "options": {
           "name": "EZTV",
-          "timeout": 3000,
-          "resources": [
-            "stream"
-          ]
+          "timeout": 3000
         },
         "category": "P2P"
       },
@@ -1387,8 +1378,6 @@
           ],
           "useCachedResultsOnly": true,
           "enableWatchlistCatalogs": false,
-          "downloadViaBrowser": false,
-          "contributorStreams": false,
           "certificationLevelsFilter": [],
           "nudityFilter": [],
           "mediaTypes": [],

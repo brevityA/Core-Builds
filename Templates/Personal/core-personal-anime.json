@@ -5,13 +5,18 @@
     "description": "Anime-optimised build for Hotack L007CM. TorBox Pro · SeaDex · NZBGeek · EZTV · Meteor. Non-Anime Query Guard. SeaDex best releases · Dual audio · Sub + Dub aware. SDR · 1080p · DD+/AAC/FLAC.",
     "source": "external",
     "author": "Personal",
-    "version": "1.2.5",
+    "version": "1.2.6",
     "category": "Anime",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
     "sourceUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Personal/core-personal-anime.json",
     "changelogUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md",
     "changelog": [
+      {
+        "date": "2026-11-21",
+        "version": "1.2.6",
+        "content": "Add-on options AIOStreams 2.38.1 no longer has are removed (Meteor usenet and others); saved behaviour is unchanged."
+      },
       {
         "date": "2026-11-18",
         "version": "1.2.5",
@@ -813,10 +818,7 @@
         "enabled": true,
         "options": {
           "name": "Zilean",
-          "timeout": 2000,
-          "resources": [
-            "stream"
-          ]
+          "timeout": 2000
         }
       },
       {
@@ -895,10 +897,6 @@
             "showStreams": true,
             "enabled": true
           },
-          "usenet": {
-            "enabled": true,
-            "customSearchEngines": true
-          },
           "resources": [
             "stream"
           ]
@@ -958,7 +956,6 @@
           "services": [
             "torbox"
           ],
-          "url": "https://api.nzbgeek.info",
           "api": {
             "url": "https://api.nzbgeek.info/api"
           }
@@ -973,10 +970,7 @@
           "name": "Knaben",
           "timeout": 3000,
           "mediaTypes": [],
-          "useMultipleInstances": false,
-          "resources": [
-            "stream"
-          ]
+          "useMultipleInstances": false
         },
         "category": "Debrid"
       },
@@ -986,10 +980,7 @@
         "enabled": true,
         "options": {
           "name": "EZTV",
-          "timeout": 3000,
-          "resources": [
-            "stream"
-          ]
+          "timeout": 3000
         },
         "category": "P2P"
       },
@@ -1005,8 +996,6 @@
           ],
           "useCachedResultsOnly": true,
           "enableWatchlistCatalogs": false,
-          "downloadViaBrowser": false,
-          "contributorStreams": false,
           "certificationLevelsFilter": [],
           "nudityFilter": [],
           "mediaTypes": [],
