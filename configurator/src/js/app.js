@@ -53,7 +53,7 @@ const STEPS = 6;
 // workflow) the raw x.y here expands to x.y.0 in package.json / versions.json and
 // the release tag; the built badge drops the trailing .0. At the 2026-09-06
 // audit the release tag was v3.7.0 while this said 3.1 — they must move together.
-const CONFIGURATOR_VERSION = '3.40';
+const CONFIGURATOR_VERSION = '3.41';
 // Set to a collector endpoint to enable the opt-in anonymous usage ping (service+device+resolution only).
 // Leave empty to keep the feature fully disabled and hidden.
 const USAGE_BEACON_URL = '';
@@ -793,6 +793,8 @@ function sanitizeSharedConfig(d) {
   pick('libraryBoost', v => ['none','default','strong'].includes(v));
   pick('nzbFailoverPosition', v => ['before-torrents','after-torrents'].includes(v));
   pick('maxFailoverNzbs', v => [1,2,3,5].includes(Number(v)));
+  // Saved and shared, but until 3.41 never read back: every reload reset the cap to 0.
+  pick('bandwidthMbps', v => Number.isInteger(v) && v >= 0 && v <= 10000);
   pick('instanceHost', v => v === 'auto' || v === 'custom' || Object.prototype.hasOwnProperty.call(HOST_BASE_URLS, v));
   ['p2pEnabled','qualityFirst','resolutionFirst','foreignLangKill','exclude4K','excludeDV','quickStart','langExclusive','langsSet','simpleMode','dedupMerge','preloadEnabled','patchCinemeta','installAIOMeta','nzbFailover'].forEach(k => pick(k, v => typeof v === 'boolean'));
   pick('autoPlayMethod', v => ['matchingFile','matchingIndex','firstFile'].includes(v));
