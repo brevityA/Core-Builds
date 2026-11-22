@@ -5,13 +5,18 @@
     "description": "Anime-optimised build for Hotack L007CM. TorBox Pro · SeaDex · NZBGeek · EZTV · Meteor. Non-Anime Query Guard. SeaDex best releases · Dual audio · Sub + Dub aware. SDR · 1080p · DD+/AAC/FLAC.",
     "source": "external",
     "author": "Personal",
-    "version": "1.2.6",
+    "version": "1.2.7",
     "category": "Anime",
     "serviceRequired": false,
     "setToSaveInstallMenu": true,
     "sourceUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Personal/core-personal-anime.json",
     "changelogUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md",
     "changelog": [
+      {
+        "date": "2026-11-21",
+        "version": "1.2.7",
+        "content": "Meteor's Usenet search is back on for AIOStreams 2.36 and 2.37 hosts: the last version removed its option, which those releases still use (2.38 and later ignore it)."
+      },
       {
         "date": "2026-11-21",
         "version": "1.2.6",
@@ -896,6 +901,10 @@
             ],
             "showStreams": true,
             "enabled": true
+          },
+          "usenet": {
+            "enabled": true,
+            "customSearchEngines": true
           },
           "resources": [
             "stream"

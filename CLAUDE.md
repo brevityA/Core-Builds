@@ -530,7 +530,7 @@ Meteor ≤ 5, Comet ≤ 5, MediaFusion ≤ 4, EZTV ≤ 3, HdHub ≤ 3, Torrent G
 ### Single (TorBox Pro)
 - `Single/core-nexus-4k-apex.json` v0.9.9 — flagship 4K, IQR PSEs, pow() decay, 5s dynamic fetching cap, Score IQR Guard, elite group pins, perGroup() Extra Cached
 - `Single/core-nexus-4k-apex-torbox.json` v2.12.19 — TorBox-cached-only Apex variant, Score IQR Guard, elite group pins, perGroup() Extra Cached
-- `Single/core-nexus-stream.json` v2.10.20 — 1080p streaming quality, 720p fallback
+- `Single/core-nexus-stream.json` v2.10.21 — 1080p streaming quality, 720p fallback
 - `Single/core-nexus-stream-lite.json` v2.10.18 — lite variant
 - `Single/core-nexus-stream-firestick.json` v2.10.18 — Fire Stick optimised
 - `Single/core-nexus-stream-firestick-lite.json` v2.10.5

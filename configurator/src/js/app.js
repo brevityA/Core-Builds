@@ -53,7 +53,7 @@ const STEPS = 6;
 // workflow) the raw x.y here expands to x.y.0 in package.json / versions.json and
 // the release tag; the built badge drops the trailing .0. At the 2026-09-06
 // audit the release tag was v3.7.0 while this said 3.1 — they must move together.
-const CONFIGURATOR_VERSION = '3.39';
+const CONFIGURATOR_VERSION = '3.40';
 // Set to a collector endpoint to enable the opt-in anonymous usage ping (service+device+resolution only).
 // Leave empty to keep the feature fully disabled and hidden.
 const USAGE_BEACON_URL = '';
@@ -846,9 +846,18 @@ function savedHostLabel(host) {
   const id = Object.keys(HOST_BASE_URLS).find(k => HOST_BASE_URLS[k] === host);
   return id ? (HOST_LABEL_MAP[id] || id) : String(host).replace(/^https?:\/\//, '').split('/')[0];
 }
+// Up to date when a fresh build from the current choices matches what was saved:
+// the same comparison the dialog shows as "No changes", so the card stays away until
+// a release or a changed choice (formatter, proxy, add-ons, anything the build reads)
+// gives it something to do. If the build cannot run, the card shows as before.
+function savedSetupIsCurrent(rec) {
+  if (!rec || !S.service) return false;
+  try { return diffConfigSections(rec.config, sanitizeTemplateForRemoteImport(buildFinal()).config).length === 0; }
+  catch(e) { return false; }
+}
 function splashUpdateCard() {
   const rec = lastSavedConfig();
-  if (!rec) return '';
+  if (!rec || savedSetupIsCurrent(rec)) return '';
   const when = new Date(rec.ts).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
   const older = rec.ver && rec.ver !== CONFIGURATOR_VERSION ? ` with v${escHtml(String(rec.ver))}` : '';
   return `<button type="button" class="start-card start-update" data-action="update-my-setup">
@@ -915,10 +924,13 @@ function updateMySetup() {
       }
       recordSavedConfig(rec.host, rec.uuid, cfg);
       saveLastGen();
-      go.textContent = 'Saved';
+      // Fold the dialog down to the result, then close it; render() drops the card,
+      // which now matches what was saved.
+      overlay.querySelector('.upd-box')?.classList.add('upd-done');
       out.innerHTML = `<div class="upd-ok">Updated on ${hostLbl}. Streams use it straight away.</div>`;
       showToast('Your setup is updated');
       render();
+      setTimeout(() => { if (overlay.isConnected) close(); }, 2200);
     } catch(err) {
       logError('deploy', 'Update in place failed', { host: S.instanceHost, error: err?.message });
       go.disabled = false; go.textContent = 'Try again';

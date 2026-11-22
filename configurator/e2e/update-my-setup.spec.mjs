@@ -76,20 +76,44 @@ async function installOnce(page, calls, opts) {
   return errors;
 }
 
+// Give the card something to do: pick another stream-card style in the real picker,
+// as someone changing a choice would. (Rewriting the saved state from the test
+// instead trips CodeQL's clear-text-storage check, which follows that key.)
+async function changeAChoice(page) {
+  await page.evaluate(() => { location.hash = '#cards'; });
+  const row = page.locator('#advancedDrawer .fmt-row[data-fmt="core-detailed"]');
+  await row.click();
+  await expect(row).toHaveAttribute('aria-pressed', 'true');
+  await expect.poll(() => page.evaluate(() => JSON.parse(localStorage.getItem('coreBuild') || '{}').formatter)).toBe('core-detailed');
+  await page.goto('/');
+}
+
 test('the first screen offers Update my setup and saves over the same config', async ({ page }) => {
   test.setTimeout(90_000);
   const calls = [];
   const errors = await installOnce(page, calls);
   const card = page.locator('[data-action="update-my-setup"]');
+  // Just saved from these choices: a rebuild is the same config, so no card.
+  await expect(page.locator('[data-action="open-express-lane"]')).toBeVisible();
+  await expect(card).toHaveCount(0);
+  await changeAChoice(page);
   await expect(card).toBeVisible();
   await expect(card).toContainText('Your Stremio link keeps working');
   await card.click();
   const modal = page.locator('#updateSetupModal');
   await expect(modal).toBeVisible();
-  // Same choices, same release: nothing differs from what was saved.
-  await expect(modal).toContainText('No changes');
+  await expect(modal.locator('.upd-sec').first()).toBeVisible();
+  await expect(modal.locator('#updSetupGo')).toHaveText('Save to my AIOStreams');
   await modal.locator('#updSetupGo').click();
   await expect(modal.locator('#updSetupResult')).toContainText('Streams use it straight away');
+  // Once saved it folds to the result, closes itself, and the card goes with it.
+  await expect(modal.locator('.upd-list')).toBeHidden();
+  await expect(modal.locator('#updSetupGo')).toBeHidden();
+  await expect(modal).toHaveCount(0, { timeout: 5000 });
+  await expect(card).toHaveCount(0);
+  await page.reload();
+  await expect(page.locator('[data-action="open-express-lane"]')).toBeVisible();
+  await expect(card, 'still up to date after a reload').toHaveCount(0);
   const updates = calls.filter(c => c.method === 'PUT');
   expect(updates).toHaveLength(1);
   expect(new URL(updates[0].url).pathname).toMatch(/\/api\/v1\/user$/);
@@ -105,12 +129,7 @@ test('a changed choice shows up before saving', async ({ page }) => {
   test.setTimeout(90_000);
   const calls = [];
   await installOnce(page, calls);
-  await page.evaluate(() => {
-    const st = JSON.parse(localStorage.getItem('coreBuild'));
-    st.resolution = '1080p';
-    localStorage.setItem('coreBuild', JSON.stringify(st));
-  });
-  await page.reload();
+  await changeAChoice(page);
   await page.locator('[data-action="update-my-setup"]').click();
   const modal = page.locator('#updateSetupModal');
   await expect(modal.locator('.upd-sec').first()).toBeVisible();
@@ -121,6 +140,7 @@ test('a refused update leaves the config alone and offers the paste method', asy
   test.setTimeout(90_000);
   const calls = [];
   await installOnce(page, calls, { updateStatus: 400 });
+  await changeAChoice(page);
   await page.locator('[data-action="update-my-setup"]').click();
   const modal = page.locator('#updateSetupModal');
   await modal.locator('#updSetupGo').click();
@@ -135,6 +155,7 @@ test('a proxy or server failure is not reported as unchanged', async ({ page }) 
   test.setTimeout(90_000);
   const calls = [];
   await installOnce(page, calls, { updateStatus: 502 });
+  await changeAChoice(page);
   await page.locator('[data-action="update-my-setup"]').click();
   const modal = page.locator('#updateSetupModal');
   await modal.locator('#updSetupGo').click();

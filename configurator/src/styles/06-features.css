@@ -158,6 +158,7 @@ a.core-tool-door:focus-visible{outline:2px solid #67e8f9;outline-offset:3px}
 .upd-ok,.upd-err{margin-top:10px;font-size:.76rem;line-height:1.5}.upd-ok{color:#34d399}.upd-err{color:#f87171}
 [data-theme='light'] .upd-go{color:#047857;border-color:rgba(4,120,87,.45)}[data-theme='light'] .upd-sec{border-color:#d7dee5}[data-theme='light'] .upd-ok{color:#047857}[data-theme='light'] .upd-err{color:#b91c1c}
 .upd-box{max-width:520px}.upd-title{font-size:1.05rem}.upd-title svg{color:var(--th-accent)}.upd-actions{display:flex;gap:8px;margin-top:12px}.upd-paste{margin-top:8px}
+.upd-done .upd-list,.upd-done .fastlane-trust,.upd-done .upd-actions,.upd-done .modal-sub{display:none}
 
 /* ── 2026-11 UI pass: journey components (classes replace inline styles) ── */
 /* Fine-Tune: the one advanced entry point. Quiet secondary, no uppercase glow. */
