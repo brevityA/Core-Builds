@@ -1,4 +1,8 @@
 export const CHANGELOG = [
+  { v:'3.41', date:'Nov 22 2026', items:[
+    'Bandwidth cap kept between visits — a connection speed typed into Quick install or Fine-Tune was saved but never read back, so reopening the configurator reset it to Auto, and a share link dropped it the same way. Builds made after a reload quietly lost the bitrate cap, and since 3.40 the Update my setup card came back on every visit for anyone who had set one. It is now restored on load and from share links (whole numbers from 0 to 10,000 Mbps).',
+    'Generated output unchanged — every reference config is byte-for-byte what 3.40 produced apart from the version stamp; only a reload or share link with a bandwidth cap now builds what was chosen.',
+  ]},
   { v:'3.40', date:'Nov 21 2026', items:[
     'Update my setup steps aside once you are up to date — after a successful save the dialog folded nothing away: the list of changes and the Save button stayed up, and the Update my setup card stayed on the first screen as if there were still something to do. Now the dialog folds down to “Updated on …” and closes itself, and the card only appears when there is something to update: when rebuilding from your current choices gives a different config from the one last saved, because of a newer Core Builds release or a choice you changed (stream cards, add-ons, proxy, anything the build uses). It is the same comparison the dialog shows as “No changes”.',
     'Generated output unchanged — every reference config is byte-for-byte what 3.39 produced apart from the version stamp; only the Update my setup card and dialog changed.',

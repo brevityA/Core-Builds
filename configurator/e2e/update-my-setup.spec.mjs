@@ -125,6 +125,30 @@ test('the first screen offers Update my setup and saves over the same config', a
   expect(errors).toEqual([]);
 });
 
+test('a bandwidth cap survives a reload, so the card stays away', async ({ page }) => {
+  test.setTimeout(90_000);
+  const calls = [];
+  await mockSplashRequests(page);
+  await mockHost(page, calls);
+  await page.goto('/');
+  await page.evaluate(() => { localStorage.clear(); localStorage.setItem('cb_tut_seen', '1'); });
+  await page.reload();
+  await page.locator('[data-action="open-express-lane"]').click();
+  await page.locator('[data-express-cred="torbox"]').fill('test-torbox-key');
+  await page.locator('#expressAdvanced > summary').click();
+  await page.locator('#expressBandwidth').fill('100');
+  await page.locator('#expressBandwidth').dispatchEvent('change');
+  await page.locator('[data-express-target="manifest"]').click();
+  await page.locator('#expressGo').click();
+  await page.locator('#pwdPrompt .pwd-go').click();
+  await expect(page.locator('#manifestModal')).toBeVisible({ timeout: 45000 });
+  expect(await page.evaluate(() => JSON.parse(localStorage.getItem('coreBuild')).bandwidthMbps)).toBe(100);
+  await page.goto('/');
+  await expect(page.locator('[data-action="open-express-lane"]')).toBeVisible();
+  // Before 3.41 the cap was dropped on load, the rebuild differed and the card came back.
+  await expect(page.locator('[data-action="update-my-setup"]')).toHaveCount(0);
+});
+
 test('a changed choice shows up before saving', async ({ page }) => {
   test.setTimeout(90_000);
   const calls = [];
