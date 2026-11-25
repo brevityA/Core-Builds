@@ -27,6 +27,7 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     outputs:
       version: ${{ steps.version.outputs.configurator }}
     steps:
@@ -64,17 +65,20 @@ jobs:
   deploy:
     needs: build
     runs-on: ubuntu-latest
+    # Holds the pages concurrency group while it runs; never for GitHub's 6 h default.
+    timeout-minutes: 15
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url || steps.retry.outputs.page_url }}
     steps:
       - name: Wait until the artifact is listed
+        timeout-minutes: 3
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           url="${GITHUB_API_URL}/repos/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}/artifacts?name=github-pages"
           for i in $(seq 1 24); do
-            n=$(curl -fsS -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" "$url" \
+            n=$(curl -fsS --max-time 10 -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" "$url" \
               | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>console.log(JSON.parse(s).total_count||0))') || n=0
             if [ "$n" -gt 0 ]; then echo "github-pages artifact listed after $((i * 5 - 5)) s"; exit 0; fi
             sleep 5
@@ -96,6 +100,7 @@ jobs:
         uses: actions/deploy-pages@v5
 
       - name: Check the live site serves this build
+        timeout-minutes: 5
         env:
           WANT: ${{ needs.build.outputs.version }}
           PAGE_URL: ${{ steps.deployment.outputs.page_url || steps.retry.outputs.page_url }}
@@ -104,7 +109,7 @@ jobs:
           [ -n "$base" ] || base="https://brevitya.github.io/Core-Builds"
           # The Pages CDN can lag the deployment by a minute or two.
           for i in $(seq 1 18); do
-            got=$(curl -fsS "$base/versions.json?run=${GITHUB_RUN_ID}-$i" \
+            got=$(curl -fsS --max-time 10 "$base/versions.json?run=${GITHUB_RUN_ID}-$i" \
               | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>console.log(JSON.parse(s).configurator))') || got=""
             if [ "$got" = "$WANT" ]; then echo "Live site serves configurator $got"; exit 0; fi
             echo "Live site serves '${got:-nothing}', want $WANT; waiting"
