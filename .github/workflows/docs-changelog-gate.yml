@@ -141,3 +141,18 @@ jobs:
         env:
           BASE_REF: ${{ github.base_ref }}
         run: python3 scripts/check_output_note.py --base "origin/${BASE_REF}"
+
+      # Generated docs (What's New, roadmap, template directory, tools page) must be
+      # regenerated in the PR itself. main's rules refuse direct pushes, so the
+      # post-merge Sync Doc Versions job can only report drift, never fix it:
+      # #851 merged template bumps without the regenerated pages and that job
+      # failed on main. Fail here instead, with the command that fixes it.
+      - name: Check generated docs are up to date
+        run: |
+          python3 scripts/sync-docs.py --apply > /tmp/sync-docs.log 2>&1 || { cat /tmp/sync-docs.log; exit 1; }
+          if ! git diff --quiet; then
+            git --no-pager diff --stat
+            echo "::error::Generated docs are out of date. Run: python3 scripts/sync-docs.py --apply, then npm run build --prefix configurator, and commit the result."
+            exit 1
+          fi
+          echo "Generated docs are up to date"
