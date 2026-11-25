@@ -278,7 +278,7 @@ python3 scripts/template_builder.py --only stream  # filter by name
 
 1. **groups.addons = instanceId** — NEVER use display names (see CRITICAL section above)
 2. **Relative links from /configurator/** — use `../` prefix, not `./`
-3. **GitHub Pages deploy failures** — check Actions tab; `deploy-configurator.yml` must succeed
+3. **GitHub Pages deploy failures** — check Actions tab; `deploy-configurator.yml` must succeed. Since v3.42 it is two jobs (build → deploy): deploy waits until the `github-pages` artifact is listed, retries `deploy-pages` once, then requires the live `versions.json` to show the version it built. Before that, deploying a split second after upload failed 4 of 8 pushes in Nov 2026 with "No artifacts named github-pages"
 4. **Filtering/ files = runtime expressions, but nothing ships them today** — no shipped template sets the synced SEL URLs (see Filtering/ section), so fix the inline code in `app.js`
 5. **sortCriteria direction** — must be `"direction"` not `"order"` (AIOStreams rejects `"order"`)
 6. **addonLogo URL** — must use `/refs/heads/main/` not `/main/`
@@ -386,7 +386,7 @@ scripts/aios-regen/
 | Workflow | Trigger | Purpose |
 |---|---|---|
 | `deploy-configurator.yml` | push to main | Deploys entire repo root to GitHub Pages |
-| `sync-docs.yml` | push to main | Auto-generates ROADMAP.md + tools page from changelogs |
+| `sync-docs.yml` | push to main | Reports generated-doc drift on main (it cannot push: main requires PRs). The `changelog-format` PR check runs `sync-docs.py --apply` and fails on any diff, so regenerate docs in the PR |
 | `deploy-icon-request-broker.yml` | manual | Deploys CoreBuildsApps' icon-request worker (`tools/icon_request_broker/`) with this repo's Cloudflare secrets; guards rate-limit `namespace_id` overlap with the cors-proxy (same account), finds/creates its KV namespace, and pushes the worker's filing secrets from `ICONREQ_*` Actions secrets (`ICONREQ_GITHUB_TOKEN` = the owner's fine-grained token) |
 | `docs-changelog-gate.yml` | PRs | Blocks merges without changelog update |
 | `upstream-drift-watch.yml` | daily cron | Detects Vidhin05 regex/expression changes |

@@ -9,17 +9,26 @@ permissions:
   contents: read
   pages: write
   id-token: write
+  actions: read # wait-for-artifact lists this run's artifacts
 
 concurrency:
   group: pages
   cancel-in-progress: false
 
+# Build and deploy are separate jobs, GitHub's documented Pages pattern.
+#
+# Until v3.42 both ran in one job, and deploy-pages asked for the artifact a
+# fraction of a second after upload-pages-artifact finished. The artifact list
+# is eventually consistent, so 4 of 8 pushes in Nov 2026 failed with
+# "Found 0 artifact(s) ... No artifacts named github-pages", and the same
+# commit deployed fine when re-run by hand. The deploy job now waits until the
+# artifact is listed, retries the deploy once, and checks that the live site
+# serves the version it just built.
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+    outputs:
+      version: ${{ steps.version.outputs.configurator }}
     steps:
       - uses: actions/checkout@v7
 
@@ -35,7 +44,6 @@ jobs:
         run: |
           npm ci --ignore-scripts
           npm run build
-        continue-on-error: false
 
       - name: Verify build output
         run: |
@@ -43,11 +51,63 @@ jobs:
           node --check configurator/dist/web/assets/app.js || { echo "ERROR: built app.js has syntax errors"; exit 1; }
           echo "Build verified: configurator/index.html is $(wc -c < configurator/index.html) bytes"
 
+      - id: version
+        name: Read the version being deployed
+        run: echo "configurator=$(node -p "require('./versions.json').configurator")" >> "$GITHUB_OUTPUT"
+
       - uses: actions/configure-pages@v6
 
       - uses: actions/upload-pages-artifact@v5
         with:
           path: '.'
 
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url || steps.retry.outputs.page_url }}
+    steps:
+      - name: Wait until the artifact is listed
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          url="${GITHUB_API_URL}/repos/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}/artifacts?name=github-pages"
+          for i in $(seq 1 24); do
+            n=$(curl -fsS -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" "$url" \
+              | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>console.log(JSON.parse(s).total_count||0))') || n=0
+            if [ "$n" -gt 0 ]; then echo "github-pages artifact listed after $((i * 5 - 5)) s"; exit 0; fi
+            sleep 5
+          done
+          echo "::error::github-pages artifact still not listed after 2 minutes"; exit 1
+
       - id: deployment
         uses: actions/deploy-pages@v5
+        continue-on-error: true
+
+      - name: Pause before retrying
+        if: steps.deployment.outcome == 'failure'
+        run: |
+          echo "::warning::First deploy attempt failed; retrying once in 30 s"
+          sleep 30
+
+      - id: retry
+        if: steps.deployment.outcome == 'failure'
+        uses: actions/deploy-pages@v5
+
+      - name: Check the live site serves this build
+        env:
+          WANT: ${{ needs.build.outputs.version }}
+          PAGE_URL: ${{ steps.deployment.outputs.page_url || steps.retry.outputs.page_url }}
+        run: |
+          base="${PAGE_URL%/}"
+          [ -n "$base" ] || base="https://brevitya.github.io/Core-Builds"
+          # The Pages CDN can lag the deployment by a minute or two.
+          for i in $(seq 1 18); do
+            got=$(curl -fsS "$base/versions.json?run=${GITHUB_RUN_ID}-$i" \
+              | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>console.log(JSON.parse(s).configurator))') || got=""
+            if [ "$got" = "$WANT" ]; then echo "Live site serves configurator $got"; exit 0; fi
+            echo "Live site serves '${got:-nothing}', want $WANT; waiting"
+            sleep 10
+          done
+          echo "::error::Live site does not serve configurator $WANT after 3 minutes"; exit 1

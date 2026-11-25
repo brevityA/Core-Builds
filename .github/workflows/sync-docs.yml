@@ -1,7 +1,7 @@
 name: Sync Doc Versions
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: sync-docs-main
@@ -40,30 +40,21 @@ jobs:
             echo "changed=true" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Setup Node + rebuild configurator bundle (inlines tools page)
-        if: steps.sync.outputs.changed == 'true'
-        uses: actions/setup-node@v7
-        with:
-          node-version: 22
-      - name: Rebuild bundle
-        if: steps.sync.outputs.changed == 'true'
-        run: cd configurator && npm ci --no-audit --no-fund && npm run build
-      - name: Commit and push
+      # main's rules require a pull request, so this job cannot push a fix (it
+      # tried, and every run with real drift failed with "push declined due to
+      # repository rule violations"). The changelog-format check on each PR now
+      # keeps the docs in step; this only reports drift that slipped past it.
+      - name: Report drift
         if: steps.sync.outputs.changed == 'true'
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add CLAUDE.md README.md "Templates/Torbox/README.md" "Guides/LABS.md" \
-            docs/introduction.mdx docs/template-directory.mdx docs/nightly-and-labs.mdx \
-            docs/changelog.mdx docs/roadmap.mdx docs/whats-new.mdx \
-            ROADMAP.md tools/index.html configurator/index.html
-          git commit -m "chore: sync doc versions + roadmap + tools page from changelogs"
-          # Avoid races with scheduled status commits or another docs sync.
-          for attempt in 1 2 3; do
-            git fetch origin main
-            git rebase origin/main && git push origin HEAD:main && exit 0
-            git rebase --abort || true
-            sleep $((attempt * 5))
-          done
-          echo "Unable to push docs sync after 3 attempts" >&2
+          {
+            echo "### Generated docs are out of date on main"
+            echo
+            echo '```'
+            git --no-pager diff --stat
+            echo '```'
+            echo
+            echo "Fix in a pull request: \`python3 scripts/sync-docs.py --apply\`, then \`npm run build --prefix configurator\`."
+          } >> "$GITHUB_STEP_SUMMARY"
+          echo "::error::Generated docs drifted on main; see the job summary for the fix"
           exit 1
