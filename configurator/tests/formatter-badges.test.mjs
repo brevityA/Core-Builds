@@ -64,5 +64,9 @@ test('HDR10 and HDR10+ labels show one badge each (replace chain)', { skip }, ()
     for (const tags of [['HDR10'], ['HDR10+'], ['DV', 'HDR10']]) {
       assert.doesNotMatch(renderWith(f, { visualTags: tags }), /🌟 🌟|✨ 🌟/, `${f.id}: ${tags.join('+')} doubled`);
     }
+    // The label must also be there, in the description itself (the name line has its own).
+    const desc = tags => aio.render(f.d, aio.parseValue({ ...PREVIEW_SAMPLE, stream: { ...PREVIEW_SAMPLE.stream, visualTags: tags } }));
+    assert.match(desc(['HDR10']), /🌟 HDR¹⁰/, `${f.id}: HDR10 label`);
+    assert.match(desc(['HDR10+']), /✨ HDR¹⁰⁺/, `${f.id}: HDR10+ label`);
   }
 });
