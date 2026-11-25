@@ -1,0 +1,162 @@
+---
+title: "Start Here: Step-by-Step Setup"
+sidebarTitle: "Start Here (Beginners)"
+description: "Never done this before? Pick your app and follow every step, from nothing to a working list of streams."
+---
+
+This page assumes you know nothing about addons, debrid or AIOStreams. Follow it top to bottom. It takes about ten minutes the first time.
+
+## The idea in one minute
+
+- **Your app** (Stremio, Nuvio, WuPlay or Chillio) shows movies and shows, but it does not find the video files itself. It asks **addons** for them.
+- **Core Builds** makes one addon for you that searches many sources, removes the junk and puts the best streams at the top.
+- That addon runs on **AIOStreams**, a free service hosted by volunteers. You never have to visit it: the configurator sets it up for you.
+- The streams come from a **service**. A paid debrid service (TorBox, Real-Debrid, AllDebrid, Premiumize) or EasyNews is usually the fastest and most reliable. **Free / P2P** works with no account.
+
+You end up with one web link, the **manifest URL**, and you paste it into your app once.
+
+## Before you start
+
+<Steps>
+  <Step title="Install your app">
+    Install the app you want to watch on. Not sure? **Stremio** works almost everywhere. On iPhone, iPad and Apple TV, **Nuvio** is the usual choice.
+  </Step>
+  <Step title="Pick a service, or go free">
+    If you already pay for TorBox, Real-Debrid, AllDebrid, Premiumize or EasyNews, use it. If you have none, you can start with **Free / P2P** and add a service later. See [Which debrid?](/debrid-comparison) to compare them.
+  </Step>
+  <Step title="Use a phone or computer for setup">
+    Even if you watch on a TV, do the setup on a phone or computer. Typing keys with a TV remote is painful, and each app section below shows how to get the result onto the TV.
+  </Step>
+</Steps>
+
+## Part 1: Build your addon (same for every app)
+
+<Steps>
+  <Step title="Open the configurator">
+    Go to **[brevitya.github.io/Core-Builds/configurator](https://brevitya.github.io/Core-Builds/configurator/)** and tap **Quick install**.
+
+    The page appears in your browser's language when it is English, Español, Português, Français or Deutsch. Change it with the language button at the top right.
+  </Step>
+  <Step title="Step 1 · Install to: pick your app">
+    Under **App**, tap the app you use: **Stremio**, **Nuvio**, **WuPlay**, **Chillio**, or **Other app** for anything else that takes Stremio addons.
+  </Step>
+  <Step title="Step 2 · Service: pick yours and paste the key">
+    Tap your service, then use the **Get key ↗** link next to the box. It opens the page on the service's website where your key (sometimes called an API key or token) is shown. Copy it, come back and paste it in.
+
+    Chose **Free / P2P**? There is no key. Skip to the next step.
+
+    Leave **AIOStreams host** on **Auto**. It picks a working public host for you.
+  </Step>
+  <Step title="Step 3 · Preferences: leave the recommended choice">
+    **What matters most** is already on **Balanced**, which is right for most people. Pick **Fast** if your internet is slow or your device is old, **Maximum** if you have fast internet and a 4K TV.
+
+    You don't need to open **Options & defaults**. Everything there has a sensible default.
+  </Step>
+  <Step title="Tap Install in ~30 seconds">
+    A **Set a Password** box appears. Leave **Auto-generate** selected, **write the password down or save it in your password manager**, and tap **Continue**.
+
+    <Warning>
+    You need this password to change or update your addon later. Nobody, including Core Builds, can recover it for you.
+    </Warning>
+  </Step>
+</Steps>
+
+When it finishes, you get your **manifest URL**: a long link ending in `manifest.json`. Treat it like a password: it contains your private settings, so don't post it in public.
+
+## Part 2: Add it to your app
+
+<Tabs>
+  <Tab title="Stremio">
+    **Easiest way: let the configurator install it for you.**
+
+    1. In Step 1, keep **Direct Install** and **Stremio** selected.
+    2. Fill in the email and password of your Stremio account. They are only used to sign in to Stremio for this install.
+    3. Tap **Install in ~30 seconds**. The addon is added to your Stremio account.
+    4. Open Stremio on any device signed in to **the same account**: the addon is already there. This is the simplest way to set up a TV. Do the setup on your phone, then just sign in on the TV.
+
+    **Prefer not to type your Stremio password?** Leave the email and password empty, or pick **Manifest URL** at the top. You get the manifest URL instead:
+
+    1. Copy it.
+    2. In Stremio, open **Addons**, paste the link into the search box at the top and press Enter.
+    3. Tap **Install**.
+
+    <Note>
+    Your other Stremio addons stay. Turn on **Clean reinstall** only if you want earlier Core Builds addons removed.
+    </Note>
+
+    More detail: [Stremio Setup](/stremio-setup).
+  </Tab>
+
+  <Tab title="Nuvio">
+    1. In Step 1, choose **Nuvio**. When the install finishes, the manifest URL is **already copied** to your clipboard.
+    2. Open Nuvio and go to **Account → Addons** (on some versions: **Settings → Add-ons**).
+    3. Paste the link into the addon field and confirm.
+
+    **On Apple TV or Android TV**, paste or type the same link in Nuvio's **Addons** screen on the TV.
+
+    <Tip>
+    Nuvio shows a **Playback Error** straight away when a stream fails, where Stremio would keep spinning. That's normal: pick the next stream in the list.
+    </Tip>
+
+    More detail: [Nuvio Setup](/nuvio-setup) · prettier stream labels: [Nuvio Badges](/nuvio-badges).
+  </Tab>
+
+  <Tab title="WuPlay">
+    1. In Step 1, choose **WuPlay**. When the install finishes, the manifest URL is **already copied** to your clipboard.
+    2. **On a phone:** open WuPlay, go to **Addons**, tap **Add Addon** and paste the link.
+    3. **On a TV or Fire Stick** (easier than typing with the remote):
+       - On the TV, open WuPlay → **Settings → Configuration**. Your **Profile Key** and a **QR code** are shown.
+       - Scan the QR code with your phone, or go to [config.wuplay.app/configure](https://config.wuplay.app/configure/) and enter the Profile Key.
+       - Under **Add-ons**, paste the manifest URL and save. It syncs to the TV by itself.
+
+    <Warning>
+    Keep your WuPlay Profile Key somewhere safe. A lost Profile Key can't be recovered.
+    </Warning>
+
+    More detail: [WuPlay Setup](/wuplay-setup).
+  </Tab>
+
+  <Tab title="Chillio">
+    1. In Step 1, choose **Chillio**. You get a **ChillLink URL**, which is already copied to your clipboard.
+    2. In Chillio, open **Settings → Manage Account → Add Account → ChillLink Protocol**.
+    3. Paste the link, give the account a name if you like, and **Save**.
+
+    The ChillLink URL supplies streams only. For TMDB or Trakt home rows, combine it with a feed using Chillio's own [Manifest Merger](https://link.chillio.app/manifest-merger).
+  </Tab>
+
+  <Tab title="Other app">
+    Any app that accepts Stremio addons can use Core Builds.
+
+    1. In Step 1, choose **Other app**. You get the manifest URL; tap **Copy**.
+    2. In your app, find the place to add an addon by URL. It is usually called **Addons**, **Add-ons** or **Install from URL**.
+    3. Paste the link and confirm.
+
+    If the app asks for a "manifest", "addon URL" or "Stremio addon link", it is this same link.
+  </Tab>
+</Tabs>
+
+## Part 3: Check it works
+
+1. In your app, search for a popular title such as **Breaking Bad**, open **Season 1, Episode 1**, and look at the stream list.
+2. You should see streams with labels like resolution, size and audio. The ones at the top are the ones Core Builds ranks best.
+3. Pick the first one. If it doesn't start within a few seconds, pick the next.
+
+<Tip>
+Test with a popular title first. Very new, very old or very niche titles can have few or no streams on any setup.
+</Tip>
+
+## Something's wrong?
+
+| What you see | What to do |
+|---|---|
+| **No streams at all** | Check that you pasted the whole key in Step 2, with no space at the start or end, and that your service subscription is active. Then build again. |
+| **The addon won't install** | Make sure you copied the whole link, ending in `manifest.json`. Copy it again from the configurator and paste it fresh. |
+| **Streams appear but won't play** | Try the next stream. If many fail on a TV, open **Options & defaults** in Quick install, set **Device** to your TV or stick, and install again. |
+| **Everything buffers** | Rebuild with **What matters most → Fast**, or set **Connection speed** under **Options & defaults**. |
+| **I lost my AIOStreams password** | Build a new addon in the configurator and install that one instead. You can remove the old one in your app's Addons screen. |
+
+Still stuck? Open the configurator menu → **Troubleshooter**, see [Troubleshooting](/troubleshooting), or ask in [Core Crew on Reddit](https://www.reddit.com/r/CoreBuilds/). Never post your keys, passwords or manifest URL when asking for help.
+
+## Later: updating
+
+When Core Builds improves, reopen the configurator on the same browser. If your setup can be updated, an **Update my setup** card appears on the first screen: tap it and follow the prompts. Your app picks up the change by itself; you don't need to reinstall anything.
