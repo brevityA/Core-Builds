@@ -1,0 +1,25 @@
+{
+  "_comment": "Public AIOStreams instances listed on stremio-addons.net that were reviewed and deliberately left out of configurator/src/data/hosts.js. check-addon-directory-drift.mjs reports them but no longer reopens the drift issue for them. Re-review when the reason no longer holds.",
+  "origins": {
+    "https://aiostreamsfortheweebs.midnightignite.me": {
+      "reviewed": "2026-11-25",
+      "verdict": "not added",
+      "reason": "Nightly sibling of Midnight's Stable, which is registered; one instance per operator, and the stable one runs the same 2.38.1 release."
+    },
+    "https://aiostreams.forthewizards.uk": {
+      "reviewed": "2026-11-25",
+      "verdict": "not added",
+      "reason": "Nightly sibling of Wizaardd Stable, which is registered; one instance per operator, and the stable one runs the same 2.38.1 release."
+    },
+    "https://aio.managedservers.click": {
+      "reviewed": "2026-11-25",
+      "verdict": "not added",
+      "reason": "LowDefPirate, 2.36.0: regex access 'trusted' with an empty allowlist, so every Core Builds template is refused on save; maxAddons 15."
+    },
+    "https://aiostreams.compass.sarl": {
+      "reviewed": "2026-11-25",
+      "verdict": "not added",
+      "reason": "Compass: /api/v1/status did not answer, so its capabilities could not be audited."
+    }
+  }
+}
