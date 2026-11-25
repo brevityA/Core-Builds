@@ -201,7 +201,9 @@ test.describe('Express language from a Spanish browser', () => {
     page.on('dialog', dialog => dialog.accept());
     await page.locator('[data-action="open-express-lane"]').click();
     await expect(page.locator('#expressLang')).toHaveValue('Spanish');
-    await expect(page.locator('#expressSummary')).toContainText('Spanish');
+    // A Spanish browser also gets the Spanish interface (3.43), so the summary
+    // names the language in Spanish; the posted config below still says 'Spanish'.
+    await expect(page.locator('#expressSummary')).toContainText('Español');
     await page.locator('[data-express-cred="torbox"]').fill('test-torbox-key');
     await page.locator('[data-express-target="manifest"]').click();
     await page.locator('#expressGo').click();
