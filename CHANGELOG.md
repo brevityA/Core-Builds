@@ -1,5 +1,17 @@
 # Changelog
 
+## Unreleased
+
+### Fixed
+- **Stream-card badges that never showed (15 formatters, 52 templates)** — the downloadable formatters in `Formatters/` and the formatters inside the shipped templates still checked `stream.releaseGroup::~(?i)(epsilon|framestor|…)`, `stream.visualTags::~(?i)(DV|HDR|HLG)`, `stream.filename::~(?i)IMAX`, `stream.audioTags::~(?i)(EAC3|DDP|DD\+)` and similar. AIOStreams' `~` is a case-insensitive *includes* for text and an exact item match for lists; it never runs a regex, so the PREMIER, HDR, IMAX, Hybrid and DD+ badges were never shown. #845 fixed the configurator's built-ins; these copies now use the same forms (`::or::` chains of `releaseGroup::=…` and per-tag `visualTags::~…`, plain `filename::~imax`). Applied by `scripts/template-upgrades/v3_15_formatter_badges.py` (idempotent); one patch bump per template. Legacy and Deprecated lanes stay frozen.
+- **Doubled HDR star** — the label chain replaced `HDR10` with `🌟 HDR¹⁰` and then replaced `HDR` again inside it, so HDR10 streams showed `🌟 🌟 HDR¹⁰` and HDR10+ streams `✨ 🌟 HDR¹⁰⁺` in 154 places. The chain now replaces `HDR` first and finishes the HDR10+ / HDR10 labels from that.
+
+### Added
+- **Core Nexus Elite: PRELOAD, PROPER, REMASTER, REGRADED and PRIVATE badges** — fields AIOStreams 2.38 exposes that Elite did not show (formatter v2 pass).
+
+### Test Coverage
+- **`configurator/tests/formatter-files-badges.test.mjs`** — no shipped formatter or active template may write `::~(?i)`, and every one is rendered with AIOStreams' own formatter engine at the pin: elite group, IMAX and HDR conditions fire, HDR10/HDR10+ show one badge, Elite shows its new fields.
+
 ## 3.14.0 (2026-11-25)
 
 ### Added
