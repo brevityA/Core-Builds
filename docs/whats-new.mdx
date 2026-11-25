@@ -1,14 +1,30 @@
 ---
-title: "What's New — Configurator v3.41"
+title: "What's New — Configurator v3.42"
 sidebarTitle: "What's New"
-description: "Latest Core Builds Configurator releases (v3.41 and earlier), auto-generated from the in-app changelog."
+description: "Latest Core Builds Configurator releases (v3.42 and earlier), auto-generated from the in-app changelog."
 ---
 
 # What's New in the Configurator
 
-This page is regenerated from `configurator/src/data/changelog.js` by `scripts/sync-docs.py`, so it always reflects the latest shipped configurator version (currently **v3.41**).
+This page is regenerated from `configurator/src/data/changelog.js` by `scripts/sync-docs.py`, so it always reflects the latest shipped configurator version (currently **v3.42**).
 
 For the template-suite release log, see the [Changelog](https://corebuilds-docs.docsalot.dev/changelog).
+
+## Configurator v3.42 (Nov 25 2026)
+
+<CardGroup cols={2}>
+  <Card title="HDR labels without a doubled star" icon="sparkles">
+    the Apex, Apex v2 and Elite stream cards showed “🌟 🌟 HDR¹⁰” on HDR10 streams and “✨ 🌟 HDR¹⁰⁺” on HDR10+ ones: the label chain turned HDR10 into HDR¹⁰ and then replaced the HDR inside it again. Each tag now gets one badge.
+  </Card>
+  <Card title="Command-line builds match the configurator" icon="bolt">
+    the core-builds CLI carried its own copy of the stream-card formatters that had fallen behind: its elite-group, HDR, IMAX, Hybrid and DD+ badges never showed, and it lacked the three Core formatters. It is now generated from the configurator’s formatters, and a test keeps the two identical.
+  </Card>
+  <Card title="Generated output unchanged" icon="shield-check">
+    every reference config is byte-for-byte what 3.41 produced apart from the version stamp; only builds that use the Apex, Apex v2 or Elite stream cards change, in that card text, and CLI builds now use the configurator’s formatters.
+  </Card>
+</CardGroup>
+
+---
 
 ## Configurator v3.41 (Nov 22 2026)
 
@@ -47,21 +63,5 @@ For the template-suite release log, see the [Changelog](https://corebuilds-docs.
   </Card>
   <Card title="Stream cards unchanged" icon="shield-check">
     every card was re-rendered with AIOStreams 2.38.1’s formatter engine and looks exactly as it did under 2.36.0.
-  </Card>
-</CardGroup>
-
----
-
-## Configurator v3.38 (Nov 21 2026)
-
-<CardGroup cols={2}>
-  <Card title="Fine-Tune opens without a freeze" icon="sparkles">
-    it now opens with only the section you are heading to in the page and adds the rest just after it appears. On a phone simulated at a quarter of desktop speed, the longest freeze when opening it from Quick install, or straight at Stream cards, fell from 124–133 ms in 3.36 (94 ms in 3.37) to under 50 ms, the point where frames start to drop (median of 10 runs). Opening Quick install itself still takes about the same as in 3.36, around 55 ms.
-  </Card>
-  <Card title="Share link with a QR code" icon="bolt">
-    Share Link in Export & share now also shows a QR code to scan on another device and the link itself, ready to copy. If the browser refuses the copy, the link is selected on screen and a message says so; before, nothing happened. The link still carries settings only, never keys or passwords.
-  </Card>
-  <Card title="Generated output unchanged" icon="shield-check">
-    every reference config is byte-for-byte what 3.37 produced apart from the version stamp; only Fine-Tune opening and the share link changed.
   </Card>
 </CardGroup>

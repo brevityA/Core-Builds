@@ -55,3 +55,14 @@ test('HDR badges name each tag once', { skip }, () => {
     assert.doesNotMatch(renderWith(f, { visualTags: ['SDR'] }), /HDR¹⁰|👁️ DV/, `${f.id}: SDR shows no HDR badge`);
   }
 });
+
+test('HDR10 and HDR10+ labels show one badge each (replace chain)', { skip }, () => {
+  const users = FORMATTERS.filter(f => text(f).includes("replace('HDR','🌟 HDR')::replace('🌟 HDR10+',"));
+  assert.ok(users.length >= 3, `found ${users.length}`);
+  assert.deepEqual(FORMATTERS.filter(f => text(f).includes("replace('HDR10','🌟 HDR¹⁰')::replace('HLG','🌤️ HLG')::replace('HDR'")).map(f => f.id), [], 'old chain gone');
+  for (const f of users) {
+    for (const tags of [['HDR10'], ['HDR10+'], ['DV', 'HDR10']]) {
+      assert.doesNotMatch(renderWith(f, { visualTags: tags }), /🌟 🌟|✨ 🌟/, `${f.id}: ${tags.join('+')} doubled`);
+    }
+  }
+});

@@ -114,7 +114,7 @@ export const FORMATTER_PREVIEWS = {
     "n": "🟣 4K  ⚡ TB  👁️ DV 🌟 HDR¹⁰    EXAMPLE FEATURE  Core 87",
     "d": [
      " 🚀 INSTANT  💎 ELITE  ✦ 87  🏷️ ɢʀᴏᴜᴘ  ",
-     " 🎬 💎 REMUX  ʜᴇᴠᴄ  72 ᴍʙᴘꜱ  👁️ DV 🌟 🌟 HDR¹⁰  ",
+     " 🎬 💎 REMUX  ʜᴇᴠᴄ  72 ᴍʙᴘꜱ  👁️ DV 🌟 HDR¹⁰  ",
      " 🎛️ 💎 TRUEHD 🔮 ATMOS  🔊 7.1  🌍 🇬🇧  📝 🇬🇧",
      " 62 GB  🔌 ᴅᴇʙʀɪᴅ"
     ]
@@ -132,7 +132,7 @@ export const FORMATTER_PREVIEWS = {
     "n": "🟣 4K  ⚡ TB  🌟 HDR¹⁰    EXAMPLE FEATURE  Core 52",
     "d": [
      " ⚠️ UNCACHED  ✦ 52  🏷️ ɢʀᴏᴜᴘ  ",
-     " 🎬 💿 BLURAY  ʜᴇᴠᴄ  28 ᴍʙᴘꜱ  🌟 🌟 HDR¹⁰  ",
+     " 🎬 💿 BLURAY  ʜᴇᴠᴄ  28 ᴍʙᴘꜱ  🌟 HDR¹⁰  ",
      " 🎛️ 🔷 DTS-HD MA  🔉 5.1  🌍 🇬🇧",
      " 24 GB  🌱 41  🔌 ᴅᴇʙʀɪᴅ"
     ]
@@ -266,7 +266,7 @@ export const FORMATTER_PREVIEWS = {
     "n": "🟣 4K  ⚡ TB  👁️ DV 🌟 HDR¹⁰  💎 TRUEHD  EXAMPLE FEATURE",
     "d": [
      " 🚀 INSTANT  💎 ELITE  ✦ QUALITY  🏷️ ɢʀᴏᴜᴘ  ",
-     " 🎬 💎 REMUX  ʜᴇᴠᴄ  👁️ DV 🌟 🌟 HDR¹⁰  72 ᴍʙᴘꜱ  ",
+     " 🎬 💎 REMUX  ʜᴇᴠᴄ  👁️ DV 🌟 HDR¹⁰  72 ᴍʙᴘꜱ  ",
      " 🎛️ 💎 TRUEHD 🔮 ATMOS  🔊 7.1  🌍 🇬🇧",
      " 62 GB  🔌 ᴅᴇʙʀɪᴅ"
     ]
@@ -284,7 +284,7 @@ export const FORMATTER_PREVIEWS = {
     "n": "🟣 4K  ⚡ TB  🌟 HDR¹⁰  🔷 DTS-HD  EXAMPLE FEATURE",
     "d": [
      " ⚠️ UNCACHED  ✦ QUALITY  🏷️ ɢʀᴏᴜᴘ  ",
-     " 🎬 💿 BLURAY  ʜᴇᴠᴄ  🌟 🌟 HDR¹⁰  28 ᴍʙᴘꜱ  ",
+     " 🎬 💿 BLURAY  ʜᴇᴠᴄ  🌟 HDR¹⁰  28 ᴍʙᴘꜱ  ",
      " 🎛️ 🔷 DTS-HD MA  🔉 5.1  🌍 🇬🇧",
      " 24 GB  🌱 41  🔌 ᴅᴇʙʀɪᴅ"
     ]
@@ -297,7 +297,7 @@ export const FORMATTER_PREVIEWS = {
     "n": "🟣 4K  ⚡ TB  👁️ DV 🌟 HDR¹⁰  EXAMPLE FEATURE",
     "d": [
      " 🚀 INSTANT  💎 87  🏷️ ɢʀᴏᴜᴘ  ",
-     " 🎬 💎 REMUX  ʜᴇᴠᴄ  👁️ DV 🌟 🌟 HDR¹⁰  72 ᴍʙᴘꜱ  ",
+     " 🎬 💎 REMUX  ʜᴇᴠᴄ  👁️ DV 🌟 HDR¹⁰  72 ᴍʙᴘꜱ  ",
      " 🎛️ 💎 TRUEHD 🔮 ATMOS  🔊 7.1  🌍 🇬🇧  📝 🇬🇧",
      " 💾 62 GB  🔌 ᴅᴇʙʀɪᴅ"
     ]
@@ -315,7 +315,7 @@ export const FORMATTER_PREVIEWS = {
     "n": "🟣 4K  ⚡ TB  🌟 HDR¹⁰  EXAMPLE FEATURE",
     "d": [
      " ⚠️ UNCACHED  🏷️ ɢʀᴏᴜᴘ  ",
-     " 🎬 💿 BLURAY  ʜᴇᴠᴄ  🌟 🌟 HDR¹⁰  28 ᴍʙᴘꜱ  ",
+     " 🎬 💿 BLURAY  ʜᴇᴠᴄ  🌟 HDR¹⁰  28 ᴍʙᴘꜱ  ",
      " 🎛️ 🔷 DTS-HD MA  🔉 5.1  🌍 🇬🇧",
      " 💾 24 GB  🌱 41  🔌 ᴅᴇʙʀɪᴅ"
     ]

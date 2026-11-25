@@ -1,4 +1,9 @@
 export const CHANGELOG = [
+  { v:'3.42', date:'Nov 25 2026', items:[
+    'HDR labels without a doubled star — the Apex, Apex v2 and Elite stream cards showed “🌟 🌟 HDR¹⁰” on HDR10 streams and “✨ 🌟 HDR¹⁰⁺” on HDR10+ ones: the label chain turned HDR10 into HDR¹⁰ and then replaced the HDR inside it again. Each tag now gets one badge.',
+    'Command-line builds match the configurator — the core-builds CLI carried its own copy of the stream-card formatters that had fallen behind: its elite-group, HDR, IMAX, Hybrid and DD+ badges never showed, and it lacked the three Core formatters. It is now generated from the configurator’s formatters, and a test keeps the two identical.',
+    'Generated output unchanged — every reference config is byte-for-byte what 3.41 produced apart from the version stamp; only builds that use the Apex, Apex v2 or Elite stream cards change, in that card text, and CLI builds now use the configurator’s formatters.',
+  ]},
   { v:'3.41', date:'Nov 22 2026', items:[
     'Bandwidth cap kept between visits — a connection speed typed into Quick install or Fine-Tune was saved but never read back, so reopening the configurator reset it to Auto, and a share link dropped it the same way. Builds made after a reload quietly lost the bitrate cap, and since 3.40 the Update my setup card came back on every visit for anyone who had set one. It is now restored on load and from share links (whole numbers from 0 to 10,000 Mbps).',
     'Generated output unchanged — every reference config is byte-for-byte what 3.40 produced apart from the version stamp; only a reload or share link with a bandwidth cap now builds what was chosen.',
