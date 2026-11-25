@@ -438,9 +438,12 @@ def validate_template(fpath):
 
     # ── Size budget (AIOStreams hardcoded 102,400-byte save limit) ──
     # The limit applies to the compact serialized config POSTed to
-    # /api/v1/user, not the pretty-printed file on disk.
+    # /api/v1/user, not the pretty-printed file on disk. That body is
+    # JSON.stringify output sent as UTF-8, so count UTF-8 bytes: Python's
+    # default ensure_ascii turned each emoji into a 12-character \uXXXX pair
+    # and overstated formatter-heavy templates by about 1 KB.
     if is_core and not is_legacy and isinstance(c, dict):
-        compact = len(json.dumps(c, separators=(',', ':')))
+        compact = len(json.dumps(c, separators=(',', ':'), ensure_ascii=False).encode('utf-8'))
         if compact > 100_000:
             err(name, f"config payload {compact:,} B > 100,000 B — AIOStreams save limit is 102,400 B; trim to keep margin")
         elif compact > 90_000:
