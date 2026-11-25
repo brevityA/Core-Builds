@@ -1,0 +1,44 @@
+---
+title: "Mobile Template"
+description: "A 1080p template for phones, tablets and data-capped connections."
+---
+
+**Core Nexus Mobile** keeps streams small enough for mobile data and weaker Wi-Fi while staying at 1080p.
+
+## What it does
+
+| Setting | Value |
+|---|---|
+| Resolution | 1080p first, then 720p and below |
+| Bitrate ceiling | 25 Mbps |
+| Size cap | 10 GB per movie, 3 GB per episode |
+| Picture | SDR preferred: phones show HDR inconsistently, and SDR files are smaller |
+| Excluded | AV1, 3D, and lossless audio (TrueHD, DTS-HD MA, DTS:X, FLAC) |
+
+An hour of 1080p WEB-DL at typical bitrates uses roughly 2–4 GB, so a film under this template stays well inside a 10 GB cap.
+
+## When to use it
+
+- Watching on a phone or tablet, on mobile data or a capped plan.
+- A home connection under about 30 Mbps, where 4K or REMUX files buffer.
+- A second Stremio profile for travel, alongside a 4K template on the TV.
+
+On a TV with a fast connection, a 1080p or 4K template from the [Template Directory](/template-directory) will look better.
+
+## Setup
+
+<Steps>
+  <Step title="Import the template">
+    Copy the **Mobile** import link from the [Template Directory](/template-directory#torbox-pro) and paste it into AIOStreams → **About → Get Started → Load Template**.
+  </Step>
+  <Step title="Add your TorBox key">
+    In AIOStreams → **Services**, paste your TorBox API key.
+  </Step>
+  <Step title="Save and install">
+    Click **Save**, copy the manifest URL and install it in Stremio or Nuvio on the device.
+  </Step>
+</Steps>
+
+<Tip>
+Want a different cap? In the [Configurator](/configurator), type your connection speed under **Connection speed · Mbps**. It limits bitrate to 80% of that speed, and keeps the setting between visits.
+</Tip>

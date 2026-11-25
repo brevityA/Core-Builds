@@ -1,6 +1,12 @@
 # Changelog
 
-## Unreleased
+## 3.14.0 (2026-11-25)
+
+### Added
+- **SeaDex picks first in Anime 4K and Anime (1080p)** — when a title has a SeaDex entry (`hasSeaDex`), SeaDex Best 2160p (4K only), then SeaDex Best 1080p, then SeaDex 1080p WEB-DL rank above the usual tiers. Titles without one rank exactly as before. Promoted from Anime 4K Labs, without its SeaDex Best `pin()`, which would have put an uncached SeaDex release above cached ones. The Dub templates keep their dub-first ranking, because SeaDex Best is often a Japanese-audio release. One patch bump each.
+- **Five templates added to the Template Directory** — Mobile, Mixed, Xiaomi 4K, Anime Dub 4K and 4K AllDebrid Essential shipped without a directory entry or import links. They now have both, and `sync-docs.py` keeps their versions current.
+- **Samsung TV setup and Mobile template guides** — which Samsung template to use, what each removes and why, and how to report a stream that will not play; and what the Mobile template caps and when to use it.
+- **`Formatters/Community/`** — a folder and submission rules for community stream-card layouts.
 
 ### Fixed
 - **HDR, PREMIER and IMAX badges never showed (Stream template)** — the formatter checked `stream.visualTags::~(?i)(DV|HDR|HLG)` and similar. In AIOStreams `~` is a case-insensitive *includes* for text and an exact item match for lists, never a regex, so these conditions were always false. They now use the per-tag and `::or::` chains the configurator formatters adopted in 3.36. Options that AIOStreams 2.38.1 no longer accepts are dropped from the Stream and Personal templates: a duplicate Newznab `url` beside `api.url`, MediaFusion `downloadViaBrowser`/`contributorStreams`, and `resources` on Zilean, Knaben and EZTV, which have no such option. Unknown options were ignored on save, so stream results are unchanged. One patch bump each.

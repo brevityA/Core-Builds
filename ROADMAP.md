@@ -11,6 +11,7 @@ Auto-generated from [`CHANGELOG.md`](https://github.com/brevityA/Core-Builds/blo
 
 | Version | Date | Highlights |
 | --- | --- | --- |
+| v3.14.0 | 2026-11-25 | SeaDex picks first in Anime 4K and Anime (1080p) — when a title has a SeaDex entry (hasSeaDex), SeaDex Best 2160p (4K on… |
 | v3.13.0 | 2026-11-14 | Best file first inside every tier (41 templates) — each active template now carries inline ranked stream expressions fro… |
 | v3.12.1 | 2026-10-23 | Remaining AIOStreams 2.36 save follow-ups (18 templates, one patch bump each) — the four Personal templates no longer ca… |
 | v3.12.0 | 2026-10-22 | 52 templates refused on AIOStreams 2.36 (AIOSubtitle removed) — AIOStreams 2.36.0 marks the aiosubtitle preset removed (… |
@@ -24,7 +25,6 @@ Auto-generated from [`CHANGELOG.md`](https://github.com/brevityA/Core-Builds/blo
 | v3.6.0 | 2026-08-11 | Preflight audit tool (Configurator v2.92 · Tools page) — audits any template or live config offline with rules learned f… |
 | v3.5.3 | 2026-08-04 | Episode-pack availability — multi-episode and season-pack streams were previously removed by an early exclusion filter b… |
 | v3.5.2 | 2026-08-02 | Core Builds CLI published to npm — npm install -g core-builds for generate, validate, diff, and info commands. Same @cor… |
-| v3.5.1 | 2026-07-31 | Capability-based device profiles (Configurator v2.87) — Android Mobile, Android TV / Google TV, Samsung Tizen, LG webOS,… |
 <!-- AUTO:ROOT_COMPLETED:END -->
 
 > **Shipped-then-removed:** Audio Pinnacle PSE and HDR/DV Priority PSE shipped at v2.84 and were **removed in v3.2.8** (REMUX-ranking fix). Do not re-implement.
@@ -35,50 +35,48 @@ Auto-generated from [`CHANGELOG.md`](https://github.com/brevityA/Core-Builds/blo
 
 | Item | Notes |
 |---|---|
-| `hasSeaDex` + `seMatched()` anime gating | LABS templates have it (Anime 4K Labs, All-Rounder Labs); needs promotion to stable Anime, Anime 4K, Anime Dub |
-| Samsung TV Nightly → stable | Samsung RU7100 4K has tier-guarded expressions; gathering hardware feedback before stable promotion |
-| Mobile / Bandwidth template validation | `core-nexus-mobile.json` exists in `Single/`; needs validation and documentation |
+| Samsung RU7100 hardware feedback | Promoted to stable in `Device/Samsung/`; collecting reports per TV model ([Samsung TV setup](docs/samsung-tv.mdx) says how to report) |
+| Profitability | Disclosed referral links in the service picker and a one-time thank-you after a successful install, pending the owner's choice of programmes and wording |
 
 ---
 
 ## 📋 Planned
 
-### Templates
-- [ ] **Anime Dub 4K variant** — English-dub priority at 4K for the growing dub community
-- [ ] **AllDebrid Essential** — Full-coverage AllDebrid template with quality gates (`Templates/AllDebrid/Essential/`)
-- [ ] **`pin()` top result** — Pin the #1 PSE-matched stream to position 1 regardless of sort order
-- [ ] **Deprecate Flash suite** — Under review; `excludeUncached: true` behaviour is genuinely distinct from Speed/Essential
-
-### Expression Layer
-- [ ] **`hasSeaDex` anime gating promotion** — Move from LABS to stable Anime templates
-- [ ] **`stddev()` / `variance()` PSE variants** — z-score style gating as alternative to IQR for large pools
-- [ ] **Per-indexer score weighting** — Reward high-trust indexers (BTN, PTP) above general public trackers
-
 ### Formatters
-- [ ] **Formatter v2 pass** — Review new AIOStreams token additions; refresh Elite formatter with any newly available fields
-- [ ] **Community formatter gallery** — Dedicated `Formatters/Community/` directory with user-submitted layouts
-
-### Infrastructure
-- [ ] **Automated live AIOStreams testing** — Docker-based e2e validation against a real AIOStreams instance
-- [ ] **GitHub Sponsors setup** — Ko-fi is live; explore GitHub-native sponsorship tier
+- [ ] **Formatter v2 pass** — check the Elite formatter against the fields AIOStreams 2.38.1 exposes and add the ones that earn their space
 
 ### Documentation
-- [ ] **Video walkthrough** — Import flow and template selection walkthrough for new users
-- [ ] **AllDebrid setup guide** — Mirror of the TorBox import guide scoped to AllDebrid credential setup
-- [ ] **Configurator guide** — Dedicated docs for wizard features (Resolution First, Foreign Language Kill, IQR PSEs, Parent/Child Config, Host Checker, Import)
-- [ ] **Samsung TV setup guide** — Which models are supported, what the template excludes, how to report hardware issues
+- [ ] **Video walkthrough** — import flow and template choice, for new users (needs a screen recording by the maintainer)
+
+### Infrastructure
+- [ ] **Sync Upstream Rules** — fails until *Settings → Actions → General → Allow GitHub Actions to create and approve pull requests* is turned on
 
 ---
 
-## 💡 Ideas / Under Consideration
+## ✔️ Done since the last roadmap pass (Nov 2026)
 
-| Idea | Status |
+- **SeaDex gating in stable Anime** — Anime 4K and Anime (1080p) rank SeaDex picks first when a title has a SeaDex entry (template suite 3.14.0). The Dub templates keep their dub-first ranking: SeaDex Best is often a Japanese-audio release.
+- **Anime Dub 4K**, **AllDebrid Essential (4K)**, **Mobile**, **Mixed** and **Xiaomi 4K** templates, now all listed in the [Template Directory](docs/template-directory.mdx)
+- **Samsung RU7100 4K** promoted from Nightly to stable
+- **Automated live AIOStreams testing** — the save test saves every generated and static config into a real AIOStreams at the pinned release on each PR
+- **GitHub Sponsors** alongside Ko-fi (`.github/FUNDING.yml`)
+- **Guides**: AllDebrid setup, Configurator, [Samsung TV setup](docs/samsung-tv.mdx), [Mobile template](docs/mobile-template.mdx)
+- **Community formatter folder** — [`Formatters/Community/`](Formatters/Community/README.md) with submission rules
+- **Live stream preview** — Review's *Test streams first* runs the build before installing
+- **Premiumize and Debrid-Link** — covered by the [smart template](Templates/Smart/core-builds.json) and the Configurator, which build for any service AIOStreams supports, so no separate static templates
+
+---
+
+## 🧭 Decided against (for now)
+
+| Item | Why |
 |---|---|
-| Unified 6-template suite | Under consideration — Apex · Essential · Hybrid · Stream · Anime · Samsung TV |
-| Debrid-Link template | Under research — supported in AIOStreams; smaller user base |
-| Premiumize template | Under research — natively supported; European user base |
-| RealDebrid support revival | Monitoring — server-side filter policy (May 2026) blocks most torrent results |
-| Live Stream Preview | Under consideration — fetch real streams before deploying |
+| `pin()` the #1 match to the top | `pin()` overrides the sort, so an uncached top match would sit above cached results that play instantly. The sort already puts the best cached match first. |
+| `stddev()` / `variance()` PSE variants | Bitrate distributions are skewed, and a mean/standard-deviation gate is pulled by the outliers it is meant to catch. The IQR fences are the robust version of the same idea. |
+| Per-indexer weighting (BTN, PTP) | Those are private trackers the public scrapers do not return, so the weight would never apply. Revisit if a supported addon exposes trusted indexers. |
+| Deprecate the Flash suite | Kept: cached-only instant play (`excludeUncached`) is a real choice the Speed and Essential lines do not offer. |
+| Unified 6-template suite | The smart template already gives one import that adapts to device, picture, services and anime, so the static line-up stays as is. |
+| RealDebrid revival | Still blocked: Real-Debrid's server-side filtering (May 2026) removes most torrent results. |
 
 ---
 

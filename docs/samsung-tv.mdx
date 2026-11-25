@@ -1,0 +1,54 @@
+---
+title: "Samsung TV Setup"
+description: "Which Samsung template to use, what each one leaves out, and how to report a stream that won't play."
+---
+
+Samsung's Tizen TVs play most streams directly, but they don't play everything. The three Samsung templates remove what these TVs can't decode, so the list in Stremio only holds streams that should start.
+
+## Pick your template
+
+| Template | Resolution | Use it for |
+|---|---|---|
+| **Samsung TV** | 1080p | 1080p Samsung TVs, or any 4K Samsung on a slower connection |
+| **Samsung TV 4K** | 4K, 1080p fallback | 4K Samsung TVs from about 2018–2022 (RU7100, RU8000, NU8000, Q60 and similar) |
+| **Samsung RU7100 4K** | 4K, 1080p fallback | The RU7100 (UA65RU7100W) specifically, with a fuller ranking stack tuned on that set |
+
+Not sure? Use **Samsung TV 4K** on a 4K set and **Samsung TV** on a 1080p one. The import links are in the [Template Directory](/template-directory#torbox-pro).
+
+## What the templates leave out, and why
+
+| Removed | Why |
+|---|---|
+| **Dolby Vision-only streams** | These TVs have no Dolby Vision. A DV-only file plays with wrong, washed-out colours or not at all. Streams that also carry HDR10 stay, and play as HDR10. |
+| **AV1 and VC-1 video** | Older Samsung hardware can't decode them. |
+| **TrueHD, DTS-HD MA, DTS:X and FLAC audio** | The TV can only pass these through to an amplifier or transcode them, which often fails or stutters. The templates prefer AAC, Dolby Digital and DD+ instead. |
+| **3D and side-by-side releases** | Not supported. |
+| **4K in the 1080p template** | Samsung TV (1080p) removes 1440p and 2160p, so a 4K file never takes a slot on a 1080p screen. |
+
+HDR10+, HDR10, HLG and SDR all stay, ranked in that order on the 4K templates.
+
+<Note>
+If your Samsung is connected to a soundbar or receiver that decodes TrueHD or DTS:X, the audio filter is stricter than you need. Build a config in the [Configurator](/configurator), pick **Samsung TV** as the device, and change the audio setting there instead.
+</Note>
+
+## Setup
+
+<Steps>
+  <Step title="Import the template">
+    Copy the import link from the [Template Directory](/template-directory#torbox-pro) and paste it into AIOStreams → **About → Get Started → Load Template**.
+  </Step>
+  <Step title="Add your TorBox key">
+    In AIOStreams → **Services**, paste your TorBox API key.
+  </Step>
+  <Step title="Save and install">
+    Click **Save**, copy the manifest URL and install it in Stremio on the TV.
+  </Step>
+</Steps>
+
+## A stream won't play
+
+1. Note the stream card as shown in Stremio: resolution, codec, HDR tag and audio.
+2. Check whether the same title plays when you pick a different stream. If another one plays, the TV is refusing that file's format, not the template's setup.
+3. Report it in [GitHub Discussions](https://github.com/brevityA/Core-Builds/discussions) with your TV model (from **Settings → Support → About This TV**), the template and version, and the stream card details. Please never post your API keys or manifest URL.
+
+Each report with a model number helps decide which sets the 4K templates should cover.

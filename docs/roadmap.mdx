@@ -10,6 +10,7 @@ Auto-generated from [`CHANGELOG.md`](https://github.com/brevityA/Core-Builds/blo
 
 | Version | Date | Completed work |
 | --- | --- | --- |
+| v3.14.0 | 2026-11-25 | SeaDex picks first in Anime 4K and Anime (1080p) — when a title has a SeaDex entry (hasSeaDex), SeaDex Best 2160p (4K on… |
 | v3.13.0 | 2026-11-14 | Best file first inside every tier (41 templates) — each active template now carries inline ranked stream expressions fro… |
 | v3.12.1 | 2026-10-23 | Remaining AIOStreams 2.36 save follow-ups (18 templates, one patch bump each) — the four Personal templates no longer ca… |
 | v3.12.0 | 2026-10-22 | 52 templates refused on AIOStreams 2.36 (AIOSubtitle removed) — AIOStreams 2.36.0 marks the aiosubtitle preset removed (… |
@@ -21,7 +22,6 @@ Auto-generated from [`CHANGELOG.md`](https://github.com/brevityA/Core-Builds/blo
 | v3.6.2 | 2026-08-22 | Core Badge Builder (Configurator v2.97 · tools/badges/) — a no-code Nuvio Fusion badge configurator with 111 original Co… |
 | v3.6.1 | 2026-08-13 | Live instance-status cron retired — the every-6-hours auto-check (host → STATUS.md + docs page) was retired after 25 con… |
 | v3.6.0 | 2026-08-11 | Preflight audit tool (Configurator v2.92 · Tools page) — audits any template or live config offline with rules learned f… |
-| v3.5.3 | 2026-08-04 | Episode-pack availability — multi-episode and season-pack streams were previously removed by an early exclusion filter b… |
 {/* AUTO:SHIPPED:END */}
 
 ## Current priorities
@@ -36,12 +36,10 @@ Auto-generated from [`CHANGELOG.md`](https://github.com/brevityA/Core-Builds/blo
 
 - Track current upstream AIOStreams preset types in the validator.
 - Maintain an explicit review list for intentional `requiredLanguages` policies.
-- Pin or snapshot upstream schema expectations and add golden generated templates.
 
 ### End-to-end testing
 
-- Add browser smoke tests for desktop and phone-sized Quick Install flows.
-- Exercise create/update operations against test AIOStreams instances without using real user credentials.
+- Extend the save test (every config saved into a real AIOStreams at the pinned release) to the update path.
 - Verify host restrictions and version behaviour over a longer health window.
 
 ### Worker hardening
@@ -57,15 +55,16 @@ Auto-generated from [`CHANGELOG.md`](https://github.com/brevityA/Core-Builds/blo
 
 - Reduce duplicate material across the root README, `Guides/`, and Mintlify `docs/`.
 - Publish generated PDFs as release assets where practical rather than tracking every generated copy.
-- Replace scheduled direct commits to `main` with CI reporting or bot pull requests.
+- Turn on *Allow GitHub Actions to create and approve pull requests* so Sync Upstream Rules can open its PRs.
 
 ## Longer-term ideas
 
 - Parent/child AIOStreams configuration architecture after a reliable permanent parent host exists.
-- Mobile and bandwidth-focused templates.
-- Anime Dub 4K variant.
 - Broader codec, audio, and HDR priority expression rollout after template-specific testing.
-- GitHub-native sponsorship in addition to the existing Ko-fi option.
+- Formatter v2 pass against the fields AIOStreams 2.38.1 exposes.
+- A short video walkthrough of importing and choosing a template.
+
+Done since the last update: the [Mobile](/mobile-template) and Anime Dub 4K templates, GitHub Sponsors next to Ko-fi, golden generated configs and a pinned upstream schema, browser tests for Quick Install on desktop and phone, and docs drift caught on each pull request instead of pushed to `main`. The repository's `ROADMAP.md` lists what was decided against, and why.
 
 <Note>
   Roadmap items are plans, not guarantees. Host availability and upstream AIOStreams schema changes can alter sequencing.
