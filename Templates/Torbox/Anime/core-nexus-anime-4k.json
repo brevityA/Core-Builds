@@ -5,11 +5,16 @@
     "description": "Dedicated 4K anime template. SeaDex best releases · DV/HDR10+ priority · Dual audio · Nyaa-sourced · Sub + Dub aware. TorBox Essential.",
     "source": "external",
     "author": "Branding-Brevity",
-    "version": "2.8.22",
+    "version": "2.8.23",
     "category": "Anime",
     "sourceUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Anime/core-nexus-anime-4k.json",
     "changelogUrl": "https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/CHANGELOG.md",
     "changelog": [
+      {
+        "date": "2026-11-25",
+        "version": "2.8.23",
+        "content": "SeaDex picks rank first when a title has a SeaDex entry: SeaDex Best 2160p, then SeaDex Best 1080p, then SeaDex 1080p WEB-DL. Titles without one rank exactly as before. Promoted from Anime 4K Labs."
+      },
       {
         "date": "2026-11-18",
         "version": "2.8.22",
@@ -537,6 +542,18 @@
       }
     ],
     "preferredStreamExpressions": [
+      {
+        "expression": "/* CB Anime | SeaDex Best 2160p — only when the title has a SeaDex entry */ hasSeaDex and count(seadex(resolution(streams, '2160p'), 'best')) > 0 ? seadex(resolution(streams, '2160p'), 'best') : []",
+        "enabled": true
+      },
+      {
+        "expression": "/* CB Anime | SeaDex Best 1080p — only when the title has a SeaDex entry */ hasSeaDex and count(seadex(resolution(streams, '1080p'), 'best')) > 0 ? seadex(resolution(streams, '1080p'), 'best') : []",
+        "enabled": true
+      },
+      {
+        "expression": "/* CB Anime | SeaDex 1080p WEB-DL — fallback when the title has a SeaDex entry */ hasSeaDex and count(seadex(streams)) > 0 ? seadex(resolution(quality(streams, 'WEB-DL'), '1080p')) : []",
+        "enabled": true
+      },
       {
         "expression": "/* CB Anime 4K S-Tier | 2160p BluRay REMUX */ resolution(quality(streams, 'BluRay REMUX'), '2160p')",
         "enabled": true

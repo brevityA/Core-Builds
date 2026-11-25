@@ -525,7 +525,7 @@ Meteor ≤ 5, Comet ≤ 5, MediaFusion ≤ 4, EZTV ≤ 3, HdHub ≤ 3, Torrent G
 
 ---
 
-## Active Template Inventory (as of v3.13.0)
+## Active Template Inventory (as of v3.14.0)
 
 ### Single (TorBox Pro)
 - `Single/core-nexus-4k-apex.json` v0.9.9 — flagship 4K, IQR PSEs, pow() decay, 5s dynamic fetching cap, Score IQR Guard, elite group pins, perGroup() Extra Cached
@@ -574,9 +574,9 @@ Meteor ≤ 5, Comet ≤ 5, MediaFusion ≤ 4, EZTV ≤ 3, HdHub ≤ 3, Torrent G
 - `Device/Windows/core-nexus-ultrawide.json` v0.2.18 — Windows PC / ultrawide monitor, 1080p primary + 4K fallback, full lossless audio, HDR-first visual tags, 14-PSE stack
 
 ### Anime
-- `Anime/core-nexus-anime-4k.json` v2.8.22 — 4K anime, SeaDex + Anime Tosho (`anime-tosho-new`, needs AIOStreams 2.36+), cachedAnime/uncachedAnime sort
+- `Anime/core-nexus-anime-4k.json` v2.8.23 — 4K anime, SeaDex + Anime Tosho (`anime-tosho-new`, needs AIOStreams 2.36+), cachedAnime/uncachedAnime sort
 - `Anime/core-nexus-anime-4k-lite.json` v2.8.19 — cachedAnime/uncachedAnime sort
-- `Anime/core-nexus-anime.json` v2.8.23 — 1080p anime, cachedAnime/uncachedAnime sort
+- `Anime/core-nexus-anime.json` v2.8.24 — 1080p anime, cachedAnime/uncachedAnime sort
 - `Anime/core-nexus-anime-lite.json` v2.8.20 — cachedAnime/uncachedAnime sort
 - `Anime/core-nexus-anime-dub.json` v2.8.23 — dubbed variant, cachedAnime/uncachedAnime sort
 - `Anime/core-nexus-anime-dub-lite.json` v2.8.20 — cachedAnime/uncachedAnime sort
