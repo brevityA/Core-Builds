@@ -129,6 +129,7 @@ const BASE_ROWS = [
   ['Help', 'Ayuda', 'Ajuda', 'Aide', 'Hilfe'],
   ['What\'s new', 'Novedades', 'Novidades', 'Nouveautés', 'Neuigkeiten'],
   ['Take the tour', 'Hacer el recorrido', 'Fazer o tour', 'Faire la visite', 'Rundgang starten'],
+  ['Troubleshooter', 'Solucionador de problemas', 'Solução de problemas', 'Dépannage', 'Fehlerhilfe'],
   ['Copy a safe feedback report', 'Copiar un informe seguro', 'Copiar um relatório seguro', 'Copier un rapport sûr', 'Sicheren Bericht kopieren'],
   ['Recommended add-ons', 'Complementos recomendados', 'Addons recomendados', 'Addons recommandés', 'Empfohlene Add-ons'],
   ['Report an issue', 'Informar un problema', 'Relatar um problema', 'Signaler un problème', 'Problem melden'],
