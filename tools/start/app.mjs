@@ -1,5 +1,5 @@
 // Start Here page: renders guide.mjs into the one-page guided setup.
-import { LANGS, LANG_KEY, detectLang, fmt, t, uiLabel, DEVICES, APPS, SERVICES, CONFIGURATOR_URL, deviceName, appName, isTV, plan, FIXES } from './guide.mjs';
+import { LANGS, LANG_KEY, detectLang, fmt, t, uiLabel, DEVICES, APPS, SERVICES, CONFIGURATOR_URL, deviceName, appName, isTV, plan, FIXES, blocked } from './guide.mjs';
 
 const STATE_KEY = 'cb-start-guide';
 const blank = () => ({ device: null, app: null, service: null, ticks: {}, played: null, fix: null });
@@ -28,8 +28,9 @@ const $ = id => document.getElementById(id);
 const T = (key, vars) => fmt(t(lang, key), lang, vars);
 const esc = v => String(v).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
-function tiles(items, key, recId) {
-  return `<div class="grid" role="radiogroup">${items.map(o => `<button type="button" class="choice${s[key] === o.id ? ' sel' : ''}" role="radio" aria-checked="${s[key] === o.id}" data-set="${key}" data-val="${o.id}"><b>${esc(o.name)}${o.id === recId ? `<span class="reco">${T('forYou')}</span>` : ''}</b><span>${esc(o.note)}</span></button>`).join('')}</div>`;
+// A locked section's buttons are disabled, not just faded: Tab must not reach them.
+function tiles(items, key, recId, locked = false) {
+  return `<div class="grid" role="radiogroup">${items.map(o => `<button type="button" class="choice${s[key] === o.id ? ' sel' : ''}" role="radio" aria-checked="${s[key] === o.id}" data-set="${key}" data-val="${o.id}"${locked ? ' disabled' : ''}><b>${esc(o.name)}${o.id === recId ? `<span class="reco">${T('forYou')}</span>` : ''}</b><span>${esc(o.note)}</span></button>`).join('')}</div>`;
 }
 const deviceItems = () => DEVICES.map(d => ({ id: d.id, name: t(lang, 'd_' + d.id), note: t(lang, `d_${d.id}_n`) }));
 const appItems = () => APPS.map(a => ({ id: a.id, name: a.name || t(lang, 'a_other'), note: t(lang, `a_${a.id}_n`) }));
@@ -40,7 +41,11 @@ function mini(kind) {
   if (kind === 'app') return `<div class="mini" aria-hidden="true"><div class="cap">${T('miniApp')}</div><div class="row">${APPS.map(a => tile(a.label, a.id === s.app)).join('')}</div></div>`;
   if (kind === 'svc') {
     const v = SERVICES.find(x => x.id === s.service);
-    return `<div class="mini" aria-hidden="true"><div class="cap">${T('miniSvc')}</div><div class="row">${SERVICES.map(x => tile(x.label, x.id === s.service)).join('')}</div>${s.service !== 'free' ? `<div class="key"><div>${T('keyPaste', { svc: v.name })}</div><b>${esc(uiLabel('Get key ↗', lang))}</b></div>` : ''}</div>`;
+    const fields = s.service === 'free' ? ''
+      : s.service === 'en'
+        ? `<div class="key"><div>${T('miniUser', { svc: v.name })}</div></div><div class="key"><div>${T('miniPass', { svc: v.name })}</div></div>`
+        : `<div class="key"><div>${T('keyPaste', { svc: v.name })}</div><b>${esc(uiLabel('Get key ↗', lang))}</b></div>`;
+    return `<div class="mini" aria-hidden="true"><div class="cap">${T('miniSvc')}</div><div class="row">${SERVICES.map(x => tile(x.label, x.id === s.service)).join('')}</div>${fields}</div>`;
   }
   if (kind === 'pref') return `<div class="mini" aria-hidden="true"><div class="cap">${T('miniPref')}</div><div class="row">${['Fast', 'Balanced', 'Maximum'].map(l => tile(l, l === 'Balanced')).join('')}</div></div>`;
   return `<div class="mini" aria-hidden="true"><div class="cap">${T('miniGo')}</div><div class="cta">${esc(uiLabel('Install in ~30 seconds', lang))}</div></div>`;
@@ -57,16 +62,18 @@ function taskList(tasks) {
 const label = (n, titleHtml, ok) => `<div class="lbl"><span class="num">${T('step')} ${n}</span><em>${titleHtml}</em>${ok ? `<span class="ok">✓ ${T('done')}</span>` : ''}</div>`;
 
 function render() {
-  const ready = s.device && s.app && s.service;
+  const blockedKey = s.app && s.service ? blocked(s) : null;
+  const ready = s.device && s.app && s.service && !blockedKey;
   const dev = DEVICES.find(d => d.id === s.device);
   const app = APPS.find(a => a.id === s.app);
   const appN = s.app ? appName(lang, s.app) : '';
   let h = '';
   h += `<section class="sec" id="sec-device">${label(1, T('s1'), !!s.device)}<p class="why">${T('s1why')}</p>${tiles(deviceItems(), 'device')}</section>`;
-  h += `<section class="sec${s.device ? '' : ' locked'}" id="sec-app"${s.device ? '' : ' aria-disabled="true"'}>${label(2, T('s2'), !!s.app)}<p class="why">${s.device ? T('s2why', { device: deviceName(lang, s.device), rec: APPS.find(a => a.id === dev.rec).name }) : T('s2lock')}</p>${tiles(appItems(), 'app', dev?.rec)}
+  h += `<section class="sec${s.device ? '' : ' locked'}" id="sec-app"${s.device ? '' : ' aria-disabled="true"'}>${label(2, T('s2'), !!s.app)}<p class="why">${s.device ? T('s2why', { device: deviceName(lang, s.device), rec: APPS.find(a => a.id === dev.rec).name }) : T('s2lock')}</p>${tiles(appItems(), 'app', dev?.rec, !s.device)}
     ${app && app.id !== 'other' ? `<div class="note"><span class="i" aria-hidden="true">↓</span><span>${T('getApp', { app: app.name, where: t(lang, `a_${app.id}_g`) })}</span></div>` : ''}</section>`;
-  h += `<section class="sec${s.app ? '' : ' locked'}" id="sec-service"${s.app ? '' : ' aria-disabled="true"'}>${label(3, T('s3'), !!s.service)}<p class="why">${T('s3why')}</p>${tiles(svcItems(), 'service')}
-    ${s.service === 'free' ? `<div class="note"><span class="i" aria-hidden="true">i</span><span>${T('freeNote')}</span></div>` : ''}</section>`;
+  h += `<section class="sec${s.app ? '' : ' locked'}" id="sec-service"${s.app ? '' : ' aria-disabled="true"'}>${label(3, T('s3'), !!s.service)}<p class="why">${T('s3why')}</p>${tiles(svcItems(), 'service', null, !s.app)}
+    ${s.service === 'free' && !blockedKey ? `<div class="note"><span class="i" aria-hidden="true">i</span><span>${T('freeNote')}</span></div>` : ''}
+    ${blockedKey ? `<div class="note warn" role="alert"><span class="i" aria-hidden="true">!</span><span>${T(blockedKey)}</span></div>` : ''}</section>`;
   let total = 3, done = [s.device, s.app, s.service].filter(Boolean).length;
   if (ready) {
     const { build, add } = plan(s);

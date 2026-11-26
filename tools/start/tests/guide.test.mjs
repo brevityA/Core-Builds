@@ -68,8 +68,9 @@ test('every answer combination gives a complete plan with text in every language
     }
     // Stremio asks for the Stremio login; nothing else does.
     assert.equal(taskIds.includes('b.login'), a.id === 'stremio');
-    // Free / P2P has no key to paste.
-    assert.equal(taskIds.includes('b.key'), v.id !== 'free');
+    // Free / P2P has no key to paste; EasyNews signs in with a username and password.
+    assert.equal(taskIds.includes('b.key'), v.id !== 'free' && v.id !== 'en');
+    assert.equal(taskIds.includes('b.login-en'), v.id === 'en');
   }
 });
 
@@ -111,4 +112,23 @@ test('the page loads its scripts as files, as its content policy requires', () =
   assert.ok(tags.length >= 2);
   for (const attrs of tags) assert.match(attrs, /\bsrc="/, `inline script: <script${attrs}>`);
   assert.match(html, /<script type="module" src=".\/app.mjs"><\/script>/);
+});
+
+test('Chillio with Free / P2P stops before the steps, as Quick install does', async () => {
+  const { blocked } = await import('../guide.mjs');
+  const policy = readFileSync(new URL('../../../configurator/src/core/chilllink-policy.js', import.meta.url), 'utf8');
+  assert.match(policy, /service === 'p2p'[\s\S]{0,80}status: 'blocked'/, 'the configurator still blocks Chillio with P2P');
+  assert.equal(blocked({ app: 'chillio', service: 'free' }), 'chillFree');
+  for (const a of APPS) for (const v of SERVICES) {
+    if (!(a.id === 'chillio' && v.id === 'free')) assert.equal(blocked({ app: a.id, service: v.id }), null, `${a.id}/${v.id}`);
+  }
+});
+
+test('EasyNews asks for a username and password, not a key', () => {
+  const creds = readFileSync(new URL('../../../configurator/src/data/credentials.js', import.meta.url), 'utf8');
+  assert.match(creds, /easynews:\s*\{ label: 'EasyNews Username'/);
+  assert.match(creds, /easynewsPass:\s*\{ label: 'EasyNews Password'/);
+  const ids = plan({ device: 'pc', app: 'stremio', service: 'en' }).build.flatMap(g => g.tasks.map(x => x[0]));
+  assert.ok(ids.includes('b.login-en'));
+  assert.ok(!ids.includes('b.key'));
 });

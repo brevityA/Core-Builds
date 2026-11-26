@@ -78,6 +78,8 @@ en: {
   b_app: 'In **Step 1**, tap [[{appLabel}]].', b_app_stremio_s: 'Keep [[Direct Install]] selected at the top.',
   b_free: 'In **Step 2**, tap [[Free / P2P]]. No key needed.', b_free_s: 'Leave AIOStreams host on [[Auto]].',
   b_svc: 'In **Step 2**, tap **{svc}**.', b_key: 'Tap [[Get key ↗]], copy the key from {svc}’s page, come back and paste it in.', b_key_s: 'The whole key, with no space at either end. Leave AIOStreams host on [[Auto]].',
+  b_en: 'In **Step 2**, fill in your **EasyNews username and password**: the ones you sign in to easynews.com with.', b_en_s: 'Leave AIOStreams host on [[Auto]].', miniUser: '{svc} username', miniPass: '{svc} password',
+  chillFree: 'Chillio can’t play free P2P (torrent) streams, so this setup would find nothing. Pick a paid service above, or choose Stremio or Nuvio as your app.',
   b_pref: 'In **Step 3**, leave [[Balanced]] selected and skip [[Options & defaults]].', b_pref_s: 'Slow internet? Pick [[Fast]]. Fast internet and a 4K TV? [[Maximum]].',
   b_login: 'Fill in your **Stremio email and password** in Step 1.', b_login_s: 'Used only to sign in to Stremio for this install. No account yet? Make a free one at stremio.com.',
   b_go: 'Tap [[Install in ~30 seconds]].', b_pw: 'In [[Set a Password]], keep [[Auto-generate]], **save the password** somewhere safe, then tap [[Continue →]].', b_pw_s: 'You need it to update your setup later. Nobody can recover it.',
@@ -124,6 +126,8 @@ es: {
   b_app: 'En el **Paso 1**, toca [[{appLabel}]].', b_app_stremio_s: 'Deja [[Direct Install]] seleccionado arriba.',
   b_free: 'En el **Paso 2**, toca [[Free / P2P]]. No hace falta clave.', b_free_s: 'Deja el host de AIOStreams en [[Auto]].',
   b_svc: 'En el **Paso 2**, toca **{svc}**.', b_key: 'Toca [[Get key ↗]], copia la clave de la página de {svc}, vuelve y pégala.', b_key_s: 'La clave completa, sin espacios al principio ni al final. Deja el host de AIOStreams en [[Auto]].',
+  b_en: 'En el **Paso 2**, escribe tu **usuario y contraseña de EasyNews**: los mismos con los que entras en easynews.com.', b_en_s: 'Deja el host de AIOStreams en [[Auto]].', miniUser: 'Usuario de {svc}', miniPass: 'Contraseña de {svc}',
+  chillFree: 'Chillio no puede reproducir streams P2P (torrent) gratuitos, así que esta configuración no encontraría nada. Elige arriba un servicio de pago, o usa Stremio o Nuvio como app.',
   b_pref: 'En el **Paso 3**, deja [[Balanced]] y no abras [[Options & defaults]].', b_pref_s: '¿Internet lento? Elige [[Fast]]. ¿Internet rápido y TV 4K? [[Maximum]].',
   b_login: 'Escribe tu **correo y contraseña de Stremio** en el Paso 1.', b_login_s: 'Solo se usan para iniciar sesión en Stremio durante esta instalación. ¿Sin cuenta? Crea una gratis en stremio.com.',
   b_go: 'Toca [[Install in ~30 seconds]].', b_pw: 'En [[Set a Password]], deja [[Auto-generate]], **guarda la contraseña** en un lugar seguro y toca [[Continue →]].', b_pw_s: 'La necesitarás para actualizar tu configuración. Nadie puede recuperarla.',
@@ -170,6 +174,8 @@ pt: {
   b_app: 'No **Passo 1**, toque em [[{appLabel}]].', b_app_stremio_s: 'Deixe [[Direct Install]] selecionado no topo.',
   b_free: 'No **Passo 2**, toque em [[Free / P2P]]. Não precisa de chave.', b_free_s: 'Deixe o host do AIOStreams em [[Auto]].',
   b_svc: 'No **Passo 2**, toque em **{svc}**.', b_key: 'Toque em [[Get key ↗]], copie a chave na página do {svc}, volte e cole.', b_key_s: 'A chave inteira, sem espaço no começo ou no fim. Deixe o host do AIOStreams em [[Auto]].',
+  b_en: 'No **Passo 2**, preencha seu **usuário e senha do EasyNews**: os mesmos com que você entra no easynews.com.', b_en_s: 'Deixe o host do AIOStreams em [[Auto]].', miniUser: 'Usuário do {svc}', miniPass: 'Senha do {svc}',
+  chillFree: 'O Chillio não reproduz streams P2P (torrent) gratuitos, então esta configuração não acharia nada. Escolha acima um serviço pago, ou use o Stremio ou o Nuvio como app.',
   b_pref: 'No **Passo 3**, deixe [[Balanced]] e não abra [[Options & defaults]].', b_pref_s: 'Internet lenta? Escolha [[Fast]]. Internet rápida e TV 4K? [[Maximum]].',
   b_login: 'Preencha seu **e-mail e senha do Stremio** no Passo 1.', b_login_s: 'Usados só para entrar no Stremio nesta instalação. Sem conta? Crie uma grátis em stremio.com.',
   b_go: 'Toque em [[Install in ~30 seconds]].', b_pw: 'Em [[Set a Password]], deixe [[Auto-generate]], **salve a senha** num lugar seguro e toque em [[Continue →]].', b_pw_s: 'Você vai precisar dela para atualizar depois. Ninguém consegue recuperá-la.',
@@ -216,6 +222,8 @@ fr: {
   b_app: 'À l’**étape 1**, touchez [[{appLabel}]].', b_app_stremio_s: 'Laissez [[Direct Install]] sélectionné en haut.',
   b_free: 'À l’**étape 2**, touchez [[Free / P2P]]. Pas de clé.', b_free_s: 'Laissez l’hôte AIOStreams sur [[Auto]].',
   b_svc: 'À l’**étape 2**, touchez **{svc}**.', b_key: 'Touchez [[Get key ↗]], copiez la clé sur la page de {svc}, revenez et collez-la.', b_key_s: 'La clé entière, sans espace au début ni à la fin. Laissez l’hôte AIOStreams sur [[Auto]].',
+  b_en: 'À l’**étape 2**, saisissez votre **identifiant et mot de passe EasyNews** : ceux de votre connexion à easynews.com.', b_en_s: 'Laissez l’hôte AIOStreams sur [[Auto]].', miniUser: 'Identifiant {svc}', miniPass: 'Mot de passe {svc}',
+  chillFree: 'Chillio ne peut pas lire les flux P2P (torrent) gratuits : cette configuration ne trouverait rien. Choisissez un service payant ci-dessus, ou Stremio ou Nuvio comme appli.',
   b_pref: 'À l’**étape 3**, laissez [[Balanced]] et n’ouvrez pas [[Options & defaults]].', b_pref_s: 'Connexion lente ? Prenez [[Fast]]. Connexion rapide et TV 4K ? [[Maximum]].',
   b_login: 'Saisissez votre **e-mail et mot de passe Stremio** à l’étape 1.', b_login_s: 'Ils servent uniquement à vous connecter à Stremio pour cette installation. Pas de compte ? Créez-en un gratuit sur stremio.com.',
   b_go: 'Touchez [[Install in ~30 seconds]].', b_pw: 'Dans [[Set a Password]], gardez [[Auto-generate]], **enregistrez le mot de passe** en lieu sûr, puis touchez [[Continue →]].', b_pw_s: 'Il vous faudra pour mettre à jour plus tard. Personne ne peut le récupérer.',
@@ -262,6 +270,8 @@ de: {
   b_app: 'Tippe in **Schritt 1** auf [[{appLabel}]].', b_app_stremio_s: 'Lass oben [[Direct Install]] ausgewählt.',
   b_free: 'Tippe in **Schritt 2** auf [[Free / P2P]]. Kein Schlüssel nötig.', b_free_s: 'Lass den AIOStreams-Host auf [[Auto]].',
   b_svc: 'Tippe in **Schritt 2** auf **{svc}**.', b_key: 'Tippe auf [[Get key ↗]], kopiere den Schlüssel von der {svc}-Seite, komm zurück und füge ihn ein.', b_key_s: 'Den ganzen Schlüssel, ohne Leerzeichen am Anfang oder Ende. Lass den AIOStreams-Host auf [[Auto]].',
+  b_en: 'Gib in **Schritt 2** deinen **EasyNews-Benutzernamen und dein Passwort** ein: dieselben wie beim Login auf easynews.com.', b_en_s: 'Lass den AIOStreams-Host auf [[Auto]].', miniUser: '{svc}-Benutzername', miniPass: '{svc}-Passwort',
+  chillFree: 'Chillio kann keine kostenlosen P2P-Streams (Torrents) abspielen, dieses Setup fände also nichts. Wähle oben einen bezahlten Dienst oder nimm Stremio oder Nuvio als App.',
   b_pref: 'Lass in **Schritt 3** [[Balanced]] ausgewählt und öffne [[Options & defaults]] nicht.', b_pref_s: 'Langsames Internet? Nimm [[Fast]]. Schnelles Internet und 4K-Fernseher? [[Maximum]].',
   b_login: 'Gib in Schritt 1 deine **Stremio-E-Mail und dein Passwort** ein.', b_login_s: 'Nur für die Anmeldung bei Stremio für diese Installation. Noch kein Konto? Leg kostenlos eins auf stremio.com an.',
   b_go: 'Tippe auf [[Install in ~30 seconds]].', b_pw: 'Lass bei [[Set a Password]] [[Auto-generate]] ausgewählt, **speichere das Passwort** sicher und tippe auf [[Continue →]].', b_pw_s: 'Du brauchst es später zum Aktualisieren. Niemand kann es wiederherstellen.',
@@ -320,7 +330,10 @@ export function plan({ device, app, service }) {
     { mini: 'app', tasks: [['app', 'b_app', app === 'stremio' ? 'b_app_stremio_s' : null, { appLabel: a.label }]] },
     { mini: 'svc', tasks: service === 'free'
       ? [['svc', 'b_free', 'b_free_s']]
-      : [['svc', 'b_svc', null, { svc: v.name }], ['key', 'b_key', 'b_key_s', { svc: v.name }]] },
+      : service === 'en'
+        // EasyNews signs in with a username and password, not an API key.
+        ? [['svc', 'b_svc', null, { svc: v.name }], ['login-en', 'b_en', 'b_en_s']]
+        : [['svc', 'b_svc', null, { svc: v.name }], ['key', 'b_key', 'b_key_s', { svc: v.name }]] },
     { mini: 'pref', tasks: [['pref', 'b_pref', 'b_pref_s']] },
     { mini: 'go', tasks: [...(app === 'stremio' ? [['login', 'b_login', 'b_login_s']] : []), ['go', 'b_go'], ['pw', 'b_pw', 'b_pw_s']] },
   ];
@@ -337,3 +350,10 @@ export function plan({ device, app, service }) {
 }
 
 export const FIXES = ['none', 'install', 'play', 'buffer'];
+
+/**
+ * A combination Quick install refuses, as the text key that explains why, or null.
+ * Chillio cannot play P2P streams (configurator src/core/chilllink-policy.js), so
+ * Quick install blocks Chillio with Free / P2P; the guide stops before the steps.
+ */
+export const blocked = ({ app, service }) => (app === 'chillio' && service === 'free' ? 'chillFree' : null);

@@ -108,3 +108,35 @@ test('?lang=de opens in German', async ({ page }) => {
   await expect(page.locator('html')).toHaveAttribute('lang', 'de');
   await expect(page.locator('#sec-device')).toContainText('Wo schaust du?');
 });
+
+test.describe('Combinations Quick install handles differently', () => {
+  test.use({ locale: 'en-US' });
+
+  test('locked answers cannot be reached with the keyboard', async ({ page }) => {
+    await open(page);
+    await expect(page.locator('[data-set="app"][data-val="stremio"]')).toBeDisabled();
+    await expect(page.locator('[data-set="service"][data-val="torbox"]')).toBeDisabled();
+    await page.locator('[data-set="device"][data-val="pc"]').click();
+    await expect(page.locator('[data-set="app"][data-val="stremio"]')).toBeEnabled();
+  });
+
+  test('Chillio with Free / P2P explains why and shows no steps', async ({ page }) => {
+    await open(page);
+    await page.locator('[data-set="device"][data-val="android"]').click();
+    await page.locator('[data-set="app"][data-val="chillio"]').click();
+    await page.locator('[data-set="service"][data-val="free"]').click();
+    await expect(page.locator('#sec-service [role="alert"]')).toContainText('Chillio can’t play free P2P');
+    await expect(page.locator('#sec-build')).toHaveCount(0);
+    await page.locator('[data-set="service"][data-val="torbox"]').click();
+    await expect(page.locator('#sec-build')).toBeVisible();
+  });
+
+  test('EasyNews asks for a username and password', async ({ page }) => {
+    await open(page);
+    await page.locator('[data-set="device"][data-val="pc"]').click();
+    await page.locator('[data-set="app"][data-val="stremio"]').click();
+    await page.locator('[data-set="service"][data-val="en"]').click();
+    await expect(page.locator('#sec-build')).toContainText('EasyNews username and password');
+    await expect(page.locator('[data-tick="b.key"]')).toHaveCount(0);
+  });
+});
