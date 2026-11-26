@@ -1,4 +1,10 @@
 export const CHANGELOG = [
+  { v:'3.47', date:'Nov 26 2026', items:[
+    'Quick install\'s Balanced shows only streams that play straight away — like Fast, Balanced now hides anything your service would still have to download, so a new setup starts playing when you pick a stream. Maximum still lists those streams too.',
+    'Your own Streams shown pick is kept — choose Mixed under Streams shown and Quick install keeps it the next time you open it. Picking a profile again goes back to that profile\'s setting. If you chose Mixed before this version, choose it once more.',
+    'Clearer Cached only label — it now reads "Plays straight away — anything still downloading is hidden" instead of promising instant play.',
+    'Generated output unchanged — every reference config is byte-for-byte what 3.46 produced apart from the version stamp. Only a new Quick install on Balanced differs: it carries excludeUncached, which Fast already did.',
+  ]},
   { v:'3.46', date:'Nov 26 2026', items:[
     'Fewer formatter styles to choose from at first — the style picker shows four recommended styles; the other fifteen sit under More styles, which opens by itself when your current style is one of them.',
     'A clear step to save your config password — after a direct install, the password sits in its own box with a Copy button and a line saying nobody, Core Builds included, can recover it. The manifest window says the same.',

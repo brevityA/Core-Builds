@@ -191,6 +191,38 @@ test('Express profile is a main step, and Fast builds 1080p instant-play-only', 
   expect(config.preferredLanguages).not.toContain('Spanish');
 });
 
+test('Balanced (the default) builds cached-only; a Mixed pick is kept and builds mixed (v3.47)', async ({ page }) => {
+  const posted = [];
+  await mockBackend(page, posted);
+  await fresh(page);
+  page.on('dialog', dialog => dialog.accept());
+  await page.locator('[data-action="open-express-lane"]').click();
+  await expect(page.locator('#expressLaneModal [data-express-profile="balanced"]')).toHaveClass(/active/);
+  await expect(page.locator('[data-express-cache="cached"]')).toHaveClass(/active/);
+  await page.locator('[data-express-cred="torbox"]').fill('test-torbox-key');
+  await page.locator('[data-express-target="manifest"]').click();
+  await page.locator('#expressGo').click();
+  await page.locator('#pwdPrompt .pwd-go').click();
+  await expect(page.locator('#manifestModal')).toBeVisible({ timeout: 45000 });
+  expect(posted).toHaveLength(1);
+  expect(posted[0].config.excludeUncached, 'Balanced shows only streams ready to play').toBe(true);
+
+  // Choosing Mixed yourself survives closing and reopening Quick install.
+  await page.reload();
+  await page.waitForTimeout(950);
+  await page.locator('[data-action="open-express-lane"]').click();
+  await page.locator('[data-express-cache="mixed"]').click();
+  await page.reload();
+  await page.waitForTimeout(950);
+  await page.locator('[data-action="open-express-lane"]').click();
+  await expect(page.locator('[data-express-cache="mixed"]')).toHaveClass(/active/);
+  // Picking a profile again restores that profile's own setting.
+  await page.locator('#expressLaneModal [data-express-profile="maximum"]').click();
+  await expect(page.locator('[data-express-cache="mixed"]')).toHaveClass(/active/);
+  await page.locator('#expressLaneModal [data-express-profile="balanced"]').click();
+  await expect(page.locator('[data-express-cache="cached"]')).toHaveClass(/active/);
+});
+
 test.describe('Express language from a Spanish browser', () => {
   test.use({ locale: 'es-ES' });
 
