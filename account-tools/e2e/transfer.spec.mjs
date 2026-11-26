@@ -48,6 +48,7 @@ async function setup(page) {
     if (url.includes('/rpc/sync_pull_profiles')) return json(200, [{ profile_index: 1, name: 'Main', uses_primary_addons: false }, { profile_index: 2, name: 'Kids', uses_primary_addons: false }, { profile_index: 3, name: 'Guest', uses_primary_addons: true }]);
     if (url.includes('/rest/v1/addons')) {
       const pid = Number(new URL(url).searchParams.get('profile_id').replace('eq.', ''));
+      if (state.nuvioFail?.has(pid)) return json(503, { msg: 'Service unavailable' });
       return json(200, clone(state.nuvio[pid] || []).map(r => ({ ...r, profile_id: pid })));
     }
     if (url.includes('/rpc/sync_push_addons')) {
@@ -186,6 +187,31 @@ test('Nuvio add keeps an addon added elsewhere after the page loaded', async ({ 
   await page.click('#installNuvio');
   await expect(page.locator('#status')).toContainText('Addon added to your Nuvio profile');
   expect(state.nuvio[1].map(a => a.url)).toEqual(['https://nuvio-default.example.com/manifest.json', 'https://elsewhere.example.com/manifest.json', 'https://kids.example.com/manifest.json']);
+});
+
+test('a failed profile switch keeps install and copy off until that profile loads', async ({ page }) => {
+  const state = await setup(page);
+  page.on('dialog', d => d.accept());
+  await page.goto(PAGE_PATH);
+  await signInStremio(page);
+  await signInNuvio(page);
+  await expect(page.locator('#copyToStremio')).toBeEnabled();
+  state.nuvioFail = new Set([2]);
+  await page.selectOption('#nuvioProfile', '2');
+  await expect(page.locator('#status')).toContainText('Nuvio: Service unavailable');
+  await expect(page.locator('#nuvio-summary')).toContainText('could not be loaded');
+  // Profile 1's addons are no longer on screen, and nothing can act on them.
+  await expect(page.locator('#nuvio-list .addon')).toHaveCount(0);
+  for (const id of ['#copyToStremio', '#copyToNuvio', '#installNuvio']) await expect(page.locator(id)).toBeDisabled();
+  await expect(page.locator('#installStremio')).toBeEnabled();
+  expect(state.nuvioPushes).toEqual([]);
+  expect(state.stremioSets).toEqual([]);
+  // Once the profile answers, Reload brings the buttons back.
+  state.nuvioFail.clear();
+  await page.click('#nuvioReload');
+  await expect(page.locator('#status')).toContainText('Nuvio profile reloaded');
+  await expect(page.locator('#nuvioReload')).toBeHidden();
+  await expect(page.locator('#copyToStremio')).toBeEnabled();
 });
 
 test('cancelling the install confirmation changes nothing', async ({ page }) => {

@@ -109,6 +109,7 @@ code{font-size:.85em}
   <label for="nuvioProfile">Profile</label>
   <select id="nuvioProfile"></select>
   <p id="nuvio-summary"></p>
+  <button id="nuvioReload" class="hidden" type="button">Reload this profile</button>
   <div id="nuvio-list"></div>
 </div>
 <div id="nuvio-undo" class="undo-bar hidden"><span class="undo-label" id="nuvio-undo-label">Last Nuvio change can be undone</span><button type="button" id="nuvioUndo">Undo</button></div>
@@ -645,7 +646,7 @@ async function restoreNow(e){
 const NUVIO_API='https://api.nuvio.tv';
 // Nuvio's publishable client key, published in its API docs for third-party clients (not a secret).
 const NUVIO_KEY='sb_publishable_1Clq8rlTVACkdcZuqr6_AD__xUUC_EN';
-let nuvioToken=null,nuvioProfiles=[],nuvioRows=[],nuvioUndo=[],nuvioLoadSeq=0,nuvioLoading=false;
+let nuvioToken=null,nuvioProfiles=[],nuvioRows=[],nuvioUndo=[],nuvioLoadSeq=0,nuvioLoading=false,nuvioRowsReady=false;
 let stremioBusy=false,nuvioBusy=false;
 
 // One write at a time per service: a second click while a write is saving is refused,
@@ -687,11 +688,22 @@ async function readNuvioRows(pid){
 }
 async function loadNuvioAddons(){
   const seq=++nuvioLoadSeq;const pid=nuvioAddonProfile(currentNuvioProfile());
-  nuvioLoading=true;refreshTransferButtons();
+  // Until this profile's list arrives, the rows on screen belong to another profile:
+  // transfers stay off, and they stay off if the load fails.
+  nuvioLoading=true;nuvioRowsReady=false;hide('nuvioReload');refreshTransferButtons();
   try{
-    const rows=await readNuvioRows(pid);
+    let rows;
+    try{rows=await readNuvioRows(pid)}
+    catch(e){
+      if(seq===nuvioLoadSeq){
+        nuvioRows=[];$('nuvio-list').innerHTML='';
+        $('nuvio-summary').textContent='This profile\'s addons could not be loaded ('+e.message+'). Install and copy stay off until it loads.';
+        show('nuvioReload');
+      }
+      throw e;
+    }
     if(seq!==nuvioLoadSeq)return nuvioRows; // a newer selection is loading; drop this answer
-    nuvioRows=rows;
+    nuvioRows=rows;nuvioRowsReady=true;
     const shared=currentNuvioProfile()?.uses_primary_addons;
     $('nuvio-summary').textContent=nuvioRows.length+' addon'+(nuvioRows.length===1?'':'s')+(shared?' (this profile shares profile 1\'s addons)':'');
     $('nuvio-list').innerHTML=nuvioRows.map((r,i)=>'<div class="addon"><span class="num">'+(i+1)+'</span><div class="meta"><div class="name">'+esc(r.name||'Addon')+(r.enabled===false?' <span class="tag removed">off</span>':'')+'</div><div class="url">'+esc(redactUrl(r.url))+'</div></div></div>').join('');
@@ -714,7 +726,7 @@ async function pushNuvio(build,label){
   return true;
 }
 function refreshTransferButtons(){
-  const st=!!authKey,nv=!!nuvioToken,nvReady=nv&&!nuvioLoading;
+  const st=!!authKey,nv=!!nuvioToken,nvReady=nv&&!nuvioLoading&&nuvioRowsReady;
   if(st||nv)show('install-card');else hide('install-card');
   $('installStremio').disabled=!st||stremioBusy;
   $('installNuvio').disabled=!nvReady||nuvioBusy;
@@ -769,6 +781,7 @@ $('nuvioLogin').onclick=async()=>{
   finally{$('nuvioLogin').disabled=false}
 };
 $('nuvioProfile').onchange=()=>loadNuvioAddons().catch(e=>{$('status').textContent='Nuvio: '+e.message});
+$('nuvioReload').onclick=()=>loadNuvioAddons().then(()=>{$('status').textContent='Nuvio profile reloaded.'},e=>{$('status').textContent='Nuvio: '+e.message});
 
 $('installNuvio').onclick=()=>nuvioExclusive(async()=>{
   const url=normalizeManifestUrl($('installUrl').value);
