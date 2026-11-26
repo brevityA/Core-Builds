@@ -8,6 +8,8 @@
 
 - **Flash and Flash 4K could show no streams at all** — a rule hid every stream still downloading on any title older than 3 days, or with no release date, even when nothing cached was left, so a title TorBox had not cached gave an empty list. The README said the 0Cached ISE prevented that; it cannot, because it only passes the title check and an exclude rule still removes the streams. The rule now hides downloads only while a cached stream remains, and runs just before the late pack fallbacks, after the filters that can remove cached streams. Checked with AIOStreams 2.36.0's own expression engine: unchanged whenever a cached stream exists and in a title's first 3 days; uncached-only titles now list their streams. Descriptions, READMEs and docs no longer claim Flash shows nothing uncached. Flash 2.10.18, Flash 4K 2.10.19.
 
+- **Account Tools said a backup is saved before every change** — the previous addon list is kept in the page for Undo (the last 10 changes) and is lost when the page closes; no file is saved. The page, the Tools hub and the README now say so, and the README no longer calls the tool read-only.
+
 ### Added
 - **Core Nexus Elite: PRELOAD, PROPER, REMASTER, REGRADED and PRIVATE badges** — fields AIOStreams 2.38 exposes that Elite did not show (formatter v2 pass).
 

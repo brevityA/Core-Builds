@@ -50,7 +50,7 @@ configurator/               — Web app (main product)
 
 tools/                      — Tools hub
   inspector/                — Template Inspector (paste JSON for instant validation)
-account-tools/              — Addon Backup (read-only Stremio addon backup)
+account-tools/              — Account Tools (Stremio addon backup, compare, reorder, remove, restore, undo)
 cli/                        — CLI tool (available)
 cloudflare-worker/          — CORS proxy (Cloudflare Worker for cross-origin requests)
 AIOMetadata/                — AIOMetadata configs (movies+TV, full)
@@ -129,8 +129,7 @@ The `build()` function (line ~3400) assembles the full AIOStreams config from cu
 |---|---|---|
 | **Template Builder** | `configurator/` | Live — the configurator |
 | **Template Inspector** | `tools/inspector/` | Live — paste/upload/fetch JSON for instant validation, health score, host compatibility |
-| **Addon Backup** | `account-tools/` | Live — read-only Stremio addon backup |
-| **Account Manager** | `account-tools/` | In development — addon reorder, removal, restore, rollback |
+| **Account Tools** | `account-tools/` | Live — backup, compare, reorder, remove, restore; Undo keeps the last 10 changes in page memory |
 | **CLI** | `cli/` | Live — `npm install -g core-builds` |
 | **CORS Proxy** | `cloudflare-worker/` | Live — Cloudflare Worker for cross-origin config push |
 
@@ -163,7 +162,7 @@ The `build()` function (line ~3400) assembles the full AIOStreams config from cu
 - **Full Stack Install** — AIOMetadata + Cinemeta patch + addon ordering in one click
 - **CORS proxy** — Cloudflare Worker for cross-origin config reliability
 - **Template Inspector** — standalone validation tool with host compatibility checks
-- **Addon Backup** — read-only Stremio addon backup
+- **Account Tools** — Stremio addon backup, compare, reorder, remove, restore and undo
 - **Quick Install** — one-page guided setup flow
 - **Device-aware profiles** — 20+ devices with AV1/DV/HDR handling
 - **IQR PSE Architecture** — statistical bitrate filtering with Tukey fences
