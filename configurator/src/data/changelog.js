@@ -1,4 +1,9 @@
 export const CHANGELOG = [
+  { v:'3.52', date:'Nov 26 2026', items:[
+    'Main page shows the tools people use most — Account Tools (install, copy and back up addons on Stremio and Nuvio), the Troubleshooter and the Speed Test now sit on the main page next to Core Builds, Start Here and the Template Inspector.',
+    'Nuvio Stack Genie and Core Badge Builder moved to All Core Tools — both are still one tap away under All Core Tools.',
+    'Generated output unchanged — every reference config is byte-for-byte what 3.51 produced apart from the version stamp. Only the main page links changed.',
+  ]},
   { v:'3.51', date:'Nov 26 2026', items:[
     'Choose what Full stack hides in Cinemeta — Quick install\'s Full stack option now lists Search, Home rows and Details pages. Search and Home rows are on by default; hide Details pages too if you want AIOMetadata to show every title\'s details.',
     'Optional MDBList and RPDB keys — add an MDBList key for its ratings and lists, or an RPDB key for rating badges on posters. They are saved in this browser and sent only to AIOMetadata, inside the new config; they are never part of a share link.',

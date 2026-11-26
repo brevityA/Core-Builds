@@ -1,14 +1,30 @@
 ---
-title: "What's New — Configurator v3.51"
+title: "What's New — Configurator v3.52"
 sidebarTitle: "What's New"
-description: "Latest Core Builds Configurator releases (v3.51 and earlier), auto-generated from the in-app changelog."
+description: "Latest Core Builds Configurator releases (v3.52 and earlier), auto-generated from the in-app changelog."
 ---
 
 # What's New in the Configurator
 
-This page is regenerated from `configurator/src/data/changelog.js` by `scripts/sync-docs.py`, so it always reflects the latest shipped configurator version (currently **v3.51**).
+This page is regenerated from `configurator/src/data/changelog.js` by `scripts/sync-docs.py`, so it always reflects the latest shipped configurator version (currently **v3.52**).
 
 For the template-suite release log, see the [Changelog](https://core-builds.mintlify.app/changelog).
+
+## Configurator v3.52 (Nov 26 2026)
+
+<CardGroup cols={2}>
+  <Card title="Main page shows the tools people use most" icon="sparkles">
+    Account Tools (install, copy and back up addons on Stremio and Nuvio), the Troubleshooter and the Speed Test now sit on the main page next to Core Builds, Start Here and the Template Inspector.
+  </Card>
+  <Card title="Nuvio Stack Genie and Core Badge Builder moved to All Core Tools" icon="bolt">
+    both are still one tap away under All Core Tools.
+  </Card>
+  <Card title="Generated output unchanged" icon="shield-check">
+    every reference config is byte-for-byte what 3.51 produced apart from the version stamp. Only the main page links changed.
+  </Card>
+</CardGroup>
+
+---
 
 ## Configurator v3.51 (Nov 26 2026)
 
@@ -65,30 +81,5 @@ For the template-suite release log, see the [Changelog](https://core-builds.mint
   </Card>
   <Card title="Generated output unchanged" icon="sliders">
     every reference config is byte-for-byte what 3.48 produced apart from the version stamp. This release changes what Full stack does on your Stremio account, not the AIOStreams config.
-  </Card>
-</CardGroup>
-
----
-
-## Configurator v3.48 (Nov 26 2026)
-
-<CardGroup cols={2}>
-  <Card title="Ready to play first replaces hard cached-only" icon="sparkles">
-    3.47 made Quick install's Balanced hide every stream your service would still have to download. AIOStreams removes those even when nothing else is left, so a brand-new episode or a rarer title could show no streams at all (checked in AIOStreams 2.36.0). Fast and Balanced now show only streams that play straight away while there are any, and the ones that need downloading when there are none, among streams that pass your other settings such as picture quality.
-  </Card>
-  <Card title="Fast behaves the same way" icon="bolt">
-    Fast hid uncached streams outright before 3.48 too; it now uses Ready to play first as well.
-  </Card>
-  <Card title="Ready first is also in the full builder" icon="shield-check">
-    Streams shown offers Mixed, Ready first, Cached only and Uncached only, and the CLI takes --cache-mode ready. Cached only still hides downloads even when nothing else is ready.
-  </Card>
-  <Card title="A Cached only pick from 3.47 is explained" icon="sliders">
-    if you chose Cached only in Quick install, it is kept and the screen says what it does; choose Ready to play to switch.
-  </Card>
-  <Card title="Checked in a real AIOStreams on every save test" icon="gauge">
-    a stub add-on serves cached and uncached streams, and the Quick install config must list only cached ones while any exist and the uncached ones when none do, ; both host variants check that these configs save, and the open variant also checks the streams that come back.
-  </Card>
-  <Card title="Generated output changes for Ready to play first only" icon="wand">
-    new Quick installs on Fast and Balanced carry one extra exclude rule and excludeUncached off; two new reference configs pin that. Every other reference config is unchanged apart from the version stamp.
   </Card>
 </CardGroup>

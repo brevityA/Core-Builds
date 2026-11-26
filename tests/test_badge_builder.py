@@ -14,7 +14,9 @@ def test_badge_builder_entrypoints_and_tool_links_exist():
     for name in ['index.html', 'styles.css', 'app.mjs', 'catalog.mjs', 'core.mjs', 'README.md']:
         assert (ROOT / name).exists(), f'missing Badge Builder file: {name}'
     assert 'href="./badges/"' in TOOLS
-    assert 'href="../tools/badges/"' in CONFIGURATOR
+    # v3.52: the main page lists the most-used tools; Badge Builder is reached
+    # through All Core Tools, which must stay linked from the configurator.
+    assert 'href="../tools/"' in CONFIGURATOR
 
 
 def test_badge_builder_is_no_code_in_the_user_interface():
