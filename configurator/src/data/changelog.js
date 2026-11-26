@@ -1,4 +1,10 @@
 export const CHANGELOG = [
+  { v:'3.49', date:'Nov 26 2026', items:[
+    'Full stack now sets AIOMetadata up properly — Quick install used to add AIOMetadata\'s bare address, which has no settings and so shows no rows, no search and no details. It now creates an AIOMetadata config on the public ElfHosted instance with its own default providers, protected by the same password as your AIOStreams config, and installs that. An empty AIOMetadata from an earlier install is swapped out; one you set up yourself is kept.',
+    'The Cinemeta patch works again — it went to a Cinebye address that no longer exists, so Cinemeta was never patched. Full stack now hides Cinemeta\'s home rows and search in your Stremio account itself, from your browser. Cinemeta still supplies details, notifications and the calendar.',
+    'Cinemeta is only patched once AIOMetadata is in place — if AIOMetadata cannot be set up, Cinemeta is left as it is, so your home screen and search never end up empty.',
+    'Generated output unchanged — every reference config is byte-for-byte what 3.48 produced apart from the version stamp. This release changes what Full stack does on your Stremio account, not the AIOStreams config.',
+  ]},
   { v:'3.48', date:'Nov 26 2026', items:[
     'Ready to play first replaces hard cached-only — 3.47 made Quick install\'s Balanced hide every stream your service would still have to download. AIOStreams removes those even when nothing else is left, so a brand-new episode or a rarer title could show no streams at all (checked in AIOStreams 2.36.0). Fast and Balanced now show only streams that play straight away while there are any, and the ones that need downloading when there are none, among streams that pass your other settings such as picture quality.',
     'Fast behaves the same way — Fast hid uncached streams outright before 3.48 too; it now uses Ready to play first as well.',

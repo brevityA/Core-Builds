@@ -10,7 +10,7 @@ test.describe.configure({ retries: 2 });
 // Express Install lane — one-click two-step install (Duck Streams pattern):
 // pick a debrid service + key, connect Stremio or grab the manifest, go.
 // The lane reuses the shared install pipeline, so the mocked surface is the
-// same as stability.spec.mjs plus the Stremio API + Cinebye patch calls.
+// same as stability.spec.mjs plus the Stremio API and AIOMetadata's config save.
 
 const UUID = '11111111-2222-4333-8444-555555555555';
 // The AIOStreams host probe (Phase 4) fetches `<host>/api/v1/status` from the
@@ -35,8 +35,22 @@ async function fresh(page) {
   return errors;
 }
 
-async function mockBackend(page, posted) {
-  let addonCollection = [];
+// The account starts with Cinemeta, as every Stremio account does; Full Stack patches
+// its manifest in the collection itself.
+const cinemetaEntry = () => ({
+  transportUrl: 'https://v3-cinemeta.strem.io/manifest.json', transportName: '', flags: { official: true, protected: true },
+  manifest: { id: 'com.linvo.cinemeta', name: 'Cinemeta', resources: ['catalog', 'meta', 'addon_catalog'], types: ['movie', 'series'], catalogs: [
+    { type: 'movie', id: 'top', extra: [{ name: 'genre' }, { name: 'search' }, { name: 'skip' }], extraSupported: ['search', 'genre', 'skip'] },
+    { type: 'series', id: 'top', extra: [{ name: 'genre' }, { name: 'search' }, { name: 'skip' }], extraSupported: ['search', 'genre', 'skip'] },
+    { type: 'movie', id: 'year', extra: [{ name: 'genre', isRequired: true }, { name: 'skip' }], extraRequired: ['genre'] },
+    { type: 'series', id: 'last-videos', extra: [{ name: 'lastVideosIds', isRequired: true }], extraRequired: ['lastVideosIds'] },
+  ] },
+});
+
+async function mockBackend(page, posted, stack = {}) {
+  let addonCollection = [cinemetaEntry()];
+  stack.collection = () => addonCollection;
+  stack.metaSaves = [];
   await page.route('**/*', async route => {
     const request = route.request();
     const url = request.url();
@@ -73,9 +87,10 @@ async function mockBackend(page, posted) {
     if (url.includes('api.strem.io/api/register')) {
       return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ result: { authKey: 'auth-key-123', user: { email: 'x@y.z' } } }) });
     }
-    // Cinebye patch (Full-Stack step)
-    if (url.includes('cinebye')) {
-      return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ ok: true, message: 'Cinemeta patched' }) });
+    // AIOMetadata config save (Full-Stack step)
+    if (url.includes('aiometadata.elfhosted.com/api/config/save') && request.method() === 'POST') {
+      stack.metaSaves.push(JSON.parse(request.postData() || '{}'));
+      return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ success: true, userUUID: 'meta-uuid', installUrl: 'https://aiometadata.elfhosted.com/stremio/meta-uuid/manifest.json' }) });
     }
     return route.continue();
   });
@@ -118,11 +133,14 @@ test('Express Install creates a v2.32-clean config and pushes to Stremio (Full S
   // Full Stack chain = several staged writes; under full-suite load the 45s default flakes (#682)
   test.setTimeout(90_000);
   const posted = [];
-  await mockBackend(page, posted);
+  const stack = {};
+  await mockBackend(page, posted, stack);
   const errors = await fresh(page);
   page.on('dialog', dialog => dialog.accept());
   await page.locator('[data-action="open-express-lane"]').click();
   await page.locator('[data-express-cred="torbox"]').fill('test-torbox-key');
+  // Full stack is opt-in; turn it on (the row may sit inside a closed section).
+  await page.locator('#expressFullStack').evaluate(el => { el.checked = true; el.dispatchEvent(new Event('change', { bubbles: true })); });
   await page.locator('#stremioEmailInline').fill('test@stremio.com');
   await page.locator('#stremioPasswordInline').fill('test-password');
   await page.locator('#expressGo').click();
@@ -136,6 +154,16 @@ test('Express Install creates a v2.32-clean config and pushes to Stremio (Full S
   expect(config.services.some(s => s.id === 'torbox')).toBe(true);
   expect(config.presets.some(p => p.type === 'library')).toBe(true);
   expect(config.presets.length).toBeGreaterThan(5);
+  // Full Stack: a configured AIOMetadata (same password as AIOStreams), then Cinemeta patched in the collection.
+  expect(stack.metaSaves).toHaveLength(1);
+  expect(stack.metaSaves[0].password).toBe(posted[0].password);
+  expect(stack.metaSaves[0].config.catalogs).toBeUndefined();
+  const urls = stack.collection().map(a => a.transportUrl);
+  expect(urls[0]).toBe('https://v3-cinemeta.strem.io/manifest.json');
+  expect(urls[1]).toBe('https://aiometadata.elfhosted.com/stremio/meta-uuid/manifest.json');
+  expect(urls[2]).toContain('/stremio/' + UUID + '/');
+  expect(stack.collection()[0].manifest.catalogs.map(c => c.id)).toEqual(['last-videos']);
+  await expect(page.locator('#aioResult')).toContainText('Cinemeta patched');
   expect(errors).toEqual([]);
 });
 

@@ -45,6 +45,7 @@ import { inspectTemplateComplexity, findFeatureConflicts, validateOutputProfileB
 import { buildFeedbackReport } from '../core/feedback-report-policy.js';
 import { preflightFindings, hasBlockers, summarise, findingsAsMessages } from '../core/preflight-policy.js';
 import { verifyAddonInstall } from '../core/install-transaction-policy.js';
+import { isCinemeta, isConfiguredAioMetadata, isBareAioMetadata, patchCinemetaInCollection, aioMetadataDefaultConfig, DEFAULT_CINEMETA_PATCHES, AIOMETADATA_BASE } from '../core/cinemeta-patch.js';
 import { unknownConfigKeys } from '../config/generated/aiostreams-config-schema.js';
 import '../../../tools/core-nav.js'; // classic script: defines window.CoreNav
 
@@ -55,7 +56,7 @@ const STEPS = 6;
 // workflow) the raw x.y here expands to x.y.0 in package.json / versions.json and
 // the release tag; the built badge drops the trailing .0. At the 2026-09-06
 // audit the release tag was v3.7.0 while this said 3.1 — they must move together.
-const CONFIGURATOR_VERSION = '3.48';
+const CONFIGURATOR_VERSION = '3.49';
 // Set to a collector endpoint to enable the opt-in anonymous usage ping (service+device+resolution only).
 // Leave empty to keep the feature fully disabled and hidden.
 const USAGE_BEACON_URL = '';
@@ -8386,7 +8387,7 @@ function showExpressLane(resume = null) {
         <select class="fastlane-field" id="expressLang">${LANG_OPTS.map(l => `<option value="${l.v}"${state.lang === l.v ? ' selected' : ''}>${l.v}</option>`).join('')}</select>
         <p class="fastlane-trust">Releases in this language come first when everything else is equal. English and original-audio releases still show.</p>
       </div>
-      <label class="ux-toggle-row"><input type="checkbox" id="expressFullStack" ${S.installAIOMeta !== false?'checked':''}><span class="ux-toggle-copy"><b class="u-tx">Full stack</b><br><span class="u-tx2">Install AIOMetadata + patch Cinemeta for better posters and catalogs. Cinebye, a separate service, makes the Cinemeta patch using your Stremio sign-in.</span></span></label>
+      <label class="ux-toggle-row"><input type="checkbox" id="expressFullStack" ${S.installAIOMeta !== false?'checked':''}><span class="ux-toggle-copy"><b class="u-tx">Full stack</b><br><span class="u-tx2">Set up AIOMetadata (posters, catalogs and search) with the same password as AIOStreams, then hide Cinemeta's duplicate rows and search. Done in your browser on your Stremio account; no other service sees your sign-in.</span></span></label>
       <label class="ux-toggle-row"><input type="checkbox" id="expressClean" ${S.cleanInstall?'checked':''}><span class="ux-toggle-copy"><b class="u-tx">Clean reinstall</b><br><span class="u-tx2">Remove previous Core Builds addons from your Stremio account.</span></span></label>
       <div class="u-mt8"><div class="input-action-wrap"><input class="fastlane-field" id="expressTmdb" type="password" autocomplete="off" spellcheck="false" placeholder="TMDB Read Access Token (optional — improves matching)" value="${escH(S.tmdbToken||'')}" style="width:100%"><button type="button" class="input-paste-btn" data-action="paste-input" data-target="expressTmdb">Paste</button></div></div>
       <div class="fastlane-section"><div class="fastlane-label">Defaults we’ll use</div>
@@ -9011,7 +9012,7 @@ async function simpleInstall(target, { profile = '' } = {}) {
           const stackResult = await fullStackAfterPush(
             installResult.authKey,
             manifestUrl,
-            { patchCinemeta: S.patchCinemeta !== false, installAIOMetadata: S.installAIOMeta !== false, reorder: true }
+            { patchCinemeta: S.patchCinemeta !== false, installAIOMetadata: S.installAIOMeta !== false, reorder: true, password: pwd }
           );
           btn.disabled = false; btn.innerHTML = origHtml;
           // Steps and errors come back from the network: escape before they reach innerHTML.
@@ -9127,26 +9128,26 @@ async function pushToStremio(manifestUrl, email, password) {
   return { status: S.cleanInstall ? 'replaced' : 'installed', authKey };
 }
 
-// ── Full Stack Install (Cinemeta patch + AIOMetadata + addon ordering) ──
-
-const CINEBYE_HOSTS = ['https://cinebye.elfhosted.com', 'https://cinebye.dinsden.top'];
-const AIOMETADATA_MANIFEST = 'https://aiometadata.elfhosted.com/manifest.json';
+// ── Full Stack Install (configured AIOMetadata + Cinemeta patch + addon ordering) ──
 
 /**
- * Patch Cinemeta via Cinebye to hide its catalogs/metadata/search.
- * Returns { ok: boolean, message: string }
+ * Creates an AIOMetadata config on the public ElfHosted instance and returns its
+ * install URL. The bare `/manifest.json` has no config, so it serves no catalogs,
+ * no search and no metadata — installing it gave people an empty addon.
+ * The config is protected by the same password as the AIOStreams config.
  */
-async function patchCinemeta(authKey, patches = ['removeSearch','removeCatalogs']) {
-  for (const host of CINEBYE_HOSTS) {
-    try {
-      const res = await fetchWithTimeout(`${host}/api/patch`, {
-        method:'POST', headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({ authKey, patches })
-      }, 8000);
-      if (res.ok) return { ok:true, message:`Cinemeta patched: ${patches.join(', ')}` };
-    } catch(e) { /* try next host */ }
-  }
-  return { ok:false, message:'Could not reach Cinebye — patch manually at cinebye.elfhosted.com' };
+async function createAioMetadataConfig(password) {
+  const res = await fetchWithTimeout(`${AIOMETADATA_BASE}/api/config/save`, {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ config: aioMetadataDefaultConfig(), password })
+  }, 12000);
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok || data?.success === false) throw new Error(data?.error || data?.message || `AIOMetadata returned ${res.status}`);
+  const url = typeof data?.installUrl === 'string' && /^https:\/\/[^\s]+\/manifest\.json$/.test(data.installUrl)
+    ? data.installUrl
+    : (data?.userUUID ? `${AIOMETADATA_BASE}/stremio/${encodeURIComponent(data.userUUID)}/manifest.json` : '');
+  if (!url) throw new Error('AIOMetadata did not return an install link');
+  return url;
 }
 
 /**
@@ -9155,10 +9156,10 @@ async function patchCinemeta(authKey, patches = ['removeSearch','removeCatalogs'
  */
 async function reorderAddons(authKey, aiometadataUrl, aiostreamsUrl) {
   const getData = await stremioFetch('https://api.strem.io/api/addonCollectionGet', { type:'AddonCollectionGet', authKey, update:true });
-  if (!getData?.result?.addons) return { ok:false, message:'Could not fetch addons' };
+  if (!Array.isArray(getData?.result?.addons)) return { ok:false, message:'Could not fetch addons' };
   const existing = getData.result.addons;
-  const cinemeta = existing.find(a => a.transportUrl?.includes('cinemeta'));
-  const aiometa = existing.find(a => a.transportUrl === aiometadataUrl);
+  const cinemeta = existing.find(isCinemeta);
+  const aiometa = aiometadataUrl ? existing.find(a => a.transportUrl === aiometadataUrl) : null;
   const aios = existing.find(a => a.transportUrl === aiostreamsUrl);
   const others = existing.filter(a => a !== cinemeta && a !== aiometa && a !== aios);
   const ordered = [];
@@ -9168,19 +9169,22 @@ async function reorderAddons(authKey, aiometadataUrl, aiostreamsUrl) {
   ordered.push(...others);
   const setData = await stremioFetch('https://api.strem.io/api/addonCollectionSet', { type:'AddonCollectionSet', authKey, addons: ordered });
   if (!setData?.result) return { ok:false, message:'Failed to save addon order' };
-  return { ok:true, message:'Addon order: Cinemeta → AIOMetadata → AIOStreams' };
+  return { ok:true, message: aiometa ? 'Addon order: Cinemeta → AIOMetadata → AIOStreams' : 'Addon order: Cinemeta → AIOStreams' };
 }
 
 /**
- * Full stack install: AIOStreams + AIOMetadata + Cinemeta patch + addon order.
+ * Full stack install: AIOStreams + configured AIOMetadata + Cinemeta patch + addon order.
  * Called after the AIOStreams config has been pushed to Stremio.
+ * Cinemeta is patched only once a configured AIOMetadata is on the account:
+ * hiding Cinemeta's rows and search with nothing to replace them leaves an empty home screen.
  */
 async function fullStackAfterPush(authKey, aiostreamsUrl, opts = {}) {
   const steps = [];
   const errors = [];
-  const { patchCinemeta: doPatch = true, installAIOMetadata = true, reorder = true } = opts;
+  const { patchCinemeta: doPatch = true, installAIOMetadata = true, reorder = true, password = '', cinemetaPatches = DEFAULT_CINEMETA_PATCHES } = opts;
+  let aiometaUrl = '';
 
-  // Step 1: Install AIOMetadata
+  // Step 1: a configured AIOMetadata
   if (installAIOMetadata) {
     try {
       const getData = await stremioFetch('https://api.strem.io/api/addonCollectionGet', { type:'AddonCollectionGet', authKey, update:true });
@@ -9188,27 +9192,53 @@ async function fullStackAfterPush(authKey, aiostreamsUrl, opts = {}) {
       // every addon on the account with AIOMetadata alone.
       const existing = getData?.result?.addons;
       if (!Array.isArray(existing)) throw new Error(stremioErrText(getData?.error, 'could not read your addon list, so nothing was changed'));
-      if (!existing.some(a => a.transportUrl === AIOMETADATA_MANIFEST)) {
-        const updated = [...existing, { transportName:'http', transportUrl: AIOMETADATA_MANIFEST, flags:{} }];
+      const configured = existing.find(isConfiguredAioMetadata);
+      const hadBare = existing.some(isBareAioMetadata);
+      if (configured) {
+        aiometaUrl = configured.transportUrl;
+        if (hadBare) {
+          const setData = await stremioFetch('https://api.strem.io/api/addonCollectionSet', { type:'AddonCollectionSet', authKey, addons: existing.filter(a => !isBareAioMetadata(a)) });
+          if (!setData?.result) throw new Error(stremioErrText(setData?.error, 'could not remove the empty AIOMetadata'));
+        }
+        steps.push('✓ AIOMetadata already installed — your own config was kept');
+      } else {
+        if (!password) throw new Error('no password to protect its config, so it was not created');
+        aiometaUrl = await createAioMetadataConfig(password);
+        // Earlier versions installed the bare manifest, which shows nothing: swap it out.
+        const updated = [...existing.filter(a => !isBareAioMetadata(a)), { transportName:'http', transportUrl: aiometaUrl, flags:{} }];
         const setData = await stremioFetch('https://api.strem.io/api/addonCollectionSet', { type:'AddonCollectionSet', authKey, addons: updated });
         if (!setData?.result) throw new Error(stremioErrText(setData?.error, 'install failed'));
-        steps.push('✓ AIOMetadata installed');
-      } else {
-        steps.push('✓ AIOMetadata already installed');
+        steps.push(`✓ AIOMetadata configured and installed${hadBare ? ' (replaced the empty one from an earlier install)' : ''} — its password is the same as AIOStreams'`);
       }
-    } catch(e) { errors.push('AIOMetadata: ' + e.message); }
+    } catch(e) { aiometaUrl = ''; errors.push('AIOMetadata: ' + e.message); }
   }
 
-  // Step 2: Patch Cinemeta
+  // Step 2: patch Cinemeta in the account's own collection
   if (doPatch) {
-    const r = await patchCinemeta(authKey);
-    if (r.ok) steps.push('✓ ' + r.message);
-    else errors.push(r.message);
+    if (!aiometaUrl) {
+      steps.push('• Cinemeta left as it is: AIOMetadata is not set up, so hiding Cinemeta would leave no catalogs or search');
+    } else {
+      try {
+        const getData = await stremioFetch('https://api.strem.io/api/addonCollectionGet', { type:'AddonCollectionGet', authKey, update:true });
+        const existing = getData?.result?.addons;
+        if (!Array.isArray(existing)) throw new Error(stremioErrText(getData?.error, 'could not read your addon list'));
+        const r = patchCinemetaInCollection(existing, cinemetaPatches);
+        if (r.patched) {
+          const setData = await stremioFetch('https://api.strem.io/api/addonCollectionSet', { type:'AddonCollectionSet', authKey, addons: r.addons });
+          if (!setData?.result) throw new Error(stremioErrText(setData?.error, 'could not save the patched Cinemeta'));
+          steps.push('✓ Cinemeta patched: its home rows and search are hidden (AIOMetadata provides them)');
+        } else if (r.reason === 'not-installed') {
+          steps.push('• Cinemeta is not installed, so there was nothing to patch');
+        } else {
+          throw new Error('Stremio did not return Cinemeta\'s manifest, so it was left as it is');
+        }
+      } catch (e) { errors.push('Cinemeta patch: ' + e.message); }
+    }
   }
 
   // Step 3: Reorder addons
   if (reorder) {
-    const r = await reorderAddons(authKey, AIOMETADATA_MANIFEST, aiostreamsUrl);
+    const r = await reorderAddons(authKey, aiometaUrl, aiostreamsUrl);
     if (r.ok) steps.push('✓ ' + r.message);
     else errors.push(r.message);
   }
@@ -9218,7 +9248,7 @@ async function fullStackAfterPush(authKey, aiostreamsUrl, opts = {}) {
   // that makes that true. A failed read-back is reported, never hidden.
   try {
     const expected = [aiostreamsUrl];
-    if (installAIOMetadata) expected.push(AIOMETADATA_MANIFEST);
+    if (aiometaUrl) expected.push(aiometaUrl);
     const readBack = await stremioFetch('https://api.strem.io/api/addonCollectionGet', { type:'AddonCollectionGet', authKey, update:true });
     const check = verifyAddonInstall({ actual: readBack?.result?.addons || [], expectedUrls: expected });
     if (check.ok) steps.push(`✓ Verified: your account holds ${check.expectedCount === 1 ? 'the requested addon' : 'both requested addons'}`);
