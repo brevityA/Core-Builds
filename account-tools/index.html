@@ -234,7 +234,7 @@ function redactUrl(url){
   if(!url)return'';
   try{
     const u=new URL(url),segs=u.pathname.split('/');
-    return u.origin+'/'+segs.map(s=>s.length>=16&&/^[a-zA-Z0-9+/=_-]+$/.test(s)?'[REDACTED]':s).join('/')+u.search;
+    return u.origin+segs.map(s=>s.length>=16&&/^[a-zA-Z0-9+/=_-]+$/.test(s)?'[REDACTED]':s).join('/')+u.search;
   }catch{return url.replace(/[a-zA-Z0-9+/=_-]{16,}/g,'[REDACTED]')}
 }
 

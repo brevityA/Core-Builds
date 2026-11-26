@@ -61,3 +61,10 @@ test('a Nuvio profile sharing profile 1 writes to profile 1', () => {
 test('the page only talks to the Stremio and Nuvio APIs', () => {
   assert.match(html, /connect-src https:\/\/api\.strem\.io https:\/\/api\.nuvio\.tv;/);
 });
+
+test('addon links display with a single slash after the host', () => {
+  const fn = html.match(/function redactUrl\(url\)\{[\s\S]*?\n\}/)[0];
+  const redactUrl = new Function(`${fn}; return redactUrl;`)();
+  assert.equal(redactUrl('https://a.example/manifest.json'), 'https://a.example/manifest.json');
+  assert.equal(redactUrl('https://a.example/stremio/abcdefghijklmnopqrstu/manifest.json'), 'https://a.example/stremio/[REDACTED]/manifest.json');
+});
