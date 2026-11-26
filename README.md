@@ -192,7 +192,7 @@ Getting too few results / low-overhead host? → use the Lite variant of any tem
 
 ### ⚡⚡ Flash — Single-Click Instant Play
 
-> Pure cached-only builds. Only streams already cached in TorBox appear — zero uncached results. If nothing is cached, the 0Cached ISE shows a title passthrough instead of a blank screen. Faster than Speed because there's nothing to wait for.
+> Cached-first instant play. Only streams already cached in TorBox appear while there are any; if TorBox has none for a title, the ones that still need downloading are shown instead of an empty list, and titles released in the last 3 days always show both. Faster than Speed because it stops as soon as 2 cached results arrive.
 
 | Template | Res | Import URL |
 |---|---|---|
