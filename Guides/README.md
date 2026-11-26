@@ -123,7 +123,7 @@ TorBox Pro?
 └── 1080p only? → Stream
 
 TorBox Essential?
-├── Cached-only, single-click play? → Flash tier
+├── Cached-first, single-click play? → Flash tier
 │   ├── 4K? → Flash 4K
 │   └── 1080p? → Flash
 ├── Fast play (2-3s)? → Speed tier
@@ -161,8 +161,8 @@ Getting too few results / low-overhead host? → Lite variant of any template ab
 |---|---|
 | 4K with full addon stack | **[Core Nexus 4K Essential](../Templates/Torbox/Essential/core-nexus-4k-essential.json)** |
 | 1080p that works on any device | **[Core Nexus Essential](../Templates/Torbox/Essential/core-nexus-essential.json)** |
-| Cached-only 4K, single-click play | **[Core Nexus Flash 4K](../Templates/Torbox/Flash/core-nexus-flash-4k.json)** |
-| Cached-only 1080p, single-click play | **[Core Nexus Flash](../Templates/Torbox/Flash/core-nexus-flash.json)** |
+| Cached-first 4K, single-click play | **[Core Nexus Flash 4K](../Templates/Torbox/Flash/core-nexus-flash-4k.json)** |
+| Cached-first 1080p, single-click play | **[Core Nexus Flash](../Templates/Torbox/Flash/core-nexus-flash.json)** |
 | Core Nexus Speed 4K+ | **[Core Nexus Speed 4K+](../Templates/Torbox/Speed/EasyNews/core-nexus-speed-4k-plus.json)** |
 | Core Nexus Speed EasyNews | **[Core Nexus Speed EasyNews](../Templates/Torbox/Speed/EasyNews/core-nexus-speed-easynews.json)** |
 
@@ -543,7 +543,7 @@ You can enable more than one service simultaneously. AIOStreams will query all e
 
 **TorBox Pro vs Essential** — The template tier (Pro/Essential) refers to your TorBox plan's features (Usenet access, cacheAndPlay). If you switch to a different debrid service entirely, any template works — the Pro/Essential label is only relevant when using TorBox.
 
-**Flash templates** — Flash is cached-only (`excludeUncached: true`). This works with any debrid service, but your results depend entirely on what that service has already cached. Flash with a service that has a smaller cache will return fewer results than Flash with TorBox or RD.
+**Flash templates** — Flash shows only cached streams while there are any, and the ones that still need downloading when the service has none cached for a title. This works with any debrid service, but how often you get instant play depends on what that service has already cached: with a smaller cache, Flash falls back to downloads more often than with TorBox or RD.
 
 ---
 

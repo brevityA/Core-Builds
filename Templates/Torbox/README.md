@@ -74,8 +74,8 @@ Nightly templates test new optimisations before they're promoted to stable. They
 | [Speed](#torbox-only-speed-templates) | Essential | 1080p | Fast cached 1080p — no EasyNews needed || [Anime](#-anime) 🎌 | Essential | 1080p | SeaDex best-release anime |
 | [Anime 4K](#-anime) 🎌 | Essential | 4K + 1080p | HDR anime |
 | [Anime Dub](#-anime) 🎌 | Essential | 1080p | English dubbed anime |
-| [Flash](#️-flash-tier) ⚡⚡ | Essential | 1080p | Instant play, cached only |
-| [Flash 4K](#️-flash-tier) ⚡⚡ | Essential | 4K + 1080p | Instant play 4K, cached only |
+| [Flash](#️-flash-tier) ⚡⚡ | Essential | 1080p | Instant play, cached first |
+| [Flash 4K](#️-flash-tier) ⚡⚡ | Essential | 4K + 1080p | Instant play 4K, cached first |
 
 > 🪶 Every template above also has a **Lite variant** (`-lite` suffix in the filename). Import URLs are in the [All Templates](#-all-templates) table below.
 
@@ -106,7 +106,7 @@ TorBox Pro?
 └── 1080p only? → Stream
 
 TorBox Essential?
-├── Single-click instant play (cached only)? → Flash tier
+├── Single-click instant play (cached first)? → Flash tier
 │   ├── 4K? → Flash 4K
 │   └── 1080p? → Flash
 ├── Fast cached play + EasyNews?
@@ -620,9 +620,9 @@ SeaDex best-release enforcement · AnimeTosho (Nyaa.si mirror) · FLAC/AAC first
 
 ## ⚡⚡ Flash Tier
 
-Pure cached-only instant play. `excludeUncached: true` — only streams already cached in TorBox appear. A 2-stream dynamic stop condition fires as soon as 2 cached results are found, making load time nearly instant. The 0Cached ISE passes through a title result if nothing is cached, so you never get a completely blank screen.
+Cached-first instant play. Only streams already cached in TorBox appear while there are any (the *Ready to play first* rule, checked after the other filters). If TorBox has none for a title, the streams that still need downloading are shown instead of an empty list, and titles released in the last 3 days always show both. A 2-stream dynamic stop condition fires as soon as 2 cached results are found, making load time nearly instant.
 
-> **Flash vs Speed:** Speed shows uncached streams as fallback. Flash never does — it's literally only what TorBox has ready to serve right now. If content isn't cached, use Speed or Essential instead.
+> **Flash vs Speed:** Speed always lists uncached streams below the cached ones. Flash lists them only when TorBox has nothing cached for the title (or it came out in the last 3 days). For the widest choice on rare titles, use Speed or Essential.
 
 | | Flash | Flash 4K |
 |---|---|---|
