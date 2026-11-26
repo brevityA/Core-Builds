@@ -77,6 +77,7 @@ test('AIOMetadata detection tells a configured install from the empty bare manif
   assert.equal(isConfiguredAioMetadata({ transportUrl: 'https://aiometadata.elfhosted.com/stremio/abc/manifest.json' }), true);
   assert.equal(isConfiguredAioMetadata({ transportUrl: 'https://meta.example/stremio/abc/manifest.json', manifest: { id: 'com.aio.metadata' } }), true);
   assert.equal(isConfiguredAioMetadata({ transportUrl: 'https://aio.elfhosted.com/stremio/u/p/manifest.json', manifest: { id: 'com.aiostreams.viren070' } }), false);
+  assert.equal(isConfiguredAioMetadata({ transportUrl: 'https://aiometadata.elfhosted.com/stremio/abc/eyJjb25m/manifest.json', manifest: { id: 'com.aio.metadata' } }), true, 'older two-segment installs');
   assert.equal(isCinemeta({ manifest: { name: 'Cinemeta' } }), true);
 });
 

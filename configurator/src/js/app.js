@@ -9204,8 +9204,12 @@ async function fullStackAfterPush(authKey, aiostreamsUrl, opts = {}) {
       } else {
         if (!password) throw new Error('no password to protect its config, so it was not created');
         aiometaUrl = await createAioMetadataConfig(password);
+        // The config save takes a moment: build the write from a fresh read so a change
+        // made meanwhile (another device, another tab) is not overwritten.
+        const fresh = (await stremioFetch('https://api.strem.io/api/addonCollectionGet', { type:'AddonCollectionGet', authKey, update:true }))?.result?.addons;
+        if (!Array.isArray(fresh)) throw new Error('could not re-read your addon list, so AIOMetadata was not added');
         // Earlier versions installed the bare manifest, which shows nothing: swap it out.
-        const updated = [...existing.filter(a => !isBareAioMetadata(a)), { transportName:'http', transportUrl: aiometaUrl, flags:{} }];
+        const updated = [...fresh.filter(a => !isBareAioMetadata(a) && a.transportUrl !== aiometaUrl), { transportName:'http', transportUrl: aiometaUrl, flags:{} }];
         const setData = await stremioFetch('https://api.strem.io/api/addonCollectionSet', { type:'AddonCollectionSet', authKey, addons: updated });
         if (!setData?.result) throw new Error(stremioErrText(setData?.error, 'install failed'));
         steps.push(`✓ AIOMetadata configured and installed${hadBare ? ' (replaced the empty one from an earlier install)' : ''} — its password is the same as AIOStreams'`);
@@ -9213,10 +9217,17 @@ async function fullStackAfterPush(authKey, aiostreamsUrl, opts = {}) {
     } catch(e) { aiometaUrl = ''; errors.push('AIOMetadata: ' + e.message); }
   }
 
-  // Step 2: patch Cinemeta in the account's own collection
+  // Step 2: patch Cinemeta in the account's own collection. With the AIOMetadata step
+  // off, an AIOMetadata the user configured themselves still counts.
+  if (doPatch && !aiometaUrl && !installAIOMetadata) {
+    try {
+      const r = await stremioFetch('https://api.strem.io/api/addonCollectionGet', { type:'AddonCollectionGet', authKey, update:true });
+      aiometaUrl = (r?.result?.addons || []).find(isConfiguredAioMetadata)?.transportUrl || '';
+    } catch (e) { aiometaUrl = ''; }
+  }
   if (doPatch) {
     if (!aiometaUrl) {
-      steps.push('• Cinemeta left as it is: AIOMetadata is not set up, so hiding Cinemeta would leave no catalogs or search');
+      steps.push('• Cinemeta left as it is: no configured AIOMetadata is on your account, so hiding Cinemeta would leave no catalogs or search');
     } else {
       try {
         const getData = await stremioFetch('https://api.strem.io/api/addonCollectionGet', { type:'AddonCollectionGet', authKey, update:true });

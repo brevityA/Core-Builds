@@ -130,3 +130,15 @@ test('a failed addon read never overwrites the collection with AIOMetadata alone
   assert.match(r.errors.join(' '), /AIOMetadata: session expired/);
   assert.equal(r.ok, false);
 });
+
+test('the Cinemeta patch also runs for an AIOMetadata the user set up, with the AIOMetadata step off', async () => {
+  const aios = 'https://h/stremio/x/y/manifest.json';
+  const mine = { transportUrl: 'https://aiometadata.elfhosted.com/stremio/mine/manifest.json', manifest: { id: 'com.aio.metadata' } };
+  const { state, stremioFetch } = account([cinemeta(), { transportUrl: aios }, mine]);
+  const saves = [];
+  const { fullStackAfterPush } = loadStack(stremioFetch, saves);
+  const r = await fullStackAfterPush('k', aios, { installAIOMetadata: false, password: 'pw' });
+  assert.equal(r.ok, true, r.errors.join(' '));
+  assert.equal(saves.length, 0);
+  assert.deepEqual(state.addons[0].manifest.catalogs.map(c => c.id), ['last-videos']);
+});

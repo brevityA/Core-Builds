@@ -95,12 +95,13 @@ export function resetCinemetaInCollection(addons, originalManifest) {
 // ── AIOMetadata ──
 export const AIOMETADATA_BASE = 'https://aiometadata.elfhosted.com';
 
-/** A configured AIOMetadata install: `<host>/stremio/<id>/manifest.json`. */
+/** A configured AIOMetadata install: `<host>/stremio/<id>[/<config>]/manifest.json`. */
 export function isConfiguredAioMetadata(addon) {
   const u = addon?.transportUrl;
   if (typeof u !== 'string') return false;
   if (addon.manifest?.id && addon.manifest.id !== 'com.aio.metadata') return false;
-  return /\/stremio\/[^/]+\/manifest\.json$/.test(u) && (addon.manifest?.id === 'com.aio.metadata' || /aiometadata/i.test(u));
+  // Current AIOMetadata serves /stremio/<id>/manifest.json; older installs carry a second segment.
+  return /\/stremio\/[^/]+(?:\/[^/]+)?\/manifest\.json$/.test(u) && (addon.manifest?.id === 'com.aio.metadata' || /aiometadata/i.test(u));
 }
 
 /** The bare manifest earlier versions installed: no config, so no catalogs and no metadata. */
