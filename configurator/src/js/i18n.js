@@ -9,7 +9,7 @@
 //
 // Skipped: script/style, form fields' values, <pre>/<code>, and any subtree marked
 // [data-no-i18n] (JSON previews, formatter previews, the user's own names).
-import { I18N_ROWS, I18N_LANGS } from '../data/i18n-strings.js';
+import { I18N_ROWS, I18N_LANGS, I18N_HTML_ROWS } from '../data/i18n-strings.js';
 
 export const LANGS = I18N_LANGS; // [{ id:'en', label:'English', short:'EN' }, ...]
 const IDS = LANGS.map(l => l.id);
@@ -35,7 +35,38 @@ const PATTERNS = [
   { re: /^(Sources|Your Device|Video Quality|Content Preferences|Accounts & Keys): (.+)$/, out: { es: '$1: $2', pt: '$1: $2', fr: '$1 : $2', de: '$1: $2' }, sub: [1, 2] },
   { re: /^(\d+)\/(\d+) checks passed$/, out: { es: '$1/$2 comprobaciones superadas', pt: '$1/$2 verificações aprovadas', fr: '$1/$2 vérifications réussies', de: '$1/$2 Prüfungen bestanden' } },
   { re: /^Go back to (.+)$/, out: { es: 'Volver a $1', pt: 'Voltar para $1', fr: 'Revenir à $1', de: 'Zurück zu $1' }, sub: [1] },
+  // Messages that end in a detail from the host or the browser: translate the lead-in, keep the detail.
+  { re: /^(Install failed|Update failed|Could not create account|Could not strip patterns|Preview generation failed|Applied|Restored backup from|Stripped): ?(.*)$/, out: { es: '$1: $2', pt: '$1: $2', fr: '$1 : $2', de: '$1: $2' }, sub: [1] },
 ];
+
+// Paragraphs with bold or code in the middle of a sentence are translated whole:
+// word order differs between languages, so their pieces cannot be swapped one by
+// one. Keys are the element's innerHTML, normalised by the browser itself
+// (entities, quotes) the first time they are needed, then matched with whitespace
+// collapsed.
+let HTML = null; // normalised en innerHTML -> { es, pt, fr, de }
+let HTML_FIRST = null; // first words of each key, to find candidates cheaply
+const squash = s => s.replace(/\s+/g, ' ').trim();
+function firstWords(node) {
+  for (let n = node.firstChild; n; n = n.nextSibling) {
+    if (n.nodeType === 3) { if (n.data.trim()) return n.data.trim(); continue; }
+    if (n.nodeType === 1) { const w = firstWords(n); if (w) return w; }
+  }
+  return '';
+}
+function htmlTable() {
+  if (HTML) return HTML;
+  HTML = new Map(); HTML_FIRST = new Set();
+  const tpl = document.createElement('template');
+  for (const [en, ...rest] of I18N_HTML_ROWS) {
+    tpl.innerHTML = en;
+    const t = {};
+    IDS.slice(1).forEach((id, i) => { t[id] = rest[i]; });
+    HTML.set(squash(tpl.innerHTML), t);
+    HTML_FIRST.add(firstWords(tpl.content));
+  }
+  return HTML;
+}
 
 let lang = 'en';
 // Read ?lang= when this module loads: loadState() strips the query string on
@@ -44,6 +75,25 @@ let urlLang = null;
 try { urlLang = new URLSearchParams(location.search).get('lang'); } catch { /* no location (tests) */ }
 const textState = new WeakMap(); // Text node -> { en, out }
 const attrState = new WeakMap(); // Element -> { [attr]: { en, out } }
+const htmlState = new WeakMap(); // Element -> { en, out, lang }: out is innerHTML as the browser re-serialised it
+
+function doHtml(el) {
+  const table = htmlTable();
+  const rec = htmlState.get(el);
+  if (!rec && !HTML_FIRST.has(firstWords(el))) return;
+  const cur = el.innerHTML;
+  const ours = rec && cur === rec.out; // still exactly what we put there
+  if (ours && rec.lang === lang) return; // nothing to do: this is what stops re-entry
+  const en = ours ? rec.en : cur;
+  const hit = lang === 'en' ? null : table.get(squash(en))?.[lang];
+  if (!hit) {
+    if (ours) el.innerHTML = en; // back to English
+    if (rec) htmlState.set(el, { en, out: el.innerHTML, lang });
+    return;
+  }
+  el.innerHTML = hit;
+  htmlState.set(el, { en, out: el.innerHTML, lang });
+}
 
 export function translate(en, to = lang) {
   if (to === 'en' || typeof en !== 'string') return en;
@@ -110,7 +160,7 @@ export function translateTree(root) {
   if (root.nodeType !== 1 && root.nodeType !== 9 && root.nodeType !== 11) return;
   const start = root.nodeType === 1 ? root : null;
   if (start && skipped(start)) return;
-  if (start) doAttrs(start);
+  if (start) { doHtml(start); doAttrs(start); }
   const walker = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_TEXT, {
     acceptNode(n) {
       if (n.nodeType === 1) {
@@ -121,7 +171,7 @@ export function translateTree(root) {
     },
   });
   for (let n = walker.nextNode(); n; n = walker.nextNode()) {
-    if (n.nodeType === 3) doText(n); else doAttrs(n);
+    if (n.nodeType === 3) doText(n); else { doHtml(n); doAttrs(n); }
   }
 }
 
@@ -210,7 +260,11 @@ export function initI18n() {
   new MutationObserver(records => {
     if (lang === 'en') return;
     for (const r of records) {
-      if (r.type === 'childList') r.addedNodes.forEach(n => translateTree(n));
+      if (r.type === 'childList') {
+        // A whole paragraph swapped in (a help pop-up, a re-rendered hint) is matched at its parent.
+        if (r.target.nodeType === 1 && r.addedNodes.length && !skipped(r.target)) doHtml(r.target);
+        r.addedNodes.forEach(n => translateTree(n));
+      }
       else if (r.type === 'attributes' && r.target.nodeType === 1 && !skipped(r.target)) doAttrs(r.target);
     }
   }).observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ATTRS });

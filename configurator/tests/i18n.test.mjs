@@ -2,7 +2,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { I18N_ROWS, I18N_LANGS } from '../src/data/i18n-strings.js';
+import { I18N_ROWS, I18N_LANGS, I18N_HTML_ROWS } from '../src/data/i18n-strings.js';
 import { translate, detectLang } from '../src/js/i18n.js';
 
 const app = readFileSync(new URL('../src/js/app.js', import.meta.url), 'utf8');
@@ -62,4 +62,30 @@ test('detectLang: saved choice, then browser languages, then English', () => {
   assert.equal(detectLang(['de-DE'], 'en'), 'en');
   assert.equal(detectLang(['de-DE'], 'xx'), 'de');
   assert.equal(detectLang(undefined, null), 'en');
+});
+
+test('whole-paragraph translations keep the same tags, in the same order, in every language', () => {
+  const tags = html => [...html.matchAll(/<\/?([a-z]+)\b([^>]*)>/gi)].map(m => m[0]).join('');
+  for (const row of I18N_HTML_ROWS) {
+    assert.equal(row.length, I18N_LANGS.length, row[0].slice(0, 60));
+    for (const cell of row.slice(1)) {
+      assert.ok(cell.trim(), `empty translation for ${row[0].slice(0, 60)}`);
+      assert.equal(tags(cell), tags(row[0]), `tags differ in: ${cell.slice(0, 80)}`);
+      assert.doesNotMatch(cell, /<script|on\w+=|javascript:/i, 'no active content in a translation');
+    }
+  }
+});
+
+test('every Fine-Tune help pop-up is translated whole', () => {
+  const keys = new Set(I18N_HTML_ROWS.map(r => r[0]));
+  const tips = [...app.matchAll(/ftTip\('([^']*)'\)/g)].map(m => m[1]);
+  assert.ok(tips.length >= 10, `found ${tips.length} help pop-ups`);
+  for (const tip of tips) assert.ok(keys.has(tip), `help pop-up not translated: ${tip.slice(0, 70)}`);
+});
+
+test('status messages shown with showToast have translations', () => {
+  const keys = new Set(I18N_ROWS.map(r => r[0]));
+  const literal = [...app.matchAll(/showToast\('([^']+)'/g)].map(m => m[1]).filter(m => !/[:\s]$/.test(m) && !/^Enter your $/.test(m));
+  const missing = [...new Set(literal)].filter(m => !keys.has(m));
+  assert.deepEqual(missing, [], 'add these to i18n-strings-more.js');
 });
