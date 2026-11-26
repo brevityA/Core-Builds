@@ -26,6 +26,7 @@ const TOOL_PAGES = [
   'tools/inspector/index.html',
   'tools/preflight/index.html',
   'tools/speedtest/index.html',
+  'tools/start/index.html',
 ];
 
 const routes = [...nav.matchAll(/\['([^']+)', '([^']+)', '[a-z]+'\]/g)].map(([, name, href]) => ({ name, href }));

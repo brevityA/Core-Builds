@@ -1,14 +1,27 @@
 ---
-title: "What's New — Configurator v3.43"
+title: "What's New — Configurator v3.44"
 sidebarTitle: "What's New"
-description: "Latest Core Builds Configurator releases (v3.43 and earlier), auto-generated from the in-app changelog."
+description: "Latest Core Builds Configurator releases (v3.44 and earlier), auto-generated from the in-app changelog."
 ---
 
 # What's New in the Configurator
 
-This page is regenerated from `configurator/src/data/changelog.js` by `scripts/sync-docs.py`, so it always reflects the latest shipped configurator version (currently **v3.43**).
+This page is regenerated from `configurator/src/data/changelog.js` by `scripts/sync-docs.py`, so it always reflects the latest shipped configurator version (currently **v3.44**).
 
 For the template-suite release log, see the [Changelog](https://corebuilds-docs.docsalot.dev/changelog).
+
+## Configurator v3.44 (Nov 26 2026)
+
+<CardGroup cols={2}>
+  <Card title="Start Here, a guided setup for beginners" icon="sparkles">
+    a new page for anyone who has never set up an addon. It asks three questions (where you watch, which app, which service, or none yet) and then shows only your steps on one page: Quick install with the tile to tap lit up, adding it to Stremio, Nuvio, WuPlay, Chillio or another app (a TV is set up from a phone), and a check that streams play, with fixes for the four common problems. Tick each step as you go; the page remembers where you are. It speaks the same five languages as the configurator and names every button the way the configurator shows it in your language. Find it as Start Here on the first screen, in the menu under Help, and at tools/start.
+  </Card>
+  <Card title="Generated output unchanged" icon="bolt">
+    every reference config is byte-for-byte what 3.43 produced apart from the version stamp; only the first screen and the menu gained the Start Here link.
+  </Card>
+</CardGroup>
+
+---
 
 ## Configurator v3.43 (Nov 25 2026)
 
@@ -50,18 +63,5 @@ For the template-suite release log, see the [Changelog](https://corebuilds-docs.
   </Card>
   <Card title="Generated output unchanged" icon="bolt">
     every reference config is byte-for-byte what 3.40 produced apart from the version stamp; only a reload or share link with a bandwidth cap now builds what was chosen.
-  </Card>
-</CardGroup>
-
----
-
-## Configurator v3.40 (Nov 21 2026)
-
-<CardGroup cols={2}>
-  <Card title="Update my setup steps aside once you are up to date" icon="sparkles">
-    after a successful save the dialog folded nothing away: the list of changes and the Save button stayed up, and the Update my setup card stayed on the first screen as if there were still something to do. Now the dialog folds down to “Updated on …” and closes itself, and the card only appears when there is something to update: when rebuilding from your current choices gives a different config from the one last saved, because of a newer Core Builds release or a choice you changed (stream cards, add-ons, proxy, anything the build uses). It is the same comparison the dialog shows as “No changes”.
-  </Card>
-  <Card title="Generated output unchanged" icon="bolt">
-    every reference config is byte-for-byte what 3.39 produced apart from the version stamp; only the Update my setup card and dialog changed.
   </Card>
 </CardGroup>

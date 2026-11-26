@@ -32,6 +32,7 @@ const SECTIONS = [
     ['Core Speed', 'tools/speedtest/', 'gauge'],
   ]],
   ['Help', [
+    ['Start Here (beginners)', 'tools/start/', 'compass'],
     ["What's new", 'configurator/#changelog', 'spark'],
     ['Take the tour', 'configurator/#tour', 'route'],
     ['Troubleshooter', 'configurator/#troubleshooter', 'wrench'],

@@ -244,6 +244,7 @@ body{
 
   <div class="section-label">Configurator</div>
   <nav class="cfg-links" aria-label="Configurator shortcuts">
+    <a class="cfg-link" href="./start/"><b>Start Here</b><span>New to this? Your steps, one page</span></a>
     <a class="cfg-link" href="../configurator/#express"><b>Quick install</b><span>Service, device, key, done</span></a>
     <a class="cfg-link" href="../configurator/#advanced"><b>Custom build</b><span>Every setting, step by step</span></a>
     <a class="cfg-link" href="../configurator/#guided"><b>Guided setup</b><span>One decision at a time</span></a>
@@ -429,9 +430,12 @@ body{
   <details class="inline-card fold">
     <summary>What's new</summary>
     <!-- AUTO:TOOLS_WHATSNEW:BEGIN -->
-    <h3>🆕 What's New — v3.43</h3>
+    <h3>🆕 What's New — v3.44</h3>
     <div style="margin-top:8px;display:flex;flex-direction:column;gap:4px">
       <div class="news-item"><span class="badge" style="flex-shrink:0;background:rgba(0,212,255,.12);color:var(--th-accent)">↗</span><span style="color:var(--th-tx2)"><a href="https://brevitya.github.io/Core-Builds/configurator/#changelog" style="color:var(--th-accent);text-decoration:none">Full Configurator changelog →</a> &nbsp;·&nbsp; <a href="https://corebuilds-docs.docsalot.dev/changelog" style="color:var(--th-accent);text-decoration:none">suite changelog →</a></span></div>
+      <div style="font-size:.72rem;font-weight:800;color:var(--th-accent);letter-spacing:.04em;margin-top:8px">v3.44 · Nov 26 2026</div>
+      <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Start Here, a guided setup for beginners — a new page for anyone who has never set up an addon. It asks three questions (where you watch, which app, which service, or none yet) and then shows only your steps on one page: Quick install with the tile to tap lit up, adding it to Stremio, Nuvio, WuPlay, Chillio or another app (a TV is set up from a phone), and a check that streams play, with fixes for the four common problems. Tick each step as you go; the page remembers where you are. It speaks the same five languages as the configurator and names every button the way the configurator shows it in your language. Find it as Start Here on the first screen, in the menu under Help, and at tools/start.</span></div>
+      <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Generated output unchanged — every reference config is byte-for-byte what 3.43 produced apart from the version stamp; only the first screen and the menu gained the Start Here link.</span></div>
       <div style="font-size:.72rem;font-weight:800;color:var(--th-accent);letter-spacing:.04em;margin-top:8px">v3.43 · Nov 25 2026</div>
       <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Configurator in Español, Português, Français and Deutsch — a language button at the top right switches the interface. It starts in your browser’s language when that is one of the five, remembers your pick on this device, and a link ending in ?lang=es (or pt, fr, de) opens in that language. The main page, menu, message form, Quick install, the guided step titles and choices, and the main Review and Export controls are translated; deeper Fine-Tune options, help pop-ups and error messages are still in English for now. Service, app, host and stream-card names stay as they are.</span></div>
       <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Quick install defaults list fits longer words — on a narrow phone the “How results look” row could squeeze its value to nothing. The label now wraps instead.</span></div>
@@ -443,9 +447,6 @@ body{
       <div style="font-size:.72rem;font-weight:800;color:var(--th-accent);letter-spacing:.04em;margin-top:8px">v3.41 · Nov 22 2026</div>
       <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Bandwidth cap kept between visits — a connection speed typed into Quick install or Fine-Tune was saved but never read back, so reopening the configurator reset it to Auto, and a share link dropped it the same way. Builds made after a reload quietly lost the bitrate cap, and since 3.40 the Update my setup card came back on every visit for anyone who had set one. It is now restored on load and from share links (whole numbers from 0 to 10,000 Mbps).</span></div>
       <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Generated output unchanged — every reference config is byte-for-byte what 3.40 produced apart from the version stamp; only a reload or share link with a bandwidth cap now builds what was chosen.</span></div>
-      <div style="font-size:.72rem;font-weight:800;color:var(--th-accent);letter-spacing:.04em;margin-top:8px">v3.40 · Nov 21 2026</div>
-      <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Update my setup steps aside once you are up to date — after a successful save the dialog folded nothing away: the list of changes and the Save button stayed up, and the Update my setup card stayed on the first screen as if there were still something to do. Now the dialog folds down to “Updated on …” and closes itself, and the card only appears when there is something to update: when rebuilding from your current choices gives a different config from the one last saved, because of a newer Core Builds release or a choice you changed (stream cards, add-ons, proxy, anything the build uses). It is the same comparison the dialog shows as “No changes”.</span></div>
-      <div class="news-item"><span class="badge badge-green" style="flex-shrink:0">NEW</span><span style="color:var(--th-tx2)">Generated output unchanged — every reference config is byte-for-byte what 3.39 produced apart from the version stamp; only the Update my setup card and dialog changed.</span></div>
     </div>
 <!-- AUTO:TOOLS_WHATSNEW:END -->
   </details>

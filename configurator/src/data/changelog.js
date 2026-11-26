@@ -1,4 +1,8 @@
 export const CHANGELOG = [
+  { v:'3.44', date:'Nov 26 2026', items:[
+    'Start Here, a guided setup for beginners — a new page for anyone who has never set up an addon. It asks three questions (where you watch, which app, which service, or none yet) and then shows only your steps on one page: Quick install with the tile to tap lit up, adding it to Stremio, Nuvio, WuPlay, Chillio or another app (a TV is set up from a phone), and a check that streams play, with fixes for the four common problems. Tick each step as you go; the page remembers where you are. It speaks the same five languages as the configurator and names every button the way the configurator shows it in your language. Find it as Start Here on the first screen, in the menu under Help, and at tools/start.',
+    'Generated output unchanged — every reference config is byte-for-byte what 3.43 produced apart from the version stamp; only the first screen and the menu gained the Start Here link.',
+  ]},
   { v:'3.43', date:'Nov 25 2026', items:[
     'Configurator in Español, Português, Français and Deutsch — a language button at the top right switches the interface. It starts in your browser’s language when that is one of the five, remembers your pick on this device, and a link ending in ?lang=es (or pt, fr, de) opens in that language. The main page, menu, message form, Quick install, the guided step titles and choices, and the main Review and Export controls are translated; deeper Fine-Tune options, help pop-ups and error messages are still in English for now. Service, app, host and stream-card names stay as they are.',
     'Quick install defaults list fits longer words — on a narrow phone the “How results look” row could squeeze its value to nothing. The label now wraps instead.',
