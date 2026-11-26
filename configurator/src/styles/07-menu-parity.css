@@ -475,3 +475,17 @@ html.rv-sheet-on{overflow:hidden}
 .share-qr-text{flex:1;min-width:180px;display:flex;flex-direction:column;gap:6px}
 .share-qr-hint{font-size:.74rem;color:var(--th-tx3)}
 .share-qr-url{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.72rem}
+
+/* Stream-card styles: four up front, the rest behind "More styles" (v3.46) */
+.fmt-more{margin-top:10px;border:1px solid var(--ui-line,rgba(255,255,255,.09));border-radius:12px;padding:0 10px}
+.fmt-more>summary{cursor:pointer;list-style:none;padding:11px 2px;font-size:.8rem;font-weight:700;color:var(--th-tx2,#8b949e);display:flex;align-items:center;gap:8px}
+.fmt-more>summary::-webkit-details-marker{display:none}
+.fmt-more>summary::before{content:"›";display:inline-block;transition:transform .15s;color:var(--th-accent)}
+.fmt-more[open]>summary::before{transform:rotate(90deg)}
+.fmt-more>summary:focus-visible{outline:2px solid var(--th-accent);outline-offset:2px;border-radius:6px}
+.fmt-more-n{font-size:.68rem;padding:0 7px;border-radius:99px;border:1px solid currentColor;opacity:.75}
+.fmt-list-more{padding-bottom:10px}
+
+/* The sidebar pushes the column 256px right; without this the column kept its
+   full 100% width as well and every wide screen scrolled 256px sideways (v3.46). */
+@media(min-width:1000px){.cb-sidebar:not(.sb-hidden)~.wrap{width:calc(100% - 256px);min-width:0}.cb-sidebar:not(.sb-hidden)~.wrap .nav::before{right:0}}

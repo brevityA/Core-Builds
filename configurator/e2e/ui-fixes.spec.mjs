@@ -83,3 +83,49 @@ test('feedback / contact widget mounts and opens (v2.83 wiring restored)', async
   await expect(page.locator('#cbContactPanel, .cb-contact-panel').first()).toBeVisible();
   await expect(page.locator('#cbContactForm')).toBeVisible();
 });
+
+// v3.46: with the step sidebar showing, the page was wider than the window (128 px at
+// 1000 px, 256 px at wider sizes) because .wrap took 100% width plus the sidebar margin.
+for (const width of [1000, 1280, 1920]) {
+  test(`no sideways scroll beside the step sidebar at ${width}px`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto('/');
+    await page.evaluate(() => {
+      localStorage.clear(); localStorage.setItem('cb_tut_seen', '1');
+      localStorage.setItem('coreBuild', JSON.stringify({ _schema: 6, multiServices: ['torbox-pro'], device: 'generic', resolution: '4k' }));
+      localStorage.setItem('coreBuildStep', '3');
+    });
+    await page.reload();
+    await page.locator('[data-action="continue-session"]').click({ timeout: 3000 }).catch(() => {});
+    await expect(page.locator('.cb-sidebar:not(.sb-hidden)')).toBeVisible();
+    const extra = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+    expect(extra).toBe(0);
+  });
+}
+
+test('More styles: Enter opens it without moving the wizard, and a pick made in Compare opens it', async ({ page }) => {
+  await page.goto('/?cb-e2e=1');
+  await page.evaluate(() => { localStorage.clear(); localStorage.setItem('cb_tut_seen', '1'); });
+  await page.reload();
+  await page.evaluate(() => { location.hash = '#cards'; });
+  const drawer = page.locator('#advancedDrawer');
+  await expect(drawer.locator('#ft-layout')).toBeVisible();
+  const more = drawer.locator('details.fmt-more').first();
+  await expect(more).toHaveJSProperty('open', false);
+
+  const before = await page.evaluate(() => localStorage.getItem('coreBuildStep'));
+  await more.locator('summary').focus();
+  await page.keyboard.press('Enter');
+  await expect(more).toHaveJSProperty('open', true);
+  expect(await page.evaluate(() => localStorage.getItem('coreBuildStep'))).toBe(before);
+  await page.keyboard.press('Enter');
+  await expect(more).toHaveJSProperty('open', false);
+
+  // Pick a More-styles formatter through Compare side by side: the fold must open to show it.
+  const hidden = await more.locator('.fmt-row').first().getAttribute('data-fmt');
+  await drawer.locator('.fmt-compare-open').click();
+  await drawer.locator('#fmtCmpPick2').selectOption(hidden);
+  await drawer.locator('.fmt-cmp-col').nth(2).locator('.fmt-cmp-use').click();
+  await expect(more).toHaveJSProperty('open', true);
+  await expect(more.locator(`.fmt-row[data-fmt="${hidden}"]`)).toHaveAttribute('data-active', 'true');
+});
