@@ -148,7 +148,8 @@ Generate options:
   --formatter <id>     Formatter ID (default: family-v4)
   --content <type>     all, anime, live, mixed (default: all)
   --match-mode <m>     relaxed, balanced, strict (default: balanced)
-  --cache-mode <m>     mixed, cached, uncached (default: mixed)
+  --cache-mode <m>     mixed, ready, cached, uncached (default: mixed)
+                       ready = cached only unless nothing is cached yet
   --size-limit <GB>    Max file size in GB (default: unlimited)
   --optional-scrapers  Comma-separated scraper IDs (eztv,knaben,torrent-galaxy)
   --output <file>      Output file (default: stdout)
@@ -294,7 +295,7 @@ async function cmdGenerate() {
     if (!Number.isFinite(num) || num <= 0) dieJson(`Invalid --size-limit "${opts['size-limit']}". Must be a positive number (in GB).`);
   }
   const VALID_MATCH_MODES = ['relaxed', 'balanced', 'strict'];
-  const VALID_CACHE_MODES = ['mixed', 'cached', 'uncached'];
+  const VALID_CACHE_MODES = ['mixed', 'ready', 'cached', 'uncached'];
   if (!VALID_RESOLUTIONS.includes(opts.resolution)) dieJson(`Unknown resolution "${opts.resolution}". Valid: ${VALID_RESOLUTIONS.join(', ')}`);
   if (!VALID_ARCHITECTURES.includes(opts.architecture)) dieJson(`Unknown architecture "${opts.architecture}". Valid: ${VALID_ARCHITECTURES.join(', ')}`);
   if (!VALID_AUDIO.includes(opts.audio)) dieJson(`Unknown audio mode "${opts.audio}". Valid: ${VALID_AUDIO.join(', ')}`);

@@ -55,7 +55,7 @@ const STEPS = 6;
 // workflow) the raw x.y here expands to x.y.0 in package.json / versions.json and
 // the release tag; the built badge drops the trailing .0. At the 2026-09-06
 // audit the release tag was v3.7.0 while this said 3.1 — they must move together.
-const CONFIGURATOR_VERSION = '3.47';
+const CONFIGURATOR_VERSION = '3.48';
 // Set to a collector endpoint to enable the opt-in anonymous usage ping (service+device+resolution only).
 // Leave empty to keep the feature fully disabled and hidden.
 const USAGE_BEACON_URL = '';
@@ -786,7 +786,7 @@ function sanitizeSharedConfig(d) {
   pick('formatter',    v => v === 'custom' || FORMATTERS.some(f => f.id === v));
   pick('fmtScore',     v => CORE_SCORE_MODES.includes(v));
   pick('matchMode',    v => ['relaxed','balanced','strict'].includes(v));
-  pick('cacheMode',    v => ['mixed','cached','uncached'].includes(v));
+  pick('cacheMode',    v => ['mixed','ready','cached','uncached'].includes(v));
   pick('streamPool',   v => ['normal','large','max'].includes(v));
   pick('pseArch',      v => ['standard','iqr','apex-mixed'].includes(v));
   pick('outputProfile', v => ['auto', ...OUTPUT_PROFILES].includes(v));
@@ -1001,7 +1001,7 @@ function lastGenDiff() {
   try {
     const last = JSON.parse(localStorage.getItem('coreBuildLastGen') || 'null');
     if (!last) return [];
-    const NICE = { sizeLimit: v => v === 'unlimited' ? 'Unlimited' : v + 'GB', cacheMode: v => ({ mixed:'Mixed', cached:'Cached Only', uncached:'Uncached' })[v] || v, streamPool: v => ({ normal:'Normal', large:'Large', max:'Maximum' })[v] || v };
+    const NICE = { sizeLimit: v => v === 'unlimited' ? 'Unlimited' : v + 'GB', cacheMode: v => ({ mixed:'Mixed', ready:'Ready to play first', cached:'Cached Only', uncached:'Uncached' })[v] || v, streamPool: v => ({ normal:'Normal', large:'Large', max:'Maximum' })[v] || v };
     const KEYS = [['device','Device'],['resolution','Resolution'],['audio','Audio'],['content','Content'],['formatter','Formatter'],['sizeLimit','Size limit'],['cacheMode','Cache'],['streamPool','Stream pool']];
     const out = [];
     KEYS.forEach(([k, lbl]) => {
@@ -1756,6 +1756,7 @@ function renderCacheMode() {
   if (S.service === 'p2p' || S.service === 'http') return '';
   const modes = [
     { v:'mixed',   icon:'<svg width="16" height="16" viewBox="0 0 44 44" fill="none"><rect x="7" y="7" width="30" height="30" rx="6" stroke="#06b6d4" stroke-width="1.5" fill="#06b6d4" fill-opacity=".06"/><circle cx="16" cy="18" r="3.5" fill="#22c55e" fill-opacity=".8"/><circle cx="28" cy="18" r="3.5" stroke="#f59e0b" stroke-width="1.2" fill="none"/><path d="M16 27h12" stroke="#06b6d4" stroke-width="1.5" stroke-linecap="round"/></svg>', label:'Mixed',       desc:'Cached + uncached, cached first' },
+    { v:'ready',   icon:'<svg width="16" height="16" viewBox="0 0 44 44" fill="none"><rect x="7" y="7" width="30" height="30" rx="6" stroke="#22c55e" stroke-width="1.5" fill="#22c55e" fill-opacity=".08"/><path d="M15 22l4 4 10-10" stroke="#22c55e" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>', label:'Ready First', desc:'Cached; downloads only if none' },
     { v:'cached',  icon:'<svg width="16" height="16" viewBox="0 0 44 44" fill="none"><rect x="7" y="7" width="30" height="30" rx="6" stroke="#22c55e" stroke-width="1.5" fill="#22c55e" fill-opacity=".08"/><path d="M15 22l4 4 10-10" stroke="#22c55e" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>', label:'Cached Only', desc:'Instant play — cached debrid only' },
     { v:'uncached',icon:'<svg width="16" height="16" viewBox="0 0 44 44" fill="none"><rect x="7" y="7" width="30" height="30" rx="6" stroke="#f59e0b" stroke-width="1.5" fill="#f59e0b" fill-opacity=".06"/><circle cx="22" cy="20" r="6" stroke="#f59e0b" stroke-width="1.5" fill="none"/><path d="M22 17v4l2.5 2.5" stroke="#f59e0b" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>', label:'Uncached',    desc:'Show uncached downloads only' },
   ];
@@ -2773,7 +2774,7 @@ function renderCore() {
               </div>
             </div>`;
           }).join('')}
-          <div class="receipt-row"><div class="receipt-row-left"><span class="receipt-row-ico">${ICO.antenna(14,'#8b949e')}</span><span class="receipt-row-lbl">cache</span></div><div class="receipt-row-val hl">${S.cacheMode === 'cached' ? '⚡ Cached Only — instant play' : S.cacheMode === 'uncached' ? 'Uncached Only' : 'Mixed — cached first, uncached may download'}</div></div>
+          <div class="receipt-row"><div class="receipt-row-left"><span class="receipt-row-ico">${ICO.antenna(14,'#8b949e')}</span><span class="receipt-row-lbl">cache</span></div><div class="receipt-row-val hl">${S.cacheMode === 'cached' ? '⚡ Cached Only — instant play' : S.cacheMode === 'ready' ? '⚡ Ready to play first — downloads only if nothing is ready' : S.cacheMode === 'uncached' ? 'Uncached Only' : 'Mixed — cached first, uncached may download'}</div></div>
           ${S.langs && (S.langs.length > 1 || !S.langs.includes('English') || S.langExclusive) ? `<div class="receipt-row"><div class="receipt-row-left"><span class="receipt-row-ico">${ICO.globe(14,'#8b949e')}</span><span class="receipt-row-lbl">languages</span></div><div class="receipt-row-val hl">${S.langs.slice(0,3).join(', ')}${S.langs.length>3?` +${S.langs.length-3}`:''}${S.langExclusive?' · Exclusive':''}</div></div>` : ''}
           ${hasApis ? `<div class="receipt-row">
             <div class="receipt-row-left">
@@ -6131,7 +6132,8 @@ function parseTemplateToState(tpl) {
   // Cache mode
   const hasP2P = enabledPresets.some(p => ['torrentio','comet','jackettio','knaben','torrent-galaxy'].includes(p.type));
   st.p2pEnabled = hasP2P;
-  st.cacheMode = c.excludeUncached === true ? 'cached' : c.excludeCached === true ? 'uncached' : 'mixed';
+  const readyFirst = (c.excludedStreamExpressions || []).some(e => /Ready to play first/.test(e?.expression || ''));
+  st.cacheMode = c.excludeUncached === true ? 'cached' : c.excludeCached === true ? 'uncached' : readyFirst ? 'ready' : 'mixed';
 
   // Max results → stream pool
   const mr = c.resultLimits?.global || c.maxResults || 20;
@@ -7323,7 +7325,7 @@ function simpleFinishHtml() {
           <div>
             <div style="font-size:.72rem;font-weight:700;color:#8b949e;margin-bottom:6px">Cache mode</div>
             <div class="u-row6">
-              ${[['mixed','Mixed'],['cached','Cached only'],['uncached','Uncached only']].map(([v,l]) => `<button data-action="set-simple-cache" data-val="${v}" data-active="${S.cacheMode===v}" style="flex:1;padding:5px 10px;border-radius:7px;font-size:.72rem;font-weight:700;cursor:pointer;transition:.15s;transition-property:var(--ui-tp);border:1px solid ${S.cacheMode===v?'rgba(0,212,255,.4)':'rgba(255,255,255,.08)'};background:${S.cacheMode===v?'rgba(0,212,255,.1)':'transparent'};color:${S.cacheMode===v?'#00d4ff':'#6b7280'}">${l}</button>`).join('')}
+              ${[['mixed','Mixed'],['ready','Ready first'],['cached','Cached only'],['uncached','Uncached only']].map(([v,l]) => `<button data-action="set-simple-cache" data-val="${v}" data-active="${S.cacheMode===v}" style="flex:1;padding:5px 10px;border-radius:7px;font-size:.72rem;font-weight:700;cursor:pointer;transition:.15s;transition-property:var(--ui-tp);border:1px solid ${S.cacheMode===v?'rgba(0,212,255,.4)':'rgba(255,255,255,.08)'};background:${S.cacheMode===v?'rgba(0,212,255,.1)':'transparent'};color:${S.cacheMode===v?'#00d4ff':'#6b7280'}">${l}</button>`).join('')}
             </div>
           </div>
           ${['advanced', 'labs'].includes(activeOutputProfile()) ? `          <div>
@@ -8141,9 +8143,10 @@ function showPreflightModal(findings, { actionLabel = 'Continue anyway' } = {}) 
   });
 }
 
-// Fast and Balanced show only streams that play straight away; Maximum also lists
-// ones your service would still have to download (v3.47).
-function quickProfileCache(profile) { return profile === 'maximum' ? 'mixed' : 'cached'; }
+// Fast and Balanced show streams that play straight away first and hide the rest,
+// unless nothing is ready yet (v3.48; 3.47 hid them even then, leaving empty lists).
+// Maximum also lists streams your service would still have to download.
+function quickProfileCache(profile) { return profile === 'maximum' ? 'mixed' : 'ready'; }
 
 function applyQuickProfile(profile) {
   S.quickProfile = profile;
@@ -8154,11 +8157,11 @@ function applyQuickProfile(profile) {
   S.excludeDV = false;
   S.exclude4K = false;
   if (profile === 'fast') {
-    Object.assign(S, { resolution:'1080p', audio:'limited', cacheMode:'cached', streamPool:'normal', sizeLimit:'20', qualityFirst:false, resolutionFirst:true });
+    Object.assign(S, { resolution:'1080p', audio:'limited', cacheMode:'ready', streamPool:'normal', sizeLimit:'20', qualityFirst:false, resolutionFirst:true });
   } else if (profile === 'maximum') {
     Object.assign(S, { resolution:'4k', audio:'standard', cacheMode:'mixed', streamPool:'max', sizeLimit:'unlimited', qualityFirst:true, resolutionFirst:false });
   } else {
-    Object.assign(S, { resolution:'4k', audio:'standard', cacheMode:'cached', streamPool:'normal', sizeLimit:'30', qualityFirst:false, resolutionFirst:true });
+    Object.assign(S, { resolution:'4k', audio:'standard', cacheMode:'ready', streamPool:'normal', sizeLimit:'30', qualityFirst:false, resolutionFirst:true });
   }
 }
 
@@ -8357,10 +8360,10 @@ function showExpressLane(resume = null) {
         <div class="ux-field-label">What matters most</div>
         <div class="ux-seg" role="group" aria-label="What matters most">${EXPRESS_PROFILES.map(([v,n,d])=>`<button type="button" class="fastlane-choice${state.profile===v?' active':''}" data-express-profile="${v}"><b>${n}${v==='balanced'?' <span class="fastlane-reco">Recommended</span>':''}</b><span>${d}</span></button>`).join('')}</div>
         <p class="ux-hint" id="expressProfileHint"></p>
-        <div class="ux-field-label">Streams shown ${ftTip('<strong>Cached only</strong> = instant play; nothing that still needs downloading appears at all. <strong>Mixed</strong> also shows torrents your debrid must fetch first — those stall on a “downloading to debrid” screen the first time. Fast profile implies Cached-only until you change it here.')}</div>
+        <div class="ux-field-label">Streams shown ${ftTip('<strong>Ready first</strong> = only streams that play straight away, unless none are ready yet; then the ones that need downloading appear, so the list is never empty. <strong>Cached only</strong> hides them even then. <strong>Mixed</strong> also shows torrents your debrid must fetch first — those stall on a “downloading to debrid” screen the first time. Quick install’s Fast and Balanced use Ready first.')}</div>
         <div class="ux-seg" role="group" aria-label="Streams shown">
-        <button type="button" class="fastlane-choice${S.cacheMode!=='cached' && S.cacheMode!=='uncached'?' active':''}" data-express-cache="mixed"><b>Mixed</b><span>Cached first · uncached can download first</span></button>
-        <button type="button" class="fastlane-choice${S.cacheMode==='cached'?' active':''}" data-express-cache="cached"><b>⚡ Cached only</b><span>Plays straight away — anything still downloading is hidden</span></button>
+        <button type="button" class="fastlane-choice${S.cacheMode==='ready'?' active':''}" data-express-cache="ready"><b>⚡ Ready to play</b><span>Plays straight away · if nothing is ready yet, downloads are shown</span></button>
+        <button type="button" class="fastlane-choice${S.cacheMode==='mixed' || !S.cacheMode?' active':''}" data-express-cache="mixed"><b>Mixed</b><span>Cached first · uncached can download first</span></button>
         </div>
         <p class="ux-hint" id="expressCacheHint"></p>
         <div class="ux-field-label">Stream cards</div>
@@ -8468,14 +8471,14 @@ function showExpressLane(resume = null) {
     const profName = { fast:'Fast', balanced:'Balanced', maximum:'Maximum' }[state.profile] || 'Balanced';
     const resName = { '4k':'4K', '1080p':'1080p', mixed:'Mixed' }[state.resolution] || '4K';
     const tgtName = { app:'Stremio', nuvio:'Nuvio', wuplay:'WuPlay', chillio:'Chillio', manifest:'Manifest URL' }[state.target] || 'Stremio';
-    const cacheName = S.cacheMode === 'cached' ? '⚡ Cached only' : S.cacheMode === 'uncached' ? 'Uncached only' : 'Mixed cache (uncached may download first)';
+    const cacheName = S.cacheMode === 'cached' ? '⚡ Cached only' : S.cacheMode === 'ready' ? '⚡ Ready to play first' : S.cacheMode === 'uncached' ? 'Uncached only' : 'Mixed cache (uncached may download first)';
     const fsOn = document.getElementById('expressFullStack')?.checked;
     const chip = (t, cls = '') => `<span class="ux-chip${cls}">${t}</span>`;
-    elSum.innerHTML = [chip(`${escHtml(svcName)} → ${escHtml(tgtName)}`), chip(OUTPUT_PROFILE_INFO[activeOutputProfile()].label), chip(`search ${profName}`), chip(escHtml(resName)), chip(escHtml(state.lang)), chip(cacheName, S.cacheMode === 'cached' ? ' ok' : ' warn'), chip(`host ${escHtml(HOST_LABEL_MAP[S.instanceHost] || S.instanceHost || 'auto')}`), fsOn ? chip('+ full stack (AIOMetadata + Cinemeta patch)') : ''].join('');
+    elSum.innerHTML = [chip(`${escHtml(svcName)} → ${escHtml(tgtName)}`), chip(OUTPUT_PROFILE_INFO[activeOutputProfile()].label), chip(`search ${profName}`), chip(escHtml(resName)), chip(escHtml(state.lang)), chip(cacheName, (S.cacheMode === 'cached' || S.cacheMode === 'ready') ? ' ok' : ' warn'), chip(`host ${escHtml(HOST_LABEL_MAP[S.instanceHost] || S.instanceHost || 'auto')}`), fsOn ? chip('+ full stack (AIOMetadata + Cinemeta patch)') : ''].join('');
     const ph = document.getElementById('expressProfileHint');
     if (ph) { const pr = EXPRESS_PROFILES.find(([v]) => v === state.profile); ph.textContent = pr ? pr[2] + (state.profile === 'balanced' ? ' · Recommended' : '') : ''; }
     const ch = document.getElementById('expressCacheHint');
-    if (ch) ch.textContent = S.cacheMode === 'cached' ? 'Instant play only. Anything that still needs downloading is hidden.' : S.cacheMode === 'uncached' ? 'Uncached only, as set in the full builder.' : 'Cached first. Uncached results can download to your debrid first.';
+    if (ch) ch.textContent = S.cacheMode === 'cached' ? 'Cached only, as chosen before: anything still downloading is hidden, even when nothing else is ready. Pick Ready to play so the list is never empty.' : S.cacheMode === 'ready' ? 'Streams that play straight away only. If none are ready yet, ones that still need downloading appear instead, so the list is never empty.' : S.cacheMode === 'uncached' ? 'Uncached only, as set in the full builder.' : 'Cached first. Uncached results can download to your debrid first.';
   };
   const refreshDeliveryMode = () => {
     if (!overlay.isConnected) return;
@@ -8780,7 +8783,7 @@ function feedbackReportContext() {
   return {
     device: label('device', S.device) || S.device || 'Not selected',
     service: label('service', S.service) || S.service || 'Not selected',
-    cacheMode: S.cacheMode === 'cached' ? 'Cached only' : S.cacheMode === 'uncached' ? 'Uncached only' : 'Mixed',
+    cacheMode: S.cacheMode === 'cached' ? 'Cached only' : S.cacheMode === 'ready' ? 'Ready to play first' : S.cacheMode === 'uncached' ? 'Uncached only' : 'Mixed',
     resolution: label('resolution', S.resolution) || S.resolution || 'Not selected',
     host: HOST_LABEL_MAP[S.instanceHost] || S.instanceHost || 'Not selected',
     aiostreamsVersion: target,

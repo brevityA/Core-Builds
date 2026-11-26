@@ -389,3 +389,51 @@ test('originally absent fields remain absent after profile defaults', () => {
   const result = applyOutputProfile({ config: {} }, 'stable', { removeFields: ['resultLimits'] });
   assert.equal(Object.hasOwn(result.config, 'resultLimits'), false);
 });
+
+// v3.48 "Ready to play first": cached only unless nothing is cached yet. Behaviour is
+// checked against a real AIOStreams in scripts/aio-save-test/ready-first.mjs.
+test('ready cache mode: soft rule on every profile, native flag off, packs stay last', async () => {
+  const { READY_FIRST_ESE } = await import('../src/core/output-profile-policy.js');
+  assert.match(READY_FIRST_ESE.expression, /count\(cached\(streams\)\) > 0 \? uncached\(streams\) : \[\]$/);
+  for (const profile of OUTPUT_PROFILES) {
+    const out = applyOutputProfile({ config: { excludeUncached: true, excludedStreamExpressions: [] } }, profile,
+      { service: 'torbox-pro', multiServices: ['torbox-pro'], resolution: '4k', cacheMode: 'ready' }).config;
+    const ese = out.excludedStreamExpressions.map(e => e.expression);
+    assert.equal(out.excludeUncached, false, `${profile}: native flag off`);
+    assert.equal(ese.filter(e => /Ready to play first/.test(e)).length, 1, `${profile}: rule present once`);
+    const ready = ese.findIndex(e => /Ready to play first/.test(e));
+    const packs = ese.map((e, i) => /Late Pack Fallback/.test(e) ? i : -1).filter(i => i >= 0);
+    for (const i of packs) assert.ok(ready < i, `${profile}: rule runs before the late pack fallbacks`);
+  }
+  // Applying twice does not stack the rule.
+  const once = applyOutputProfile({ config: {} }, 'advanced', { service: 'torbox-pro', cacheMode: 'ready' });
+  const twice = applyOutputProfile(once, 'advanced', { service: 'torbox-pro', cacheMode: 'ready' }).config;
+  assert.equal(twice.excludedStreamExpressions.filter(e => /Ready to play first/.test(e.expression)).length, 1);
+});
+
+test('ready cache mode leaves free routes and other cache modes alone', () => {
+  for (const service of ['p2p', 'http']) {
+    const out = applyOutputProfile({ config: {} }, 'stable', { service, cacheMode: 'ready' }).config;
+    assert.ok(!out.excludedStreamExpressions.some(e => /Ready to play first/.test(e.expression)), service);
+  }
+  for (const cacheMode of ['mixed', 'cached', 'uncached']) {
+    const out = applyOutputProfile({ config: { excludeUncached: cacheMode === 'cached' } }, 'stable', { service: 'torbox-pro', cacheMode }).config;
+    assert.ok(!out.excludedStreamExpressions.some(e => /Ready to play first/.test(e.expression)), cacheMode);
+    assert.equal(out.excludeUncached, cacheMode === 'cached', `${cacheMode} keeps its native flag`);
+  }
+});
+
+test('a Ready rule carried over from an earlier config is removed when the mode changes', () => {
+  const stale = { config: { excludeUncached: false, excludedStreamExpressions: [
+    { enabled: true, expression: '/* Keep me */ size(streams, 1)' },
+    { enabled: true, expression: "/* CB | Ready to play first — hide downloads only while something plays now */ count(cached(streams)) > 0 ? uncached(streams) : []" },
+  ] } };
+  for (const cacheMode of ['mixed', 'cached', 'uncached']) {
+    const out = applyOutputProfile(structuredClone(stale), 'advanced', { service: 'torbox-pro', cacheMode }).config;
+    const ese = out.excludedStreamExpressions.map(e => e.expression);
+    assert.ok(!ese.some(e => /Ready to play first/.test(e)), cacheMode);
+    assert.ok(ese.some(e => /Keep me/.test(e)), `${cacheMode}: other rules stay`);
+  }
+  const p2p = applyOutputProfile(structuredClone(stale), 'advanced', { service: 'p2p', cacheMode: 'ready' }).config;
+  assert.ok(!p2p.excludedStreamExpressions.some(e => /Ready to play first/.test(e.expression)), 'p2p');
+});

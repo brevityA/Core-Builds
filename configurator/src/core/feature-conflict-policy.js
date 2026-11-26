@@ -380,14 +380,22 @@ export function findFeatureConflicts(templateOrConfig) {
  * Check the structural complexity budget for an output profile. This is not a
  * schema validator; callers should run normal AIOStreams/schema validation too.
  */
+// Expressions that stand in for a native flag rather than add a rule. "Ready to play
+// first" (v3.48) does the job of excludeUncached, which would empty a title nobody has
+// cached yet, so it costs a profile what that flag costs: nothing. Stable's one-rule
+// contract and Balanced's three still hold for everything else.
+const NATIVE_EQUIVALENT_EXPRESSION = /\/\*\s*CB \| Ready to play first\b/;
+
 export function validateOutputProfileBudget(templateOrConfig, profile = 'stable') {
   const budget = OUTPUT_PROFILE_BUDGETS[profile];
   if (!budget) throw new Error(`Unknown output profile: ${profile}`);
   const complexity = inspectTemplateComplexity(templateOrConfig);
   const violations = [];
+  const nativeEquivalent = expressions(configOf(templateOrConfig), 'excludedStreamExpressions')
+    .filter(expression => NATIVE_EQUIVALENT_EXPRESSION.test(expression)).length;
 
   const checks = [
-    ['excludedExpressions', complexity.expressions.excluded, 'excluded SEL expressions'],
+    ['excludedExpressions', complexity.expressions.excluded - nativeEquivalent, 'excluded SEL expressions'],
     ['includedExpressions', complexity.expressions.included, 'included SEL expressions'],
     ['preferredExpressions', complexity.expressions.preferred, 'preferred SEL expressions'],
     ['rankedExpressions', complexity.expressions.ranked, 'ranked SEL expressions'],
