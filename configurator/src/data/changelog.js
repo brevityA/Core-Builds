@@ -1,4 +1,11 @@
 export const CHANGELOG = [
+  { v:'3.51', date:'Nov 26 2026', items:[
+    'Choose what Full stack hides in Cinemeta — Quick install\'s Full stack option now lists Search, Home rows and Details pages. Search and Home rows are on by default; hide Details pages too if you want AIOMetadata to show every title\'s details.',
+    'Optional MDBList and RPDB keys — add an MDBList key for its ratings and lists, or an RPDB key for rating badges on posters. They go into the new AIOMetadata config only and stay in this browser; they are never part of a share link.',
+    'Restore the original Cinemeta — one button puts Stremio\'s own Cinemeta back on your account, with its rows, search and details.',
+    'Full stack never adds a second AIOMetadata — if one you set up elsewhere appears while Full stack is saving, that one is used.',
+    'Generated output unchanged — every reference config is byte-for-byte what 3.50 produced apart from the version stamp. These changes are to what Full stack does on your Stremio account and in AIOMetadata.',
+  ]},
   { v:'3.50', date:'Nov 26 2026', items:[
     'Install to Jellyfin — Quick install has a Jellyfin target. AIOStreams can act as a Jellyfin server, so after saving you get a server address, a username (your config ID) and your config password to sign in with from a Jellyfin app.',
     'Jellyfin picks a host that has it turned on — ElfHosted has AIOStreams\' Jellyfin server switched off, so a Jellyfin install goes to a public host that has it on (checked on every host on Nov 26). A custom host is used as you set it.',

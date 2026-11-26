@@ -45,7 +45,7 @@ import { inspectTemplateComplexity, findFeatureConflicts, validateOutputProfileB
 import { buildFeedbackReport } from '../core/feedback-report-policy.js';
 import { preflightFindings, hasBlockers, summarise, findingsAsMessages } from '../core/preflight-policy.js';
 import { verifyAddonInstall } from '../core/install-transaction-policy.js';
-import { isCinemeta, isConfiguredAioMetadata, isBareAioMetadata, patchCinemetaInCollection, aioMetadataDefaultConfig, DEFAULT_CINEMETA_PATCHES, AIOMETADATA_BASE } from '../core/cinemeta-patch.js';
+import { isCinemeta, isConfiguredAioMetadata, isBareAioMetadata, patchCinemetaInCollection, resetCinemetaInCollection, aioMetadataDefaultConfig, sanitizeCinemetaPatches, DEFAULT_CINEMETA_PATCHES, AIOMETADATA_BASE, CINEMETA_MANIFEST_URL } from '../core/cinemeta-patch.js';
 import { unknownConfigKeys } from '../config/generated/aiostreams-config-schema.js';
 import '../../../tools/core-nav.js'; // classic script: defines window.CoreNav
 
@@ -56,7 +56,7 @@ const STEPS = 6;
 // workflow) the raw x.y here expands to x.y.0 in package.json / versions.json and
 // the release tag; the built badge drops the trailing .0. At the 2026-09-06
 // audit the release tag was v3.7.0 while this said 3.1 — they must move together.
-const CONFIGURATOR_VERSION = '3.50';
+const CONFIGURATOR_VERSION = '3.51';
 // Set to a collector endpoint to enable the opt-in anonymous usage ping (service+device+resolution only).
 // Leave empty to keep the feature fully disabled and hidden.
 const USAGE_BEACON_URL = '';
@@ -493,7 +493,7 @@ async function selectHealthyHost(timeout=4000, opts={}) {
 // Cloudflare Worker CORS proxy — see cloudflare-worker/README.md for deployment.
 // Set to '' to disable and fall back to direct-only fetches.
 const CORS_PROXY = 'https://core-builds-cors-proxy.tlorenzato26.workers.dev';
-const S = { service:null, device:null, resolution:null, audio:'limited', bandwidthMbps:0, content:null, name:'', multiServices:[], sizeLimit:'unlimited', formatter:'family-v4', fmtScore:DEFAULT_CORE_SCORE_MODE, p2pEnabled:false, qualityFirst:false, resolutionFirst:false, foreignLangKill:true, matchMode:'balanced', exclude4K:false, excludeDV:false, excludeHDR:false, tmdbToken:'', tmdbApiKey:'', creds:{torbox:'',realdebrid:'',alldebrid:'',premiumize:'',debridlink:'',offcloud:'',easynews:'',easynewsPass:'',nzbgeek:'',debridio:'',debrider:'',nzbnoob:'',althub:'',usenetcrawler:'',drunkenslug:'',nzbfinder:'',jackett:'',prowlarr:'',subdl:'',penguplay:''}, instanceHost:'elfhosted', instanceUrl:'', instanceUuid:'', instancePassword:'', baseUuid:'', basePassword:'', quickStart:false, langs: ['English'], langsSet: false, langExclusive: false, cacheMode: 'mixed', streamPool: 'normal', pseArch: 'standard', telemetryOk: false, simpleMode: false, outputProfile:'auto', aiostreamsVersion:DEFAULT_AIOSTREAMS_VERSION, installMode: 'direct', stremioEmail: '', stremioPassword: '', subtitleLangs: ['en'], subtitleAddons: ['opensubtitles-v3-plus'], streamProxy: { ...DEFAULT_STREAM_PROXY, proxiedServices: [], proxiedAddons: [] }, streamProxyPassword: '', catalogs: ['tmdb-addon'], dedupMerge: false, optionalScrapers: [], cleanInstall: false, quickProfile: 'balanced', quickCacheChosen: false, preloadEnabled:true, autoPlayMethod:'matchingFile', addonTimeout:6000, patchCinemeta:false, installAIOMeta:false, libraryBoost:'default', nzbFailover:false, nzbFailoverPosition:'after-torrents', maxFailoverNzbs:3, addonServices:[] };
+const S = { service:null, device:null, resolution:null, audio:'limited', bandwidthMbps:0, content:null, name:'', multiServices:[], sizeLimit:'unlimited', formatter:'family-v4', fmtScore:DEFAULT_CORE_SCORE_MODE, p2pEnabled:false, qualityFirst:false, resolutionFirst:false, foreignLangKill:true, matchMode:'balanced', exclude4K:false, excludeDV:false, excludeHDR:false, tmdbToken:'', tmdbApiKey:'', creds:{torbox:'',realdebrid:'',alldebrid:'',premiumize:'',debridlink:'',offcloud:'',easynews:'',easynewsPass:'',nzbgeek:'',debridio:'',debrider:'',nzbnoob:'',althub:'',usenetcrawler:'',drunkenslug:'',nzbfinder:'',jackett:'',prowlarr:'',subdl:'',penguplay:''}, instanceHost:'elfhosted', instanceUrl:'', instanceUuid:'', instancePassword:'', baseUuid:'', basePassword:'', quickStart:false, langs: ['English'], langsSet: false, langExclusive: false, cacheMode: 'mixed', streamPool: 'normal', pseArch: 'standard', telemetryOk: false, simpleMode: false, outputProfile:'auto', aiostreamsVersion:DEFAULT_AIOSTREAMS_VERSION, installMode: 'direct', stremioEmail: '', stremioPassword: '', subtitleLangs: ['en'], subtitleAddons: ['opensubtitles-v3-plus'], streamProxy: { ...DEFAULT_STREAM_PROXY, proxiedServices: [], proxiedAddons: [] }, streamProxyPassword: '', catalogs: ['tmdb-addon'], dedupMerge: false, optionalScrapers: [], cleanInstall: false, quickProfile: 'balanced', quickCacheChosen: false, preloadEnabled:true, autoPlayMethod:'matchingFile', addonTimeout:6000, patchCinemeta:false, installAIOMeta:false, cinemetaPatches:[...DEFAULT_CINEMETA_PATCHES], metaKeys:{ mdblist:'', rpdb:'' }, libraryBoost:'default', nzbFailover:false, nzbFailoverPosition:'after-torrents', maxFailoverNzbs:3, addonServices:[] };
 // A clean template update must not inherit unrelated wizard/experimental flags.
 const INITIAL_STATE = cloneUpdateValue(S);
 function replaceState(nextState) {
@@ -1068,6 +1068,9 @@ function loadState() {
         if (parsed.basePassword) S.basePassword = parsed.basePassword;
         if (parsed.streamProxy) S.streamProxy = normaliseStreamProxyState(parsed.streamProxy);
         if (typeof parsed.streamProxyPassword === 'string') S.streamProxyPassword = parsed.streamProxyPassword;
+        // Local only (not in SHARE_KEYS): Full stack's Cinemeta choices and optional AIOMetadata keys.
+        if (Array.isArray(parsed.cinemetaPatches)) S.cinemetaPatches = sanitizeCinemetaPatches(parsed.cinemetaPatches);
+        if (parsed.metaKeys && typeof parsed.metaKeys === 'object') S.metaKeys = { mdblist: typeof parsed.metaKeys.mdblist === 'string' ? parsed.metaKeys.mdblist : '', rpdb: typeof parsed.metaKeys.rpdb === 'string' ? parsed.metaKeys.rpdb : '' };
         if (parsed.stremioEmail) S.stremioEmail = parsed.stremioEmail;
         if (parsed.stremioPassword) S.stremioPassword = parsed.stremioPassword;
         if (Array.isArray(parsed._importedPresets)) {
@@ -3940,6 +3943,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (inp) inp.type = inp.type === 'password' ? 'text' : 'password';
     }
     if (action === 'create-stremio-account') createRandomStremioAccount();
+    if (action === 'reset-cinemeta') resetCinemetaOnAccount();
     if (action === 'continue-session') { step = _savedStep || 1; pushStep(); saveState(); render(); window.scrollTo(0,0); }
     if (action === 'quick-reinstall') { S.simpleMode = true; S.outputProfile='auto'; step = STEPS; pushStep(); saveState(); render(); window.scrollTo(0,0); showToast('Using your previous settings — review and install'); }
     if (action === 'start-fresh') { clearState(); }
@@ -8416,6 +8420,18 @@ function showExpressLane(resume = null) {
         <p class="fastlane-trust">Releases in this language come first when everything else is equal. English and original-audio releases still show.</p>
       </div>
       <label class="ux-toggle-row"><input type="checkbox" id="expressFullStack" ${S.installAIOMeta !== false?'checked':''}><span class="ux-toggle-copy"><b class="u-tx">Full stack</b><br><span class="u-tx2">Set up AIOMetadata (posters, catalogs and search) with the same password as AIOStreams, then hide Cinemeta's duplicate rows and search. Done in your browser on your Stremio account; no other service sees your sign-in.</span></span></label>
+      <div class="fs-opts" id="expressStackOpts"${S.installAIOMeta !== false ? '' : ' hidden'}>
+        <fieldset class="fs-opts-group"><legend>Hide in Cinemeta</legend>
+          ${[['removeSearch','Search','AIOMetadata answers searches'],['removeCatalogs','Home rows','AIOMetadata\'s rows replace Cinemeta\'s'],['removeMeta','Details pages','AIOMetadata shows every title\'s details; nothing falls back to Cinemeta']].map(([v, n, d]) => `<label class="fs-opt"><input type="checkbox" data-cinemeta-patch="${v}" ${(S.cinemetaPatches || []).includes(v) ? 'checked' : ''}><span><b>${n}</b> · ${d}</span></label>`).join('')}
+        </fieldset>
+        <label class="fastlane-sublabel" for="expressMdblist">MDBList API key · optional</label>
+        <div class="input-action-wrap"><input class="fastlane-field" id="expressMdblist" type="password" autocomplete="off" spellcheck="false" placeholder="Adds MDBList ratings and lists" value="${escH(S.metaKeys?.mdblist || '')}" style="width:100%"><button type="button" class="input-paste-btn" data-action="paste-input" data-target="expressMdblist">Paste</button></div>
+        <label class="fastlane-sublabel" for="expressRpdb">RPDB API key · optional</label>
+        <div class="input-action-wrap"><input class="fastlane-field" id="expressRpdb" type="password" autocomplete="off" spellcheck="false" placeholder="Adds rating badges to posters" value="${escH(S.metaKeys?.rpdb || '')}" style="width:100%"><button type="button" class="input-paste-btn" data-action="paste-input" data-target="expressRpdb">Paste</button></div>
+        <p class="fastlane-trust">Keys go to the new AIOMetadata config only and stay in this browser. An AIOMetadata you already set up is kept as it is; add keys on its own configure page.</p>
+        <button type="button" class="fs-reset" data-action="reset-cinemeta">Restore the original Cinemeta on my Stremio account</button>
+        <div id="cinemetaResetResult" role="status" aria-live="polite"></div>
+      </div>
       <label class="ux-toggle-row"><input type="checkbox" id="expressClean" ${S.cleanInstall?'checked':''}><span class="ux-toggle-copy"><b class="u-tx">Clean reinstall</b><br><span class="u-tx2">Remove previous Core Builds addons from your Stremio account.</span></span></label>
       <div class="u-mt8"><div class="input-action-wrap"><input class="fastlane-field" id="expressTmdb" type="password" autocomplete="off" spellcheck="false" placeholder="TMDB Read Access Token (optional — improves matching)" value="${escH(S.tmdbToken||'')}" style="width:100%"><button type="button" class="input-paste-btn" data-action="paste-input" data-target="expressTmdb">Paste</button></div></div>
       <div class="fastlane-section"><div class="fastlane-label">Defaults we’ll use</div>
@@ -8486,6 +8502,8 @@ function showExpressLane(resume = null) {
     stremioEmail: document.getElementById('stremioEmailInline')?.value.trim() || '',
     stremioPassword: document.getElementById('stremioPasswordInline')?.value || '',
     fullStack: document.getElementById('expressFullStack')?.checked !== false,
+    cinemetaPatches: [...overlay.querySelectorAll('[data-cinemeta-patch]')].filter(i => i.checked).map(i => i.dataset.cinemetaPatch),
+    metaKeys: { mdblist: document.getElementById('expressMdblist')?.value.trim() || '', rpdb: document.getElementById('expressRpdb')?.value.trim() || '' },
     clean: document.getElementById('expressClean')?.checked === true,
     tmdb: document.getElementById('expressTmdb')?.value.trim() || '',
     extras: { services: state.extras, scrapers: state.scrapers },
@@ -8532,7 +8550,7 @@ function showExpressLane(resume = null) {
   refreshDeviceSpec();
   refreshDeliveryMode();
   refreshExpressSummary();
-  document.getElementById('expressFullStack')?.addEventListener('change', refreshExpressSummary);
+  document.getElementById('expressFullStack')?.addEventListener('change', e => { const o = document.getElementById('expressStackOpts'); if (o) o.hidden = !e.target.checked; refreshExpressSummary(); });
   document.getElementById('expressLang')?.addEventListener('change', e => { state.lang = e.target.value; refreshExpressSummary(); });
   overlay.addEventListener('click', e => {
     if (e.target === overlay || e.target.closest('#expressClose') || e.target.closest('[data-express-back]')) { closeLane(); return; }
@@ -8701,6 +8719,8 @@ function applyExpressChoices(p) {
   Object.assign(S.creds, p.creds);
   S.patchCinemeta = p.fullStack;
   S.installAIOMeta = p.fullStack;
+  if (Array.isArray(p.cinemetaPatches)) S.cinemetaPatches = sanitizeCinemetaPatches(p.cinemetaPatches);
+  if (p.metaKeys) S.metaKeys = { mdblist: p.metaKeys.mdblist || '', rpdb: p.metaKeys.rpdb || '' };
   S.cleanInstall = p.clean;
   if (p.tmdb) { S.tmdbToken = p.tmdb; S.tmdbApiKey = p.tmdb; }
   if (p.stremioEmail) S.stremioEmail = p.stremioEmail;
@@ -9040,7 +9060,7 @@ async function simpleInstall(target, { profile = '' } = {}) {
           const stackResult = await fullStackAfterPush(
             installResult.authKey,
             manifestUrl,
-            { patchCinemeta: S.patchCinemeta !== false, installAIOMetadata: S.installAIOMeta !== false, reorder: true, password: pwd }
+            { patchCinemeta: S.patchCinemeta !== false && sanitizeCinemetaPatches(S.cinemetaPatches).length > 0, installAIOMetadata: S.installAIOMeta !== false, reorder: true, password: pwd, cinemetaPatches: sanitizeCinemetaPatches(S.cinemetaPatches), metaKeys: S.metaKeys }
           );
           btn.disabled = false; btn.innerHTML = origHtml;
           // Steps and errors come back from the network: escape before they reach innerHTML.
@@ -9170,10 +9190,10 @@ async function pushToStremio(manifestUrl, email, password) {
  * no search and no metadata — installing it gave people an empty addon.
  * The config is protected by the same password as the AIOStreams config.
  */
-async function createAioMetadataConfig(password) {
+async function createAioMetadataConfig(password, keys = {}) {
   const res = await fetchWithTimeout(`${AIOMETADATA_BASE}/api/config/save`, {
     method:'POST', headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({ config: aioMetadataDefaultConfig(), password })
+    body: JSON.stringify({ config: aioMetadataDefaultConfig({ mdblistKey: keys.mdblist, rpdbKey: keys.rpdb }), password })
   }, 12000);
   const data = await res.json().catch(() => ({}));
   if (!res.ok || data?.success === false) throw new Error(data?.error || data?.message || `AIOMetadata returned ${res.status}`);
@@ -9215,7 +9235,7 @@ async function reorderAddons(authKey, aiometadataUrl, aiostreamsUrl) {
 async function fullStackAfterPush(authKey, aiostreamsUrl, opts = {}) {
   const steps = [];
   const errors = [];
-  const { patchCinemeta: doPatch = true, installAIOMetadata = true, reorder = true, password = '', cinemetaPatches = DEFAULT_CINEMETA_PATCHES } = opts;
+  const { patchCinemeta: doPatch = true, installAIOMetadata = true, reorder = true, password = '', cinemetaPatches = DEFAULT_CINEMETA_PATCHES, metaKeys = {} } = opts;
   let aiometaUrl = '';
 
   // Step 1: a configured AIOMetadata
@@ -9237,13 +9257,18 @@ async function fullStackAfterPush(authKey, aiostreamsUrl, opts = {}) {
         steps.push('✓ AIOMetadata already installed — your own config was kept');
       } else {
         if (!password) throw new Error('no password to protect its config, so it was not created');
-        aiometaUrl = await createAioMetadataConfig(password);
+        aiometaUrl = await createAioMetadataConfig(password, metaKeys);
         // The config save takes a moment: build the write from a fresh read so a change
         // made meanwhile (another device, another tab) is not overwritten.
         const fresh = (await stremioFetch('https://api.strem.io/api/addonCollectionGet', { type:'AddonCollectionGet', authKey, update:true }))?.result?.addons;
         if (!Array.isArray(fresh)) throw new Error('could not re-read your addon list, so AIOMetadata was not added');
+        // A configured AIOMetadata added meanwhile (another device) wins: never hold two.
+        const addedMeanwhile = fresh.find(a => isConfiguredAioMetadata(a) && a.transportUrl !== aiometaUrl);
+        if (addedMeanwhile) aiometaUrl = addedMeanwhile.transportUrl;
         // Earlier versions installed the bare manifest, which shows nothing: swap it out.
-        const updated = [...fresh.filter(a => !isBareAioMetadata(a) && a.transportUrl !== aiometaUrl), { transportName:'http', transportUrl: aiometaUrl, flags:{} }];
+        const updated = addedMeanwhile
+          ? fresh.filter(a => !isBareAioMetadata(a))
+          : [...fresh.filter(a => !isBareAioMetadata(a) && a.transportUrl !== aiometaUrl), { transportName:'http', transportUrl: aiometaUrl, flags:{} }];
         const setData = await stremioFetch('https://api.strem.io/api/addonCollectionSet', { type:'AddonCollectionSet', authKey, addons: updated });
         if (!setData?.result) throw new Error(stremioErrText(setData?.error, 'install failed'));
         steps.push(`✓ AIOMetadata configured and installed${hadBare ? ' (replaced the empty one from an earlier install)' : ''} — its password is the same as AIOStreams'`);
@@ -9271,7 +9296,8 @@ async function fullStackAfterPush(authKey, aiostreamsUrl, opts = {}) {
         if (r.patched) {
           const setData = await stremioFetch('https://api.strem.io/api/addonCollectionSet', { type:'AddonCollectionSet', authKey, addons: r.addons });
           if (!setData?.result) throw new Error(stremioErrText(setData?.error, 'could not save the patched Cinemeta'));
-          steps.push('✓ Cinemeta patched: its home rows and search are hidden (AIOMetadata provides them)');
+          const hid = { removeSearch: 'search', removeCatalogs: 'home rows', removeMeta: 'details pages' };
+          steps.push(`✓ Cinemeta patched: its ${cinemetaPatches.map(p => hid[p]).filter(Boolean).join(', ')} hidden (AIOMetadata provides them)`);
         } else if (r.reason === 'not-installed') {
           steps.push('• Cinemeta is not installed, so there was nothing to patch');
         } else {
@@ -9301,6 +9327,35 @@ async function fullStackAfterPush(authKey, aiostreamsUrl, opts = {}) {
   } catch (e) { errors.push('Read-back check: ' + (e.message || 'could not re-read the addon collection')); }
 
   return { steps, errors, ok: errors.length === 0 };
+}
+
+/**
+ * Restore: put back the original Cinemeta manifest (fetched from Stremio's own
+ * Cinemeta, which allows cross-origin reads) in the user's addon collection.
+ */
+async function resetCinemetaOnAccount() {
+  const out = document.getElementById('cinemetaResetResult');
+  const say = (msg, bad = false) => { if (out) out.innerHTML = `<p class="fastlane-trust${bad ? ' u-red' : ''}">${escHtml(msg)}</p>`; };
+  const email = document.getElementById('stremioEmailInline')?.value.trim() || S.stremioEmail;
+  const password = document.getElementById('stremioPasswordInline')?.value || S.stremioPassword;
+  if (!email || !password) { say('Enter your Stremio email and password above first.', true); return; }
+  say('Restoring Cinemeta…');
+  try {
+    const login = await stremioFetch('https://api.strem.io/api/login', { type:'Login', email, password, facebook:false });
+    const authKey = login?.result?.authKey;
+    if (!authKey) throw new Error(stremioErrText(login?.error, 'Login failed — check your email and password.'));
+    const got = await stremioFetch('https://api.strem.io/api/addonCollectionGet', { type:'AddonCollectionGet', authKey, update:true });
+    const addons = got?.result?.addons;
+    if (!Array.isArray(addons)) throw new Error(stremioErrText(got?.error, 'Could not read your addon list, so nothing was changed.'));
+    const res = await fetchWithTimeout(CINEMETA_MANIFEST_URL, { method:'GET' }, 10000);
+    const original = res.ok ? await res.json().catch(() => null) : null;
+    const r = resetCinemetaInCollection(addons, original);
+    if (r.reason === 'not-installed') { say('Cinemeta is not on this account, so there was nothing to restore.'); return; }
+    if (!r.patched) throw new Error('Could not load the original Cinemeta from Stremio, so nothing was changed.');
+    const set = await stremioFetch('https://api.strem.io/api/addonCollectionSet', { type:'AddonCollectionSet', authKey, addons: r.addons });
+    if (!set?.result) throw new Error(stremioErrText(set?.error, 'Could not save your addon list.'));
+    say('Cinemeta restored: its rows, search and details are back. Reopen Stremio to see them.');
+  } catch (e) { say(e.message || 'Restoring Cinemeta failed.', true); }
 }
 
 async function createRandomStremioAccount() {

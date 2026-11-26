@@ -226,3 +226,14 @@ a.core-tool-door:focus-visible{outline:2px solid #67e8f9;outline-offset:3px}
 .jf-lbl{flex:0 0 100%;font-size:.72rem;font-weight:700;letter-spacing:.04em;color:var(--th-tx3)}
 .jf-val{flex:1;min-width:0;overflow-wrap:anywhere;font:600 .78rem ui-monospace,Menlo,monospace;color:var(--th-tx,#e6edf3);background:rgba(255,255,255,.05);padding:5px 8px;border-radius:6px}
 [data-theme="light"] .jf-val{background:rgba(0,0,0,.05);color:#1c2128}
+
+/* Full stack options in Quick install (v3.51) */
+.fs-opts{display:flex;flex-direction:column;gap:6px;margin:4px 0 8px 30px}
+.fs-opts[hidden]{display:none}
+.fs-opts-group{border:0;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.fs-opts-group legend{font-size:.76rem;font-weight:700;color:var(--th-tx2);margin-bottom:2px}
+.fs-opt{display:flex;align-items:flex-start;gap:8px;font-size:.78rem;line-height:1.45;color:var(--th-tx2);cursor:pointer}
+.fs-opt input{margin-top:3px}
+.fs-opt b{color:var(--th-tx)}
+.fs-reset{appearance:none;font:inherit;align-self:flex-start;margin-top:4px;padding:6px 0;border:0;background:none;color:var(--th-accent);font-size:.74rem;font-weight:800;cursor:pointer}
+@media(max-width:640px){#expressLaneModal .fs-reset{font-size:.9rem;min-height:44px}}
