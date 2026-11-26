@@ -81,12 +81,18 @@ export function patchCinemetaInCollection(addons, patches = DEFAULT_CINEMETA_PAT
   return { addons: next, patched: true, reason: 'ok' };
 }
 
-/** Puts back the original Cinemeta manifest (fetched from CINEMETA_MANIFEST_URL by the caller). */
+/**
+ * Puts back the original Cinemeta manifest (fetched from CINEMETA_MANIFEST_URL by the
+ * caller). If Cinemeta was removed from the account, it is added back at the end;
+ * every other addon keeps its place. Without a valid manifest nothing changes.
+ */
 export function resetCinemetaInCollection(addons, originalManifest) {
   if (!Array.isArray(addons)) return { addons, patched: false, reason: 'no-collection' };
-  const idx = addons.findIndex(isCinemeta);
-  if (idx < 0) return { addons, patched: false, reason: 'not-installed' };
   if (!originalManifest || originalManifest.name !== 'Cinemeta') return { addons, patched: false, reason: 'no-manifest' };
+  const idx = addons.findIndex(isCinemeta);
+  if (idx < 0) {
+    return { addons: [...addons, { transportUrl: CINEMETA_MANIFEST_URL, transportName: 'http', flags: {}, manifest: originalManifest }], patched: true, reason: 'added' };
+  }
   const next = addons.slice();
   next[idx] = { ...addons[idx], manifest: originalManifest };
   return { addons: next, patched: true, reason: 'ok' };

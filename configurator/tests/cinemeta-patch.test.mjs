@@ -69,6 +69,13 @@ test('reset puts back the original manifest', () => {
   const r = resetCinemetaInCollection(patched, manifest());
   assert.equal(r.addons[0].manifest.catalogs.length, 6);
   assert.equal(resetCinemetaInCollection(patched, { name: 'Other' }).patched, false);
+  // Removed from the account: added back at the end, everything else in place.
+  const other = { transportUrl: 'https://x/manifest.json' };
+  const back = resetCinemetaInCollection([other], manifest());
+  assert.equal(back.reason, 'added');
+  assert.equal(back.addons[0], other);
+  assert.deepEqual(back.addons[1], { transportUrl: 'https://v3-cinemeta.strem.io/manifest.json', transportName: 'http', flags: {}, manifest: manifest() });
+  assert.deepEqual(resetCinemetaInCollection([other], null).addons, [other]);
 });
 
 test('AIOMetadata detection tells a configured install from the empty bare manifest', () => {

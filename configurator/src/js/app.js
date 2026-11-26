@@ -9355,11 +9355,10 @@ async function resetCinemetaOnAccount() {
     const addons = got?.result?.addons;
     if (!Array.isArray(addons)) throw new Error(stremioErrText(got?.error, 'Could not read your addon list, so nothing was changed.'));
     const r = resetCinemetaInCollection(addons, original);
-    if (r.reason === 'not-installed') { say('Cinemeta is not on this account, so there was nothing to restore.'); return; }
     if (!r.patched) throw new Error('Could not load the original Cinemeta from Stremio, so nothing was changed.');
     const set = await stremioFetch('https://api.strem.io/api/addonCollectionSet', { type:'AddonCollectionSet', authKey, addons: r.addons });
     if (!set?.result) throw new Error(stremioErrText(set?.error, 'Could not save your addon list.'));
-    say('Cinemeta restored: its rows, search and details are back. Reopen Stremio to see them.');
+    say(r.reason === 'added' ? 'Cinemeta added back to your account, with its rows, search and details. Reopen Stremio to see it.' : 'Cinemeta restored: its rows, search and details are back. Reopen Stremio to see them.');
   } catch (e) { say(e.message || 'Restoring Cinemeta failed.', true); }
 }
 
