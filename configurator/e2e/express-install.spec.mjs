@@ -87,6 +87,10 @@ async function mockBackend(page, posted, stack = {}) {
     if (url.includes('api.strem.io/api/register')) {
       return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ result: { authKey: 'auth-key-123', user: { email: 'x@y.z' } } }) });
     }
+    // Stremio's own Cinemeta manifest (Restore Cinemeta)
+    if (url.startsWith('https://v3-cinemeta.strem.io/manifest.json')) {
+      return route.fulfill({ status: 200, contentType: 'application/json', headers: { 'access-control-allow-origin': '*' }, body: JSON.stringify(cinemetaEntry().manifest) });
+    }
     // AIOMetadata config save (Full-Stack step)
     if (url.includes('aiometadata.elfhosted.com/api/config/save') && request.method() === 'POST') {
       stack.metaSaves.push(JSON.parse(request.postData() || '{}'));
@@ -487,5 +491,44 @@ test('Express Jellyfin target saves on a Jellyfin host and shows the sign-in det
   await expect(panel).not.toContainText('aiostreams.elfhosted.com/jellyfin');
   expect(hosts.join(' ')).not.toContain(encodeURIComponent('https://aiostreams.elfhosted.com'));
   await expect(panel.locator('.pwd-keep-val')).toHaveText(posted[0].password);
+  expect(errors).toEqual([]);
+});
+
+test('Full stack options: chosen Cinemeta parts and optional keys, then Restore Cinemeta', async ({ page }) => {
+  test.setTimeout(90_000);
+  const posted = [];
+  const stack = {};
+  await mockBackend(page, posted, stack);
+  const errors = await fresh(page);
+  page.on('dialog', dialog => dialog.accept());
+  await page.locator('[data-action="open-express-lane"]').click();
+  await page.locator('[data-express-cred="torbox"]').fill('test-torbox-key');
+  await page.locator('#stremioEmailInline').fill('test@stremio.com');
+  await page.locator('#stremioPasswordInline').fill('test-password');
+  await page.locator('#expressAdvanced > summary').click();
+  await expect(page.locator('#expressStackOpts')).toBeHidden();
+  await page.locator('#expressFullStack').check();
+  await expect(page.locator('#expressStackOpts')).toBeVisible();
+  // Keep rows and search; hide details only.
+  await page.locator('[data-cinemeta-patch="removeSearch"]').uncheck();
+  await page.locator('[data-cinemeta-patch="removeCatalogs"]').uncheck();
+  await page.locator('[data-cinemeta-patch="removeMeta"]').check();
+  await page.locator('#expressMdblist').fill('mdb-key');
+  await page.locator('#expressRpdb').fill('rpdb-key');
+  await page.locator('#expressGo').click();
+  await page.locator('#pwdPrompt .pwd-go').click();
+  await expect(page.locator('#aioResult')).toContainText('Full Stack Installed and verified!', { timeout: 45000 });
+  expect(stack.metaSaves[0].config.apiKeys).toMatchObject({ mdblist: 'mdb-key', rpdb: 'rpdb-key' });
+  expect(stack.metaSaves[0].config.posterRatingProvider).toBe('rpdb');
+  const cm = stack.collection()[0].manifest;
+  expect(cm.catalogs.map(c => c.id)).toEqual(['top', 'top', 'year', 'last-videos']);
+  expect(cm.resources).not.toContain('meta');
+  await expect(page.locator('#aioResult')).toContainText('details pages hidden');
+  // Restore puts the original manifest back.
+  const deploymentClose = page.locator('#deploymentClose');
+  if (await deploymentClose.isVisible()) await deploymentClose.click();
+  await page.locator('[data-action="reset-cinemeta"]').click();
+  await expect(page.locator('#cinemetaResetResult')).toContainText('Cinemeta restored', { timeout: 20000 });
+  expect(stack.collection()[0].manifest.resources).toContain('meta');
   expect(errors).toEqual([]);
 });

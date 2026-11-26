@@ -33,7 +33,7 @@ test('pushToStremio hands the caller its status and the session', async () => {
   assert.equal((await pushToStremio('https://h/stremio/u/p/manifest.json', 'e', 'p')).status, 'replaced');
   assert.match(app, /const installResult = await pushToStremio\([^)]*\);\s*const installed = installResult\.status;/);
   assert.match(app, /fullStackAfterPush\(\s*installResult\.authKey,/);
-  assert.match(app, /reorder: true, password: pwd \}/);
+  assert.match(app, /reorder: true, password: pwd, cinemetaPatches: sanitizeCinemetaPatches\(S\.cinemetaPatches\), metaKeys: S\.metaKeys \}/);
 });
 
 const cinemeta = () => ({
@@ -141,4 +141,42 @@ test('the Cinemeta patch also runs for an AIOMetadata the user set up, with the 
   assert.equal(r.ok, true, r.errors.join(' '));
   assert.equal(saves.length, 0);
   assert.deepEqual(state.addons[0].manifest.catalogs.map(c => c.id), ['last-videos']);
+});
+
+test('the chosen Cinemeta patches and AIOMetadata keys reach the account and the config', async () => {
+  const aios = 'https://h/stremio/x/y/manifest.json';
+  const { state, stremioFetch } = account([cinemeta(), { transportUrl: aios }]);
+  const saves = [];
+  const { fullStackAfterPush } = loadStack(stremioFetch, saves);
+  const r = await fullStackAfterPush('k', aios, { password: 'pw', cinemetaPatches: ['removeMeta'], metaKeys: { mdblist: 'm-1', rpdb: 'r-1' } });
+  assert.equal(r.ok, true, r.errors.join(' '));
+  assert.equal(saves[0].body.config.apiKeys.mdblist, 'm-1');
+  assert.equal(saves[0].body.config.apiKeys.rpdb, 'r-1');
+  assert.equal(saves[0].body.config.posterRatingProvider, 'rpdb');
+  const m = state.addons[0].manifest;
+  assert.equal(m.catalogs.length, 4, 'rows and search kept');
+  assert.ok(!m.resources.includes('meta'), 'details hidden');
+  assert.match(r.steps.join(' '), /details pages hidden/);
+});
+
+test('a configured AIOMetadata added while the config was saving is used, never doubled', async () => {
+  const aios = 'https://h/stremio/x/y/manifest.json';
+  const other = { transportUrl: 'https://aiometadata.elfhosted.com/stremio/other/manifest.json', manifest: { id: 'com.aio.metadata' } };
+  const { state, stremioFetch } = account([cinemeta(), { transportUrl: aios }]);
+  const saves = [];
+  const { fullStackAfterPush } = load(['reorderAddons', 'fullStackAfterPush'], {
+    stremioFetch, stremioErrText: errText, verifyAddonInstall, ...cp,
+    createAioMetadataConfig: async () => { state.addons.push(structuredClone(other)); return 'https://aiometadata.elfhosted.com/stremio/new/manifest.json'; },
+  });
+  const r = await fullStackAfterPush('k', aios, { password: 'pw' });
+  assert.equal(r.ok, true, r.errors.join(' '));
+  const metas = state.addons.filter(cp.isConfiguredAioMetadata);
+  assert.deepEqual(metas.map(a => a.transportUrl), [other.transportUrl]);
+  assert.match(r.steps.join(' '), /existing config appeared on your account and was kept/);
+  assert.doesNotMatch(r.steps.join(' '), /same as AIOStreams/);
+});
+
+test('AIOMetadata keys and Cinemeta choices stay local: never in share links', () => {
+  const keys = app.match(/const SHARE_KEYS = \[([^\]]*)\]/)[1];
+  assert.doesNotMatch(keys, /metaKeys|cinemetaPatches/);
 });

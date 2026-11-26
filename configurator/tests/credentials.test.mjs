@@ -69,9 +69,10 @@ test('every Stremio error throw is normalized through stremioErrText (audit C3, 
 
   // 1 definition + 6 call sites (login / addon-list / addon-set, in each of the two flows)
   // + 3 in the full-stack AIOMetadata step (addon-list read; set that drops an empty AIOMetadata;
-  // set that installs the configured one) + 2 in the Cinemeta patch step (read, write).
+  // set that installs the configured one) + 2 in the Cinemeta patch step (read, write)
+  // + 3 in Restore Cinemeta (login, read, write).
   const uses = app.match(/stremioErrText\(/g) || [];
-  assert.equal(uses.length, 12, `expected 1 definition + 11 call sites, found ${uses.length}`);
+  assert.equal(uses.length, 15, `expected 1 definition + 14 call sites, found ${uses.length}`);
 });
 
 test('stremioErrText normalizes string, object and missing shapes', async () => {

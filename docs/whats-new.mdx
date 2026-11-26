@@ -1,14 +1,36 @@
 ---
-title: "What's New — Configurator v3.50"
+title: "What's New — Configurator v3.51"
 sidebarTitle: "What's New"
-description: "Latest Core Builds Configurator releases (v3.50 and earlier), auto-generated from the in-app changelog."
+description: "Latest Core Builds Configurator releases (v3.51 and earlier), auto-generated from the in-app changelog."
 ---
 
 # What's New in the Configurator
 
-This page is regenerated from `configurator/src/data/changelog.js` by `scripts/sync-docs.py`, so it always reflects the latest shipped configurator version (currently **v3.50**).
+This page is regenerated from `configurator/src/data/changelog.js` by `scripts/sync-docs.py`, so it always reflects the latest shipped configurator version (currently **v3.51**).
 
 For the template-suite release log, see the [Changelog](https://core-builds.mintlify.app/changelog).
+
+## Configurator v3.51 (Nov 26 2026)
+
+<CardGroup cols={2}>
+  <Card title="Choose what Full stack hides in Cinemeta" icon="sparkles">
+    Quick install's Full stack option now lists Search, Home rows and Details pages. Search and Home rows are on by default; hide Details pages too if you want AIOMetadata to show every title's details.
+  </Card>
+  <Card title="Optional MDBList and RPDB keys" icon="bolt">
+    add an MDBList key for its ratings and lists, or an RPDB key for rating badges on posters. They are saved in this browser and sent only to AIOMetadata, inside the new config; they are never part of a share link.
+  </Card>
+  <Card title="Restore the original Cinemeta" icon="shield-check">
+    one button puts Stremio's own Cinemeta back on your account, with its rows, search and details.
+  </Card>
+  <Card title="Full stack never adds a second AIOMetadata" icon="sliders">
+    if one you set up elsewhere appears while Full stack is saving, that one is used.
+  </Card>
+  <Card title="Generated output unchanged" icon="gauge">
+    every reference config is byte-for-byte what 3.50 produced apart from the version stamp. These changes are to what Full stack does on your Stremio account and in AIOMetadata.
+  </Card>
+</CardGroup>
+
+---
 
 ## Configurator v3.50 (Nov 26 2026)
 
@@ -68,24 +90,5 @@ For the template-suite release log, see the [Changelog](https://core-builds.mint
   </Card>
   <Card title="Generated output changes for Ready to play first only" icon="wand">
     new Quick installs on Fast and Balanced carry one extra exclude rule and excludeUncached off; two new reference configs pin that. Every other reference config is unchanged apart from the version stamp.
-  </Card>
-</CardGroup>
-
----
-
-## Configurator v3.47 (Nov 26 2026)
-
-<CardGroup cols={2}>
-  <Card title="Quick install's Balanced shows only streams that play straight away" icon="sparkles">
-    like Fast, Balanced now hides anything your service would still have to download, so a new setup starts playing when you pick a stream. Maximum still lists those streams too.
-  </Card>
-  <Card title="Your own Streams shown pick is kept" icon="bolt">
-    choose Mixed under Streams shown and Quick install keeps it the next time you open it. Picking a profile again goes back to that profile's setting. If you chose Mixed before this version, choose it once more.
-  </Card>
-  <Card title="Clearer Cached only label" icon="shield-check">
-    it now reads 'Plays straight away — anything still downloading is hidden' instead of promising instant play.
-  </Card>
-  <Card title="Generated output unchanged" icon="sliders">
-    every reference config is byte-for-byte what 3.46 produced apart from the version stamp. Only a new Quick install on Balanced differs: it carries excludeUncached, which Fast already did.
   </Card>
 </CardGroup>

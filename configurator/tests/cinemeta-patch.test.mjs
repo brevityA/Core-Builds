@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
   patchCinemetaManifest, patchCinemetaInCollection, resetCinemetaInCollection, isCinemeta,
-  isConfiguredAioMetadata, isBareAioMetadata, aioMetadataDefaultConfig,
+  isConfiguredAioMetadata, isBareAioMetadata, aioMetadataDefaultConfig, sanitizeCinemetaPatches,
 } from '../src/core/cinemeta-patch.js';
 
 // Shape of the live v3-cinemeta.strem.io manifest (genre options trimmed).
@@ -69,6 +69,13 @@ test('reset puts back the original manifest', () => {
   const r = resetCinemetaInCollection(patched, manifest());
   assert.equal(r.addons[0].manifest.catalogs.length, 6);
   assert.equal(resetCinemetaInCollection(patched, { name: 'Other' }).patched, false);
+  // Removed from the account: added back at the end, everything else in place.
+  const other = { transportUrl: 'https://x/manifest.json' };
+  const back = resetCinemetaInCollection([other], manifest());
+  assert.equal(back.reason, 'added');
+  assert.equal(back.addons[0], other);
+  assert.deepEqual(back.addons[1], { transportUrl: 'https://v3-cinemeta.strem.io/manifest.json', transportName: 'http', flags: {}, manifest: manifest() });
+  assert.deepEqual(resetCinemetaInCollection([other], null).addons, [other]);
 });
 
 test('AIOMetadata detection tells a configured install from the empty bare manifest', () => {
@@ -86,6 +93,17 @@ test('the AIOMetadata config is the configure page defaults, with no keys and no
   assert.equal(c.language, 'en-US');
   assert.equal(c.providers.series, 'tvdb');
   assert.equal(c.catalogs, undefined);
-  assert.equal(c.apiKeys, undefined);
-  assert.ok(!JSON.stringify(c).includes('fanart'), 'fanart art would make a fanart key required');
+  // Every key present and empty, as AIOMetadata's configure page sends them.
+  assert.deepEqual(Object.values(c.apiKeys), Array(Object.keys(c.apiKeys).length).fill(''));
+  assert.equal(c.posterRatingProvider, 'none');
+  assert.ok(!JSON.stringify(c.artProviders).includes('fanart'), 'fanart art would make a fanart key required');
+});
+
+test('optional MDBList and RPDB keys go where AIOMetadata reads them', () => {
+  const c = aioMetadataDefaultConfig({ mdblistKey: ' mdb-1 ', rpdbKey: 'rp-1' });
+  assert.equal(c.apiKeys.mdblist, 'mdb-1');
+  assert.equal(c.apiKeys.rpdb, 'rp-1');
+  assert.equal(c.posterRatingProvider, 'rpdb');
+  assert.deepEqual(sanitizeCinemetaPatches(['removeMeta', 'bogus', 'removeSearch']), ['removeSearch', 'removeMeta']);
+  assert.deepEqual(sanitizeCinemetaPatches('x'), []);
 });

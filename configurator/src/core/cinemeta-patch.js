@@ -81,12 +81,18 @@ export function patchCinemetaInCollection(addons, patches = DEFAULT_CINEMETA_PAT
   return { addons: next, patched: true, reason: 'ok' };
 }
 
-/** Puts back the original Cinemeta manifest (fetched from CINEMETA_MANIFEST_URL by the caller). */
+/**
+ * Puts back the original Cinemeta manifest (fetched from CINEMETA_MANIFEST_URL by the
+ * caller). If Cinemeta was removed from the account, it is added back at the end;
+ * every other addon keeps its place. Without a valid manifest nothing changes.
+ */
 export function resetCinemetaInCollection(addons, originalManifest) {
   if (!Array.isArray(addons)) return { addons, patched: false, reason: 'no-collection' };
-  const idx = addons.findIndex(isCinemeta);
-  if (idx < 0) return { addons, patched: false, reason: 'not-installed' };
   if (!originalManifest || originalManifest.name !== 'Cinemeta') return { addons, patched: false, reason: 'no-manifest' };
+  const idx = addons.findIndex(isCinemeta);
+  if (idx < 0) {
+    return { addons: [...addons, { transportUrl: CINEMETA_MANIFEST_URL, transportName: 'http', flags: {}, manifest: originalManifest }], patched: true, reason: 'added' };
+  }
   const next = addons.slice();
   next[idx] = { ...addons[idx], manifest: originalManifest };
   return { addons: next, patched: true, reason: 'ok' };
@@ -111,14 +117,26 @@ export function isBareAioMetadata(addon) {
 
 /**
  * The smallest config AIOMetadata's own configure page would save: its defaults for
- * language, providers and art. `catalogs` is left out so the addon serves its default
- * catalogs and search. ElfHosted supplies the TMDB and TVDB keys.
+ * language, providers, art and API keys (every key present, empty unless given, as
+ * configure/src/contexts/ConfigContext.tsx sends them). `catalogs` is left out so the
+ * addon serves its default catalogs and search. ElfHosted supplies TMDB and TVDB keys.
+ * An RPDB key turns on RPDB rating posters; an MDBList key enables its ratings and lists.
  */
-export function aioMetadataDefaultConfig({ language = 'en-US' } = {}) {
+export function aioMetadataDefaultConfig({ language = 'en-US', mdblistKey = '', rpdbKey = '' } = {}) {
   const art = { poster: 'meta', background: 'meta', logo: 'meta' };
+  const clean = v => (typeof v === 'string' ? v.trim() : '');
+  const rpdb = clean(rpdbKey);
   return {
     language,
     providers: { movie: 'tmdb', series: 'tvdb', anime: 'mal', anime_id_provider: 'imdb', forceAnimeForDetectedImdb: false },
     artProviders: { movie: { ...art }, series: { ...art }, anime: { poster: 'meta', background: 'imdb', logo: 'imdb' }, englishArtOnly: false, originalLangFallback: false },
+    apiKeys: { gemini: '', tmdb: '', tvdb: '', fanart: '', rpdb, topPoster: '', mdblist: clean(mdblistKey), openrouter: '', publicmetadb: '' },
+    posterRatingProvider: rpdb ? 'rpdb' : 'none',
   };
+}
+
+/** Keeps only known patch names, in a fixed order. */
+export function sanitizeCinemetaPatches(value) {
+  const list = Array.isArray(value) ? value : [];
+  return CINEMETA_PATCHES.filter(p => list.includes(p));
 }
