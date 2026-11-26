@@ -140,6 +140,16 @@ for (const combo of MATRIX) {
       expect(tpl.config.failover, `${combo.name} must emit canonical failover`).toBeTruthy();
     }
 
+    // Ready to play first must hold even when goldens are being regenerated: native
+    // flag off, one enabled rule, and that rule ahead of every late pack fallback.
+    if (state.cacheMode === 'ready') {
+      const ese = (tpl.config.excludedStreamExpressions || []).map(e => (typeof e === 'string' ? e : e.expression));
+      const at = ese.map((e, i) => /Ready to play first/.test(e) ? i : -1).filter(i => i >= 0);
+      expect(tpl.config.excludeUncached, `${combo.name} keeps the native flag off`).not.toBe(true);
+      expect(at, `${combo.name} carries one Ready rule`).toHaveLength(1);
+      ese.forEach((e, i) => { if (/Late Pack Fallback/.test(e)) expect(at[0], `${combo.name} Ready rule before pack fallback`).toBeLessThan(i); });
+    }
+
     if (expectedProfile === 'stable') {
       expect(tpl.config.syncedRankedRegexUrls || []).toEqual([]);
       expect(tpl.config.syncedRankedStreamExpressionUrls || []).toEqual([]);

@@ -52,22 +52,26 @@ async function results(config) {
   const out = {};
   for (const id of Object.keys(TITLES)) {
     const s = await (await fetch(`${BASE}/stremio/${body.data.uuid}/${body.data.encryptedPassword}/stream/movie/${id}.json`)).json();
-    out[id] = (s.streams || []).filter(x => x.url).map(x => (x.url.match(/\/play\/([cu])/) || [])[1]).filter(Boolean);
+    // Full URLs, so the Cached only comparison catches a different stream with the
+    // same cache status; kind() reads cached/uncached from them for the other checks.
+    out[id] = (s.streams || []).filter(x => x.url).map(x => x.url);
   }
   return out;
 }
 
+const kind = urls => urls.map(u => (u.match(/\/play\/([cu])/) || [])[1] || '?');
 const failures = [];
 const check = (ok, msg) => { console.log(`${ok ? 'PASS' : 'FAIL'}  ${msg}`); if (!ok) failures.push(msg); };
 try {
   const ready = await results(build('ready'));
   const hard = await results(build('cached'));
-  console.log('ready ', JSON.stringify(ready));
-  console.log('cached', JSON.stringify(hard));
+  const summary = r => JSON.stringify(Object.fromEntries(Object.entries(r).map(([k, v]) => [k, kind(v)])));
+  console.log('ready ', summary(ready));
+  console.log('cached', summary(hard));
   check(build('ready').excludedStreamExpressions.some(e => /Ready to play first/.test(e.expression)), 'ready: the Stable profile keeps the Ready to play first rule');
-  check(ready.tt9000001.length > 0 && ready.tt9000001.every(c => c === 'c'), 'ready: cached + uncached title shows only cached streams');
+  check(ready.tt9000001.length > 0 && kind(ready.tt9000001).every(c => c === 'c'), 'ready: cached + uncached title shows only cached streams');
   check(JSON.stringify(ready.tt9000001) === JSON.stringify(hard.tt9000001), 'ready: same streams as Cached only when anything is cached');
-  check(ready.tt9000002.length === 3 && ready.tt9000002.every(c => c === 'u'), 'ready: uncached-only title still lists its 3 streams');
+  check(ready.tt9000002.length === 3 && kind(ready.tt9000002).every(c => c === 'u'), 'ready: uncached-only title still lists its 3 streams');
   check(ready.tt9000003.length === 2, 'ready: cached-only title lists its 2 streams');
   check(ready.tt9000004.length === 2, 'ready: uncached-only title at two resolutions lists both');
   check(hard.tt9000002.length === 0, 'cached: native excludeUncached leaves an uncached-only title empty (the reason for ready)');

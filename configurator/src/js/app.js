@@ -6132,7 +6132,8 @@ function parseTemplateToState(tpl) {
   // Cache mode
   const hasP2P = enabledPresets.some(p => ['torrentio','comet','jackettio','knaben','torrent-galaxy'].includes(p.type));
   st.p2pEnabled = hasP2P;
-  const readyFirst = (c.excludedStreamExpressions || []).some(e => /Ready to play first/.test(e?.expression || ''));
+  // An enabled Ready rule only: a disabled one means the setup runs as Mixed.
+  const readyFirst = (c.excludedStreamExpressions || []).some(e => (typeof e === 'string' || e?.enabled !== false) && /Ready to play first/.test(typeof e === 'string' ? e : (e?.expression || '')));
   st.cacheMode = c.excludeUncached === true ? 'cached' : c.excludeCached === true ? 'uncached' : readyFirst ? 'ready' : 'mixed';
 
   // Max results → stream pool
@@ -8360,7 +8361,7 @@ function showExpressLane(resume = null) {
         <div class="ux-field-label">What matters most</div>
         <div class="ux-seg" role="group" aria-label="What matters most">${EXPRESS_PROFILES.map(([v,n,d])=>`<button type="button" class="fastlane-choice${state.profile===v?' active':''}" data-express-profile="${v}"><b>${n}${v==='balanced'?' <span class="fastlane-reco">Recommended</span>':''}</b><span>${d}</span></button>`).join('')}</div>
         <p class="ux-hint" id="expressProfileHint"></p>
-        <div class="ux-field-label">Streams shown ${ftTip('<strong>Ready first</strong> = only streams that play straight away, unless none are ready yet; then the ones that need downloading appear, so the list is never empty. <strong>Cached only</strong> hides them even then. <strong>Mixed</strong> also shows torrents your debrid must fetch first — those stall on a “downloading to debrid” screen the first time. Quick install’s Fast and Balanced use Ready first.')}</div>
+        <div class="ux-field-label">Streams shown ${ftTip('<strong>Ready first</strong> = only streams that play straight away, unless none are ready yet; then the ones that need downloading appear instead. <strong>Cached only</strong> hides them even then. <strong>Mixed</strong> also shows torrents your debrid must fetch first — those stall on a “downloading to debrid” screen the first time. Quick install’s Fast and Balanced use Ready first.')}</div>
         <div class="ux-seg" role="group" aria-label="Streams shown">
         <button type="button" class="fastlane-choice${S.cacheMode==='ready'?' active':''}" data-express-cache="ready"><b>⚡ Ready to play</b><span>Plays straight away · if nothing is ready yet, downloads are shown</span></button>
         <button type="button" class="fastlane-choice${S.cacheMode==='mixed' || !S.cacheMode?' active':''}" data-express-cache="mixed"><b>Mixed</b><span>Cached first · uncached can download first</span></button>
@@ -8478,7 +8479,7 @@ function showExpressLane(resume = null) {
     const ph = document.getElementById('expressProfileHint');
     if (ph) { const pr = EXPRESS_PROFILES.find(([v]) => v === state.profile); ph.textContent = pr ? pr[2] + (state.profile === 'balanced' ? ' · Recommended' : '') : ''; }
     const ch = document.getElementById('expressCacheHint');
-    if (ch) ch.textContent = S.cacheMode === 'cached' ? 'Cached only, as chosen before: anything still downloading is hidden, even when nothing else is ready. Pick Ready to play so the list is never empty.' : S.cacheMode === 'ready' ? 'Streams that play straight away only. If none are ready yet, ones that still need downloading appear instead, so the list is never empty.' : S.cacheMode === 'uncached' ? 'Uncached only, as set in the full builder.' : 'Cached first. Uncached results can download to your debrid first.';
+    if (ch) ch.textContent = S.cacheMode === 'cached' ? 'Cached only, as chosen before: anything still downloading is hidden, even when nothing else is ready. Pick Ready to play to see downloads when nothing is ready.' : S.cacheMode === 'ready' ? 'Streams that play straight away only. If none are ready yet, the ones that still need downloading are shown instead.' : S.cacheMode === 'uncached' ? 'Uncached only, as set in the full builder.' : 'Cached first. Uncached results can download to your debrid first.';
   };
   const refreshDeliveryMode = () => {
     if (!overlay.isConnected) return;

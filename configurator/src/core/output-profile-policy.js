@@ -145,7 +145,8 @@ function applyReadyFirst(config, context) {
   // Always drop an earlier copy first: "Update my setup" can carry the old config's
   // rules across, and a Ready rule left behind after switching to Mixed or Cached
   // only would keep hiding downloads.
-  const ese = values(config.excludedStreamExpressions).filter(entry => !/Ready to play first/.test(entry?.expression || ''));
+  const text = entry => (typeof entry === 'string' ? entry : String(entry?.expression || ''));
+  const ese = values(config.excludedStreamExpressions).filter(entry => !/Ready to play first/.test(text(entry)));
   if (Array.isArray(config.excludedStreamExpressions)) config.excludedStreamExpressions = ese;
   if (context.cacheMode !== 'ready') return;
   // Free routes have no debrid cache to read; the generator leaves their flags off too.
@@ -153,7 +154,7 @@ function applyReadyFirst(config, context) {
   config.excludeUncached = false;
   // Before the late pack fallbacks: pack filtering stays the final step, and its
   // "3 playable singles" count then sees only what this rule kept.
-  const pack = ese.findIndex(entry => /Late Pack Fallback/.test(entry?.expression || ''));
+  const pack = ese.findIndex(entry => /Late Pack Fallback/.test(text(entry)));
   ese.splice(pack < 0 ? ese.length : pack, 0, { ...READY_FIRST_ESE });
   config.excludedStreamExpressions = ese;
 }

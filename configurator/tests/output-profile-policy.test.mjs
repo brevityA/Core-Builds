@@ -437,3 +437,13 @@ test('a Ready rule carried over from an earlier config is removed when the mode 
   const p2p = applyOutputProfile(structuredClone(stale), 'advanced', { service: 'p2p', cacheMode: 'ready' }).config;
   assert.ok(!p2p.excludedStreamExpressions.some(e => /Ready to play first/.test(e.expression)), 'p2p');
 });
+
+test('Ready rule placement and clean-up also read rules stored as plain strings', () => {
+  const pack = "/* CB | Late Pack Fallback — hide multi-episode files only when 3 playable singles remain */ (queryType == 'series') ? multiEpisode(streams) : []";
+  const oldReady = "/* CB | Ready to play first — hide downloads only while something plays now */ count(cached(streams)) > 0 ? uncached(streams) : []";
+  const out = applyOutputProfile({ config: { excludedStreamExpressions: ['/* Other */ size(streams, 1)', oldReady, pack] } }, 'advanced',
+    { service: 'torbox-pro', cacheMode: 'ready' }).config;
+  const text = out.excludedStreamExpressions.map(e => (typeof e === 'string' ? e : e.expression));
+  assert.equal(text.filter(e => /Ready to play first/.test(e)).length, 1, 'string copy replaced, not stacked');
+  assert.ok(text.findIndex(e => /Ready to play first/.test(e)) < text.findIndex(e => /Late Pack Fallback/.test(e)), 'before the string-form pack rule');
+});

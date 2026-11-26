@@ -233,11 +233,11 @@ test('A Cached only pick kept from 3.47 is explained, and Ready to play replaces
   await page.reload();
   await page.waitForTimeout(950);
   await page.locator('[data-action="open-express-lane"]').click();
-  await expect(page.locator('#expressCacheHint')).toContainText('never empty');
+  await expect(page.locator('#expressCacheHint')).toContainText('see downloads when nothing is ready');
   await expect(page.locator('[data-express-cache].active')).toHaveCount(0);
   await page.locator('[data-express-cache="ready"]').click();
   await expect(page.locator('[data-express-cache="ready"]')).toHaveClass(/active/);
-  await expect(page.locator('#expressCacheHint')).toContainText('never empty');
+  await expect(page.locator('#expressCacheHint')).toContainText('shown instead');
   expect(await page.evaluate(() => JSON.parse(localStorage.getItem('coreBuild')).cacheMode)).toBe('ready');
 });
 
