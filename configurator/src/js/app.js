@@ -54,7 +54,7 @@ const STEPS = 6;
 // workflow) the raw x.y here expands to x.y.0 in package.json / versions.json and
 // the release tag; the built badge drops the trailing .0. At the 2026-09-06
 // audit the release tag was v3.7.0 while this said 3.1 — they must move together.
-const CONFIGURATOR_VERSION = '3.43';
+const CONFIGURATOR_VERSION = '3.44';
 // Set to a collector endpoint to enable the opt-in anonymous usage ping (service+device+resolution only).
 // Leave empty to keep the feature fully disabled and hidden.
 const USAGE_BEACON_URL = '';
@@ -2628,6 +2628,7 @@ function splashHtml() {
              Other routes are deep links (#advanced, #update, #import, #tour…) listed on All Core Tools. -->
         <nav class="lp-rows" id="splashStart" aria-label="Core Builds tools">
         <button type="button" class="lp-row lp-row-main" data-action="open-express-lane"><span class="lp-row-ico">${BRAND_GLYPHS.corebuilds}</span><b>Core Builds</b><span class="lp-tag">Setup</span></button>
+        <a class="lp-row" href="../tools/start/"><span class="lp-row-ico">${ICO.compass(22,'currentColor')}</span><b>Start Here</b><span class="lp-tag">New here</span></a>
         <a class="lp-row" href="../tools/inspector/"><span class="lp-row-ico">${ICO.search(22,'currentColor')}</span><b>Template Inspector</b><span class="lp-tag">JSON</span></a>
         <a class="lp-row" href="../account-tools/" target="_blank" rel="noopener noreferrer"><span class="lp-row-ico">${ICO.download(22,'currentColor')}</span><b>Back Up Addons</b><span class="lp-tag">Backup</span></a>
         <a class="lp-row" href="../tools/genies/nuvio-stacks.html"><span class="lp-row-ico">${BRAND_GLYPHS.nuvio}</span><b>Nuvio Stack Genie</b><span class="lp-tag">Nuvio</span></a>

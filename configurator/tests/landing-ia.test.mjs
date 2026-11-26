@@ -27,9 +27,9 @@ assert.ok(startBlock && heroBlock, 'fixture guard: the landing rows and hero mus
 
 test('one list of equal rows, Core Builds first (v3.33)', () => {
   const rows = startBlock.match(/class="lp-row(?: [^"]*)?"/g) || [];
-  assert.equal(rows.length, 6, 'Core Builds + five tools');
+  assert.equal(rows.length, 7, 'Core Builds, Start Here + five tools');
   assert.match(startBlock, /^[^]*?class="lp-row lp-row-main" data-action="open-express-lane"><span class="lp-row-ico">\$\{BRAND_GLYPHS\.corebuilds\}<\/span><b>Core Builds<\/b>/);
-  for (const href of ['../tools/inspector/', '../account-tools/', '../tools/genies/nuvio-stacks.html', '../tools/badges/', '../tools/']) {
+  for (const href of ['../tools/start/', '../tools/inspector/', '../account-tools/', '../tools/genies/nuvio-stacks.html', '../tools/badges/', '../tools/']) {
     assert.ok(startBlock.includes(`href="${href}"`), href);
   }
 });

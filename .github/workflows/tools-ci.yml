@@ -11,11 +11,17 @@ on:
     paths:
       - 'tools/**'
       - '.github/workflows/tools-ci.yml'
+      # Start Here checks its button names against these two files.
+      - 'configurator/src/js/app.js'
+      - 'configurator/src/data/i18n-strings.js'
   push:
     branches: [main]
     paths:
       - 'tools/**'
       - '.github/workflows/tools-ci.yml'
+      # Start Here checks its button names against these two files.
+      - 'configurator/src/js/app.js'
+      - 'configurator/src/data/i18n-strings.js'
 
 permissions:
   contents: read
@@ -42,3 +48,8 @@ jobs:
 
       - name: Test Badge Builder
         run: node --test tools/badges/tests/*.test.mjs
+
+      # Start Here imports the configurator's translation table, so changes there
+      # (configurator/src/data/i18n-strings.js) re-run this too.
+      - name: Test Start Here
+        run: node --test tools/start/tests/*.test.mjs
