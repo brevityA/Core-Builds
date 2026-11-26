@@ -50,7 +50,7 @@ configurator/               — Web app (main product)
 
 tools/                      — Tools hub
   inspector/                — Template Inspector (paste JSON for instant validation)
-account-tools/              — Account Tools (Stremio addon backup, compare, reorder, remove, restore, undo)
+account-tools/              — Account Tools (Stremio addon backup, compare, reorder, remove, restore, undo; install from a link; copy Stremio ↔ Nuvio and from another Stremio account)
 cli/                        — CLI tool (available)
 cloudflare-worker/          — CORS proxy (Cloudflare Worker for cross-origin requests)
 AIOMetadata/                — AIOMetadata configs (movies+TV, full)
@@ -129,7 +129,7 @@ The `build()` function (line ~3400) assembles the full AIOStreams config from cu
 |---|---|---|
 | **Template Builder** | `configurator/` | Live — the configurator |
 | **Template Inspector** | `tools/inspector/` | Live — paste/upload/fetch JSON for instant validation, health score, host compatibility |
-| **Account Tools** | `account-tools/` | Live — backup, compare, reorder, remove, restore; Undo keeps the last 10 changes in page memory |
+| **Account Tools** | `account-tools/` | Live — backup, compare, reorder, remove, restore, install from a link, copy Stremio ↔ Nuvio and from another Stremio account; Undo keeps the last 10 changes in page memory (Nuvio has its own) |
 | **CLI** | `cli/` | Live — `npm install -g core-builds` |
 | **CORS Proxy** | `cloudflare-worker/` | Live — Cloudflare Worker for cross-origin config push |
 
