@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src https://api.strem.io; frame-src 'none'; object-src 'none'; worker-src 'none'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'"><meta name="referrer" content="no-referrer"><title>Core Account Tools — Backup, Diff & Restore</title><style>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src https:; frame-src 'none'; object-src 'none'; worker-src 'none'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'"><meta name="referrer" content="no-referrer"><title>Core Account Tools — Backup, Install, Copy & Restore</title><style>
 :root{color-scheme:dark;font-family:system-ui;background:#071018;color:#e6edf3;--cyan:#67e8f9;--border:#243342;--card:#0e1822;--input:#0a121a;--muted:#718493;--warn-bg:#2b210b;--warn-border:#7c5b19;--warn-text:#fbd38d;--green:#34d399;--red:#f87171;--blue:#60a5fa}
 body{margin:0;padding:24px}
 .wrap{max-width:800px;margin:auto}
@@ -48,14 +48,18 @@ button:disabled{opacity:.4;cursor:default}
 .undo-bar button{width:auto;padding:6px 14px;background:#312e81;border-color:#4c1d95;color:#c4b5fd}
 .count{font-weight:900;color:var(--cyan)}
 .hidden{display:none}
+.copy-note{font-size:.82rem;color:var(--muted);margin:6px 0}
+label{display:block;font-size:.82rem;color:var(--muted);margin-top:8px}
+label.sr{position:absolute}
+code{font-size:.85em}
 @media(max-width:560px){.row,.row3{grid-template-columns:1fr}}
 </style><style>/* Core Builds page transitions: cross-fade between same-site pages. */@media(prefers-reduced-motion:no-preference){@view-transition{navigation:auto}}</style>
 <link rel="stylesheet" href="../tools/core-shell.css">
 </head><body><main class="wrap">
 <p class="cb-kicker">Core Builds · Stremio account</p>
 <h1 class="cb-title">Core Account <em>Tools</em></h1>
-<p>Addon backup, inspection, comparison, and restore. Before every change the previous list is kept for Undo (last 10 changes, until you close the page).</p>
-<div class="warn">Login details are sent directly to the Stremio API and kept only in page memory. Never use this from an untrusted copy.</div>
+<p>Addon backup, inspection, comparison, restore, install, and copying between Stremio and Nuvio. Before every change the previous list is kept for Undo (last 10 changes, until you close the page).</p>
+<div class="warn">Login details are sent directly to the Stremio API (and, for Nuvio, to the Nuvio API) and kept only in page memory. Never use this from an untrusted copy.</div>
 
 <section class="card" id="auth-card">
 <h2>Sign in</h2>
@@ -83,6 +87,43 @@ button:disabled{opacity:.4;cursor:default}
   <div><strong id="session-label">Signed in</strong></div>
   <div style="text-align:right"><button class="danger" id="logout" style="width:auto;padding:6px 16px">Clear session</button></div>
 </div>
+</section>
+
+
+<section class="card hidden" id="install-card">
+<h2>Install an addon</h2>
+<p>Paste an addon's manifest link (it ends in <code>manifest.json</code>; a <code>stremio://</code> link works too).</p>
+<label for="installUrl" class="sr">Manifest link</label>
+<input id="installUrl" type="url" autocomplete="off" spellcheck="false" placeholder="https://…/manifest.json">
+<div class="row"><button type="button" id="installStremio">Add to my Stremio account</button><button type="button" class="secondary" id="installNuvio" disabled>Add to my Nuvio profile</button></div>
+</section>
+
+<section class="card" id="nuvio-card">
+<h2>Nuvio</h2>
+<p>Sign in to Nuvio to install addons there, or copy addons between Stremio and Nuvio. Your Nuvio sign-in goes only to the Nuvio API and is kept in page memory.</p>
+<div id="nuvio-auth">
+  <div class="row"><input id="nuvioEmail" type="email" autocomplete="username" placeholder="Nuvio email"><input id="nuvioPassword" type="password" autocomplete="current-password" placeholder="Nuvio password"></div>
+  <button type="button" id="nuvioLogin">Sign in to Nuvio</button>
+</div>
+<div id="nuvio-session" class="hidden">
+  <label for="nuvioProfile">Profile</label>
+  <select id="nuvioProfile"></select>
+  <p id="nuvio-summary"></p>
+  <div id="nuvio-list"></div>
+</div>
+<div id="nuvio-undo" class="undo-bar hidden"><span class="undo-label" id="nuvio-undo-label">Last Nuvio change can be undone</span><button type="button" id="nuvioUndo">Undo</button></div>
+</section>
+
+<section class="card" id="copy-card">
+<h2>Copy addons</h2>
+<label for="copyMode">How to copy</label>
+<select id="copyMode"><option value="add">Add the ones that are missing (keep everything already there)</option><option value="replace">Replace the whole list</option></select>
+<p class="copy-note">Replacing a Stremio list always keeps Stremio's protected addons, such as Cinemeta. Links that are not https (Local Files) are never copied.</p>
+<div class="row"><button type="button" id="copyToNuvio" disabled>My Stremio → Nuvio profile</button><button type="button" id="copyToStremio" disabled>Nuvio profile → my Stremio</button></div>
+<h3>From another Stremio account</h3>
+<div class="row"><input id="srcEmail" type="email" autocomplete="off" placeholder="Other account's email"><input id="srcPassword" type="password" autocomplete="off" placeholder="Other account's password"></div>
+<button type="button" class="secondary" id="copyFromStremio" disabled>Copy its addons into my Stremio account</button>
+<p class="copy-note">The other account is only read, never changed. Sign in to your own account above first.</p>
 </section>
 
 <section class="card hidden" id="warnings-card">
@@ -148,6 +189,49 @@ let authKey=null,addons=[],currentSnapshot=null,undoStack=[],isLiveSession=false
 
 const CRED_RE=/apiKey|password|secret|auth.*key|token/i;
 
+/* transfer-helpers:start — pure, unit-tested by tests/transfer.test.mjs */
+function normalizeManifestUrl(input){
+  let u=String(input||'').trim();
+  if(/^stremio:\/\//i.test(u))u='https://'+u.slice(10);
+  let url;try{url=new URL(u)}catch{return null}
+  if(url.protocol!=='https:'||!/\/manifest\.json$/.test(url.pathname))return null;
+  return url.href;
+}
+function isCopyable(url){try{return new URL(url).protocol==='https:'}catch{return false}}
+function planStremioCopy(target,incoming,mode){
+  const src=[];const seenSrc=new Set();
+  for(const a of incoming||[]){if(isCopyable(a&&a.transportUrl)&&!seenSrc.has(a.transportUrl)){seenSrc.add(a.transportUrl);src.push(a)}}
+  if(mode==='replace'){
+    const keep=(target||[]).filter(a=>a&&a.flags&&a.flags.protected);
+    const seen=new Set(keep.map(a=>a.transportUrl));
+    const out=[...keep];for(const a of src)if(!seen.has(a.transportUrl)){seen.add(a.transportUrl);out.push(a)}
+    const kept=new Set(out.map(a=>a.transportUrl));
+    return{addons:out,added:out.filter(a=>!(target||[]).some(t=>t.transportUrl===a.transportUrl)).length,removed:(target||[]).filter(t=>!kept.has(t.transportUrl)).length};
+  }
+  const seen=new Set((target||[]).map(a=>a.transportUrl));
+  const add=src.filter(a=>!seen.has(a.transportUrl));
+  return{addons:[...(target||[]),...add],added:add.length,removed:0};
+}
+function stremioToNuvio(entries){return(entries||[]).filter(a=>isCopyable(a&&a.transportUrl)).map(a=>({url:a.transportUrl,name:(a.manifest&&a.manifest.name)||'',enabled:true}))}
+function nuvioToStremio(rows){return(rows||[]).filter(r=>isCopyable(r&&r.url)).map(r=>({transportUrl:r.url,transportName:'http',flags:{}}))}
+function planNuvioCopy(target,incoming,mode){
+  const base=mode==='replace'?[]:(target||[]).map(r=>({url:r.url,name:r.name||'',enabled:r.enabled!==false}));
+  const seen=new Set(base.map(r=>r.url));const add=[];
+  for(const r of incoming||[])if(isCopyable(r&&r.url)&&!seen.has(r.url)){seen.add(r.url);add.push(r)}
+  const all=[...base,...add].map((r,i)=>({url:r.url,name:r.name||'',enabled:r.enabled!==false,sort_order:i}));
+  const urls=new Set(all.map(a=>a.url));
+  return{addons:all,added:all.filter(a=>!(target||[]).some(t=>t.url===a.url)).length,removed:(target||[]).filter(t=>!urls.has(t.url)).length};
+}
+/* A planned list that matches the destination exactly (same order, same on/off) needs no write. */
+function sameStremioList(a,b){a=a||[];b=b||[];return a.length===b.length&&a.every((x,i)=>x&&b[i]&&x.transportUrl===b[i].transportUrl)}
+function sameNuvioList(rows,planned){rows=rows||[];planned=planned||[];return rows.length===planned.length&&rows.every((r,i)=>r.url===planned[i].url&&(r.enabled!==false)===(planned[i].enabled!==false))}
+/* Minimal check that a fetched object is a Stremio addon manifest. */
+function isAddonManifest(m){return!!m&&typeof m==='object'&&typeof m.id==='string'&&typeof m.name==='string'&&typeof m.version==='string'&&Array.isArray(m.resources)}
+/* Nuvio profiles that share profile 1's addons write to profile 1. */
+function nuvioAddonProfile(profile){return profile&&profile.uses_primary_addons?1:(profile&&profile.profile_index)||1}
+/* transfer-helpers:end */
+
+
 function show(id){$(id).classList.remove('hidden')}
 function hide(id){$(id).classList.add('hidden')}
 
@@ -155,7 +239,7 @@ function redactUrl(url){
   if(!url)return'';
   try{
     const u=new URL(url),segs=u.pathname.split('/');
-    return u.origin+'/'+segs.map(s=>s.length>=16&&/^[a-zA-Z0-9+/=_-]+$/.test(s)?'[REDACTED]':s).join('/')+u.search;
+    return u.origin+segs.map(s=>s.length>=16&&/^[a-zA-Z0-9+/=_-]+$/.test(s)?'[REDACTED]':s).join('/')+u.search;
   }catch{return url.replace(/[a-zA-Z0-9+/=_-]{16,}/g,'[REDACTED]')}
 }
 
@@ -216,6 +300,7 @@ function onLogin(data,label){
   renderList(addons);
   showWarnings();
   show('session-card');show('addons-card');show('actions-card');
+  refreshTransferButtons();
   $('session-label').textContent='Signed in'+(label?' — '+esc(label):'');
 }
 
@@ -274,8 +359,9 @@ $('logout').onclick=()=>{
   authKey=null;addons=[];currentSnapshot=null;undoStack=[];isLiveSession=false;
   $('addon-list').innerHTML='';$('search').value='';$('type-filter').value='';
   $('status').textContent='Session cleared.';
-  hide('session-card');hide('addons-card');hide('actions-card');hide('warnings-card');hide('inspect-card');hide('diff-card');hide('undo-card');
+  hide('session-card');hide('addons-card');hide('actions-card');hide('warnings-card');hide('inspect-card');hide('diff-card');hide('undo-card');hide('install-card');
   show('auth-card');
+  refreshTransferButtons();
 };
 
 // Search & filter
@@ -439,7 +525,8 @@ async function verifyFresh(raw){
   return true;
 }
 
-async function doMove(fromIdx,toIdx){
+function doMove(fromIdx,toIdx){return stremioExclusive(()=>moveNow(fromIdx,toIdx))}
+async function moveNow(fromIdx,toIdx){
   if(!authKey||fromIdx===toIdx)return;
   const raw=currentSnapshot?.addons;
   if(!raw)return;
@@ -463,7 +550,8 @@ async function doMove(fromIdx,toIdx){
   }
 }
 
-async function doRemove(idx){
+function doRemove(idx){return stremioExclusive(()=>removeNow(idx))}
+async function removeNow(idx){
   if(!authKey)return;
   const raw=currentSnapshot?.addons;
   if(!raw||idx<0||idx>=raw.length)return;
@@ -504,7 +592,8 @@ $('addon-list').addEventListener('click',e=>{
   else if(dir==='down'&&idx<addons.length-1)doMove(idx,idx+1);
 });
 
-$('undoBtn').onclick=async()=>{
+$('undoBtn').onclick=()=>stremioExclusive(undoNow);
+async function undoNow(){
   if(!undoStack.length||!authKey)return;
   const btn=$('undoBtn');
   btn.disabled=true;
@@ -520,14 +609,15 @@ $('undoBtn').onclick=async()=>{
     else{$('undo-label').textContent='Last: '+undoStack[undoStack.length-1].label+' — undo available'}
   }catch(e){$('status').textContent='Undo failed: '+e.message}
   finally{btn.disabled=false}
-};
+}
 
 // Restore from backup
 $('restoreBtn').onclick=()=>{
   if(!authKey)return $('status').textContent='Sign in first.';
   $('restoreFile').value='';$('restoreFile').click();
 };
-$('restoreFile').onchange=async e=>{
+$('restoreFile').onchange=e=>stremioExclusive(()=>restoreNow(e));
+async function restoreNow(e){
   try{
     const raw=JSON.parse(await e.target.files[0].text());
     const list=raw?.addons||raw?.result?.addons;
@@ -548,7 +638,210 @@ $('restoreFile').onchange=async e=>{
   }finally{
     e.target.value='';
   }
+}
+
+// --- Install & copy (Stremio and Nuvio) ---
+
+const NUVIO_API='https://api.nuvio.tv';
+// Nuvio's publishable client key, published in its API docs for third-party clients (not a secret).
+const NUVIO_KEY='sb_publishable_1Clq8rlTVACkdcZuqr6_AD__xUUC_EN';
+let nuvioToken=null,nuvioProfiles=[],nuvioRows=[],nuvioUndo=[],nuvioLoadSeq=0,nuvioLoading=false;
+let stremioBusy=false,nuvioBusy=false;
+
+// One write at a time per service: a second click while a write is saving is refused,
+// so every write verifies against the list the previous write produced.
+async function stremioExclusive(fn){
+  if(stremioBusy){$('status').textContent='Another change to your Stremio account is still saving — try again in a moment.';return}
+  stremioBusy=true;refreshTransferButtons();
+  try{return await fn()}finally{stremioBusy=false;refreshTransferButtons()}
+}
+async function nuvioExclusive(fn){
+  if(nuvioBusy){$('status').textContent='Another change to Nuvio is still saving — try again in a moment.';return}
+  nuvioBusy=true;refreshTransferButtons();
+  try{return await fn()}finally{nuvioBusy=false;refreshTransferButtons()}
+}
+
+async function nuvio(path,{method='GET',body,token}={}){
+  const r=await fetch(NUVIO_API+path,{method,headers:{apikey:NUVIO_KEY,'Content-Type':'application/json',...(token?{Authorization:'Bearer '+token}:{})},body:body?JSON.stringify(body):undefined});
+  const text=await r.text();let d=null;try{d=text?JSON.parse(text):null}catch{}
+  if(!r.ok)throw new Error((d&&(d.msg||d.message||d.error_description))||('Nuvio API error '+r.status));
+  return d;
+}
+// Stremio stores each addon with its manifest. Addons must allow cross-origin reads
+// (Stremio's own web app fetches manifests the same way), so the page reads it directly.
+async function fetchManifest(url){
+  const ctrl=new AbortController();const t=setTimeout(()=>ctrl.abort(),10000);
+  try{
+    const r=await fetch(url,{signal:ctrl.signal});
+    if(!r.ok)throw new Error('the addon answered '+r.status);
+    const m=await r.json();
+    if(!isAddonManifest(m))throw new Error('that link is not an addon manifest');
+    return m;
+  }catch(e){throw new Error(e.name==='AbortError'?'the addon did not answer':e.message)}
+  finally{clearTimeout(t)}
+}
+function currentNuvioProfile(){return nuvioProfiles.find(p=>String(p.profile_index)===$('nuvioProfile').value)||null}
+async function readNuvioRows(pid){
+  const rows=await nuvio('/rest/v1/addons?select=*&profile_id=eq.'+pid+'&order=sort_order',{token:nuvioToken});
+  return Array.isArray(rows)?rows:[];
+}
+async function loadNuvioAddons(){
+  const seq=++nuvioLoadSeq;const pid=nuvioAddonProfile(currentNuvioProfile());
+  nuvioLoading=true;refreshTransferButtons();
+  try{
+    const rows=await readNuvioRows(pid);
+    if(seq!==nuvioLoadSeq)return nuvioRows; // a newer selection is loading; drop this answer
+    nuvioRows=rows;
+    const shared=currentNuvioProfile()?.uses_primary_addons;
+    $('nuvio-summary').textContent=nuvioRows.length+' addon'+(nuvioRows.length===1?'':'s')+(shared?' (this profile shares profile 1\'s addons)':'');
+    $('nuvio-list').innerHTML=nuvioRows.map((r,i)=>'<div class="addon"><span class="num">'+(i+1)+'</span><div class="meta"><div class="name">'+esc(r.name||'Addon')+(r.enabled===false?' <span class="tag removed">off</span>':'')+'</div><div class="url">'+esc(redactUrl(r.url))+'</div></div></div>').join('');
+    return nuvioRows;
+  }finally{if(seq===nuvioLoadSeq){nuvioLoading=false;refreshTransferButtons()}}
+}
+// Nuvio's sync_push_addons replaces the whole list: build the new list from a fresh
+// read taken right before the write, so a change made elsewhere is kept.
+async function pushNuvio(build,label){
+  const pid=nuvioAddonProfile(currentNuvioProfile());
+  const fresh=await readNuvioRows(pid);
+  const addons=build(fresh);
+  if(!addons)return false;
+  if(sameNuvioList(fresh,addons))return false;
+  const prev=fresh.map((r,i)=>({url:r.url,name:r.name||'',enabled:r.enabled!==false,sort_order:i}));
+  await nuvio('/rest/v1/rpc/sync_push_addons',{method:'POST',body:{p_profile_id:pid,p_addons:addons},token:nuvioToken});
+  nuvioUndo.push({pid,addons:prev,label});if(nuvioUndo.length>10)nuvioUndo.shift();
+  $('nuvio-undo-label').textContent='Last Nuvio change: '+label+' — undo available';show('nuvio-undo');
+  await loadNuvioAddons();
+  return true;
+}
+function refreshTransferButtons(){
+  const st=!!authKey,nv=!!nuvioToken,nvReady=nv&&!nuvioLoading;
+  if(st||nv)show('install-card');else hide('install-card');
+  $('installStremio').disabled=!st||stremioBusy;
+  $('installNuvio').disabled=!nvReady||nuvioBusy;
+  $('copyToNuvio').disabled=!(st&&nvReady)||nuvioBusy;
+  $('copyToStremio').disabled=!(st&&nvReady)||stremioBusy;
+  $('copyFromStremio').disabled=!st||stremioBusy;
+}
+// Write a whole Stremio collection with the same guard and undo as move/remove.
+// Callers run inside stremioExclusive.
+async function writeStremio(next,label){
+  const raw=currentSnapshot?.addons;
+  if(!authKey||!raw)throw new Error('Sign in to your Stremio account first.');
+  if(!await verifyFresh(raw))throw new Error('Your addon list changed elsewhere and was reloaded — try again.');
+  const prev=JSON.parse(JSON.stringify(raw));
+  await post('addonCollectionSet',{type:'AddonCollectionSet',authKey,addons:next});
+  showUndo({addons:prev,label});
+  await reloadAddons();
+  $('undo-label').textContent='Last: '+label+' — undo available';
+}
+
+$('installStremio').onclick=()=>stremioExclusive(async()=>{
+  const url=normalizeManifestUrl($('installUrl').value);
+  if(!url)return $('status').textContent='That is not an https manifest link ending in manifest.json.';
+  const raw=currentSnapshot?.addons||[];
+  if(raw.some(a=>a.transportUrl===url))return $('status').textContent='That addon is already on your Stremio account.';
+  try{
+    $('status').textContent='Reading the addon…';
+    const manifest=await fetchManifest(url);
+    if(!confirm('Add '+manifest.name+' to your Stremio account? Undo stays available.'))return $('status').textContent='Nothing was changed.';
+    $('status').textContent='Adding addon…';
+    await writeStremio([...raw,{transportUrl:url,transportName:'http',manifest,flags:{}}],'installed '+manifest.name);
+    $('status').textContent=manifest.name+' added to your Stremio account. Undo available.';$('installUrl').value='';
+  }catch(e){$('status').textContent='Install failed: '+e.message}
+});
+
+$('nuvioLogin').onclick=async()=>{
+  const email=$('nuvioEmail').value.trim(),password=$('nuvioPassword').value;
+  if(!email||!password)return $('status').textContent='Enter your Nuvio email and password.';
+  $('nuvioLogin').disabled=true;$('status').textContent='Signing in to Nuvio…';
+  try{
+    const t=await nuvio('/auth/v1/token?grant_type=password',{method:'POST',body:{email,password}});
+    if(!t||!t.access_token)throw new Error('Nuvio sign-in failed');
+    nuvioToken=t.access_token;$('nuvioPassword').value='';
+    const profiles=await nuvio('/rest/v1/rpc/sync_pull_profiles',{method:'POST',body:{},token:nuvioToken});
+    nuvioProfiles=(Array.isArray(profiles)?profiles:[]).filter(p=>Number.isInteger(p.profile_index)).sort((a,b)=>a.profile_index-b.profile_index);
+    if(!nuvioProfiles.length)nuvioProfiles=[{profile_index:1,name:'Profile 1'}];
+    $('nuvioProfile').innerHTML=nuvioProfiles.map(p=>'<option value="'+p.profile_index+'">'+esc(p.name||('Profile '+p.profile_index))+'</option>').join('');
+    await loadNuvioAddons();
+    hide('nuvio-auth');show('nuvio-session');refreshTransferButtons();
+    $('status').textContent='Signed in to Nuvio. Password cleared.';
+  }catch(e){nuvioToken=null;refreshTransferButtons();$('status').textContent='Nuvio: '+e.message}
+  finally{$('nuvioLogin').disabled=false}
 };
+$('nuvioProfile').onchange=()=>loadNuvioAddons().catch(e=>{$('status').textContent='Nuvio: '+e.message});
+
+$('installNuvio').onclick=()=>nuvioExclusive(async()=>{
+  const url=normalizeManifestUrl($('installUrl').value);
+  if(!url)return $('status').textContent='That is not an https manifest link ending in manifest.json.';
+  if(nuvioRows.some(r=>r.url===url))return $('status').textContent='That addon is already on this Nuvio profile.';
+  if(!confirm('Add this addon to your Nuvio profile? Undo stays available.'))return $('status').textContent='Nothing was changed.';
+  try{
+    $('status').textContent='Adding addon to Nuvio…';
+    const done=await pushNuvio(rows=>planNuvioCopy(rows,[{url,name:'',enabled:true}],'add').addons,'installed an addon');
+    $('status').textContent=done?'Addon added to your Nuvio profile. Undo available.':'That addon is already on this Nuvio profile.';
+    if(done)$('installUrl').value='';
+  }catch(e){$('status').textContent='Nuvio install failed: '+e.message}
+});
+
+$('copyToNuvio').onclick=()=>nuvioExclusive(async()=>{
+  const mode=$('copyMode').value;
+  const incoming=stremioToNuvio(currentSnapshot?.addons);
+  const plan=planNuvioCopy(nuvioRows,incoming,mode);
+  if(sameNuvioList(nuvioRows,plan.addons))return $('status').textContent='Nothing to copy: this Nuvio profile already matches.';
+  if(!confirm('Nuvio profile: add '+plan.added+(plan.removed?', remove '+plan.removed:'')+(mode==='replace'?' and use your Stremio order':'')+'. Undo stays available. Continue?'))return;
+  try{
+    $('status').textContent='Copying to Nuvio…';
+    await pushNuvio(rows=>planNuvioCopy(rows,incoming,mode).addons,'copied from Stremio');
+    $('status').textContent='Copied to Nuvio. Undo available.';
+  }catch(e){$('status').textContent='Copy to Nuvio failed: '+e.message}
+});
+
+// Copy into Stremio: manifests are fetched for the addons that are new to the account;
+// an addon whose manifest cannot be read is left out and named.
+async function copyIntoStremio(incoming,mode,label,sourceName){
+  const target=currentSnapshot?.addons||[];
+  const plan=planStremioCopy(target,incoming,mode);
+  if(sameStremioList(target,plan.addons))return $('status').textContent='Nothing to copy: your Stremio account already matches.';
+  if(!confirm('Your Stremio account: add '+plan.added+(plan.removed?', remove '+plan.removed:'')+(sourceName?' from '+sourceName:'')+'. Undo stays available. Continue?'))return;
+  const known=new Set(target.map(a=>a.transportUrl));const skipped=[];const out=[];
+  for(const a of plan.addons){
+    if(a.manifest||known.has(a.transportUrl)){out.push(a);continue}
+    try{out.push({...a,transportName:'http',manifest:await fetchManifest(a.transportUrl)})}catch(e){skipped.push(redactUrl(a.transportUrl))}
+  }
+  if(sameStremioList(target,out))return $('status').textContent='Nothing was changed: no addon manifest could be read ('+skipped.length+' skipped).';
+  await writeStremio(out,label);
+  $('status').textContent='Copied to Stremio. Undo available.'+(skipped.length?' Skipped (manifest unreadable): '+skipped.join(', '):'');
+}
+
+$('copyToStremio').onclick=()=>stremioExclusive(async()=>{
+  try{$('status').textContent='Copying to Stremio…';await copyIntoStremio(nuvioToStremio(nuvioRows),$('copyMode').value,'copied from Nuvio','')}
+  catch(e){$('status').textContent='Copy to Stremio failed: '+e.message}
+});
+
+$('copyFromStremio').onclick=()=>stremioExclusive(async()=>{
+  const email=$('srcEmail').value.trim(),password=$('srcPassword').value;
+  if(!email||!password)return $('status').textContent='Enter the other account\'s email and password.';
+  try{
+    $('status').textContent='Reading the other account…';
+    const login=await post('login',{type:'Login',email,password,facebook:false});
+    const srcKey=login?.result?.authKey;if(!srcKey)throw new Error('Sign-in to the other account failed');
+    const data=await post('addonCollectionGet',{type:'AddonCollectionGet',authKey:srcKey,update:true});
+    $('srcPassword').value='';
+    await copyIntoStremio(data?.result?.addons,$('copyMode').value,'copied from another account',email);
+  }catch(e){$('status').textContent='Copy failed: '+e.message}
+});
+
+$('nuvioUndo').onclick=()=>nuvioExclusive(async()=>{
+  const snap=nuvioUndo[nuvioUndo.length-1];if(!snap||!nuvioToken)return;
+  try{
+    await nuvio('/rest/v1/rpc/sync_push_addons',{method:'POST',body:{p_profile_id:snap.pid,p_addons:snap.addons},token:nuvioToken});
+    const i=nuvioUndo.indexOf(snap);if(i>=0)nuvioUndo.splice(i,1);
+    await loadNuvioAddons();
+    if(!nuvioUndo.length)hide('nuvio-undo');else $('nuvio-undo-label').textContent='Last Nuvio change: '+nuvioUndo[nuvioUndo.length-1].label+' — undo available';
+    $('status').textContent='Nuvio change undone.';
+  }catch(e){$('status').textContent='Nuvio undo failed: '+e.message}
+});
+refreshTransferButtons();
 
 })();</script><script src="../tools/core-nav.js" defer></script>
 </body></html>
