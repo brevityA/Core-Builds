@@ -30,6 +30,7 @@ import { sanitizeTemplateForRemoteImport } from '../core/import-template.js';
 import { nonWhitelistedPatterns, stripNonWhitelisted } from '../core/regex-whitelist.js';
 import { resolveHostCapabilities, parseHostStatus, hostOptionGate, gateTemplateForHost, describeRemovals, describeWarnings } from '../core/host-capability-policy.js';
 import { sanitizeDisplayName } from '../core/input-sanitize.js';
+import { explainAioError } from '../core/aio-error-help.js';
 import { getSelPolicy } from '../core/sel-policy.js';
 import { SCORE_IQR_GUARD } from '../core/sel-iqr-policy.js';
 import { createUpdateSession, commitUpdate, cancelUpdate } from '../core/update-session.js';
@@ -54,7 +55,7 @@ const STEPS = 6;
 // workflow) the raw x.y here expands to x.y.0 in package.json / versions.json and
 // the release tag; the built badge drops the trailing .0. At the 2026-09-06
 // audit the release tag was v3.7.0 while this said 3.1 — they must move together.
-const CONFIGURATOR_VERSION = '3.45';
+const CONFIGURATOR_VERSION = '3.46';
 // Set to a collector endpoint to enable the opt-in anonymous usage ping (service+device+resolution only).
 // Leave empty to keep the feature fully disabled and hidden.
 const USAGE_BEACON_URL = '';
@@ -1563,19 +1564,29 @@ function refreshFmtCompare(focusSelector, origin) {
   if (focusSelector) (wraps[at] || wraps[0])?.querySelector(focusSelector)?.focus({ preventScroll: true });
 }
 
+// The styles shown first (v3.46). Every other style sits behind "More styles":
+// nearly 20 at once was too many to choose between on a first visit.
+const FMT_SHORTLIST = ['family-v4', 'core-compact', 'core-detailed', 'apex-v2'];
+
 function fmtDropdownHtml() {
   const isCustom = S.formatter === 'custom' && S.customFormatter;
   const allFmts = [...FORMATTERS];
   if (S.customFormatter) allFmts.push({ id:'custom', label:S.customFormatter.label||'Custom', badge:'Imported', bc:'#a78bfa', desc:'Your imported formatter' });
-  const rows = allFmts.map(f => {
+  const row = f => {
     const active = (isCustom && f.id === 'custom') || (!isCustom && f.id === S.formatter);
     return `<div class="fmt-row" data-active="${active}" data-action="fmt-scroll-pick" data-fmt="${f.id}" role="button" tabindex="0" aria-pressed="${active}">
       <span class="fmt-row-dot" style="background:${f.bc}" aria-hidden="true"></span>
       <span class="fmt-row-main"><span class="fmt-row-name">${escHtml(f.label)}</span><span class="fmt-row-desc">${escHtml(f.desc)}</span></span>
       <span class="fmt-row-tag">${escHtml(f.badge)}</span>
     </div>`;
-  }).join('');
-  return `<div class="fmt-pick">${fmtStageHtml()}<div class="fmt-list" id="fmtScroll">${rows}</div></div>${fmtScoreControlHtml()}<div class="fmt-compare-wrap">${fmtCompareHtml()}</div>`;
+  };
+  const featured = FMT_SHORTLIST.map(id => allFmts.find(f => f.id === id)).filter(Boolean);
+  const more = allFmts.filter(f => !FMT_SHORTLIST.includes(f.id));
+  const current = isCustom ? 'custom' : S.formatter;
+  // Open when the style in use is one of the others, so the selection is never hidden.
+  const moreOpen = more.some(f => f.id === current);
+  return `<div class="fmt-pick">${fmtStageHtml()}<div class="fmt-list" id="fmtScroll">${featured.map(row).join('')}</div>
+    <details class="fmt-more"${moreOpen ? ' open' : ''}><summary>More styles <span class="fmt-more-n">${more.length}</span></summary><div class="fmt-list fmt-list-more">${more.map(row).join('')}</div></details></div>${fmtScoreControlHtml()}<div class="fmt-compare-wrap">${fmtCompareHtml()}</div>`;
 }
 
 /**
@@ -2119,7 +2130,7 @@ function renderAdvancedPanel() {
         ${prefCard('excludeDV','Exclude Dolby Vision','Fixes purple/green tint on unsupported screens.')}
         <div class="ft-box u-mt8">
           <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px">
-            <span style="font-size:.78rem;font-weight:600;color:var(--th-tx3)">Stream Pool</span> ${ftTip('When AIOStreams may stop waiting for slower sources: it returns once this many cached results at your target resolution have arrived, or after the time limit. <strong>Larger = more choice</strong>, slower loads. Only the Advanced and Labs profiles use it; Stable and Balanced always wait for every source.')}
+            <span style="font-size:.78rem;font-weight:600;color:var(--th-tx3)">How many streams to wait for</span> ${ftTip('When AIOStreams may stop waiting for slower sources: it returns once this many cached results at your target resolution have arrived, or after the time limit. <strong>Larger = more choice</strong>, slower loads. Only the Advanced and Labs profiles use it; Stable and Balanced always wait for every source.')}
             <span class="u-micro">${streamPoolSummary()}</span>
           </div>
           <div class="u-row5">
@@ -2129,7 +2140,7 @@ function renderAdvancedPanel() {
         </div>
         ${(S.service !== 'http' && S.service !== 'p2p') ? `<div class="ft-box u-mt8">
           <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
-            <span style="font-size:.78rem;font-weight:600;color:var(--th-tx3)">PSE Quality Architecture</span> ${ftTip('<strong>Standard</strong> uses simple resolution/quality tiers to rank streams. <strong>Apex IQR</strong> uses statistical bitrate analysis (interquartile range) to detect outliers &mdash; it adapts to what&apos;s actually available, filtering out suspiciously low or high bitrates. Apex IQR matches the flagship 4K Apex template.')}
+            <span style="font-size:.78rem;font-weight:600;color:var(--th-tx3)">Quality ranking method</span> ${ftTip('<strong>Standard</strong> uses simple resolution/quality tiers to rank streams. <strong>Apex IQR</strong> uses statistical bitrate analysis (interquartile range) to detect outliers &mdash; it adapts to what&apos;s actually available, filtering out suspiciously low or high bitrates. Apex IQR matches the flagship 4K Apex template.')}
           </div>
           <div style="font-size:.65rem;color:var(--th-tx4);margin-bottom:10px;line-height:1.4">How stream quality tiers are built. Standard uses simple resolution/quality filters. Apex IQR uses statistical bitrate analysis matching the flagship Apex template.</div>
           <div class="u-row5">
@@ -2138,7 +2149,7 @@ function renderAdvancedPanel() {
         </div>` : ''}
         ${(S.service !== 'http' && S.service !== 'p2p') ? `<div class="ft-box u-mt8">
           <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
-            <span style="font-size:.78rem;font-weight:600;color:var(--th-tx3)">Library Boost</span> ${ftTip('<strong>Default</strong> ranks library items first within each quality tier. <strong>Strong</strong> always puts library items at the very top regardless of quality. <strong>None</strong> removes library sorting entirely.')}
+            <span style="font-size:.78rem;font-weight:600;color:var(--th-tx3)">Your library first</span> ${ftTip('<strong>Default</strong> ranks library items first within each quality tier. <strong>Strong</strong> always puts library items at the very top regardless of quality. <strong>None</strong> removes library sorting entirely.')}
           </div>
           <div style="font-size:.65rem;color:var(--th-tx4);margin-bottom:10px;line-height:1.4">How much priority your existing library items get in results</div>
           <div class="u-row5">
@@ -2223,14 +2234,14 @@ function renderAdvancedPanel() {
 
       <div>
         <div class="ft-head" id="ft-more">${ICO.gear(16,'#64748b')} Resilience &amp; more</div>
-        ${prefCard('dedupMerge','Failover Streams','Keep deduplicated streams as fallbacks. If the primary stream fails, AIOStreams tries the next best match.')}
+        ${prefCard('dedupMerge','Backup streams','Keep deduplicated streams as fallbacks. If the primary stream fails, AIOStreams tries the next best match.')}
       </div>
 
       <div>
         <div style="font-size:.72rem;font-weight:700;color:var(--th-tx4);letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px">Playback & Timing</div>
         ${prefCard('preloadEnabled','Preload first streams','Preload cached candidates to reduce wait time. Disable to reduce background requests.')}
         <div class="u-mt8"><div style="font-size:.68rem;color:var(--th-tx3);margin-bottom:5px">Autoplay method</div><div class="u-row5">${[['matchingFile','Matching file'],['matchingIndex','Matching index'],['firstFile','First file']].map(([v,l])=>`<button data-action="set-autoplay-method" data-val="${v}" style="flex:1;padding:6px;border-radius:7px;border:1px solid ${(S.autoPlayMethod||'matchingFile')===v?'rgba(0,212,255,.4)':'var(--th-border-strong)'};background:${(S.autoPlayMethod||'matchingFile')===v?'rgba(0,212,255,.1)':'transparent'};color:${(S.autoPlayMethod||'matchingFile')===v?'var(--th-accent)':'var(--th-tx3)'};font-size:.65rem;cursor:pointer">${l}</button>`).join('')}</div></div>
-        <div class="u-mt8"><div style="font-size:.68rem;color:var(--th-tx3);margin-bottom:5px">Global addon timeout</div><div class="u-row5">${[4000,6000,8000,10000].map(v=>`<button data-action="set-addon-timeout" data-val="${v}" style="flex:1;padding:6px;border-radius:7px;border:1px solid ${Number(S.addonTimeout||6000)===v?'rgba(0,212,255,.4)':'var(--th-border-strong)'};background:${Number(S.addonTimeout||6000)===v?'rgba(0,212,255,.1)':'transparent'};color:${Number(S.addonTimeout||6000)===v?'var(--th-accent)':'var(--th-tx3)'};font-size:.65rem;cursor:pointer">${v/1000}s</button>`).join('')}</div></div>
+        <div class="u-mt8"><div style="font-size:.68rem;color:var(--th-tx3);margin-bottom:5px">How long to wait for each source</div><div class="u-row5">${[4000,6000,8000,10000].map(v=>`<button data-action="set-addon-timeout" data-val="${v}" style="flex:1;padding:6px;border-radius:7px;border:1px solid ${Number(S.addonTimeout||6000)===v?'rgba(0,212,255,.4)':'var(--th-border-strong)'};background:${Number(S.addonTimeout||6000)===v?'rgba(0,212,255,.1)':'transparent'};color:${Number(S.addonTimeout||6000)===v?'var(--th-accent)':'var(--th-tx3)'};font-size:.65rem;cursor:pointer">${v/1000}s</button>`).join('')}</div></div>
         <div class="u-mt8"><div style="font-size:.68rem;color:var(--th-tx3);margin-bottom:5px">Bandwidth cap (Mbps) <span class="u-dim">— auto-limits bitrate to 80% of your speed</span></div><input type="number" min="1" max="10000" placeholder="e.g. 100" value="${Number(S.bandwidthMbps)||''}" data-action="set-bandwidth" style="width:100%;padding:7px 10px;border-radius:7px;border:1px solid var(--th-input-border);background:var(--th-input-bg);color:var(--th-tx);font-size:.72rem;outline:none" /></div>
       </div>
 
@@ -2240,7 +2251,7 @@ function renderAdvancedPanel() {
       </div>
 
       <div>
-        <div style="font-size:.72rem;font-weight:700;color:var(--th-tx4);letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px">Partial Exports</div>
+        <div style="font-size:.72rem;font-weight:700;color:var(--th-tx4);letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px">Export one part only</div>
         <div style="font-size:.67rem;color:var(--th-tx3);margin-bottom:8px">Download only the layer you want to apply. Credentials are excluded.</div>
         <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px">
           ${[['formatter','Formatter only'],['filtering','Filtering only'],['sorting','Sorting only'],['device','Device limits'],['services','Services & presets']].map(([kind,label])=>`<button data-action="export-partial" data-kind="${kind}" style="padding:8px;border-radius:8px;border:1px solid rgba(0,212,255,.18);background:rgba(0,212,255,.04);color:#67e8f9;font-size:.7rem;font-weight:700;cursor:pointer">${label}</button>`).join('')}
@@ -3007,7 +3018,7 @@ function renderCore() {
             </div>
           </div>
           <div style="display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:6px 16px">
-            <a href="https://corebuilds-docs.docsalot.dev/templates/directory" target="_blank" rel="noopener noreferrer" class="community-link">
+            <a href="https://core-builds.mintlify.app/template-directory" target="_blank" rel="noopener noreferrer" class="community-link">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
               Browse Templates
             </a>
@@ -4000,6 +4011,16 @@ document.addEventListener('DOMContentLoaded', () => {
       if (h) h.style.display = h.style.display === 'block' ? 'none' : 'block';
     }
     if (action === 'install-stremio') openInAIOStreams();
+    if (action === 'copy-password') {
+      const val = el.closest('.pwd-keep')?.querySelector('.pwd-keep-val');
+      if (!val) return;
+      const pick = () => { try { const r = document.createRange(); r.selectNodeContents(val); const sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(r); } catch {} };
+      Promise.resolve().then(() => navigator.clipboard.writeText(val.textContent))
+        .then(() => showToast('Password copied — keep it somewhere safe'))
+        .catch(() => { pick(); showToast('Copy was blocked — the password is selected, copy it with your device', true); });
+      return;
+    }
+
     if (action === 'copy-manifest') {
       const btn = e.target.closest('[data-action="copy-manifest"]') || e.target.closest('[data-url]') || e.target;
       const url = btn.dataset.url;
@@ -5327,6 +5348,11 @@ function renderAddonFetchFallback(name, reason, safeMsg) {
     `<button data-action="generate-dl" style="padding:8px 14px;border-radius:8px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.03);color:#9ca3af;font-size:.78rem;font-weight:700;cursor:pointer">Export JSON</button>`+
     `</div></div>`;
 }
+// What a known AIOStreams refusal means and what to do next (v3.46); nothing for unknown ones.
+function aioErrorHelpHtml(detail) {
+  const h = explainAioError(detail);
+  return h ? `<div class="aio-err-help"><b>${escHtml(h.title)}</b><span>${escHtml(h.help)}</span></div>` : '';
+}
 function renderConfigRejectedDispatch(safeMsg, apiDetail) {
   try { const snap={}; SHARE_KEYS.forEach(k=>{snap[k]=S[k];}); const safeSnap = sanitizeSnapshotForStorage(snap); safeSnap._ver=CONFIGURATOR_VERSION; safeSnap._ts=Date.now(); safeSnap._reason='soft-fail-recovery'; const list=JSON.parse(localStorage.getItem('coreBuildBackups')||'[]'); list.unshift(safeSnap); localStorage.setItem('coreBuildBackups',JSON.stringify(list.slice(0,10))); } catch(e) {}
   const sim = (typeof _simulateAddonFail !== 'undefined' && _simulateAddonFail) ? parseAddonFetchError('Failed to fetch manifest for ' + _simulateAddonFail) : null;
@@ -5346,7 +5372,7 @@ function renderConfigRejectedDispatch(safeMsg, apiDetail) {
       `<button data-action="disable-stream-proxy" style="padding:8px 14px;border-radius:8px;border:1px solid rgba(245,158,11,.4);background:rgba(245,158,11,.12);color:#fbbf24;font-size:.78rem;font-weight:700;cursor:pointer">Turn the proxy off</button>`+
       `</div>`;
   }
-  return `<div style="margin-top:10px;padding:12px 14px;border-radius:10px;background:rgba(248,113,113,.06);border:1px solid rgba(248,113,113,.2)"><div style="font-size:.82rem;font-weight:700;color:#f87171;margin-bottom:6px">${ICO.warn(14,'#f87171')} Config rejected by AIOStreams</div><div style="font-size:.76rem;color:#8b949e;line-height:1.5;margin-bottom:8px"><code style="font-size:.72rem;background:rgba(0,0,0,.3);padding:4px 8px;border-radius:4px;display:block;margin-top:4px;word-break:break-word;color:#f87171">${safeMsg}</code></div><div class="u-row8"><button data-action="simple-install" style="padding:8px 16px;border-radius:8px;border:1px solid rgba(0,212,255,.3);background:rgba(0,212,255,.06);color:#00d4ff;font-size:.8rem;font-weight:700;cursor:pointer">Retry</button><button data-action="generate-dl" style="padding:8px 16px;border-radius:8px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.03);color:#9ca3af;font-size:.8rem;font-weight:700;cursor:pointer">Export JSON</button></div></div>`;
+  return `<div style="margin-top:10px;padding:12px 14px;border-radius:10px;background:rgba(248,113,113,.06);border:1px solid rgba(248,113,113,.2)"><div style="font-size:.82rem;font-weight:700;color:#f87171;margin-bottom:6px">${ICO.warn(14,'#f87171')} Config rejected by AIOStreams</div>${aioErrorHelpHtml(apiDetail || safeMsg)}<div style="font-size:.76rem;color:#8b949e;line-height:1.5;margin-bottom:8px"><code style="font-size:.72rem;background:rgba(0,0,0,.3);padding:4px 8px;border-radius:4px;display:block;margin-top:4px;word-break:break-word;color:#f87171">${safeMsg}</code></div><div class="u-row8"><button data-action="simple-install" style="padding:8px 16px;border-radius:8px;border:1px solid rgba(0,212,255,.3);background:rgba(0,212,255,.06);color:#00d4ff;font-size:.8rem;font-weight:700;cursor:pointer">Retry</button><button data-action="generate-dl" style="padding:8px 16px;border-radius:8px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.03);color:#9ca3af;font-size:.8rem;font-weight:700;cursor:pointer">Export JSON</button></div></div>`;
 }
 
 // ── Host capability gate (Phase 4) ─────────────────────────────────────────────
@@ -6727,6 +6753,16 @@ function showTestDriveModal() {
   });
 }
 
+// "Save your password now": shown wherever a new config's password appears (v3.46).
+// A lost AIOStreams password means building a new setup, and nobody can recover it.
+// The password is page text only (no attribute), copied by the copy-password action.
+function pwdKeepHtml(pwd) {
+  const safe = String(pwd || '').replace(/&/g, '&amp;').replace(/</g, '&lt;');
+  return `<div class="pwd-keep" role="note"><div class="pwd-keep-head">${ICO.key(14,'#fbbf24')} Save your password now</div>
+    <div class="pwd-keep-row"><code class="pwd-keep-val" data-no-i18n>${safe}</code><button type="button" class="copy-btn" data-action="copy-password">Copy</button></div>
+    <div class="pwd-keep-why">You need it to change or update this setup later. Nobody, including Core Builds, can recover it.</div></div>`;
+}
+
 function showManifestModal(manifestUrl, password, hostLabel, initialTab) {
   const ex = document.getElementById('manifestModal');
   if (ex) ex.remove();
@@ -6782,6 +6818,7 @@ function showManifestModal(manifestUrl, password, hostLabel, initialTab) {
           <button class="copy-btn" id="mCopyPwd">Copy</button>
         </div>` : ''}
       </div>
+      ${password ? `<p class="pwd-keep-why pwd-keep-why-modal">Save this password now: you need it to change or update this setup later. Nobody, including Core Builds, can recover it.</p>` : ''}
       <div id="mAppHelp" style="display:none;margin:8px 0 4px;padding:10px 13px;border-radius:8px;border:1px solid rgba(79,70,229,.2);background:rgba(79,70,229,.04)">
         <div style="font-size:.78rem;font-weight:700;color:#a78bfa;margin-bottom:6px" id="mAppHelpTitle"></div>
         <div style="font-size:.76rem;color:#8b949e;line-height:1.55" id="mAppHelpBody"></div>
@@ -6843,7 +6880,7 @@ function showManifestModal(manifestUrl, password, hostLabel, initialTab) {
         </div>
       </details>
       <div style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,.05);display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:6px 14px">
-        <a href="https://corebuilds-docs.docsalot.dev/templates/directory" target="_blank" rel="noopener noreferrer" class="community-link">Browse Templates →</a>
+        <a href="https://core-builds.mintlify.app/template-directory" target="_blank" rel="noopener noreferrer" class="community-link">Browse Templates →</a>
         <a href="https://www.reddit.com/r/CoreBuilds/" target="_blank" rel="noopener noreferrer" class="community-link">Core Crew</a>
         <a href="https://github.com/brevityA/Core-Builds" target="_blank" rel="noopener noreferrer" class="community-link">GitHub</a>
         <a href="https://discord.gg/AwJ49yzbqT" target="_blank" rel="noopener noreferrer" class="community-link">Discord</a>
@@ -8269,7 +8306,7 @@ function showExpressLane(resume = null) {
   overlay.className = 'fastlane-overlay';
   overlay.innerHTML = `<div class="fastlane-panel fastlane-express ux-v2" role="dialog" aria-modal="true" aria-labelledby="expressTitle">
     <div class="fastlane-head ux-hero"><button class="fastlane-back" type="button" data-express-back aria-label="Back">&larr; Back</button>
-      <div class="ux-hero-copy"><span class="ux-core-mark">${BRAND_GLYPHS.corebuilds}</span><div class="ux-wordmark" id="expressTitle">Core <span>Builds</span></div><p class="ux-tagline">Quick install · working streams in about 30 seconds</p><p class="ux-ver">v${CONFIGURATOR_VERSION} · <a href="https://corebuilds-docs.docsalot.dev/" target="_blank" rel="noopener noreferrer">Docs</a></p></div>
+      <div class="ux-hero-copy"><span class="ux-core-mark">${BRAND_GLYPHS.corebuilds}</span><div class="ux-wordmark" id="expressTitle">Core <span>Builds</span></div><p class="ux-tagline">Quick install · working streams in about 30 seconds</p><p class="ux-ver">v${CONFIGURATOR_VERSION} · <a href="https://core-builds.mintlify.app/" target="_blank" rel="noopener noreferrer">Docs</a></p></div>
       <button class="fastlane-close" id="expressClose" aria-label="Close">✕</button></div>
     <div class="ux-body"><div class="ux-main">
     <section class="ux-step" id="ux-target" aria-labelledby="ux-target-title"><h2 class="ux-step-label" id="ux-target-title">Step 1 <b>Install to</b></h2>
@@ -8966,7 +9003,7 @@ async function simpleInstall(target, { profile = '' } = {}) {
           } else {
             const stackTitle = stackResult.ok ? (installed==='replaced'?'Previous install replaced and verified!':'Full Stack Installed and verified!') : 'AIOStreams installed; stack needs attention';
             const stackColour = stackResult.ok ? '#3fb950' : '#fbbf24';
-            result.innerHTML = `<div style="margin-top:10px;padding:12px 14px;border-radius:10px;background:rgba(63,185,80,.06);border:1px solid rgba(63,185,80,.2)"><div style="font-size:.82rem;font-weight:700;color:${stackColour};margin-bottom:4px">${ICO.check(14,stackColour)} ${stackTitle}</div><div style="font-size:.78rem;color:#8b949e">${stackResult.ok?'The requested addons were read back from your account successfully. Reopen Stremio to see your new setup.':'AIOStreams was verified, but one or more optional full-stack operations did not verify. Review the details below.'}</div>${stackHtml}<div style="margin-top:8px;font-size:.74rem;color:#6b7280">Config password: <code style="background:rgba(255,255,255,.05);padding:2px 6px;border-radius:4px;font-size:.72rem;color:#e6edf3">${pwd.replace(/&/g,'&amp;').replace(/</g,'&lt;')}</code> — save it for later edits</div></div>`;
+            result.innerHTML = `<div style="margin-top:10px;padding:12px 14px;border-radius:10px;background:rgba(63,185,80,.06);border:1px solid rgba(63,185,80,.2)"><div style="font-size:.82rem;font-weight:700;color:${stackColour};margin-bottom:4px">${ICO.check(14,stackColour)} ${stackTitle}</div><div style="font-size:.78rem;color:#8b949e">${stackResult.ok?'The requested addons were read back from your account successfully. Reopen Stremio to see your new setup.':'AIOStreams was verified, but one or more optional full-stack operations did not verify. Review the details below.'}</div>${stackHtml}${pwdKeepHtml(pwd)}</div>`;
           }
           deployment.settle(stackResult.ok, stackResult.ok ? 'Install verified in your Stremio library.' : 'AIOStreams installed; optional stack needs attention.');
           showToast(stackResult.ok ? 'Install verified in your Stremio library' : 'AIOStreams verified; optional stack needs attention', !stackResult.ok);

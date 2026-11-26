@@ -83,3 +83,22 @@ test('feedback / contact widget mounts and opens (v2.83 wiring restored)', async
   await expect(page.locator('#cbContactPanel, .cb-contact-panel').first()).toBeVisible();
   await expect(page.locator('#cbContactForm')).toBeVisible();
 });
+
+// v3.46: with the step sidebar showing, the page was wider than the window (128 px at
+// 1000 px, 256 px at wider sizes) because .wrap took 100% width plus the sidebar margin.
+for (const width of [1000, 1280, 1920]) {
+  test(`no sideways scroll beside the step sidebar at ${width}px`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto('/');
+    await page.evaluate(() => {
+      localStorage.clear(); localStorage.setItem('cb_tut_seen', '1');
+      localStorage.setItem('coreBuild', JSON.stringify({ _schema: 6, multiServices: ['torbox-pro'], device: 'generic', resolution: '4k' }));
+      localStorage.setItem('coreBuildStep', '3');
+    });
+    await page.reload();
+    await page.locator('[data-action="continue-session"]').click({ timeout: 3000 }).catch(() => {});
+    await expect(page.locator('.cb-sidebar:not(.sb-hidden)')).toBeVisible();
+    const extra = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+    expect(extra).toBe(0);
+  });
+}

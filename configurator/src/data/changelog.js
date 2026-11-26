@@ -1,4 +1,13 @@
 export const CHANGELOG = [
+  { v:'3.46', date:'Nov 26 2026', items:[
+    'Fewer formatter styles to choose from at first — the style picker shows four recommended styles; the other fifteen sit under More styles, which opens by itself when your current style is one of them.',
+    'A clear step to save your config password — after a direct install, the password sits in its own box with a Copy button and a line saying nobody, Core Builds included, can recover it. The manifest window says the same.',
+    'Plain explanations when AIOStreams refuses a config — known refusals (a filter the host does not allow, a retired add-on, a missing service key, wrong password, a busy host, a config over 100 KB, no connection, a version mismatch) now say what happened and what to do; the host\'s own message still shows underneath.',
+    'Plainer Fine-Tune names — Quality ranking method, How many streams to wait for, Your library first, Backup streams, How long to wait for each source and Export one part only replace the technical labels.',
+    'No more sideways scrolling on wide screens — with the step list showing, the page was up to 256 px wider than the window.',
+    'Docs links point to the current docs — every Docs link in the configurator, the tools page and the README now opens core-builds.mintlify.app.',
+    'Generated output unchanged — every reference config is byte-for-byte what 3.45 produced apart from the version stamp; these are interface changes only.',
+  ]},
   { v:'3.45', date:'Nov 26 2026', items:[
     'The rest of the configurator in Español, Português, Français and Deutsch — 3.43 translated the main screens; this covers the guided steps for sources, device and video quality, all of Fine-Tune (sound, video, subtitles, catalogs, playback, proxy, partial exports), the extras list, the password prompt, Update my setup, Compare templates, the troubleshooter and both reports, the recommended add-ons dialog, every help pop-up and the status messages. Paragraphs with bold words mid-sentence are translated whole, so word order reads naturally. Still in English: service, app, host, template and stream-card names, the stream-card style descriptions, codec shorthand on the device cards, the changelog, and error text that comes from AIOStreams itself.',
     'Start Here names more buttons in your language — the guide shows each button the way the configurator does, so the password step now reads in the chosen language too.',

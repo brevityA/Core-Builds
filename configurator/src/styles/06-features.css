@@ -202,3 +202,20 @@ a.core-tool-door:focus-visible{outline:2px solid #67e8f9;outline-offset:3px}
 /* Side room, taken back by the margin, keeps focus rings and shadows on edge cards inside the containment.
    (.ux-advanced already clips its content.) */
 #expressLaneModal .ux-main>.ux-step{padding-inline:4px;margin-inline:-4px}
+
+/* Save-your-password block after an install (v3.46) */
+.pwd-keep{margin-top:10px;padding:10px 12px;border-radius:9px;background:rgba(251,191,36,.06);border:1px solid rgba(251,191,36,.28)}
+.pwd-keep-head{display:flex;align-items:center;gap:6px;font-size:.8rem;font-weight:800;color:#fbbf24;margin-bottom:6px}
+.pwd-keep-row{display:flex;align-items:center;gap:8px}
+.pwd-keep-val{flex:1;min-width:0;overflow-wrap:anywhere;font:600 .82rem ui-monospace,Menlo,monospace;color:var(--th-tx,#e6edf3);background:rgba(255,255,255,.05);padding:5px 8px;border-radius:6px}
+.pwd-keep-why{margin:6px 0 0;font-size:.74rem;line-height:1.5;color:var(--th-tx2,#8b949e)}
+.pwd-keep-why-modal{margin:-2px 2px 10px;color:#fbbf24}
+[data-theme="light"] .pwd-keep{background:#fff8e6;border-color:#f0c879}
+[data-theme="light"] .pwd-keep-head,[data-theme="light"] .pwd-keep-why-modal{color:#a15c00}
+[data-theme="light"] .pwd-keep-val{background:rgba(0,0,0,.05);color:#1c2128}
+
+/* Plain explanation above a raw AIOStreams refusal (v3.46) */
+.aio-err-help{display:flex;flex-direction:column;gap:3px;margin:0 0 8px;padding:9px 11px;border-radius:8px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);font-size:.78rem;line-height:1.5;color:var(--th-tx2,#c9d1d9)}
+.aio-err-help b{color:var(--th-tx,#e6edf3)}
+[data-theme="light"] .aio-err-help{background:rgba(0,0,0,.03);border-color:rgba(0,0,0,.1);color:#44515e}
+[data-theme="light"] .aio-err-help b{color:#1c2128}

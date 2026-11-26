@@ -42,7 +42,7 @@ const SECTIONS = [
     ['Support Core Builds', 'configurator/#support', 'heart'],
   ]],
   ['Community', [
-    ['Docs', 'https://corebuilds-docs.docsalot.dev/', 'book'],
+    ['Docs', 'https://core-builds.mintlify.app/', 'book'],
     ['Core Crew on Reddit', 'https://www.reddit.com/r/CoreBuilds/', 'chat'],
     ['Discord', 'https://discord.gg/AwJ49yzbqT', 'chat'],
     ['GitHub', 'https://github.com/brevityA/Core-Builds', 'code'],
