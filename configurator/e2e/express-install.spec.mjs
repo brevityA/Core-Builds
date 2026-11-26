@@ -228,10 +228,8 @@ test('Balanced (the default) builds ready-to-play-first; a Mixed pick is kept (v
 
 test('A Cached only pick kept from 3.47 is explained, and Ready to play replaces it (v3.48)', async ({ page }) => {
   await fresh(page);
-  await page.evaluate(() => {
-    const s = JSON.parse(localStorage.getItem('coreBuild') || '{}');
-    localStorage.setItem('coreBuild', JSON.stringify({ ...s, _schema: 6, cacheMode: 'cached', quickCacheChosen: true }));
-  });
+  // Only the two fields under test; no saved state (which can hold keys) is copied.
+  await page.evaluate(() => localStorage.setItem('coreBuild', JSON.stringify({ _schema: 6, cacheMode: 'cached', quickCacheChosen: true })));
   await page.reload();
   await page.waitForTimeout(950);
   await page.locator('[data-action="open-express-lane"]').click();
