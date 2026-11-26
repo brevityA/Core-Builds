@@ -7,6 +7,10 @@
 // app.js updateFmtReceiptRow); stream-card previews.
 // tests/i18n.test.mjs checks every row is complete and every key is unique.
 
+import { MORE_ROWS, I18N_HTML_ROWS } from './i18n-strings-more.js';
+
+export { I18N_HTML_ROWS };
+
 export const I18N_LANGS = [
   { id: 'en', label: 'English', short: 'EN' },
   { id: 'es', label: 'Español', short: 'ES' },
@@ -15,7 +19,7 @@ export const I18N_LANGS = [
   { id: 'de', label: 'Deutsch', short: 'DE' },
 ];
 
-export const I18N_ROWS = [
+const BASE_ROWS = [
   // Landing, support dialog, tutorial
   ['Skip to configurator', 'Ir al configurador', 'Ir para o configurador', 'Aller au configurateur', 'Zum Konfigurator springen'],
   ['Support Core Builds', 'Apoya a Core Builds', 'Apoie o Core Builds', 'Soutenir Core Builds', 'Core Builds unterstützen'],
@@ -404,3 +408,6 @@ export const I18N_ROWS = [
   ['Change content', 'Cambiar contenido', 'Alterar conteúdo', 'Changer le contenu', 'Inhalt ändern'],
   ['Change formatter', 'Cambiar formateador', 'Alterar formatador', 'Changer de formateur', 'Formatter ändern'],
 ];
+
+// Second batch (v3.45): guided steps 1–3, Fine-Tune, dialogs, messages.
+export const I18N_ROWS = [...BASE_ROWS, ...MORE_ROWS];

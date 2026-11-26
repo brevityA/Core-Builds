@@ -45,9 +45,11 @@ test('labels show the way the configurator shows them in each language', () => {
   const row = new Map(I18N_ROWS.map(r => [r[0], r]));
   assert.equal(uiLabel('Quick install', 'es'), row.get('Quick install')[1]);
   assert.equal(uiLabel('Balanced', 'de'), row.get('Balanced')[4]);
-  // Not translated in the configurator, so not translated here either.
-  assert.equal(row.has('Set a Password'), false);
-  assert.equal(uiLabel('Set a Password', 'fr'), 'Set a Password');
+  // The password prompt is translated since v3.45; the guide follows automatically.
+  assert.equal(uiLabel('Set a Password', 'fr'), row.get('Set a Password')[3]);
+  // A label the configurator leaves in English stays English here too.
+  assert.equal(row.has('Update my setup'), false);
+  assert.equal(uiLabel('Update my setup', 'fr'), 'Update my setup');
 });
 
 test('every answer combination gives a complete plan with text in every language', () => {
