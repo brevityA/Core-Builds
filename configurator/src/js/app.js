@@ -55,7 +55,7 @@ const STEPS = 6;
 // workflow) the raw x.y here expands to x.y.0 in package.json / versions.json and
 // the release tag; the built badge drops the trailing .0. At the 2026-09-06
 // audit the release tag was v3.7.0 while this said 3.1 — they must move together.
-const CONFIGURATOR_VERSION = '3.46';
+const CONFIGURATOR_VERSION = '3.47';
 // Set to a collector endpoint to enable the opt-in anonymous usage ping (service+device+resolution only).
 // Leave empty to keep the feature fully disabled and hidden.
 const USAGE_BEACON_URL = '';
@@ -488,7 +488,7 @@ async function selectHealthyHost(timeout=4000) {
 // Cloudflare Worker CORS proxy — see cloudflare-worker/README.md for deployment.
 // Set to '' to disable and fall back to direct-only fetches.
 const CORS_PROXY = 'https://core-builds-cors-proxy.tlorenzato26.workers.dev';
-const S = { service:null, device:null, resolution:null, audio:'limited', bandwidthMbps:0, content:null, name:'', multiServices:[], sizeLimit:'unlimited', formatter:'family-v4', fmtScore:DEFAULT_CORE_SCORE_MODE, p2pEnabled:false, qualityFirst:false, resolutionFirst:false, foreignLangKill:true, matchMode:'balanced', exclude4K:false, excludeDV:false, tmdbToken:'', tmdbApiKey:'', creds:{torbox:'',realdebrid:'',alldebrid:'',premiumize:'',debridlink:'',offcloud:'',easynews:'',easynewsPass:'',nzbgeek:'',debridio:'',debrider:'',nzbnoob:'',althub:'',usenetcrawler:'',drunkenslug:'',nzbfinder:'',jackett:'',prowlarr:'',subdl:'',penguplay:''}, instanceHost:'elfhosted', instanceUrl:'', instanceUuid:'', instancePassword:'', baseUuid:'', basePassword:'', quickStart:false, langs: ['English'], langsSet: false, langExclusive: false, cacheMode: 'mixed', streamPool: 'normal', pseArch: 'standard', telemetryOk: false, simpleMode: false, outputProfile:'auto', aiostreamsVersion:DEFAULT_AIOSTREAMS_VERSION, installMode: 'direct', stremioEmail: '', stremioPassword: '', subtitleLangs: ['en'], subtitleAddons: ['opensubtitles-v3-plus'], streamProxy: { ...DEFAULT_STREAM_PROXY, proxiedServices: [], proxiedAddons: [] }, streamProxyPassword: '', catalogs: ['tmdb-addon'], dedupMerge: false, optionalScrapers: [], cleanInstall: false, quickProfile: 'balanced', preloadEnabled:true, autoPlayMethod:'matchingFile', addonTimeout:6000, patchCinemeta:false, installAIOMeta:false, libraryBoost:'default', nzbFailover:false, nzbFailoverPosition:'after-torrents', maxFailoverNzbs:3, addonServices:[] };
+const S = { service:null, device:null, resolution:null, audio:'limited', bandwidthMbps:0, content:null, name:'', multiServices:[], sizeLimit:'unlimited', formatter:'family-v4', fmtScore:DEFAULT_CORE_SCORE_MODE, p2pEnabled:false, qualityFirst:false, resolutionFirst:false, foreignLangKill:true, matchMode:'balanced', exclude4K:false, excludeDV:false, tmdbToken:'', tmdbApiKey:'', creds:{torbox:'',realdebrid:'',alldebrid:'',premiumize:'',debridlink:'',offcloud:'',easynews:'',easynewsPass:'',nzbgeek:'',debridio:'',debrider:'',nzbnoob:'',althub:'',usenetcrawler:'',drunkenslug:'',nzbfinder:'',jackett:'',prowlarr:'',subdl:'',penguplay:''}, instanceHost:'elfhosted', instanceUrl:'', instanceUuid:'', instancePassword:'', baseUuid:'', basePassword:'', quickStart:false, langs: ['English'], langsSet: false, langExclusive: false, cacheMode: 'mixed', streamPool: 'normal', pseArch: 'standard', telemetryOk: false, simpleMode: false, outputProfile:'auto', aiostreamsVersion:DEFAULT_AIOSTREAMS_VERSION, installMode: 'direct', stremioEmail: '', stremioPassword: '', subtitleLangs: ['en'], subtitleAddons: ['opensubtitles-v3-plus'], streamProxy: { ...DEFAULT_STREAM_PROXY, proxiedServices: [], proxiedAddons: [] }, streamProxyPassword: '', catalogs: ['tmdb-addon'], dedupMerge: false, optionalScrapers: [], cleanInstall: false, quickProfile: 'balanced', quickCacheChosen: false, preloadEnabled:true, autoPlayMethod:'matchingFile', addonTimeout:6000, patchCinemeta:false, installAIOMeta:false, libraryBoost:'default', nzbFailover:false, nzbFailoverPosition:'after-torrents', maxFailoverNzbs:3, addonServices:[] };
 // A clean template update must not inherit unrelated wizard/experimental flags.
 const INITIAL_STATE = cloneUpdateValue(S);
 function replaceState(nextState) {
@@ -1045,6 +1045,8 @@ function loadState() {
         const parsed = migrateState(JSON.parse(savedS));
         Object.assign(S, sanitizeSharedConfig(parsed));
         if (typeof parsed.telemetryOk === 'boolean') S.telemetryOk = parsed.telemetryOk;
+        // Local only (not in SHARE_KEYS): whether "Streams shown" was picked in Quick install.
+        if (typeof parsed.quickCacheChosen === 'boolean') S.quickCacheChosen = parsed.quickCacheChosen;
         if (parsed.creds && typeof parsed.creds === 'object' && !Array.isArray(parsed.creds)) {
           const safeCreds = Object.create(null);
           for (const k of Object.keys(parsed.creds)) {
@@ -8139,6 +8141,10 @@ function showPreflightModal(findings, { actionLabel = 'Continue anyway' } = {}) 
   });
 }
 
+// Fast and Balanced show only streams that play straight away; Maximum also lists
+// ones your service would still have to download (v3.47).
+function quickProfileCache(profile) { return profile === 'maximum' ? 'mixed' : 'cached'; }
+
 function applyQuickProfile(profile) {
   S.quickProfile = profile;
   S.device = 'generic';
@@ -8152,7 +8158,7 @@ function applyQuickProfile(profile) {
   } else if (profile === 'maximum') {
     Object.assign(S, { resolution:'4k', audio:'standard', cacheMode:'mixed', streamPool:'max', sizeLimit:'unlimited', qualityFirst:true, resolutionFirst:false });
   } else {
-    Object.assign(S, { resolution:'4k', audio:'standard', cacheMode:'mixed', streamPool:'normal', sizeLimit:'30', qualityFirst:false, resolutionFirst:true });
+    Object.assign(S, { resolution:'4k', audio:'standard', cacheMode:'cached', streamPool:'normal', sizeLimit:'30', qualityFirst:false, resolutionFirst:true });
   }
 }
 
@@ -8200,7 +8206,7 @@ function bindModalEsc(overlay, doClose){
 // Quick install profiles, named by what you get. Values mirror applyQuickProfile().
 const EXPRESS_PROFILES = [
   ['fast', 'Fast', 'Starts instantly · 1080p · only streams ready to play'],
-  ['balanced', 'Balanced', '4K when available · starts quickly'],
+  ['balanced', 'Balanced', '4K when available · only streams ready to play'],
   ['maximum', 'Maximum', 'Best picture · widest search · any file size'],
 ];
 // Logos for the phone layout's list rows (hidden on wider screens).
@@ -8243,6 +8249,8 @@ function showExpressLane(resume = null) {
     // A language already chosen (Custom build or an earlier Quick install) wins, English
     // included; only a never-chosen list falls back to the browser's language.
     lang: (S.langsSet && S.langs?.[0]) || ((S.langs?.[0] && S.langs[0] !== 'English') ? S.langs[0] : browserLang()) };
+  // The profile decides "Streams shown" until the person picks it here themselves.
+  if (!S.quickCacheChosen) S.cacheMode = quickProfileCache(state.profile);
   const credInput = (key) => {
     const d = PROVIDER_CREDENTIALS[key] || { label: key, placeholder:'Paste your key', url:'#', linkLabel:'Get key' };
     const link = (d.url && d.url !== '#') ? `<a class="fastlane-get-key" href="${d.url}" target="_blank" rel="noopener noreferrer">${d.linkLabel||'Get key'} &nearr;</a>` : '';
@@ -8352,7 +8360,7 @@ function showExpressLane(resume = null) {
         <div class="ux-field-label">Streams shown ${ftTip('<strong>Cached only</strong> = instant play; nothing that still needs downloading appears at all. <strong>Mixed</strong> also shows torrents your debrid must fetch first — those stall on a “downloading to debrid” screen the first time. Fast profile implies Cached-only until you change it here.')}</div>
         <div class="ux-seg" role="group" aria-label="Streams shown">
         <button type="button" class="fastlane-choice${S.cacheMode!=='cached' && S.cacheMode!=='uncached'?' active':''}" data-express-cache="mixed"><b>Mixed</b><span>Cached first · uncached can download first</span></button>
-        <button type="button" class="fastlane-choice${S.cacheMode==='cached'?' active':''}" data-express-cache="cached"><b>⚡ Cached only</b><span>Instant play guaranteed — uncached hidden</span></button>
+        <button type="button" class="fastlane-choice${S.cacheMode==='cached'?' active':''}" data-express-cache="cached"><b>⚡ Cached only</b><span>Plays straight away — anything still downloading is hidden</span></button>
         </div>
         <p class="ux-hint" id="expressCacheHint"></p>
         <div class="ux-field-label">Stream cards</div>
@@ -8521,6 +8529,7 @@ function showExpressLane(resume = null) {
     const cacheBtn = e.target.closest('[data-express-cache]');
     if (cacheBtn) {
       S.cacheMode = cacheBtn.dataset.expressCache;   // the actual install knob — visible truth
+      S.quickCacheChosen = true;                     // kept the next time Quick install opens
       saveState();
       overlay.querySelectorAll('[data-express-cache]').forEach(b => b.classList.toggle('active', b === cacheBtn));
       refreshExpressSummary();
@@ -8541,8 +8550,9 @@ function showExpressLane(resume = null) {
       state.profile = profBtn.dataset.expressProfile;
       overlay.querySelectorAll('[data-express-profile]').forEach(b => b.classList.toggle('active', b.dataset.expressProfile === state.profile));
       // Keep the visible "Streams shown" toggle truthful about the profile's own cache semantics
-      // (mirrors applyQuickProfile: fast→cached-only, balanced/maximum→mixed). User can override after.
-      S.cacheMode = state.profile === 'fast' ? 'cached' : 'mixed';
+      // (mirrors applyQuickProfile: fast/balanced→cached-only, maximum→mixed). User can override after.
+      S.cacheMode = quickProfileCache(state.profile);
+      S.quickCacheChosen = false;
       // The profile's resolution too: Quick install passes its own resolution to
       // applyExpressChoices, which overrides the profile's, so Fast used to build 4K.
       state.resolution = state.profile === 'fast' ? '1080p' : '4k';

@@ -1,14 +1,33 @@
 ---
-title: "What's New — Configurator v3.46"
+title: "What's New — Configurator v3.47"
 sidebarTitle: "What's New"
-description: "Latest Core Builds Configurator releases (v3.46 and earlier), auto-generated from the in-app changelog."
+description: "Latest Core Builds Configurator releases (v3.47 and earlier), auto-generated from the in-app changelog."
 ---
 
 # What's New in the Configurator
 
-This page is regenerated from `configurator/src/data/changelog.js` by `scripts/sync-docs.py`, so it always reflects the latest shipped configurator version (currently **v3.46**).
+This page is regenerated from `configurator/src/data/changelog.js` by `scripts/sync-docs.py`, so it always reflects the latest shipped configurator version (currently **v3.47**).
 
 For the template-suite release log, see the [Changelog](https://core-builds.mintlify.app/changelog).
+
+## Configurator v3.47 (Nov 26 2026)
+
+<CardGroup cols={2}>
+  <Card title="Quick install's Balanced shows only streams that play straight away" icon="sparkles">
+    like Fast, Balanced now hides anything your service would still have to download, so a new setup starts playing when you pick a stream. Maximum still lists those streams too.
+  </Card>
+  <Card title="Your own Streams shown pick is kept" icon="bolt">
+    choose Mixed under Streams shown and Quick install keeps it the next time you open it. Picking a profile again goes back to that profile's setting. If you chose Mixed before this version, choose it once more.
+  </Card>
+  <Card title="Clearer Cached only label" icon="shield-check">
+    it now reads 'Plays straight away — anything still downloading is hidden' instead of promising instant play.
+  </Card>
+  <Card title="Generated output unchanged" icon="sliders">
+    every reference config is byte-for-byte what 3.46 produced apart from the version stamp. Only a new Quick install on Balanced differs: it carries excludeUncached, which Fast already did.
+  </Card>
+</CardGroup>
+
+---
 
 ## Configurator v3.46 (Nov 26 2026)
 
@@ -62,21 +81,5 @@ For the template-suite release log, see the [Changelog](https://core-builds.mint
   </Card>
   <Card title="Generated output unchanged" icon="bolt">
     every reference config is byte-for-byte what 3.43 produced apart from the version stamp; only the first screen and the menu gained the Start Here link.
-  </Card>
-</CardGroup>
-
----
-
-## Configurator v3.43 (Nov 25 2026)
-
-<CardGroup cols={2}>
-  <Card title="Configurator in Español, Português, Français and Deutsch" icon="sparkles">
-    a language button at the top right switches the interface. It starts in your browser’s language when that is one of the five, remembers your pick on this device, and a link ending in ?lang=es (or pt, fr, de) opens in that language. The main page, menu, message form, Quick install, the guided step titles and choices, and the main Review and Export controls are translated; deeper Fine-Tune options, help pop-ups and error messages are still in English for now. Service, app, host and stream-card names stay as they are.
-  </Card>
-  <Card title="Quick install defaults list fits longer words" icon="bolt">
-    on a narrow phone the “How results look” row could squeeze its value to nothing. The label now wraps instead.
-  </Card>
-  <Card title="Generated output unchanged" icon="shield-check">
-    every reference config is byte-for-byte what 3.42 produced apart from the version stamp; the language only changes what the page shows, never the config it builds.
   </Card>
 </CardGroup>
