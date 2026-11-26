@@ -18,6 +18,8 @@ Manage the addons on a Stremio account from the browser. It is separate from the
 - A failed write is reported and changes nothing locally.
 - Undo history lives only in page memory and is lost when the page is closed or reloaded. Download a backup file before large changes.
 - Credentials stay in page memory for the session and are sent only to the Stremio API, or for Nuvio only to the Nuvio API (`api.nuvio.tv`, with the publishable client key from Nuvio's API docs). Passwords are cleared from the form after sign-in.
-- Nuvio's `sync_push_addons` replaces a profile's whole list, so every Nuvio write first re-reads the profile, keeps that list for Undo, then writes. A profile that shares profile 1's addons (`uses_primary_addons`) writes to profile 1.
+- Nuvio's `sync_push_addons` replaces a profile's whole list, so every Nuvio write builds its new list from a fresh read of the profile taken right before the write (an addon added elsewhere is kept), and keeps that read for Undo. A profile that shares profile 1's addons (`uses_primary_addons`) writes to profile 1.
+- Stremio stores each addon with its manifest, so installing (or copying an addon that is new to the account) first reads the addon's `manifest.json`. An addon whose manifest cannot be read is refused or skipped and named, never stored half-made. Addons must allow cross-origin reads for Stremio itself, so this works from the page; the page's CSP allows `connect-src https:` for that reason, with scripts still limited to the page itself.
+- One change at a time per service: a second click while a write is saving is refused, so every write checks the list the previous one produced. Every install and copy asks first.
 
 Open `index.html` locally or host it as a static page. Tests: `npm test` (unit) and `npx playwright test` (browser flows in `e2e/mutations.spec.mjs` and `e2e/transfer.spec.mjs`) in this folder.

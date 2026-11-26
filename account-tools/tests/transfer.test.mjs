@@ -6,7 +6,7 @@ import { readFileSync } from 'node:fs';
 // so it works from file://). Pull the marked block out and test it directly.
 const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 const block = html.match(/\/\* transfer-helpers:start[\s\S]*?\/\* transfer-helpers:end \*\//)[0];
-const h = new Function(`${block}; return { normalizeManifestUrl, isCopyable, planStremioCopy, stremioToNuvio, nuvioToStremio, planNuvioCopy, nuvioAddonProfile };`)();
+const h = new Function(`${block}; return { normalizeManifestUrl, isCopyable, planStremioCopy, stremioToNuvio, nuvioToStremio, planNuvioCopy, nuvioAddonProfile, sameStremioList, sameNuvioList, isAddonManifest };`)();
 
 const S = (url, extra = {}) => ({ transportUrl: url, transportName: 'http', flags: {}, ...extra });
 const cinemeta = S('https://v3-cinemeta.strem.io/manifest.json', { flags: { official: true, protected: true }, manifest: { name: 'Cinemeta' } });
@@ -58,8 +58,27 @@ test('a Nuvio profile sharing profile 1 writes to profile 1', () => {
   assert.equal(h.nuvioAddonProfile(null), 1);
 });
 
-test('the page only talks to the Stremio and Nuvio APIs', () => {
-  assert.match(html, /connect-src https:\/\/api\.strem\.io https:\/\/api\.nuvio\.tv;/);
+test('connect-src allows https only (addon manifests live on any addon host)', () => {
+  assert.match(html, /connect-src https:;/);
+  assert.match(html, /script-src 'self' 'unsafe-inline';/);
+});
+
+test('a replace that only reorders or toggles still counts as a change', () => {
+  const A = S('https://a/manifest.json'), B = S('https://b/manifest.json');
+  assert.equal(h.sameStremioList([A, B], [A, B]), true);
+  assert.equal(h.sameStremioList([B, A], [A, B]), false);
+  const plan = h.planStremioCopy([cinemeta, B, A], [cinemeta, A, B], 'replace');
+  assert.equal(plan.added + plan.removed, 0);
+  assert.equal(h.sameStremioList([cinemeta, B, A], plan.addons), false, 'order changed, so it is written');
+  const rows = [{ url: 'https://a/manifest.json', enabled: false }];
+  assert.equal(h.sameNuvioList(rows, h.planNuvioCopy(rows, [{ url: 'https://a/manifest.json', enabled: true }], 'replace').addons), false);
+  assert.equal(h.sameNuvioList(rows, h.planNuvioCopy(rows, [], 'add').addons), true);
+});
+
+test('only real addon manifests are accepted', () => {
+  assert.equal(h.isAddonManifest({ id: 'x', name: 'X', version: '1.0.0', resources: ['stream'] }), true);
+  assert.equal(h.isAddonManifest({ id: 'x', name: 'X' }), false);
+  assert.equal(h.isAddonManifest('<html>'), false);
 });
 
 test('addon links display with a single slash after the host', () => {

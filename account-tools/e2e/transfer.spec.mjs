@@ -10,7 +10,15 @@ const CINEMETA = { manifest: { id: 'com.linvo.cinemeta', name: 'Cinemeta' }, tra
 const MINE = [CINEMETA, { manifest: { id: 'torrentio', name: 'Torrentio' }, transportUrl: 'https://torrentio.example.com/manifest.json', flags: {} }];
 const OTHER = [CINEMETA, { manifest: { id: 'comet', name: 'Comet' }, transportUrl: 'https://comet.example.com/manifest.json', flags: {} }];
 
+const manifestFor = id => ({ id, name: id, version: '1.0.0', resources: ['stream'], types: ['movie'] });
+
 async function setup(page) {
+  // Addon hosts: each serves its manifest with CORS, as Stremio requires.
+  await page.route(/^https:\/\/(new|kids|nuvio-default|comet|broken)\.example\.com\/.*manifest\.json$/, route => {
+    const host = new URL(route.request().url()).hostname.split('.')[0];
+    if (host === 'broken') return route.fulfill({ status: 500, body: 'down' });
+    return route.fulfill({ status: 200, contentType: 'application/json', headers: { 'access-control-allow-origin': '*' }, body: JSON.stringify(manifestFor(host)) });
+  });
   const state = { mine: clone(MINE), other: clone(OTHER), stremioSets: [], nuvio: { 1: [{ url: 'https://nuvio-default.example.com/manifest.json', name: 'Default', enabled: true, sort_order: 0 }], 2: [] }, nuvioPushes: [], nuvioAuth: [] };
   await page.route('https://api.strem.io/api/**', async route => {
     const url = route.request().url();
@@ -68,6 +76,7 @@ async function signInNuvio(page) {
 
 test('install a manifest link on Stremio, then undo', async ({ page }) => {
   const state = await setup(page);
+  page.on('dialog', d => d.accept());
   await page.goto(PAGE_PATH);
   await expect(page.locator('#install-card')).toBeHidden();
   await signInStremio(page);
@@ -76,8 +85,14 @@ test('install a manifest link on Stremio, then undo', async ({ page }) => {
   await expect(page.locator('#status')).toContainText('not an https manifest link');
   await page.fill('#installUrl', 'stremio://new.example.com/abc/manifest.json');
   await page.click('#installStremio');
-  await expect(page.locator('#status')).toContainText('Addon added to your Stremio account');
-  expect(state.mine.map(a => a.transportUrl)).toContain('https://new.example.com/abc/manifest.json');
+  await expect(page.locator('#status')).toContainText('new added to your Stremio account');
+  const added = state.mine.find(a => a.transportUrl === 'https://new.example.com/abc/manifest.json');
+  expect(added.manifest).toEqual(manifestFor('new'));
+  // An addon whose manifest cannot be read is refused, not stored half-made.
+  await page.fill('#installUrl', 'https://broken.example.com/manifest.json');
+  await page.click('#installStremio');
+  await expect(page.locator('#status')).toContainText('Install failed: the addon answered 500');
+  expect(state.mine.some(a => a.transportUrl.includes('broken'))).toBe(false);
   await page.click('#undoBtn');
   await expect(page.locator('#status')).toContainText(/undo complete/i);
   expect(state.mine.map(a => a.transportUrl)).not.toContain('https://new.example.com/abc/manifest.json');
@@ -104,7 +119,7 @@ test('Nuvio: sign in, install to a profile, copy both ways, undo', async ({ page
   await page.selectOption('#nuvioProfile', '3');
   await expect(page.locator('#nuvio-summary')).toContainText("shares profile 1's addons");
   await page.click('#copyToNuvio');
-  await expect(page.locator('#status')).toContainText('Copied 2 addon(s) to Nuvio');
+  await expect(page.locator('#status')).toContainText('Copied to Nuvio');
   const last = state.nuvioPushes.at(-1);
   expect(last.p_profile_id).toBe(1);
   expect(last.p_addons.map(a => a.url)).toEqual(['https://nuvio-default.example.com/manifest.json', CINEMETA.transportUrl, 'https://torrentio.example.com/manifest.json']);
@@ -116,8 +131,8 @@ test('Nuvio: sign in, install to a profile, copy both ways, undo', async ({ page
 
   // Nuvio → Stremio adds the Nuvio-only addon.
   await page.click('#copyToStremio');
-  await expect(page.locator('#status')).toContainText('Copied 1 addon(s) to Stremio');
-  expect(state.mine.at(-1)).toEqual({ transportUrl: 'https://nuvio-default.example.com/manifest.json', transportName: 'http', flags: {} });
+  await expect(page.locator('#status')).toContainText('Copied to Stremio');
+  expect(state.mine.at(-1)).toEqual({ transportUrl: 'https://nuvio-default.example.com/manifest.json', transportName: 'http', flags: {}, manifest: manifestFor('nuvio-default') });
 });
 
 test('copy from another Stremio account: only reads it, replace keeps Cinemeta', async ({ page }) => {
@@ -129,7 +144,7 @@ test('copy from another Stremio account: only reads it, replace keeps Cinemeta',
   await page.fill('#srcEmail', 'other@example.com');
   await page.fill('#srcPassword', 'pw2');
   await page.click('#copyFromStremio');
-  await expect(page.locator('#status')).toContainText('Copied 1 addon(s) from the other account');
+  await expect(page.locator('#status')).toContainText('Copied to Stremio');
   expect(state.mine.map(a => a.transportUrl)).toEqual([CINEMETA.transportUrl, 'https://comet.example.com/manifest.json']);
   expect(state.other).toEqual(OTHER);
   await expect(page.locator('#srcPassword')).toHaveValue('');
@@ -144,4 +159,43 @@ test('a wrong Nuvio password says so and changes nothing', async ({ page }) => {
   await expect(page.locator('#status')).toContainText('Nuvio: Invalid login credentials');
   await expect(page.locator('#nuvio-session')).toBeHidden();
   expect(state.nuvioPushes).toEqual([]);
+});
+
+test('a Nuvio-only session can install into Nuvio; Stremio install stays off', async ({ page }) => {
+  const state = await setup(page);
+  page.on('dialog', d => d.accept());
+  await page.goto(PAGE_PATH);
+  await expect(page.locator('#install-card')).toBeHidden();
+  await signInNuvio(page);
+  await expect(page.locator('#install-card')).toBeVisible();
+  await expect(page.locator('#installStremio')).toBeDisabled();
+  await page.fill('#installUrl', 'https://kids.example.com/manifest.json');
+  await page.click('#installNuvio');
+  await expect(page.locator('#status')).toContainText('Addon added to your Nuvio profile');
+  expect(state.nuvio[1].map(a => a.url)).toEqual(['https://nuvio-default.example.com/manifest.json', 'https://kids.example.com/manifest.json']);
+});
+
+test('Nuvio add keeps an addon added elsewhere after the page loaded', async ({ page }) => {
+  const state = await setup(page);
+  page.on('dialog', d => d.accept());
+  await page.goto(PAGE_PATH);
+  await signInNuvio(page);
+  // Another device adds an addon after this page read the profile.
+  state.nuvio[1].push({ url: 'https://elsewhere.example.com/manifest.json', name: 'Elsewhere', enabled: true, sort_order: 1 });
+  await page.fill('#installUrl', 'https://kids.example.com/manifest.json');
+  await page.click('#installNuvio');
+  await expect(page.locator('#status')).toContainText('Addon added to your Nuvio profile');
+  expect(state.nuvio[1].map(a => a.url)).toEqual(['https://nuvio-default.example.com/manifest.json', 'https://elsewhere.example.com/manifest.json', 'https://kids.example.com/manifest.json']);
+});
+
+test('cancelling the install confirmation changes nothing', async ({ page }) => {
+  const state = await setup(page);
+  page.on('dialog', d => d.dismiss());
+  await page.goto(PAGE_PATH);
+  await signInStremio(page);
+  await page.fill('#installUrl', 'https://new.example.com/manifest.json');
+  await page.click('#installStremio');
+  await expect(page.locator('#status')).toContainText('Nothing was changed');
+  expect(state.stremioSets).toEqual([]);
+  await expect(page.locator('#undo-card')).toBeHidden();
 });
