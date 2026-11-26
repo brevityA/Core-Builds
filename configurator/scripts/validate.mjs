@@ -96,7 +96,7 @@ const checks = {
   'Advanced extras carousel': app.includes('const carouselOptSection =') && app.includes('const optSection = S.simpleMode ? compactOptSection : carouselOptSection') && app.includes('toggle-carousel-service') && app.includes('toggle-optional-scraper'),
   'advanced playback controls': app.includes("preloadEnabled:true") && app.includes("autoPlayMethod:'matchingFile'") && app.includes('addonPolicy(input, S._nuvioInstant ? presets() : withPenguplay(presets()'),
   'partial exports': app.includes('const PARTIAL_EXPORT_FIELDS') && app.includes("credentials:{}") && app.includes("exportPartial(el.dataset.kind)"),
-  'Core Tools links': app.includes('Back Up Addons') && app.includes('All Core Tools') && app.includes('Back up your current addons first'),
+  'Core Tools links': app.includes('<b>Account Tools</b>') && app.includes('href="../tools/speedtest/"') && app.includes('All Core Tools') && app.includes('Back up your current addons first'),
   'cache-busted web assets': buildScript.includes("createHash('sha256')") && buildScript.includes('app.js?v=${assetVersions.js}') && buildScript.includes('app.css?v=${assetVersions.css}'),
   'version badge placeholder': shell.includes('v__CB_VERSION__') && !(/v\d+\.\d+<\/span>/.test(shell)),
   'module shell': shell.includes('type="module" src="./js/app.js"'),
