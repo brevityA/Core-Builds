@@ -1,14 +1,33 @@
 ---
-title: "What's New — Configurator v3.49"
+title: "What's New — Configurator v3.50"
 sidebarTitle: "What's New"
-description: "Latest Core Builds Configurator releases (v3.49 and earlier), auto-generated from the in-app changelog."
+description: "Latest Core Builds Configurator releases (v3.50 and earlier), auto-generated from the in-app changelog."
 ---
 
 # What's New in the Configurator
 
-This page is regenerated from `configurator/src/data/changelog.js` by `scripts/sync-docs.py`, so it always reflects the latest shipped configurator version (currently **v3.49**).
+This page is regenerated from `configurator/src/data/changelog.js` by `scripts/sync-docs.py`, so it always reflects the latest shipped configurator version (currently **v3.50**).
 
 For the template-suite release log, see the [Changelog](https://core-builds.mintlify.app/changelog).
+
+## Configurator v3.50 (Nov 26 2026)
+
+<CardGroup cols={2}>
+  <Card title="Install to Jellyfin" icon="sparkles">
+    Quick install has a Jellyfin target. AIOStreams can act as a Jellyfin server, so after saving you get a server address, a username (your config ID) and your config password to sign in with from a Jellyfin app.
+  </Card>
+  <Card title="Jellyfin picks a host that has it turned on" icon="bolt">
+    ElfHosted has AIOStreams' Jellyfin server switched off, so a Jellyfin install goes to a public host that has it on (checked on every host on Nov 26). A custom host is used as you set it.
+  </Card>
+  <Card title="Hide HDR" icon="shield-check">
+    a new Fine-Tune toggle under Video Preferences for screens that only show SDR. It hides HDR10, HDR10+, HLG and Dolby Vision streams; SDR and untagged streams stay. It works on every output profile and survives a re-import.
+  </Card>
+  <Card title="Generated output unchanged" icon="sliders">
+    every reference config is byte-for-byte what 3.49 produced apart from the version stamp. Hide HDR is off unless you turn it on, and Jellyfin uses the same config as any other target.
+  </Card>
+</CardGroup>
+
+---
 
 ## Configurator v3.49 (Nov 26 2026)
 
@@ -68,33 +87,5 @@ For the template-suite release log, see the [Changelog](https://core-builds.mint
   </Card>
   <Card title="Generated output unchanged" icon="sliders">
     every reference config is byte-for-byte what 3.46 produced apart from the version stamp. Only a new Quick install on Balanced differs: it carries excludeUncached, which Fast already did.
-  </Card>
-</CardGroup>
-
----
-
-## Configurator v3.46 (Nov 26 2026)
-
-<CardGroup cols={2}>
-  <Card title="Fewer formatter styles to choose from at first" icon="sparkles">
-    the style picker shows four recommended styles; the other fifteen sit under More styles, which opens by itself when your current style is one of them.
-  </Card>
-  <Card title="A clear step to save your config password" icon="bolt">
-    after a direct install, the password sits in its own box with a Copy button and a line saying nobody, Core Builds included, can recover it. The manifest window says the same.
-  </Card>
-  <Card title="Plain explanations when AIOStreams refuses a config" icon="shield-check">
-    known refusals (a filter the host does not allow, a retired add-on, a missing service key, wrong password, a busy host, a config over 100 KB, no connection, a version mismatch) now say what happened and what to do; the host's own message still shows underneath.
-  </Card>
-  <Card title="Plainer Fine-Tune names" icon="sliders">
-    Quality ranking method, How many streams to wait for, Your library first, Backup streams, How long to wait for each source and Export one part only replace the technical labels.
-  </Card>
-  <Card title="No more sideways scrolling on wide screens" icon="gauge">
-    with the step list showing, the page was up to 256 px wider than the window.
-  </Card>
-  <Card title="Docs links point to the current docs" icon="wand">
-    every Docs link in the configurator, the tools page and the README now opens core-builds.mintlify.app.
-  </Card>
-  <Card title="Generated output unchanged" icon="layers">
-    every reference config is byte-for-byte what 3.45 produced apart from the version stamp; these are interface changes only.
   </Card>
 </CardGroup>

@@ -883,6 +883,7 @@ export function generateTemplate(rawInput = {}, options = {}) {
     resolutionFirst: Boolean(input.resolutionFirst),
     exclude4K: Boolean(input.exclude4K),
     excludeDV: Boolean(input.excludeDV),
+    excludeHDR: Boolean(input.excludeHDR),
     aiostreamsVersion: input.aiostreamsVersion,
   };
   return applyOutputProfile(result, resolveOutputProfile(profileContext), profileContext);

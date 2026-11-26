@@ -463,3 +463,29 @@ test('Express without a Debridio key omits the preset (no config reject)', async
   expect(config.presets.some(p => p.type === 'debridio')).toBe(false);
   expect(JSON.stringify(config)).not.toContain('debridioApiKey');
 });
+
+test('Express Jellyfin target saves on a Jellyfin host and shows the sign-in details', async ({ page }) => {
+  test.setTimeout(90_000);
+  const posted = [];
+  const hosts = [];
+  await mockBackend(page, posted);
+  page.on('request', req => { if (req.method() === 'POST' && req.url().includes('/api/v1/user')) hosts.push(req.url()); });
+  const errors = await fresh(page);
+  page.on('dialog', dialog => dialog.accept());
+  await page.locator('[data-action="open-express-lane"]').click();
+  await page.locator('[data-express-cred="torbox"]').fill('test-torbox-key');
+  await page.locator('[data-express-target="jellyfin"]').click();
+  await expect(page.locator('#expressStremio')).toBeHidden();
+  await page.locator('#expressGo').click();
+  await page.locator('#pwdPrompt .pwd-go').click();
+  const panel = page.locator('#aioResult .jf-signin');
+  await expect(panel).toBeVisible({ timeout: 45000 });
+  expect(posted).toHaveLength(1);
+  await expect(panel).toContainText(UUID);
+  await expect(panel).toContainText(/https:\/\/\S+\/jellyfin/);
+  // ElfHosted is the default host and has Jellyfin turned off: the save goes elsewhere.
+  await expect(panel).not.toContainText('aiostreams.elfhosted.com/jellyfin');
+  expect(hosts.join(' ')).not.toContain(encodeURIComponent('https://aiostreams.elfhosted.com'));
+  await expect(panel.locator('.pwd-keep-val')).toHaveText(posted[0].password);
+  expect(errors).toEqual([]);
+});

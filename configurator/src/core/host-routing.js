@@ -135,6 +135,7 @@ export function autoRoutableHostKeys(request, options = {}) {
     const meta = HOST_META[key];
     if (!meta) return false;
     if (isFreeRoute && (meta.blocksFree || !meta.supportsP2P)) return false;
+    if (request?.target === 'jellyfin' && meta.jellyfin !== true) return false;
     if (required && meta.aiostreamsVersion && !isVersionAtLeast(meta.aiostreamsVersion, required)) return false;
     return true;
   });

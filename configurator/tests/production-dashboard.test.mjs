@@ -12,6 +12,6 @@ test('deployment diagnostics are driven by operation results, not timers', () =>
   const start = app.indexOf('function showDeploymentProgress(');
   const end = app.indexOf('async function simpleInstall(', start);
   assert.doesNotMatch(app.slice(start, end), /setTimeout|setInterval/);
-  assert.match(app, /await resolveInstallHost\(4000\);\s*deployment.advance\(2/);
+  assert.match(app, /await resolveInstallHost\(4000, \{ target \}\);\s*deployment.advance\(2/);
   assert.match(app, /if \(rgx.status === 'skip'\) deployment.skip/);
 });

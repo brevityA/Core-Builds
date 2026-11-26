@@ -123,6 +123,18 @@ test('Hide 4K and Hide Dolby Vision survive Stable and Balanced as native filter
   }
 });
 
+test('Hide HDR lists every HDR tag AIOStreams matches, on every profile', () => {
+  // AIOStreams' filterer matches excludedVisualTags exactly and adds HDR+DV, DV Only and HDR Only itself.
+  const tags = ['HDR', 'HDR10', 'HDR10+', 'HLG', 'DV', 'HDR+DV', 'DV Only', 'HDR Only'];
+  for (const profile of ['stable', 'balanced', 'advanced', 'labs']) {
+    const out = applyOutputProfile(richTemplate(), profile, { service:'torbox-pro', resolution:'4k', langs:['English'], excludeHDR:true });
+    for (const tag of tags) assert.ok(out.config.excludedVisualTags.includes(tag), `${profile}: ${tag} hidden`);
+    assert.ok(!out.config.excludedVisualTags.includes('SDR'), `${profile}: SDR kept`);
+    const off = applyOutputProfile(richTemplate(), profile, { service:'torbox-pro', resolution:'4k', langs:['English'] });
+    assert.ok(!(off.config.excludedVisualTags || []).includes('HDR10'), `${profile}: HDR kept when the toggle is off`);
+  }
+});
+
 test('Core Stable reduces output to a local, deterministic policy', () => {
   const source = richTemplate();
   const stable = applyOutputProfile(source, 'stable', {
