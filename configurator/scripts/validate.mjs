@@ -56,7 +56,6 @@ function hasCspOrigin(html, expectedOrigin) {
   return allowedOrigins.has(expectedOrigin);
 }
 
-const hasCinebyeCspOrigin = hasCspOrigin(shell, 'https://cinebye.dinsden.top');
 
 const pkg = JSON.parse(await readFile(resolve(root, 'package.json'), 'utf8'));
 const versions = JSON.parse(await readFile(resolve(repoRoot, 'versions.json'), 'utf8'));
@@ -101,7 +100,9 @@ const checks = {
   'cache-busted web assets': buildScript.includes("createHash('sha256')") && buildScript.includes('app.js?v=${assetVersions.js}') && buildScript.includes('app.css?v=${assetVersions.css}'),
   'version badge placeholder': shell.includes('v__CB_VERSION__') && !(/v\d+\.\d+<\/span>/.test(shell)),
   'module shell': shell.includes('type="module" src="./js/app.js"'),
-  'Cinebye fallback allowed by CSP': appOrigins.has('https://cinebye.dinsden.top') && hasCinebyeCspOrigin,
+  // v3.49: Full stack saves an AIOMetadata config on aiometadata.elfhosted.com (covered by the
+  // *.elfhosted.com connect-src) and patches Cinemeta in the browser, so no Cinebye host is called.
+  'Full stack hosts allowed by CSP': /connect-src[^;]*https:\/\/\*\.elfhosted\.com/.test(shell) && !appOrigins.has('https://cinebye.dinsden.top') && !appOrigins.has('https://cinebye.elfhosted.com'),
   'external source CSS': cssFiles.every(file => shell.includes(`./styles/${file}`)) && !shell.includes('<style>'),
   'balanced CSS': cssParts.every(part => (part.match(/{/g)||[]).length === (part.match(/}/g)||[]).length),
   'tutorial runtime': app.includes('function tutPositionTarget') && app.includes('Step 5 of 5'),

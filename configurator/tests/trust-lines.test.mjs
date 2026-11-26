@@ -50,9 +50,9 @@ test('Quick install still does what the QuackStart comparison claimed', () => {
   assert.match(app, /\['manifest','Other app','Copy manifest'\]/);
 });
 
-test('Full stack says the Cinemeta patch goes through Cinebye with the Stremio sign-in', () => {
-  // patchCinemeta posts the Stremio authKey to these hosts; the option must say so.
-  assert.match(app, /const CINEBYE_HOSTS = \[/);
-  assert.match(app, /body: JSON\.stringify\(\{ authKey, patches \}\)/);
-  assert.match(app, /Cinebye, a separate service, makes the Cinemeta patch using your Stremio sign-in\./);
+test('Full stack patches Cinemeta in the browser and says so', () => {
+  // v3.49: Cinebye has no server API; the patch runs on the user's own collection.
+  assert.doesNotMatch(app, /CINEBYE_HOSTS|\/api\/patch/);
+  assert.match(app, /patchCinemetaInCollection\(existing, cinemetaPatches\)/);
+  assert.match(app, /Done in your browser on your Stremio account; no other service sees your sign-in\./);
 });
