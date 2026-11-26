@@ -102,3 +102,30 @@ for (const width of [1000, 1280, 1920]) {
     expect(extra).toBe(0);
   });
 }
+
+test('More styles: Enter opens it without moving the wizard, and a pick made in Compare opens it', async ({ page }) => {
+  await page.goto('/?cb-e2e=1');
+  await page.evaluate(() => { localStorage.clear(); localStorage.setItem('cb_tut_seen', '1'); });
+  await page.reload();
+  await page.evaluate(() => { location.hash = '#cards'; });
+  const drawer = page.locator('#advancedDrawer');
+  await expect(drawer.locator('#ft-layout')).toBeVisible();
+  const more = drawer.locator('details.fmt-more').first();
+  await expect(more).toHaveJSProperty('open', false);
+
+  const before = await page.evaluate(() => localStorage.getItem('coreBuildStep'));
+  await more.locator('summary').focus();
+  await page.keyboard.press('Enter');
+  await expect(more).toHaveJSProperty('open', true);
+  expect(await page.evaluate(() => localStorage.getItem('coreBuildStep'))).toBe(before);
+  await page.keyboard.press('Enter');
+  await expect(more).toHaveJSProperty('open', false);
+
+  // Pick a More-styles formatter through Compare side by side: the fold must open to show it.
+  const hidden = await more.locator('.fmt-row').first().getAttribute('data-fmt');
+  await drawer.locator('.fmt-compare-open').click();
+  await drawer.locator('#fmtCmpPick2').selectOption(hidden);
+  await drawer.locator('.fmt-cmp-col').nth(2).locator('.fmt-cmp-use').click();
+  await expect(more).toHaveJSProperty('open', true);
+  await expect(more.locator(`.fmt-row[data-fmt="${hidden}"]`)).toHaveAttribute('data-active', 'true');
+});

@@ -1622,6 +1622,8 @@ function updateFmtFeatured() {
     card.dataset.active = isSel ? 'true' : 'false';
     card.setAttribute('aria-pressed', String(isSel));
   });
+  // A style picked outside the list (Compare side by side) may sit under More styles.
+  if (!FMT_SHORTLIST.includes(S.formatter)) document.querySelectorAll('details.fmt-more').forEach(d => { d.open = true; });
   refreshFmtStage();
   document.querySelectorAll('.fmt-score').forEach(el => { el.hidden = !isCoreFormatter(S.formatter); });
 }
@@ -3636,7 +3638,9 @@ document.addEventListener('DOMContentLoaded', () => {
       labels[idx].focus();
     }
 
-    if (e.key === 'Enter' && !inInput && !e.shiftKey) {
+    // A disclosure summary (More styles) opens on Enter; it must not advance the wizard.
+    const onSummary = !!(e.target && e.target.closest && e.target.closest('summary'));
+    if (e.key === 'Enter' && !inInput && !e.shiftKey && !onSummary) {
       e.preventDefault();
       const ae = document.activeElement;
       if (ae && ae.dataset && ae.dataset.action) { ae.click(); return; }

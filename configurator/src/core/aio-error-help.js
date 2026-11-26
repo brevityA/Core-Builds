@@ -23,8 +23,8 @@ export const AIO_ERROR_HELP = [
   {
     id: 'needs-service',
     re: /requires at least one usable service|no credentials found/i,
-    title: 'A source needs a service you haven\'t added',
-    help: 'One of the selected sources only works with a debrid service and its key. Add the key, or turn that source off under Additional services & scrapers.',
+    title: 'A source needs a service you haven\'t set up',
+    help: 'The message below names the service. Add its login (a key, or a username and password for EasyNews) under Services, or turn off the source that needs it.',
   },
   {
     id: 'empty-group',
