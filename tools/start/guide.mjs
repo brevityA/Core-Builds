@@ -30,15 +30,18 @@ export function detectLang(navLangs, stored) {
 }
 
 const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-/** Escape, fill {vars}, then turn **bold** and [[Label]] into markup. */
+/**
+ * Fill {vars}, then turn **bold** and [[Label]] into markup. Works on the raw text
+ * and escapes each piece exactly once, so nothing is ever un-escaped.
+ */
 export function fmt(str, lang, vars = {}) {
-  let out = esc(str).replace(/\{(\w+)\}/g, (m, k) => (k in vars ? esc(vars[k]) : m));
-  out = out.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-  out = out.replace(/\[\[(.+?)\]\]/g, (m, label) => {
-    const en = label.replace(/&amp;/g, '&').replace(/&#39;/g, "'");
-    return `<span class="ui">${esc(uiLabel(en, lang))}</span>`;
-  });
-  return out;
+  // Values never carry markers of their own.
+  const filled = String(str).replace(/\{(\w+)\}/g, (m, k) => (k in vars ? String(vars[k]).replace(/\[\[|\]\]|\*\*/g, '') : m));
+  return filled.split(/(\[\[.+?\]\]|\*\*.+?\*\*)/).map(part => {
+    if (part.startsWith('[[') && part.endsWith(']]')) return `<span class="ui">${esc(uiLabel(part.slice(2, -2), lang))}</span>`;
+    if (part.startsWith('**') && part.endsWith('**') && part.length > 4) return `<strong>${esc(part.slice(2, -2))}</strong>`;
+    return esc(part);
+  }).join('');
 }
 /** Every [[Label]] used in a string. */
 export const labelsIn = str => [...String(str).matchAll(/\[\[(.+?)\]\]/g)].map(m => m[1]);

@@ -106,6 +106,9 @@ test('language: saved choice, then browser, then English (shared key with the co
 test('the page loads its scripts as files, as its content policy requires', () => {
   const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
   assert.match(html, /script-src 'self'[;"]/);
-  assert.doesNotMatch(html.replace(/<script[^>]*src=[^>]*><\/script>/g, ''), /<script/i, 'inline script would be blocked by the CSP');
+  // Every script tag must load a file: an inline one would be blocked by the CSP.
+  const tags = [...html.matchAll(/<script\b([^>]*)>/gi)].map(m => m[1]);
+  assert.ok(tags.length >= 2);
+  for (const attrs of tags) assert.match(attrs, /\bsrc="/, `inline script: <script${attrs}>`);
   assert.match(html, /<script type="module" src=".\/app.mjs"><\/script>/);
 });
