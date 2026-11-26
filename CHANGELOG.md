@@ -10,6 +10,8 @@
 
 - **Account Tools said a backup is saved before every change** — the previous addon list is kept in the page for Undo (the last 10 changes) and is lost when the page closes; no file is saved. The page, the Tools hub and the README now say so, and the README no longer calls the tool read-only.
 
+- **Account Tools: a Nuvio profile that failed to load left the previous profile's addons usable** — after a failed profile switch, Install and both copy buttons came back on while the page still held the previous profile's list, so a copy to Stremio could copy the wrong profile. The list is now cleared, those buttons stay off until the selected profile loads, and a **Reload this profile** button retries it.
+
 ### Added
 - **Account Tools: install and copy addons, Stremio and Nuvio** — paste a manifest link (https or `stremio://`) to add it to your Stremio account or a Nuvio profile; copy addons from your Stremio account to a Nuvio profile, from Nuvio to Stremio, or from another Stremio account into yours. Each copy either adds only the missing addons or replaces the list; replacing a Stremio list keeps its protected addons (Cinemeta, Local Files). Every write asks first and can be undone (Stremio and Nuvio keep separate Undo histories); the other Stremio account is only read. Nuvio uses its documented API (`/auth/v1/token`, `sync_pull_profiles`, `addons`, `sync_push_addons`); a profile that shares profile 1's addons writes to profile 1.
 - **Core Nexus Elite: PRELOAD, PROPER, REMASTER, REGRADED and PRIVATE badges** — fields AIOStreams 2.38 exposes that Elite did not show (formatter v2 pass).
