@@ -44,6 +44,7 @@
             "group": "Getting Started",
             "pages": [
               "introduction",
+              "start-here",
               "quick-start",
               "which-template",
               "importing",
