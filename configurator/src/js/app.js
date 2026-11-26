@@ -8244,12 +8244,12 @@ const EXPRESS_PROFILES = [
 ];
 // Logos for the phone layout's list rows (hidden on wider screens).
 // Core Builds Icon Pack glyphs where the pack has one; the configurator's own icons otherwise.
-const EXPRESS_GLYPH = { app:'stremio', nuvio:'nuvio', wuplay:'wuplay', chillio:'chillio', 'torbox-pro':'torbox', realdebrid:'realdebrid', alldebrid:'alldebrid', premiumize:'premiumize' };
+const EXPRESS_GLYPH = { app:'stremio', nuvio:'nuvio', wuplay:'wuplay', chillio:'chillio', jellyfin:'jellyfin', 'torbox-pro':'torbox', realdebrid:'realdebrid', alldebrid:'alldebrid', premiumize:'premiumize' };
 function expressIcon(kind, v) {
   const g = BRAND_GLYPHS[EXPRESS_GLYPH[v]];
   if (g) return `<span class="fl-ico fl-glyph" aria-hidden="true">${g}</span>`;
   if (kind === 'target') {
-    const t = { manifest: ICO.link(28, 'currentColor'), jellyfin: ICO.tv(28, 'currentColor') }[v];
+    const t = { manifest: ICO.link(28, 'currentColor') }[v];
     return t ? `<span class="fl-ico" aria-hidden="true">${t}</span>` : '';
   }
   const opt = DEFS.find(d => d.key === 'service')?.opts.find(o => o.v === v);

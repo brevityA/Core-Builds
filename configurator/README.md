@@ -115,3 +115,10 @@ payloads can never contain a key or addon the target host rejects.
 ## Version
 
 Current: **v2.97.0**
+
+## Credits
+
+- The Jellyfin icon in Quick install's app picker is the official Jellyfin icon from
+  [jellyfin/jellyfin-ux](https://github.com/jellyfin/jellyfin-ux) (`branding/SVG/icon-transparent.svg`),
+  © the Jellyfin contributors, licensed [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/).
+  Jellyfin is a trademark of its owners.
