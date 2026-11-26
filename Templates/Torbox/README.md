@@ -629,7 +629,7 @@ Cached-first instant play. Only streams already cached in TorBox appear while th
 | **File** | `core-nexus-flash.json` | `core-nexus-flash-4k.json` |
 | **Resolution** | 1080p primary · 720p fallback | 2160p primary · 1080p fallback |
 | **Visual priority** | SDR | DV → HDR10+ → HDR |
-| **Uncached streams** | ❌ Never shown | ❌ Never shown |
+| **Uncached streams** | Only when nothing is cached, or in a title's first 3 days | Only when nothing is cached, or in a title's first 3 days |
 | **Import URL** | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Flash/core-nexus-flash.json` | `https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/Templates/Torbox/Flash/core-nexus-flash-4k.json` |
 
 ---
