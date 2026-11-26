@@ -1,16 +1,16 @@
 {
   "kind": "source",
-  "extractedAt": "2026-11-21T13:35:57.980Z",
-  "fingerprint": "dad8f809c64eb9b8",
+  "extractedAt": "2026-11-26T11:30:30.530Z",
+  "fingerprint": "d5ec714cc2702ae5",
   "repo": "Viren070/AIOStreams",
   "ref": "main",
   "commit": null,
   "counts": {
-    "presets": 86,
+    "presets": 87,
     "services": 21,
     "schemaKeys": 162,
-    "selFunctions": 70,
-    "formatterFields": 90,
+    "selFunctions": 71,
+    "formatterFields": 92,
     "formatters": 8,
     "autoPlayMethods": 3,
     "requiredOptions": 2
@@ -72,6 +72,7 @@
     "yastream",
     "streamasia",
     "xtream",
+    "m3u",
     "usa-tv",
     "usa-tv-next",
     "argentina-tv",
@@ -329,6 +330,7 @@
       "max",
       "mean",
       "mediaInfoQuality",
+      "mediaInfoSource",
       "median",
       "merge",
       "message",
@@ -410,11 +412,13 @@
     "bitrate",
     "folderSize",
     "library",
+    "failovers",
     "quality",
     "resolution",
     "subbed",
     "dubbed",
     "mediaInfoQuality",
+    "mediaInfoSource",
     "languages",
     "uLanguages",
     "subtitles",
@@ -686,6 +690,7 @@
       "optionIds": [
         "mediaTypes",
         "strictTitleMatching",
+        "preferredLanguage",
         "socials"
       ]
     },
@@ -994,6 +999,11 @@
     },
     {
       "id": "xtream",
+      "requiredOptions": [],
+      "optionIds": []
+    },
+    {
+      "id": "m3u",
       "requiredOptions": [],
       "optionIds": []
     },
