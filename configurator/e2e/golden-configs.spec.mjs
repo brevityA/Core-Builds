@@ -91,6 +91,12 @@ const MATRIX = [
   // unnoticed (they are what the feature-conflict checker reports as
   // "applied twice").
   { name: 'torbox-4k-cached-size-capped', state: { resolution: '4k', cacheMode: 'cached', sizeLimit: 20 } },
+  // Ready to play first (v3.48): what Quick install's Fast and Balanced build. The
+  // native excludeUncached flag stays off and one rule hides uncached streams only
+  // while a cached one survives; on the Balanced profile it must sit before the late
+  // pack fallbacks. Behaviour is checked in AIOStreams by aio-save-test/ready-first.mjs.
+  { name: 'quick-torbox-4k-ready', profile: 'stable', state: { resolution: '4k', quickStart: true, quickProfile: 'balanced', cacheMode: 'ready', sizeLimit: '30' } },
+  { name: 'core-balanced-torbox-1080p-ready', profile: 'balanced', state: { resolution: '1080p', outputProfile: 'balanced', cacheMode: 'ready' } },
   // Same two routes on the labs profile, which keeps its expression stack
   // instead of collapsing it — this is the shape a user on Apex Mixed runs.
   { name: 'torbox-4k-apex-mixed-cached-size', state: { resolution: '4k', pseArch: 'apex-mixed', cacheMode: 'cached', sizeLimit: 20 } },
@@ -134,12 +140,27 @@ for (const combo of MATRIX) {
       expect(tpl.config.failover, `${combo.name} must emit canonical failover`).toBeTruthy();
     }
 
+    // Ready to play first must hold even when goldens are being regenerated: native
+    // flag off, one enabled rule, and that rule ahead of every late pack fallback.
+    if (state.cacheMode === 'ready') {
+      const ese = (tpl.config.excludedStreamExpressions || []).map(e => (typeof e === 'string' ? e : e.expression));
+      const at = ese.map((e, i) => /Ready to play first/.test(e) ? i : -1).filter(i => i >= 0);
+      expect(tpl.config.excludeUncached, `${combo.name} keeps the native flag off`).not.toBe(true);
+      expect(at, `${combo.name} carries one Ready rule`).toHaveLength(1);
+      ese.forEach((e, i) => { if (/Late Pack Fallback/.test(e)) expect(at[0], `${combo.name} Ready rule before pack fallback`).toBeLessThan(i); });
+    }
+
     if (expectedProfile === 'stable') {
       expect(tpl.config.syncedRankedRegexUrls || []).toEqual([]);
       expect(tpl.config.syncedRankedStreamExpressionUrls || []).toEqual([]);
       expect(tpl.config.groups?.enabled).toBe(false);
       expect(tpl.config.dynamicAddonFetching?.enabled).toBe(false);
-      expect(tpl.config.excludedStreamExpressions || []).toHaveLength(1);
+      // One rule, plus Ready to play first when asked for: it stands in for the native
+      // excludeUncached flag, as validateOutputProfileBudget counts it (v3.48).
+      const ese = tpl.config.excludedStreamExpressions || [];
+      const ready = ese.filter(e => /Ready to play first/.test(e.expression));
+      expect(ese.length - ready.length).toBe(1);
+      expect(ready).toHaveLength(state.cacheMode === 'ready' ? 1 : 0);
       expect(tpl.config.resultLimits?.mode).toBe('independent');
       expect(tpl.config.hideErrors).toBe(false);
     }

@@ -129,6 +129,36 @@ const BALANCED_LATE_PACK_FALLBACKS = Object.freeze([
   },
 ]);
 
+// "Ready to play first" (cacheMode 'ready', v3.48). AIOStreams' own excludeUncached
+// removes every uncached stream even when nothing cached is left, so a title nobody
+// has cached yet showed an empty list. This hides uncached streams only while at
+// least one cached stream survives. Stream expressions run after filtering,
+// deduplication and sorting and before result limits, so the count sees what the
+// player would get. Checked against AIOStreams 2.36.0 with cached-only,
+// uncached-only and mixed titles on the Stable 4K and 1080p configs.
+export const READY_FIRST_ESE = Object.freeze({
+  enabled: true,
+  expression: "/* CB | Ready to play first — hide downloads only while something plays now */ count(cached(streams)) > 0 ? uncached(streams) : []",
+});
+
+function applyReadyFirst(config, context) {
+  // Always drop an earlier copy first: "Update my setup" can carry the old config's
+  // rules across, and a Ready rule left behind after switching to Mixed or Cached
+  // only would keep hiding downloads.
+  const text = entry => (typeof entry === 'string' ? entry : String(entry?.expression || ''));
+  const ese = values(config.excludedStreamExpressions).filter(entry => !/Ready to play first/.test(text(entry)));
+  if (Array.isArray(config.excludedStreamExpressions)) config.excludedStreamExpressions = ese;
+  if (context.cacheMode !== 'ready') return;
+  // Free routes have no debrid cache to read; the generator leaves their flags off too.
+  if (context.service === 'p2p' || context.service === 'http') return;
+  config.excludeUncached = false;
+  // Before the late pack fallbacks: pack filtering stays the final step, and its
+  // "3 playable singles" count then sees only what this rule kept.
+  const pack = ese.findIndex(entry => /Late Pack Fallback/.test(text(entry)));
+  ese.splice(pack < 0 ? ese.length : pack, 0, { ...READY_FIRST_ESE });
+  config.excludedStreamExpressions = ese;
+}
+
 function clone(value) {
   if (typeof structuredClone === 'function') return structuredClone(value);
   return JSON.parse(JSON.stringify(value));
@@ -707,6 +737,7 @@ export function applyOutputProfile(rawTemplate, requestedProfile = 'auto', conte
     if (ALLOWED_MIGRATION_FIELDS.has(key) && key !== 'parentConfig') delete template.config[key];
   }
 
+  applyReadyFirst(template.config, context);
   enforceLocalExpressionPolicy(template.config);
   preventStackedFetchExits(template.config);
   applyAIOStreamsCompatibility(template, context);

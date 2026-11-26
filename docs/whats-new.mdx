@@ -1,14 +1,39 @@
 ---
-title: "What's New — Configurator v3.47"
+title: "What's New — Configurator v3.48"
 sidebarTitle: "What's New"
-description: "Latest Core Builds Configurator releases (v3.47 and earlier), auto-generated from the in-app changelog."
+description: "Latest Core Builds Configurator releases (v3.48 and earlier), auto-generated from the in-app changelog."
 ---
 
 # What's New in the Configurator
 
-This page is regenerated from `configurator/src/data/changelog.js` by `scripts/sync-docs.py`, so it always reflects the latest shipped configurator version (currently **v3.47**).
+This page is regenerated from `configurator/src/data/changelog.js` by `scripts/sync-docs.py`, so it always reflects the latest shipped configurator version (currently **v3.48**).
 
 For the template-suite release log, see the [Changelog](https://core-builds.mintlify.app/changelog).
+
+## Configurator v3.48 (Nov 26 2026)
+
+<CardGroup cols={2}>
+  <Card title="Ready to play first replaces hard cached-only" icon="sparkles">
+    3.47 made Quick install's Balanced hide every stream your service would still have to download. AIOStreams removes those even when nothing else is left, so a brand-new episode or a rarer title could show no streams at all (checked in AIOStreams 2.36.0). Fast and Balanced now show only streams that play straight away while there are any, and the ones that need downloading when there are none, among streams that pass your other settings such as picture quality.
+  </Card>
+  <Card title="Fast behaves the same way" icon="bolt">
+    Fast hid uncached streams outright before 3.48 too; it now uses Ready to play first as well.
+  </Card>
+  <Card title="Ready first is also in the full builder" icon="shield-check">
+    Streams shown offers Mixed, Ready first, Cached only and Uncached only, and the CLI takes --cache-mode ready. Cached only still hides downloads even when nothing else is ready.
+  </Card>
+  <Card title="A Cached only pick from 3.47 is explained" icon="sliders">
+    if you chose Cached only in Quick install, it is kept and the screen says what it does; choose Ready to play to switch.
+  </Card>
+  <Card title="Checked in a real AIOStreams on every save test" icon="gauge">
+    a stub add-on serves cached and uncached streams, and the Quick install config must list only cached ones while any exist and the uncached ones when none do, ; both host variants check that these configs save, and the open variant also checks the streams that come back.
+  </Card>
+  <Card title="Generated output changes for Ready to play first only" icon="wand">
+    new Quick installs on Fast and Balanced carry one extra exclude rule and excludeUncached off; two new reference configs pin that. Every other reference config is unchanged apart from the version stamp.
+  </Card>
+</CardGroup>
+
+---
 
 ## Configurator v3.47 (Nov 26 2026)
 
@@ -68,18 +93,5 @@ For the template-suite release log, see the [Changelog](https://core-builds.mint
   </Card>
   <Card title="Generated output unchanged" icon="shield-check">
     every reference config is byte-for-byte what 3.44 produced apart from the version stamp; the language only changes what the page shows.
-  </Card>
-</CardGroup>
-
----
-
-## Configurator v3.44 (Nov 26 2026)
-
-<CardGroup cols={2}>
-  <Card title="Start Here, a guided setup for beginners" icon="sparkles">
-    a new page for anyone who has never set up an addon. It asks three questions (where you watch, which app, which service, or none yet) and then shows only your steps on one page: Quick install with the tile to tap lit up, adding it to Stremio, Nuvio, WuPlay, Chillio or another app (a TV is set up from a phone), and a check that streams play, with fixes for the four common problems. Tick each step as you go; the page remembers where you are. It speaks the same five languages as the configurator and names every button the way the configurator shows it in your language. Find it as Start Here on the first screen, in the menu under Help, and at tools/start.
-  </Card>
-  <Card title="Generated output unchanged" icon="bolt">
-    every reference config is byte-for-byte what 3.43 produced apart from the version stamp; only the first screen and the menu gained the Start Here link.
   </Card>
 </CardGroup>

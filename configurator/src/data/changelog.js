@@ -1,4 +1,12 @@
 export const CHANGELOG = [
+  { v:'3.48', date:'Nov 26 2026', items:[
+    'Ready to play first replaces hard cached-only — 3.47 made Quick install\'s Balanced hide every stream your service would still have to download. AIOStreams removes those even when nothing else is left, so a brand-new episode or a rarer title could show no streams at all (checked in AIOStreams 2.36.0). Fast and Balanced now show only streams that play straight away while there are any, and the ones that need downloading when there are none, among streams that pass your other settings such as picture quality.',
+    'Fast behaves the same way — Fast hid uncached streams outright before 3.48 too; it now uses Ready to play first as well.',
+    'Ready first is also in the full builder — Streams shown offers Mixed, Ready first, Cached only and Uncached only, and the CLI takes --cache-mode ready. Cached only still hides downloads even when nothing else is ready.',
+    'A Cached only pick from 3.47 is explained — if you chose Cached only in Quick install, it is kept and the screen says what it does; choose Ready to play to switch.',
+    'Checked in a real AIOStreams on every save test — a stub add-on serves cached and uncached streams, and the Quick install config must list only cached ones while any exist and the uncached ones when none do, ; both host variants check that these configs save, and the open variant also checks the streams that come back.',
+    'Generated output changes for Ready to play first only — new Quick installs on Fast and Balanced carry one extra exclude rule and excludeUncached off; two new reference configs pin that. Every other reference config is unchanged apart from the version stamp.',
+  ]},
   { v:'3.47', date:'Nov 26 2026', items:[
     'Quick install\'s Balanced shows only streams that play straight away — like Fast, Balanced now hides anything your service would still have to download, so a new setup starts playing when you pick a stream. Maximum still lists those streams too.',
     'Your own Streams shown pick is kept — choose Mixed under Streams shown and Quick install keeps it the next time you open it. Picking a profile again goes back to that profile\'s setting. If you chose Mixed before this version, choose it once more.',

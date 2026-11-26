@@ -162,7 +162,7 @@ test('Express Install manifest target skips Stremio and shows the manifest modal
   expect(JSON.stringify(posted[0].config)).not.toContain('torbox-search');
 });
 
-test('Express profile is a main step, and Fast builds 1080p instant-play-only', async ({ page }) => {
+test('Express profile is a main step, and Fast builds 1080p ready-to-play-first', async ({ page }) => {
   const posted = [];
   await mockBackend(page, posted);
   await fresh(page);
@@ -175,7 +175,7 @@ test('Express profile is a main step, and Fast builds 1080p instant-play-only', 
   await expect(page.locator('#expressLaneModal [data-express-profile="balanced"]')).toContainText('Recommended');
   await page.locator('[data-express-cred="torbox"]').fill('test-torbox-key');
   await fast.click();
-  await expect(page.locator('[data-express-cache="cached"]')).toHaveClass(/active/);
+  await expect(page.locator('[data-express-cache="ready"]')).toHaveClass(/active/);
   await expect(page.locator('[data-express-res="1080p"]')).toHaveClass(/active/);
   await page.locator('[data-express-target="manifest"]').click();
   await page.locator('#expressGo').click();
@@ -185,27 +185,30 @@ test('Express profile is a main step, and Fast builds 1080p instant-play-only', 
   const config = posted[0].config;
   // Fast promised 1080p: before 3.26 Quick install's own 4K default overrode it.
   expect(config.excludedResolutions || []).toContain('2160p');
-  expect(config.excludeUncached, 'Fast shows only streams ready to play').toBe(true);
+  // Ready to play first (3.48): the native flag would empty an uncached-only title.
+  expect(config.excludeUncached, 'Fast does not use the hard cached-only flag').toBe(false);
+  expect(config.excludedStreamExpressions.some(e => /Ready to play first/.test(e.expression)), 'Fast hides downloads while something plays now').toBe(true);
   // An English browser keeps the English-only language list every golden carries.
   expect(config.preferredLanguages[0]).toBe('English');
   expect(config.preferredLanguages).not.toContain('Spanish');
 });
 
-test('Balanced (the default) builds cached-only; a Mixed pick is kept and builds mixed (v3.47)', async ({ page }) => {
+test('Balanced (the default) builds ready-to-play-first; a Mixed pick is kept (v3.48)', async ({ page }) => {
   const posted = [];
   await mockBackend(page, posted);
   await fresh(page);
   page.on('dialog', dialog => dialog.accept());
   await page.locator('[data-action="open-express-lane"]').click();
   await expect(page.locator('#expressLaneModal [data-express-profile="balanced"]')).toHaveClass(/active/);
-  await expect(page.locator('[data-express-cache="cached"]')).toHaveClass(/active/);
+  await expect(page.locator('[data-express-cache="ready"]')).toHaveClass(/active/);
   await page.locator('[data-express-cred="torbox"]').fill('test-torbox-key');
   await page.locator('[data-express-target="manifest"]').click();
   await page.locator('#expressGo').click();
   await page.locator('#pwdPrompt .pwd-go').click();
   await expect(page.locator('#manifestModal')).toBeVisible({ timeout: 45000 });
   expect(posted).toHaveLength(1);
-  expect(posted[0].config.excludeUncached, 'Balanced shows only streams ready to play').toBe(true);
+  expect(posted[0].config.excludeUncached, 'Balanced does not use the hard cached-only flag').toBe(false);
+  expect(posted[0].config.excludedStreamExpressions.some(e => /Ready to play first/.test(e.expression)), 'Balanced hides downloads while something plays now').toBe(true);
 
   // Choosing Mixed yourself survives closing and reopening Quick install.
   await page.reload();
@@ -220,7 +223,22 @@ test('Balanced (the default) builds cached-only; a Mixed pick is kept and builds
   await page.locator('#expressLaneModal [data-express-profile="maximum"]').click();
   await expect(page.locator('[data-express-cache="mixed"]')).toHaveClass(/active/);
   await page.locator('#expressLaneModal [data-express-profile="balanced"]').click();
-  await expect(page.locator('[data-express-cache="cached"]')).toHaveClass(/active/);
+  await expect(page.locator('[data-express-cache="ready"]')).toHaveClass(/active/);
+});
+
+test('A Cached only pick kept from 3.47 is explained, and Ready to play replaces it (v3.48)', async ({ page }) => {
+  await fresh(page);
+  // Only the two fields under test; no saved state (which can hold keys) is copied.
+  await page.evaluate(() => localStorage.setItem('coreBuild', JSON.stringify({ _schema: 6, cacheMode: 'cached', quickCacheChosen: true })));
+  await page.reload();
+  await page.waitForTimeout(950);
+  await page.locator('[data-action="open-express-lane"]').click();
+  await expect(page.locator('#expressCacheHint')).toContainText('see downloads when nothing is ready');
+  await expect(page.locator('[data-express-cache].active')).toHaveCount(0);
+  await page.locator('[data-express-cache="ready"]').click();
+  await expect(page.locator('[data-express-cache="ready"]')).toHaveClass(/active/);
+  await expect(page.locator('#expressCacheHint')).toContainText('shown instead');
+  expect(await page.evaluate(() => JSON.parse(localStorage.getItem('coreBuild')).cacheMode)).toBe('ready');
 });
 
 test.describe('Express language from a Spanish browser', () => {

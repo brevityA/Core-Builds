@@ -160,3 +160,22 @@ test('C12 stays silent when failover is absent or disabled', () => {
   assert.ok(!ids({ excludeUncached: true }).includes('C12_CACHED_ONLY_WITH_UNCACHED_BACKGROUND_ACTION'));
   assert.ok(!ids({ excludeUncached: true, failover: { enabled: false } }).includes('C12_CACHED_ONLY_WITH_UNCACHED_BACKGROUND_ACTION'));
 });
+
+// v3.48: the Ready to play first rule replaces the native excludeUncached flag, so it
+// must not push Stable (1 rule) or Balanced (3 rules) over budget. Before this, every
+// Quick install on Fast or Balanced opened a "complexity budget exceeded" warning.
+test('Ready to play first stays within the Stable and Balanced budgets', async () => {
+  const { applyOutputProfile } = await import('../src/core/output-profile-policy.js');
+  for (const profile of ['stable', 'balanced']) {
+    const out = applyOutputProfile({ config: {} }, profile, { service: 'torbox-pro', multiServices: ['torbox-pro'], resolution: '4k', cacheMode: 'ready' });
+    assert.ok(out.config.excludedStreamExpressions.some(e => /Ready to play first/.test(e.expression)), profile);
+    const budget = validateOutputProfileBudget(out, profile);
+    assert.deepEqual(budget.violations.filter(v => v.key === 'excludedExpressions'), [], profile);
+  }
+  // Any other extra rule still counts.
+  const extra = { excludedStreamExpressions: [
+    { enabled: true, expression: "/* Core Stable | External stream kill */ type(streams,'youtube','external')" },
+    { enabled: true, expression: '/* Something else */ size(streams, 1)' },
+  ] };
+  assert.equal(validateOutputProfileBudget(extra, 'stable').ok, false);
+});

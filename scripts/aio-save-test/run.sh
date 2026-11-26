@@ -55,3 +55,8 @@ if ! curl -sf "http://127.0.0.1:$PORT/api/v1/status" >/dev/null; then
 fi
 
 AIO_URL="http://127.0.0.1:$PORT" node "$HERE/matrix.mjs"
+
+# "Ready to play first" must actually behave in this AIOStreams, not just save:
+# cached-only while anything is cached, never an empty list. Open variant only
+# (it saves a custom stub addon, which needs no allowlist either way).
+if [ "$VARIANT" = open ]; then AIO_URL="http://127.0.0.1:$PORT" node "$HERE/ready-first.mjs"; fi

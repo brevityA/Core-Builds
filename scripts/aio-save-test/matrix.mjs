@@ -47,6 +47,15 @@ for (const d of OPTIONAL_SCRAPER_DEFS) for (const service of ['torbox-pro', 'p2p
     p2pEnabled: service === 'p2p', instanceHost: ONLY_HOST || 'fortheweak', optionalScrapers: [d.id], creds: DUMMY_CREDS } });
 }
 
+// "Ready to play first" (cacheMode 'ready') on every profile route, debrid and free.
+for (const service of ['torbox-pro', 'realdebrid', 'p2p']) for (const pseArch of ARCHS) {
+  if (ONLY_HOST && free(service)) continue;
+  cases.push({ name: `ready:${service}/${pseArch}`, state: { service, multiServices: [service], content: 'all', resolution: '4k', pseArch, cacheMode: 'ready',
+    p2pEnabled: service === 'p2p', instanceHost: hostFor(service), creds: DUMMY_CREDS } });
+}
+cases.push({ name: 'ready:torbox-pro/quick-install', state: { service: 'torbox-pro', multiServices: ['torbox-pro'], content: 'all', resolution: '4k', quickStart: true, quickProfile: 'balanced', cacheMode: 'ready',
+  instanceHost: ONLY_HOST || 'elfhosted', creds: DUMMY_CREDS } });
+
 const pin = JSON.parse(readFileSync(ROOT + 'UPSTREAM.pin', 'utf8'));
 const { writeFileSync, mkdtempSync } = await import('node:fs');
 const { tmpdir } = await import('node:os');

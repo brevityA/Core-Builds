@@ -31,12 +31,18 @@ AIOStreams itself. CI: `.github/workflows/aio-save-test.yml`.
    switched off, as the configurator does when no TMDB key is set. Added in suite
    3.13; its first run found Speed EasyNews refused (Zilean with no debrid).
 
+6. `ready-first.mjs` (open variant) checks behaviour, not just the save: a stub addon
+   serves cached and uncached TorBox streams for four titles, and the Stable config
+   Quick install builds must list only cached streams while any exist and the
+   uncached ones when none do. Added in 3.48 after 3.47's hard cached-only Balanced
+   left uncached-only titles with an empty list.
+
 ## Variants
 
 | Variant | Host rules | Cases |
 |---|---|---|
-| `open` | `REGEX_FILTER_ACCESS=all`, `SEL_SYNC_ACCESS=all` | 530 (27 smart template, 41 static) |
-| `restricted` | ElfHosted's allowlist from `allowlist.elfhosted.json` (level, synced URLs, literal patterns) | 453 (24 smart template, 41 static; free lanes skipped: ElfHosted refuses them) |
+| `open` | `REGEX_FILTER_ACCESS=all`, `SEL_SYNC_ACCESS=all` | 540 (27 smart template, 41 static, 10 Ready to play first) |
+| `restricted` | ElfHosted's allowlist from `allowlist.elfhosted.json` (level, synced URLs, literal patterns) | 460 (24 smart template, 41 static, 7 Ready to play first; free lanes skipped: ElfHosted refuses them) |
 
 The restricted run also saves one config carrying a regex no allowlist has and
 fails unless AIOStreams refuses it, so a green run cannot mean the gate was off.
