@@ -22,8 +22,8 @@ test('Quick install shows three steps up front, every install target, and workin
   for (const id of ['#expressHost', '[data-express-profile="balanced"]', '[data-express-cache="mixed"]', '[data-express-target="app"]']) await expect(page.locator(id)).toBeVisible();
   await expect(page.locator('#expressAdvanced')).not.toHaveAttribute('open', '');
   await expect(page.locator('#expressOutputProfile')).toHaveValue('stable');
-  await expect(page.locator('[data-express-target]')).toHaveCount(5);
-  for (const t of ['app', 'nuvio', 'wuplay', 'chillio', 'manifest']) await expect(page.locator(`[data-express-target="${t}"]`)).toBeVisible();
+  await expect(page.locator('[data-express-target]')).toHaveCount(6);
+  for (const t of ['app', 'nuvio', 'wuplay', 'chillio', 'jellyfin', 'manifest']) await expect(page.locator(`[data-express-target="${t}"]`)).toBeVisible();
   await page.locator('#expressAdvanced > summary').click();
   await expect(page.locator('[data-express-mode="direct"]')).toHaveAttribute('aria-pressed', 'true');
   await page.locator('[data-express-mode="manifest"]').click();

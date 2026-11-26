@@ -115,7 +115,7 @@ test('app.js wiring: the gate runs after the host resolves and before the instal
   // resolves a host and POSTs — the gate deliberately guards the install
   // POST; the free lane never carries synced regex URLs)
   const iStart = app.indexOf('async function simpleInstall');
-  const iHost = app.indexOf('const fastest = await resolveInstallHost(4000);', iStart);
+  const iHost = app.indexOf('const fastest = await resolveInstallHost(4000, { target });', iStart);
   const iGate = app.indexOf('await regexGateForHost(fastest, cfg)', iStart);
   const iPost = app.indexOf("writeHostFetch(fastest, '/api/v1/user'", iStart);
   assert.ok(iHost >= 0 && iGate > iHost && iPost > iGate, `gate must sit between host resolve (${iHost}) and POST (${iPost}); got ${iGate}`);

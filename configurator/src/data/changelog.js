@@ -1,4 +1,10 @@
 export const CHANGELOG = [
+  { v:'3.50', date:'Nov 26 2026', items:[
+    'Install to Jellyfin — Quick install has a Jellyfin target. AIOStreams can act as a Jellyfin server, so after saving you get a server address, a username (your config ID) and your config password to sign in with from a Jellyfin app.',
+    'Jellyfin picks a host that has it turned on — ElfHosted has AIOStreams\' Jellyfin server switched off, so a Jellyfin install goes to a public host that has it on (checked on every host on Nov 26). A custom host is used as you set it.',
+    'Hide HDR — a new Fine-Tune toggle under Video Preferences for screens that only show SDR. It hides HDR10, HDR10+, HLG and Dolby Vision streams; SDR and untagged streams stay. It works on every output profile and survives a re-import.',
+    'Generated output unchanged — every reference config is byte-for-byte what 3.49 produced apart from the version stamp. Hide HDR is off unless you turn it on, and Jellyfin uses the same config as any other target.',
+  ]},
   { v:'3.49', date:'Nov 26 2026', items:[
     'Full stack now sets AIOMetadata up properly — Quick install used to add AIOMetadata\'s bare address, which has no settings and so shows no rows, no search and no details. It now creates an AIOMetadata config on the public ElfHosted instance with its own default providers, protected by the same password as your AIOStreams config, and installs that. An empty AIOMetadata from an earlier install is swapped out; one you set up yourself is kept.',
     'The Cinemeta patch works again — it went to a Cinebye address that no longer exists, so Cinemeta was never patched. Full stack now hides Cinemeta\'s home rows and search in your Stremio account itself, from your browser. Cinemeta still supplies details, notifications and the calendar.',

@@ -56,7 +56,7 @@ const STEPS = 6;
 // workflow) the raw x.y here expands to x.y.0 in package.json / versions.json and
 // the release tag; the built badge drops the trailing .0. At the 2026-09-06
 // audit the release tag was v3.7.0 while this said 3.1 — they must move together.
-const CONFIGURATOR_VERSION = '3.49';
+const CONFIGURATOR_VERSION = '3.50';
 // Set to a collector endpoint to enable the opt-in anonymous usage ping (service+device+resolution only).
 // Leave empty to keep the feature fully disabled and hidden.
 const USAGE_BEACON_URL = '';
@@ -358,10 +358,13 @@ async function probeHostDetail(url, timeout=4000) {
 // resolveInstallHost: an explicit dropdown selection is honored exactly (no silent
 // failover to another host — picked Omni, gets Omni, or gets told why not). 'auto'
 // keeps today's fastest-healthy probe.
-async function resolveInstallHost(timeout=4000) {
+async function resolveInstallHost(timeout=4000, opts={}) {
   const key = S.instanceHost;
   const isFree = (S.service==='p2p' || S.service==='http');
-  if (key && key !== 'auto') {
+  // Jellyfin needs a host that runs AIOStreams' Jellyfin server. A picked host that has
+  // it turned off (ElfHosted) is passed over for one that has it; a custom host is trusted.
+  const jellyfinOff = opts.target === 'jellyfin' && key && key !== 'auto' && key !== 'custom' && HOST_META[key]?.jellyfin !== true;
+  if (key && key !== 'auto' && !jellyfinOff) {
     if (key === 'custom') {
       if (!S.instanceUrl) throw new Error('HOST_UNREACHABLE:custom URL (set it in Advanced → Hosts → Custom / Self-hosted)');
       return checkHostVersion(S.instanceUrl, timeout, 'custom host');
@@ -371,7 +374,7 @@ async function resolveInstallHost(timeout=4000) {
     if (isFree && HOST_META[key]?.blocksFree) throw new Error(`HOST_BLOCKS_FREE:${HOST_LABEL_MAP[key]||key}`);
     return checkHostVersion(url, timeout, key);
   }
-  return selectHealthyHost(timeout);
+  return selectHealthyHost(timeout, opts);
 }
 
 function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
@@ -457,14 +460,15 @@ function hostRoutingNoticeHtml(decision) {
   return `<div class="import-success${warn ? ' import-info' : ' import-error'}" style="margin-top:12px"><strong style="color:${warn ? '#fbbf24' : '#f87171'}">${warn ? 'Heads-up before deploying' : 'This host can\'t take this config'}</strong><div class="u-note-tight">${decision.reasons.map(r => escHtml(r)).join('<br>')}</div></div>`;
 }
 
-async function selectHealthyHost(timeout=4000) {
+async function selectHealthyHost(timeout=4000, opts={}) {
   const isFree = typeof S!=='undefined' && (S.service==='p2p' || S.service==='http');
   // Hosts the routing matrix would block for the CURRENT config (feature keys
   // newer than the host's registry version) are not candidates — 'auto' must
   // never park a 2.34-only config on a 2.33.2 host.
   let _routable = null;
-  try { _routable = new Set(autoRoutableHostKeys({ service: S?.service, config: buildFinal().config })); } catch(e) { _routable = null; }
-  const entries = orderedHostEntries().filter(([,host])=>!(isFree && HOST_META[hostKeyFromUrl(host)]?.blocksFree)).filter(([,host])=>!_routable || _routable.has(hostKeyFromUrl(host)));
+  try { _routable = new Set(autoRoutableHostKeys({ service: S?.service, config: buildFinal().config, target: opts.target })); } catch(e) { _routable = null; }
+  const entries = orderedHostEntries().filter(([,host])=>!(isFree && HOST_META[hostKeyFromUrl(host)]?.blocksFree)).filter(([,host])=>!_routable || _routable.has(hostKeyFromUrl(host)))
+    .filter(([,host])=>opts.target !== 'jellyfin' || HOST_META[hostKeyFromUrl(host)]?.jellyfin === true);
   let preferred='';
   try { preferred=localStorage.getItem('coreBuildLastGoodHost')||''; } catch(e) {}
   const probe = async host => {
@@ -489,7 +493,7 @@ async function selectHealthyHost(timeout=4000) {
 // Cloudflare Worker CORS proxy — see cloudflare-worker/README.md for deployment.
 // Set to '' to disable and fall back to direct-only fetches.
 const CORS_PROXY = 'https://core-builds-cors-proxy.tlorenzato26.workers.dev';
-const S = { service:null, device:null, resolution:null, audio:'limited', bandwidthMbps:0, content:null, name:'', multiServices:[], sizeLimit:'unlimited', formatter:'family-v4', fmtScore:DEFAULT_CORE_SCORE_MODE, p2pEnabled:false, qualityFirst:false, resolutionFirst:false, foreignLangKill:true, matchMode:'balanced', exclude4K:false, excludeDV:false, tmdbToken:'', tmdbApiKey:'', creds:{torbox:'',realdebrid:'',alldebrid:'',premiumize:'',debridlink:'',offcloud:'',easynews:'',easynewsPass:'',nzbgeek:'',debridio:'',debrider:'',nzbnoob:'',althub:'',usenetcrawler:'',drunkenslug:'',nzbfinder:'',jackett:'',prowlarr:'',subdl:'',penguplay:''}, instanceHost:'elfhosted', instanceUrl:'', instanceUuid:'', instancePassword:'', baseUuid:'', basePassword:'', quickStart:false, langs: ['English'], langsSet: false, langExclusive: false, cacheMode: 'mixed', streamPool: 'normal', pseArch: 'standard', telemetryOk: false, simpleMode: false, outputProfile:'auto', aiostreamsVersion:DEFAULT_AIOSTREAMS_VERSION, installMode: 'direct', stremioEmail: '', stremioPassword: '', subtitleLangs: ['en'], subtitleAddons: ['opensubtitles-v3-plus'], streamProxy: { ...DEFAULT_STREAM_PROXY, proxiedServices: [], proxiedAddons: [] }, streamProxyPassword: '', catalogs: ['tmdb-addon'], dedupMerge: false, optionalScrapers: [], cleanInstall: false, quickProfile: 'balanced', quickCacheChosen: false, preloadEnabled:true, autoPlayMethod:'matchingFile', addonTimeout:6000, patchCinemeta:false, installAIOMeta:false, libraryBoost:'default', nzbFailover:false, nzbFailoverPosition:'after-torrents', maxFailoverNzbs:3, addonServices:[] };
+const S = { service:null, device:null, resolution:null, audio:'limited', bandwidthMbps:0, content:null, name:'', multiServices:[], sizeLimit:'unlimited', formatter:'family-v4', fmtScore:DEFAULT_CORE_SCORE_MODE, p2pEnabled:false, qualityFirst:false, resolutionFirst:false, foreignLangKill:true, matchMode:'balanced', exclude4K:false, excludeDV:false, excludeHDR:false, tmdbToken:'', tmdbApiKey:'', creds:{torbox:'',realdebrid:'',alldebrid:'',premiumize:'',debridlink:'',offcloud:'',easynews:'',easynewsPass:'',nzbgeek:'',debridio:'',debrider:'',nzbnoob:'',althub:'',usenetcrawler:'',drunkenslug:'',nzbfinder:'',jackett:'',prowlarr:'',subdl:'',penguplay:''}, instanceHost:'elfhosted', instanceUrl:'', instanceUuid:'', instancePassword:'', baseUuid:'', basePassword:'', quickStart:false, langs: ['English'], langsSet: false, langExclusive: false, cacheMode: 'mixed', streamPool: 'normal', pseArch: 'standard', telemetryOk: false, simpleMode: false, outputProfile:'auto', aiostreamsVersion:DEFAULT_AIOSTREAMS_VERSION, installMode: 'direct', stremioEmail: '', stremioPassword: '', subtitleLangs: ['en'], subtitleAddons: ['opensubtitles-v3-plus'], streamProxy: { ...DEFAULT_STREAM_PROXY, proxiedServices: [], proxiedAddons: [] }, streamProxyPassword: '', catalogs: ['tmdb-addon'], dedupMerge: false, optionalScrapers: [], cleanInstall: false, quickProfile: 'balanced', quickCacheChosen: false, preloadEnabled:true, autoPlayMethod:'matchingFile', addonTimeout:6000, patchCinemeta:false, installAIOMeta:false, libraryBoost:'default', nzbFailover:false, nzbFailoverPosition:'after-torrents', maxFailoverNzbs:3, addonServices:[] };
 // A clean template update must not inherit unrelated wizard/experimental flags.
 const INITIAL_STATE = cloneUpdateValue(S);
 function replaceState(nextState) {
@@ -527,6 +531,7 @@ function releaseMigrationForControl(action, element) {
   if (action === 'toggle-p2p') releaseMigrationFields(['excludedStreamExpressions']);
   if (action === 'toggle-pref') {
     if (['exclude4K', 'excludeDV', 'foreignLangKill', 'p2pEnabled'].includes(key)) releaseMigrationFields(['excludedStreamExpressions']);
+    if (key === 'excludeHDR' || key === 'excludeDV') releaseMigrationFields(['excludedVisualTags']);
     if (key === 'dedupMerge') releaseMigrationFields(['deduplicator']);
     if (key === 'preloadEnabled') releaseMigrationFields(['preloadStreams']);
   }
@@ -734,7 +739,7 @@ function sanitizeCustomFormatter(value) {
   return { name, d:description, label };
 }
 // Only wizard selections are shareable — never credentials, tokens, UUIDs, or passwords
-const SHARE_KEYS = ['device','resolution','audio','content','name','multiServices','sizeLimit','formatter','fmtScore','p2pEnabled','qualityFirst','resolutionFirst','foreignLangKill','matchMode','exclude4K','excludeDV','quickStart','langs','langsSet','langExclusive','cacheMode','streamPool','instanceHost','simpleMode','outputProfile','aiostreamsVersion','pseArch','subtitleLangs','subtitleAddons','catalogs','dedupMerge','optionalScrapers','preloadEnabled','autoPlayMethod','addonTimeout','bandwidthMbps','patchCinemeta','installAIOMeta','libraryBoost','nzbFailover','nzbFailoverPosition','maxFailoverNzbs'];
+const SHARE_KEYS = ['device','resolution','audio','content','name','multiServices','sizeLimit','formatter','fmtScore','p2pEnabled','qualityFirst','resolutionFirst','foreignLangKill','matchMode','exclude4K','excludeDV','excludeHDR','quickStart','langs','langsSet','langExclusive','cacheMode','streamPool','instanceHost','simpleMode','outputProfile','aiostreamsVersion','pseArch','subtitleLangs','subtitleAddons','catalogs','dedupMerge','optionalScrapers','preloadEnabled','autoPlayMethod','addonTimeout','bandwidthMbps','patchCinemeta','installAIOMeta','libraryBoost','nzbFailover','nzbFailoverPosition','maxFailoverNzbs'];
 /** A QR code for a URL as an SVG data URL, or '' when the URL is too long for one. */
 function qrDataUrl(u) {
   try {
@@ -799,7 +804,7 @@ function sanitizeSharedConfig(d) {
   // Saved and shared, but until 3.41 never read back: every reload reset the cap to 0.
   pick('bandwidthMbps', v => Number.isInteger(v) && v >= 0 && v <= 10000);
   pick('instanceHost', v => v === 'auto' || v === 'custom' || Object.prototype.hasOwnProperty.call(HOST_BASE_URLS, v));
-  ['p2pEnabled','qualityFirst','resolutionFirst','foreignLangKill','exclude4K','excludeDV','quickStart','langExclusive','langsSet','simpleMode','dedupMerge','preloadEnabled','patchCinemeta','installAIOMeta','nzbFailover'].forEach(k => pick(k, v => typeof v === 'boolean'));
+  ['p2pEnabled','qualityFirst','resolutionFirst','foreignLangKill','exclude4K','excludeDV','excludeHDR','quickStart','langExclusive','langsSet','simpleMode','dedupMerge','preloadEnabled','patchCinemeta','installAIOMeta','nzbFailover'].forEach(k => pick(k, v => typeof v === 'boolean'));
   pick('autoPlayMethod', v => ['matchingFile','matchingIndex','firstFile'].includes(v));
   pick('addonTimeout', v => [4000,6000,8000,10000].includes(Number(v)));
   if (Array.isArray(d.multiServices)) out.multiServices = d.multiServices.filter(v => SVC_IDS.includes(v));
@@ -1797,6 +1802,7 @@ function outputProfileContext() {
     resolutionFirst: Boolean(S.resolutionFirst),
     exclude4K: Boolean(S.exclude4K),
     excludeDV: Boolean(S.excludeDV),
+    excludeHDR: Boolean(S.excludeHDR),
     aiostreamsVersion: AIOSTREAMS_COMPATIBILITY_TARGETS.includes(S.aiostreamsVersion) ? S.aiostreamsVersion : DEFAULT_AIOSTREAMS_VERSION,
     preservedPresetIds: (S._importedPresets || []).map(preset => preset.instanceId),
     preserveFields: Object.keys(S._migrationKeep || {}),
@@ -2125,7 +2131,7 @@ function renderAdvancedPanel() {
       </div>
 
       <div>
-        <div class="ft-head" id="ft-video">${ICO.video(16,'#ec4899')} Video Preferences ${ftTip('<strong>Size Limit</strong> caps per-file size. <strong>Quality vs Resolution</strong> decides ranking priority &mdash; quality prefers REMUX/WEB-DL over raw resolution. <strong>Exclude 4K</strong> removes 2160p for bandwidth saving. <strong>Exclude DV</strong> removes Dolby Vision streams that cause purple/green tint on unsupported screens.')}</div>
+        <div class="ft-head" id="ft-video">${ICO.video(16,'#ec4899')} Video Preferences ${ftTip('<strong>Size Limit</strong> caps per-file size. <strong>Quality vs Resolution</strong> decides ranking priority &mdash; quality prefers REMUX/WEB-DL over raw resolution. <strong>Exclude 4K</strong> removes 2160p for bandwidth saving. <strong>Exclude DV</strong> removes Dolby Vision streams that cause purple/green tint on unsupported screens. <strong>Hide HDR</strong> keeps only SDR and untagged streams, for screens without HDR.')}</div>
         <div class="ft-box u-mb8">
           <div style="font-size:.78rem;font-weight:600;color:var(--th-tx3);margin-bottom:10px">Size Limit</div>
           <div class="u-row5">${sizePills}</div>
@@ -2134,6 +2140,7 @@ function renderAdvancedPanel() {
         ${prefCard('resolutionFirst','Resolution First','Higher resolution always ranks above lower, even if lower-res is cached.')}
         ${prefCard('exclude4K','Exclude 4K / UHD','Removes 2160p streams. Good for bandwidth saving.')}
         ${prefCard('excludeDV','Exclude Dolby Vision','Fixes purple/green tint on unsupported screens.')}
+        ${prefCard('excludeHDR','Hide HDR','For screens that only show SDR: hides HDR10, HDR10+, HLG and Dolby Vision streams, which look washed out there.')}
         <div class="ft-box u-mt8">
           <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px">
             <span style="font-size:.78rem;font-weight:600;color:var(--th-tx3)">How many streams to wait for</span> ${ftTip('When AIOStreams may stop waiting for slower sources: it returns once this many cached results at your target resolution have arrived, or after the time limit. <strong>Larger = more choice</strong>, slower loads. Only the Advanced and Labs profiles use it; Stable and Balanced always wait for every source.')}
@@ -4658,6 +4665,7 @@ function insights() {
   if (S.foreignLangKill !== false && cnt !== 'anime') pts.push('<b>Foreign language kill</b> — streams not in ' + (S.langs||['English']).map(escHtml).join('/') + ' are hard-blocked (Library &amp; SeaDex exempt)');
   if (S.exclude4K) pts.push('<b>4K / UHD excluded</b> — 1080p and below only');
   if (S.excludeDV) pts.push('<b>Dolby Vision excluded</b> — DV streams removed, prevents tint on unsupported screens');
+  if (S.excludeHDR) pts.push('<b>HDR hidden</b> — HDR10, HDR10+, HLG and Dolby Vision streams removed; SDR and untagged streams stay');
   if (S.sizeLimit !== 'unlimited') { const gb = escHtml(S.sizeLimit); pts.push('<b>Size limit: max ' + gb + 'GB</b> — streams over ' + gb + 'GB excluded from results'); }
   if ((S.streamPool||'normal') !== 'normal') pts.push('<b>Stream pool: ' + (S.streamPool==='max'?'Maximum':'Large') + '</b> — more streams fetched for better quality picks');
   pts.push('<b>Per-Addon Flood Guard</b> — no single scraper can flood results');
@@ -5982,7 +5990,7 @@ function parseTemplateToState(tpl) {
     service: null, device: 'generic', resolution: null, audio: 'limited', content: 'all',
     name: '', multiServices: [], sizeLimit: 'unlimited', formatter: 'family-v4',
     p2pEnabled: false, qualityFirst: false, resolutionFirst: false, foreignLangKill: true, matchMode: 'balanced',
-    exclude4K: false, excludeDV: false, langs: ['English'], langExclusive: false,
+    exclude4K: false, excludeDV: false, excludeHDR: false, langs: ['English'], langExclusive: false,
     cacheMode: 'mixed', streamPool: 'normal', simpleMode: false, outputProfile: 'auto', aiostreamsVersion: DEFAULT_AIOSTREAMS_VERSION
   };
   if (OUTPUT_PROFILES.includes(tpl?.metadata?.coreBuildsProfile)) st.outputProfile = tpl.metadata.coreBuildsProfile;
@@ -6180,6 +6188,8 @@ function parseTemplateToState(tpl) {
   // Exclude DV/4K from ESEs
   st.excludeDV = eses.some(e => e.enabled !== false && e.expression && /DV-Only Kill|visualTag.*DV/.test(e.expression));
   st.exclude4K = has4kESEKill;
+  // Hide HDR is native only: HDR10 in excludedVisualTags is its fingerprint (DV-only setups never list it).
+  st.excludeHDR = Array.isArray(c.excludedVisualTags) && c.excludedVisualTags.includes('HDR10');
 
   // Subtitle addons & languages
   // An imported AIOSubtitle (removed in AIOStreams 2.36.0) becomes OpenSubtitles v3+.
@@ -6771,6 +6781,23 @@ function pwdKeepHtml(pwd) {
   return `<div class="pwd-keep" role="note"><div class="pwd-keep-head">${ICO.key(14,'#fbbf24')} Save your password now</div>
     <div class="pwd-keep-row"><code class="pwd-keep-val" data-no-i18n>${safe}</code><button type="button" class="copy-btn" data-action="copy-password">Copy</button></div>
     <div class="pwd-keep-why">You need it to change or update this setup later. Nobody, including Core Builds, can recover it.</div></div>`;
+}
+
+// Jellyfin sign-in: AIOStreams serves a Jellyfin server at <host>/jellyfin. The
+// username is the config UUID and the password is the config password
+// (routes/jellyfin/users.js AuthenticateByName, AIOStreams 2.36).
+function jellyfinSignInHtml(host, uuid, pwd, hostLabel) {
+  const server = `${String(host).replace(/\/$/, '')}/jellyfin`;
+  const row = (label, value, copyable = true) => `<div class="jf-row"><span class="jf-lbl">${label}</span><code class="jf-val" data-no-i18n>${escHtml(value)}</code>${copyable ? `<button type="button" class="copy-btn" data-action="copy-manifest" data-url="${escHtml(value)}">Copy</button>` : ''}</div>`;
+  return `<div class="u-mt12 import-success jf-signin" role="status">
+    <strong class="u-tx">Saved on ${escHtml(hostLabel || server)} — sign in from Jellyfin</strong>
+    <div class="u-note">In your Jellyfin app, add a server, enter this address, then sign in. Your streams appear as a library there.</div>
+    ${row('Server', server)}
+    ${row('Username', uuid || '')}
+    <div class="u-note">Password: your config password, shown below.</div>
+    ${pwdKeepHtml(pwd)}
+    <div class="u-hint">Jellyfin apps differ in what they can play. If one won't connect, check that its address field has the full server address, including <code data-no-i18n>/jellyfin</code>.</div>
+  </div>`;
 }
 
 function showManifestModal(manifestUrl, password, hostLabel, initialTab) {
@@ -8157,6 +8184,7 @@ function applyQuickProfile(profile) {
   S.formatter = 'family-v4';
   S.matchMode = 'balanced';
   S.excludeDV = false;
+  S.excludeHDR = false;
   S.exclude4K = false;
   if (profile === 'fast') {
     Object.assign(S, { resolution:'1080p', audio:'limited', cacheMode:'ready', streamPool:'normal', sizeLimit:'20', qualityFirst:false, resolutionFirst:true });
@@ -8216,7 +8244,7 @@ const EXPRESS_PROFILES = [
 ];
 // Logos for the phone layout's list rows (hidden on wider screens).
 // Core Builds Icon Pack glyphs where the pack has one; the configurator's own icons otherwise.
-const EXPRESS_GLYPH = { app:'stremio', nuvio:'nuvio', wuplay:'wuplay', chillio:'chillio', 'torbox-pro':'torbox', realdebrid:'realdebrid', alldebrid:'alldebrid', premiumize:'premiumize' };
+const EXPRESS_GLYPH = { app:'stremio', nuvio:'nuvio', wuplay:'wuplay', chillio:'chillio', jellyfin:'jellyfin', 'torbox-pro':'torbox', realdebrid:'realdebrid', alldebrid:'alldebrid', premiumize:'premiumize' };
 function expressIcon(kind, v) {
   const g = BRAND_GLYPHS[EXPRESS_GLYPH[v]];
   if (g) return `<span class="fl-ico fl-glyph" aria-hidden="true">${g}</span>`;
@@ -8330,7 +8358,7 @@ function showExpressLane(resume = null) {
       <div class="ux-card">
         <div class="ux-seg" role="group" aria-label="Delivery mode">${[['direct','Direct Install'],['manifest','Manifest URL'],['json','Raw JSON']].map(([v,n]) => `<button type="button" data-express-mode="${v}" aria-pressed="${state.mode===v}">${n}</button>`).join('')}</div><p class="ux-hint" id="expressModeHelp"></p>
         <div class="ux-field-label">App</div>
-        <div class="fastlane-grid ux-rows" role="group" aria-label="App">${[['app','Stremio','Recommended — direct install'],['nuvio','Nuvio','Manifest URL'],['wuplay','WuPlay','Manifest URL'],['chillio','Chillio','ChillLink URL'],['manifest','Other app','Copy manifest']].map(([v,n,d])=>`<button type="button" class="fastlane-choice${state.target===v?' active':''}" data-express-target="${v}">${expressIcon('target', v)}<b>${n}</b><span>${d}</span></button>`).join('')}</div>
+        <div class="fastlane-grid ux-rows" role="group" aria-label="App">${[['app','Stremio','Recommended — direct install'],['nuvio','Nuvio','Manifest URL'],['wuplay','WuPlay','Manifest URL'],['chillio','Chillio','ChillLink URL'],['jellyfin','Jellyfin','Server sign-in'],['manifest','Other app','Copy manifest']].map(([v,n,d])=>`<button type="button" class="fastlane-choice${state.target===v?' active':''}" data-express-target="${v}">${expressIcon('target', v)}<b>${n}</b><span>${d}</span></button>`).join('')}</div>
       <div id="expressStremio"${state.target==='app'?'':' style="display:none"'}>
         <div class="fastlane-pair ux-pair">
           <input class="fastlane-field" id="stremioEmailInline" type="email" autocomplete="username" placeholder="Stremio email" value="${escH(S.stremioEmail||'')}">
@@ -8472,11 +8500,11 @@ function showExpressLane(resume = null) {
     const svcName = (EXPRESS_SERVICES.find(([v]) => v === state.service) || [null, state.service || '—'])[1];
     const profName = { fast:'Fast', balanced:'Balanced', maximum:'Maximum' }[state.profile] || 'Balanced';
     const resName = { '4k':'4K', '1080p':'1080p', mixed:'Mixed' }[state.resolution] || '4K';
-    const tgtName = { app:'Stremio', nuvio:'Nuvio', wuplay:'WuPlay', chillio:'Chillio', manifest:'Manifest URL' }[state.target] || 'Stremio';
+    const tgtName = { app:'Stremio', nuvio:'Nuvio', wuplay:'WuPlay', chillio:'Chillio', jellyfin:'Jellyfin', manifest:'Manifest URL' }[state.target] || 'Stremio';
     const cacheName = S.cacheMode === 'cached' ? '⚡ Cached only' : S.cacheMode === 'ready' ? '⚡ Ready to play first' : S.cacheMode === 'uncached' ? 'Uncached only' : 'Mixed cache (uncached may download first)';
     const fsOn = document.getElementById('expressFullStack')?.checked;
     const chip = (t, cls = '') => `<span class="ux-chip${cls}">${t}</span>`;
-    elSum.innerHTML = [chip(`${escHtml(svcName)} → ${escHtml(tgtName)}`), chip(OUTPUT_PROFILE_INFO[activeOutputProfile()].label), chip(`search ${profName}`), chip(escHtml(resName)), chip(escHtml(state.lang)), chip(cacheName, (S.cacheMode === 'cached' || S.cacheMode === 'ready') ? ' ok' : ' warn'), chip(`host ${escHtml(HOST_LABEL_MAP[S.instanceHost] || S.instanceHost || 'auto')}`), fsOn ? chip('+ full stack (AIOMetadata + Cinemeta patch)') : ''].join('');
+    elSum.innerHTML = [chip(`${escHtml(svcName)} → ${escHtml(tgtName)}`), chip(OUTPUT_PROFILE_INFO[activeOutputProfile()].label), chip(`search ${profName}`), chip(escHtml(resName)), chip(escHtml(state.lang)), chip(cacheName, (S.cacheMode === 'cached' || S.cacheMode === 'ready') ? ' ok' : ' warn'), (state.target === 'jellyfin' && S.instanceHost !== 'custom' && HOST_META[S.instanceHost]?.jellyfin !== true ? chip('host: one with Jellyfin turned on') : chip(`host ${escHtml(HOST_LABEL_MAP[S.instanceHost] || S.instanceHost || 'auto')}`)), fsOn ? chip('+ full stack (AIOMetadata + Cinemeta patch)') : ''].join('');
     const ph = document.getElementById('expressProfileHint');
     if (ph) { const pr = EXPRESS_PROFILES.find(([v]) => v === state.profile); ph.textContent = pr ? pr[2] + (state.profile === 'balanced' ? ' · Recommended' : '') : ''; }
     const ch = document.getElementById('expressCacheHint');
@@ -8686,7 +8714,7 @@ function expressDefaultRows() {
   const subs = (S.subtitleAddons || []).length ? `${(S.subtitleLangs || ['en']).map(l => String(l).toUpperCase()).join(', ')} · ${(S.subtitleAddons || []).length} source${(S.subtitleAddons || []).length > 1 ? 's' : ''}` : 'Off';
   return [
     ['ft-audio', 'Audio', label('audio', S.audio)],
-    ['ft-video', 'Size and quality', `${S.sizeLimit === 'unlimited' || !S.sizeLimit ? 'No size limit' : escHtml(String(S.sizeLimit))}${S.exclude4K ? ' · no 4K' : ''}${S.excludeDV ? ' · no Dolby Vision' : ''}`],
+    ['ft-video', 'Size and quality', `${S.sizeLimit === 'unlimited' || !S.sizeLimit ? 'No size limit' : escHtml(String(S.sizeLimit))}${S.exclude4K ? ' · no 4K' : ''}${S.excludeDV ? ' · no Dolby Vision' : ''}${S.excludeHDR ? ' · no HDR' : ''}`],
     ['ft-subtitles', 'Subtitles', escHtml(subs)],
     ['ft-catalogs', 'Catalogs', `${(S.catalogs || []).length} on`],
   ];
@@ -8756,7 +8784,7 @@ async function runExpressInstall(p) {
     // Renders progress + result into the modal's #aioResult.
     // Chillio keeps its own tab in the manifest modal; every other non-Stremio
     // target (WuPlay, Nuvio, Other app) collapses to the generic manifest tab.
-    await simpleInstall(p.target === 'app' && p.mode !== 'manifest' ? 'app' : (p.target === 'wuplay' ? 'wuplay' : (p.target === 'chillio' ? 'chillio' : 'manifest')), { profile: p.profile });
+    await simpleInstall(p.target === 'app' && p.mode !== 'manifest' ? 'app' : (p.target === 'wuplay' ? 'wuplay' : (p.target === 'chillio' ? 'chillio' : (p.target === 'jellyfin' ? 'jellyfin' : 'manifest'))), { profile: p.profile });
   } catch (err) {
     showToast('Install failed: ' + (err?.message || err), true);
   }
@@ -8972,7 +9000,7 @@ async function simpleInstall(target, { profile = '' } = {}) {
   const deployment = showDeploymentProgress(['Compile manifest configuration', 'Check AIOStreams host & latency', 'Check host regex compatibility', 'Save configuration through relay', target === 'app' ? 'Install & verify Stremio addons' : 'Prepare your install link']);
   deployment.advance(1, 'Configuration compiled locally. Checking your selected host…');
   try {
-    const fastest = await resolveInstallHost(4000);
+    const fastest = await resolveInstallHost(4000, { target });
     deployment.advance(2, 'Host selected. Checking regex compatibility…');
     // Regex-allowlist preflight (2026-09-06 race diagnosis): the same union
     // the host validates (synced URLs resolved live + inline patterns),
@@ -9035,6 +9063,12 @@ async function simpleInstall(target, { profile = '' } = {}) {
         }
       }
       btn.disabled = false; btn.innerHTML = origHtml;
+      if (target === 'jellyfin') {
+        deployment.settle(true, 'Saved. Sign in from your Jellyfin app with the details below.');
+        result.innerHTML = jellyfinSignInHtml(fastest, uuid, pwd, hostLbl);
+        showToast('Saved — sign in from your Jellyfin app');
+        return;
+      }
       // The manifest modal is a z-index 200 layer; Express sits at 10020. Close
       // Express first or the URL the user came for opens hidden behind it.
       deployment.close();

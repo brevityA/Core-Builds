@@ -234,3 +234,13 @@ test('auto routing keeps every host for a config with no gated keys', () => {
   const keys = autoRoutableHostKeys({ service: 'torbox-pro', config: {} });
   assert.equal(keys.length, Object.keys(HOST_META).length);
 });
+
+test('the Jellyfin target routes only to hosts that serve Jellyfin', () => {
+  const keys = autoRoutableHostKeys({ service: 'torbox-pro', config: {}, target: 'jellyfin' });
+  assert.ok(keys.length > 0);
+  assert.ok(!keys.includes('elfhosted'), 'ElfHosted has Jellyfin turned off');
+  for (const k of keys) assert.equal(HOST_META[k].jellyfin, true, k);
+  // Every registry host says whether it serves Jellyfin, so the filter never guesses.
+  for (const [k, meta] of Object.entries(HOST_META)) assert.equal(typeof meta.jellyfin, 'boolean', k);
+  assert.ok(autoRoutableHostKeys({ service: 'torbox-pro', config: {} }).includes('elfhosted'), 'other targets unchanged');
+});

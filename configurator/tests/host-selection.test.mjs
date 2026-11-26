@@ -5,24 +5,25 @@ import { readFile } from 'node:fs/promises';
 const app = await readFile(new URL('../src/js/app.js', import.meta.url), 'utf8');
 
 test('explicit host honoring layer exists (resolveInstallHost + checkHostVersion)', () => {
-  assert.match(app, /async function resolveInstallHost\(timeout=4000\)/);
+  assert.match(app, /async function resolveInstallHost\(timeout=4000, opts=\{\}\)/);
   assert.match(app, /async function checkHostVersion\(baseUrl, timeout, hostKeyOrLabel\)/);
 });
 
 test('explicit dropdown selection probes ONLY that host; auto keeps the health probe', () => {
-  const m = app.match(/async function resolveInstallHost\(timeout=4000\) \{([\s\S]*?)\n\}/);
+  const m = app.match(/async function resolveInstallHost\(timeout=4000, opts=\{\}\) \{([\s\S]*?)\n\}/);
   assert.ok(m);
   const body = m[1];
   assert.match(body, /HOST_BASE_URLS\[key\]/, 'explicit selection resolves its own URL');
   assert.match(body, /checkHostVersion\(url, timeout, key\)/, 'explicit selection is version-gated');
+  assert.match(body, /jellyfinOff/, 'a picked host without Jellyfin falls through to the Jellyfin-only auto pick');
   assert.match(body, /HOST_BLOCKS_FREE/, 'explicit selection refuses free-unsupported hosts instead of writing a broken config');
-  assert.match(body, /return selectHealthyHost\(timeout\);/, "'auto' keeps existing fastest-healthy behavior");
+  assert.match(body, /return selectHealthyHost\(timeout, opts\);/, "'auto' keeps existing fastest-healthy behavior");
 });
 
 test('no write path silently probes all hosts anymore (the silent-failover bug)', () => {
   const direct = (app.match(/await selectHealthyHost\(4000\)/g) || []).length;
   assert.equal(direct, 1, 'the ONLY direct fastest-probe call in the app is the self-heal fallback inside quick-rebuild');
-  const count = (app.match(/await resolveInstallHost\(4000\)/g) || []).length;
+  const count = (app.match(/await resolveInstallHost\(4000(?:, \{ target \})?\)/g) || []).length;
   assert.ok(count >= 3, `expected ≥3 honored call sites (direct, express, update wizard), got ${count}`);
 });
 

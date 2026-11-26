@@ -219,3 +219,10 @@ a.core-tool-door:focus-visible{outline:2px solid #67e8f9;outline-offset:3px}
 .aio-err-help b{color:var(--th-tx,#e6edf3)}
 [data-theme="light"] .aio-err-help{background:rgba(0,0,0,.03);border-color:rgba(0,0,0,.1);color:#44515e}
 [data-theme="light"] .aio-err-help b{color:#1c2128}
+
+/* Jellyfin sign-in details (v3.50) */
+.jf-signin{display:flex;flex-direction:column;gap:8px;text-align:left}
+.jf-row{display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px;min-width:0}
+.jf-lbl{flex:0 0 100%;font-size:.72rem;font-weight:700;letter-spacing:.04em;color:var(--th-tx3)}
+.jf-val{flex:1;min-width:0;overflow-wrap:anywhere;font:600 .78rem ui-monospace,Menlo,monospace;color:var(--th-tx,#e6edf3);background:rgba(255,255,255,.05);padding:5px 8px;border-radius:6px}
+[data-theme="light"] .jf-val{background:rgba(0,0,0,.05);color:#1c2128}

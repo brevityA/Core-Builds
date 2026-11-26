@@ -507,6 +507,16 @@ function stripNonSchemaPresetKeys(config) {
   });
 }
 
+export const HDR_VISUAL_TAGS = Object.freeze(['HDR', 'HDR10', 'HDR10+', 'HLG', 'DV', 'HDR+DV', 'DV Only', 'HDR Only']);
+
+// Hide HDR, for SDR-only screens: a native filter on every profile (Advanced and
+// Labs skip applyNativeFilters). AIOStreams matches each tag exactly and adds
+// HDR+DV, DV Only and HDR Only itself, so every HDR spelling is listed.
+function applyHideHdr(config, context) {
+  if (!context.excludeHDR) return;
+  config.excludedVisualTags = unique([...values(config.excludedVisualTags), ...HDR_VISUAL_TAGS]);
+}
+
 function applyNativeFilters(config, context) {
   config.excludedQualities = unique([
     ...values(config.excludedQualities),
@@ -737,6 +747,7 @@ export function applyOutputProfile(rawTemplate, requestedProfile = 'auto', conte
     if (ALLOWED_MIGRATION_FIELDS.has(key) && key !== 'parentConfig') delete template.config[key];
   }
 
+  applyHideHdr(template.config, context);
   applyReadyFirst(template.config, context);
   enforceLocalExpressionPolicy(template.config);
   preventStackedFetchExits(template.config);
