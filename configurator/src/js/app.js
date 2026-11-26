@@ -8428,7 +8428,7 @@ function showExpressLane(resume = null) {
         <div class="input-action-wrap"><input class="fastlane-field" id="expressMdblist" type="password" autocomplete="off" spellcheck="false" placeholder="Adds MDBList ratings and lists" value="${escH(S.metaKeys?.mdblist || '')}" style="width:100%"><button type="button" class="input-paste-btn" data-action="paste-input" data-target="expressMdblist">Paste</button></div>
         <label class="fastlane-sublabel" for="expressRpdb">RPDB API key · optional</label>
         <div class="input-action-wrap"><input class="fastlane-field" id="expressRpdb" type="password" autocomplete="off" spellcheck="false" placeholder="Adds rating badges to posters" value="${escH(S.metaKeys?.rpdb || '')}" style="width:100%"><button type="button" class="input-paste-btn" data-action="paste-input" data-target="expressRpdb">Paste</button></div>
-        <p class="fastlane-trust">Keys go to the new AIOMetadata config only and stay in this browser. An AIOMetadata you already set up is kept as it is; add keys on its own configure page.</p>
+        <p class="fastlane-trust">Keys are saved in this browser and sent only to AIOMetadata (ElfHosted), inside the new config. An AIOMetadata you already set up is kept as it is; add keys on its own configure page.</p>
         <button type="button" class="fs-reset" data-action="reset-cinemeta">Restore the original Cinemeta on my Stremio account</button>
         <div id="cinemetaResetResult" role="status" aria-live="polite"></div>
       </div>
@@ -9271,7 +9271,9 @@ async function fullStackAfterPush(authKey, aiostreamsUrl, opts = {}) {
           : [...fresh.filter(a => !isBareAioMetadata(a) && a.transportUrl !== aiometaUrl), { transportName:'http', transportUrl: aiometaUrl, flags:{} }];
         const setData = await stremioFetch('https://api.strem.io/api/addonCollectionSet', { type:'AddonCollectionSet', authKey, addons: updated });
         if (!setData?.result) throw new Error(stremioErrText(setData?.error, 'install failed'));
-        steps.push(`✓ AIOMetadata configured and installed${hadBare ? ' (replaced the empty one from an earlier install)' : ''} — its password is the same as AIOStreams'`);
+        steps.push(addedMeanwhile
+          ? '✓ AIOMetadata already installed — an existing config appeared on your account and was kept, with its own password'
+          : `✓ AIOMetadata configured and installed${hadBare ? ' (replaced the empty one from an earlier install)' : ''} — its password is the same as AIOStreams'`);
       }
     } catch(e) { aiometaUrl = ''; errors.push('AIOMetadata: ' + e.message); }
   }
@@ -9344,11 +9346,14 @@ async function resetCinemetaOnAccount() {
     const login = await stremioFetch('https://api.strem.io/api/login', { type:'Login', email, password, facebook:false });
     const authKey = login?.result?.authKey;
     if (!authKey) throw new Error(stremioErrText(login?.error, 'Login failed — check your email and password.'));
+    // Fetch the manifest first, then read the account right before the write, so
+    // the window in which another device's change could be lost stays as short as
+    // the Stremio API allows (AddonCollectionSet has no conditional write).
+    const res = await fetchWithTimeout(CINEMETA_MANIFEST_URL, { method:'GET' }, 10000);
+    const original = res.ok ? await res.json().catch(() => null) : null;
     const got = await stremioFetch('https://api.strem.io/api/addonCollectionGet', { type:'AddonCollectionGet', authKey, update:true });
     const addons = got?.result?.addons;
     if (!Array.isArray(addons)) throw new Error(stremioErrText(got?.error, 'Could not read your addon list, so nothing was changed.'));
-    const res = await fetchWithTimeout(CINEMETA_MANIFEST_URL, { method:'GET' }, 10000);
-    const original = res.ok ? await res.json().catch(() => null) : null;
     const r = resetCinemetaInCollection(addons, original);
     if (r.reason === 'not-installed') { say('Cinemeta is not on this account, so there was nothing to restore.'); return; }
     if (!r.patched) throw new Error('Could not load the original Cinemeta from Stremio, so nothing was changed.');

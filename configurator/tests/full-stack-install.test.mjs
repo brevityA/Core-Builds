@@ -172,6 +172,8 @@ test('a configured AIOMetadata added while the config was saving is used, never 
   assert.equal(r.ok, true, r.errors.join(' '));
   const metas = state.addons.filter(cp.isConfiguredAioMetadata);
   assert.deepEqual(metas.map(a => a.transportUrl), [other.transportUrl]);
+  assert.match(r.steps.join(' '), /existing config appeared on your account and was kept/);
+  assert.doesNotMatch(r.steps.join(' '), /same as AIOStreams/);
 });
 
 test('AIOMetadata keys and Cinemeta choices stay local: never in share links', () => {
