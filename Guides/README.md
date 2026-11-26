@@ -543,7 +543,7 @@ You can enable more than one service simultaneously. AIOStreams will query all e
 
 **TorBox Pro vs Essential** — The template tier (Pro/Essential) refers to your TorBox plan's features (Usenet access, cacheAndPlay). If you switch to a different debrid service entirely, any template works — the Pro/Essential label is only relevant when using TorBox.
 
-**Flash templates** — Flash shows only cached streams while there are any, and the ones that still need downloading when the service has none cached for a title. This works with any debrid service, but how often you get instant play depends on what that service has already cached: with a smaller cache, Flash falls back to downloads more often than with TorBox or RD.
+**Flash templates** — Flash shows only cached streams while there are any, and the ones that still need downloading when the service has none cached for a title; titles released in the last 3 days always show both. This works with any debrid service, but how often you get instant play depends on what that service has already cached: with a smaller cache, Flash falls back to downloads more often than with TorBox or RD.
 
 ---
 

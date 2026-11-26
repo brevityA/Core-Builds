@@ -542,8 +542,8 @@ Meteor ≤ 5, Comet ≤ 5, MediaFusion ≤ 4, EZTV ≤ 3, HdHub ≤ 3, Torrent G
 - `Essential/core-nexus-essential-lite.json` v2.10.5
 
 ### Flash
-- `Flash/core-nexus-flash-4k.json` v2.10.19 — cached-first 4K instant play (Ready to play first: downloads only when nothing is cached)
-- `Flash/core-nexus-flash.json` v2.10.18 — cached-first 1080p instant play (Ready to play first: downloads only when nothing is cached)
+- `Flash/core-nexus-flash-4k.json` v2.10.19 — cached-first 4K instant play (Ready to play first: downloads only when nothing is cached, or in a title's first 3 days)
+- `Flash/core-nexus-flash.json` v2.10.18 — cached-first 1080p instant play (Ready to play first: downloads only when nothing is cached, or in a title's first 3 days)
 
 ### Speed (TorBox)
 - `Speed/TorBox/core-nexus-speed-4k.json` v2.10.18 — fast cached 4K
