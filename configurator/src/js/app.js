@@ -2730,7 +2730,7 @@ function renderCore() {
           <div class="receipt-hdr">
             <div class="receipt-hdr-icon">${ICO.bolt(18,'#fbbf24')}</div>
             <div>
-              <div class="receipt-hdr-name">${escH(S.name || auto)}</div>
+              <div class="receipt-hdr-name" data-no-i18n>${escH(S.name || auto)}</div>
               <div class="receipt-hdr-sub">Template ready to generate</div>
             </div>
           </div>
@@ -7310,7 +7310,7 @@ function simpleFinishHtml() {
       </details>
       <div class="name-row">
         <label>Template name (optional)</label>
-        <input class="name-input" id="nameIn" type="text" placeholder="${escH(S.name)}" value="${escH(S.name)}" data-action="update-name" maxlength="60">
+        <input class="name-input" id="nameIn" data-no-i18n type="text" placeholder="${escH(S.name)}" value="${escH(S.name)}" data-action="update-name" maxlength="60">
       </div>
       ${telemetryHtml()}
       ${isFree ? `

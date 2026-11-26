@@ -58,3 +58,54 @@ test.describe('English browser', () => {
     await expect(page.getByText('Soutenir Core Builds').first()).toBeVisible();
   });
 });
+
+// CodeRabbit #862 review.
+test.describe('picker inside the wizard', () => {
+  test.use({ locale: 'en-US' });
+  const STATE = { _schema: 6, multiServices: ['torbox-pro'], device: 'generic', resolution: '4k', name: 'Custom' };
+
+  async function resumeAt(page, step) {
+    await mockSplashRequests(page);
+    await page.goto('/');
+    await page.evaluate(([s, step]) => {
+      localStorage.clear();
+      localStorage.setItem('cb_tut_seen', '1');
+      localStorage.setItem('coreBuild', JSON.stringify(s));
+      localStorage.setItem('coreBuildStep', String(step));
+    }, [STATE, step]);
+    await page.reload();
+    await page.getByRole('button', { name: 'Resume' }).click();
+  }
+
+  test('Escape and Enter in the picker stay in the picker, not Back/Next', async ({ page }) => {
+    await resumeAt(page, 2);
+    const step = () => page.evaluate(() => localStorage.getItem('coreBuildStep'));
+    expect(await step()).toBe('2');
+    await page.locator('.cb-lang-btn').click();
+    await page.keyboard.press('Escape');
+    await expect(page.locator('.cb-lang-menu')).toBeHidden();
+    await expect(page.locator('.cb-lang-btn')).toBeFocused();
+    expect(await step()).toBe('2');
+
+    await page.locator('.cb-lang-btn').press('Enter');
+    await expect(page.locator('.cb-lang-menu')).toBeVisible();
+    await page.keyboard.press('ArrowDown'); // English is checked; next is Español
+    await page.keyboard.press('Enter');
+    await expect(page.locator('html')).toHaveAttribute('lang', 'es');
+    expect(await step()).toBe('2');
+  });
+
+  test('a template the user named "Custom" keeps its name', async ({ page }) => {
+    await resumeAt(page, 6);
+    await page.locator('.cb-lang-btn').click();
+    await page.locator('.cb-lang-menu [data-lang="fr"]').click();
+    await expect(page.locator('.receipt-hdr-name')).toHaveText('Custom');
+  });
+
+  test('?lang= survives the start-up URL cleanup', async ({ page }) => {
+    await mockSplashRequests(page);
+    await page.goto('/?fresh&lang=de');
+    await expect(page.locator('html')).toHaveAttribute('lang', 'de');
+    await expect(page).not.toHaveURL(/lang=/);
+  });
+});

@@ -38,6 +38,10 @@ const PATTERNS = [
 ];
 
 let lang = 'en';
+// Read ?lang= when this module loads: loadState() strips the query string on
+// DOMContentLoaded, before initI18n() runs.
+let urlLang = null;
+try { urlLang = new URLSearchParams(location.search).get('lang'); } catch { /* no location (tests) */ }
 const textState = new WeakMap(); // Text node -> { en, out }
 const attrState = new WeakMap(); // Element -> { [attr]: { en, out } }
 
@@ -181,7 +185,13 @@ function buildButton() {
     const i = items.indexOf(document.activeElement);
     if (e.key === 'ArrowDown') { e.preventDefault(); items[(i + 1) % items.length].focus(); }
     else if (e.key === 'ArrowUp') { e.preventDefault(); items[(i - 1 + items.length) % items.length].focus(); }
-    else if (e.key === 'Escape') { closeMenu(); btn.focus(); }
+  });
+  // The wizard binds Escape/Enter/arrows on document (Back, Next). Keys pressed
+  // inside the picker are the picker's: stop them here, without preventing the
+  // buttons' own Enter/Space activation.
+  wrap.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && !menu.hidden) { closeMenu(); btn.focus(); }
+    e.stopPropagation();
   });
   document.addEventListener('click', e => { if (!wrap.contains(e.target)) closeMenu(); });
   document.body.appendChild(wrap);
@@ -190,8 +200,6 @@ function buildButton() {
 export function initI18n() {
   let stored = null;
   try { stored = localStorage.getItem(STORE_KEY); } catch { /* no storage: fall back to the browser */ }
-  let urlLang = null;
-  try { urlLang = new URLSearchParams(location.search).get('lang'); } catch { /* ignore */ }
   lang = detectLang(navigator.languages || [navigator.language], IDS.includes(urlLang) ? urlLang : stored);
   document.documentElement.lang = lang;
   buildButton();
