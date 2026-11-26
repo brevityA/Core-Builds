@@ -1,4 +1,9 @@
 export const CHANGELOG = [
+  { v:'3.43', date:'Nov 25 2026', items:[
+    'Configurator in Español, Português, Français and Deutsch — a language button at the top right switches the interface. It starts in your browser’s language when that is one of the five, remembers your pick on this device, and a link ending in ?lang=es (or pt, fr, de) opens in that language. The main page, menu, message form, Quick install, the guided step titles and choices, and the main Review and Export controls are translated; deeper Fine-Tune options, help pop-ups and error messages are still in English for now. Service, app, host and stream-card names stay as they are.',
+    'Quick install defaults list fits longer words — on a narrow phone the “How results look” row could squeeze its value to nothing. The label now wraps instead.',
+    'Generated output unchanged — every reference config is byte-for-byte what 3.42 produced apart from the version stamp; the language only changes what the page shows, never the config it builds.',
+  ]},
   { v:'3.42', date:'Nov 25 2026', items:[
     'HDR labels without a doubled star — the Apex, Apex v2 and Elite stream cards showed “🌟 🌟 HDR¹⁰” on HDR10 streams and “✨ 🌟 HDR¹⁰⁺” on HDR10+ ones: the label chain turned HDR10 into HDR¹⁰ and then replaced the HDR inside it again. Each tag now gets one badge.',
     'Command-line builds match the configurator — the core-builds CLI carried its own copy of the stream-card formatters that had fallen behind: its elite-group, HDR, IMAX, Hybrid and DD+ badges never showed, and it lacked the three Core formatters. It is now generated from the configurator’s formatters, and a test keeps the two identical.',

@@ -1,14 +1,30 @@
 ---
-title: "What's New — Configurator v3.42"
+title: "What's New — Configurator v3.43"
 sidebarTitle: "What's New"
-description: "Latest Core Builds Configurator releases (v3.42 and earlier), auto-generated from the in-app changelog."
+description: "Latest Core Builds Configurator releases (v3.43 and earlier), auto-generated from the in-app changelog."
 ---
 
 # What's New in the Configurator
 
-This page is regenerated from `configurator/src/data/changelog.js` by `scripts/sync-docs.py`, so it always reflects the latest shipped configurator version (currently **v3.42**).
+This page is regenerated from `configurator/src/data/changelog.js` by `scripts/sync-docs.py`, so it always reflects the latest shipped configurator version (currently **v3.43**).
 
 For the template-suite release log, see the [Changelog](https://corebuilds-docs.docsalot.dev/changelog).
+
+## Configurator v3.43 (Nov 25 2026)
+
+<CardGroup cols={2}>
+  <Card title="Configurator in Español, Português, Français and Deutsch" icon="sparkles">
+    a language button at the top right switches the interface. It starts in your browser’s language when that is one of the five, remembers your pick on this device, and a link ending in ?lang=es (or pt, fr, de) opens in that language. The main page, menu, message form, Quick install, the guided step titles and choices, and the main Review and Export controls are translated; deeper Fine-Tune options, help pop-ups and error messages are still in English for now. Service, app, host and stream-card names stay as they are.
+  </Card>
+  <Card title="Quick install defaults list fits longer words" icon="bolt">
+    on a narrow phone the “How results look” row could squeeze its value to nothing. The label now wraps instead.
+  </Card>
+  <Card title="Generated output unchanged" icon="shield-check">
+    every reference config is byte-for-byte what 3.42 produced apart from the version stamp; the language only changes what the page shows, never the config it builds.
+  </Card>
+</CardGroup>
+
+---
 
 ## Configurator v3.42 (Nov 25 2026)
 
@@ -47,21 +63,5 @@ For the template-suite release log, see the [Changelog](https://corebuilds-docs.
   </Card>
   <Card title="Generated output unchanged" icon="bolt">
     every reference config is byte-for-byte what 3.39 produced apart from the version stamp; only the Update my setup card and dialog changed.
-  </Card>
-</CardGroup>
-
----
-
-## Configurator v3.39 (Nov 21 2026)
-
-<CardGroup cols={2}>
-  <Card title="Built for AIOStreams 2.38.1" icon="sparkles">
-    the configurator now targets 2.38.1, the release most public hosts run, instead of 2.36.0. The builds themselves are the same: 2.37 and 2.38 only added things Core Builds does not use (a custom poster URL and the Cinemeta and Xtream addons), so a build still saves on hosts running 2.36 or 2.37. Each build’s metadata now names 2.38.1 as its target. A setup saved on the old 2.36.0 default moves to 2.38.1 once; 2.36.0 can still be picked in Review.
-  </Card>
-  <Card title="Host list brought up to date" icon="bolt">
-    the host picker showed 2.36.0 for seven hosts and 2.35.9 for Omni’s. Checked against each host on 21 November: ElfHosted, ForTheWeak, Midnight’s, Wizaardd and Viren’s nightly run 2.38.1, Kuu’s and Omni’s run 2.37.0, ATBP runs 2.36.0. Omni’s is no longer marked legacy, and Anime builds are offered there again.
-  </Card>
-  <Card title="Stream cards unchanged" icon="shield-check">
-    every card was re-rendered with AIOStreams 2.38.1’s formatter engine and looks exactly as it did under 2.36.0.
   </Card>
 </CardGroup>

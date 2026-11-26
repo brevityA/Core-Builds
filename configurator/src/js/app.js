@@ -14,6 +14,7 @@ import { PROVIDER_CREDENTIALS } from '../data/credentials.js';
 import { serviceCredentialKeys, serviceCredentials } from '../data/credentials.js';
 import { initErrorLogger, logError, errorLogHtml, formatErrorLog, clearErrorLog, exportErrorLog } from './error-logger.js';
 import { initContactWidget } from './contact-widget.js';
+import { initI18n } from './i18n.js';
 import { calculateBitrateLimit, DEVICE_BANDWIDTH_HINTS } from '../data/bandwidth.js';
 import { hasTmdbCredentials, templateInput } from '../core/template-policy.js';
 import { resolutionPolicy, encodePolicy, audioPolicy } from '../core/device-policies.js';
@@ -53,7 +54,7 @@ const STEPS = 6;
 // workflow) the raw x.y here expands to x.y.0 in package.json / versions.json and
 // the release tag; the built badge drops the trailing .0. At the 2026-09-06
 // audit the release tag was v3.7.0 while this said 3.1 — they must move together.
-const CONFIGURATOR_VERSION = '3.42';
+const CONFIGURATOR_VERSION = '3.43';
 // Set to a collector endpoint to enable the opt-in anonymous usage ping (service+device+resolution only).
 // Leave empty to keep the feature fully disabled and hidden.
 const USAGE_BEACON_URL = '';
@@ -2729,7 +2730,7 @@ function renderCore() {
           <div class="receipt-hdr">
             <div class="receipt-hdr-icon">${ICO.bolt(18,'#fbbf24')}</div>
             <div>
-              <div class="receipt-hdr-name">${escH(S.name || auto)}</div>
+              <div class="receipt-hdr-name" data-no-i18n>${escH(S.name || auto)}</div>
               <div class="receipt-hdr-sub">Template ready to generate</div>
             </div>
           </div>
@@ -3335,6 +3336,7 @@ document.addEventListener('DOMContentLoaded', () => {
   checkForTemplateUpdate();
   setInterval(checkForTemplateUpdate, 60 * 60 * 1000);
   initErrorLogger();
+  initI18n();
   initContactWidget(() => ({
     service: S.service === 'multi' ? 'multi' : S.service,
     device: S.device,
@@ -7308,7 +7310,7 @@ function simpleFinishHtml() {
       </details>
       <div class="name-row">
         <label>Template name (optional)</label>
-        <input class="name-input" id="nameIn" type="text" placeholder="${escH(S.name)}" value="${escH(S.name)}" data-action="update-name" maxlength="60">
+        <input class="name-input" id="nameIn" data-no-i18n type="text" placeholder="${escH(S.name)}" value="${escH(S.name)}" data-action="update-name" maxlength="60">
       </div>
       ${telemetryHtml()}
       ${isFree ? `
