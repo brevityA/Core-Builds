@@ -159,3 +159,33 @@ test('Open Nuvio keeps a badge link the user just copied', async ({ page, contex
   await expect(page.locator('#toast')).toContainText('Manifest URL copied');
   expect(await clip()).toBe(manifest);
 });
+
+test('with Sharper Nuvio badges on, the Nuvio route carries the markers and offers the Enhanced pack', async ({ page }) => {
+  let uploaded = '';
+  await page.route('**/*', async route => {
+    const url = route.request().url();
+    if (url.includes('core-builds-cors-proxy') && url.endsWith('/paste')) return route.fulfill({ status: 503, contentType: 'application/json', body: '{}' });
+    if (url.startsWith('https://paste.rs/')) return route.abort('failed');
+    if (url.startsWith('https://dpaste.com/api/v2/')) {
+      uploaded = new URLSearchParams(route.request().postData() || '').get('content') || '';
+      return route.fulfill({ status: 200, contentType: 'text/plain', body: 'https://dpaste.com/nuvio-enhanced' });
+    }
+    const host = new URL(url).hostname;
+    return ['127.0.0.1', 'localhost'].includes(host) ? route.continue() : route.fulfill({ status: 503, body: '' });
+  });
+  await page.goto('/?cb-e2e=1');
+  await page.evaluate(() => { localStorage.clear(); localStorage.setItem('cb_tut_seen', '1'); });
+  await page.reload();
+  await page.waitForFunction(() => Boolean(window.__coreBuilds));
+  await page.evaluate(() => window.__coreBuilds.generate({ service: 'p2p', multiServices: ['p2p'], device: 'samsung', resolution: '1080p', content: 'all', nuvioBadgeMarkers: true }));
+  await page.locator('[data-action="open-express-lane"]').click();
+  await page.locator('#expressHost').selectOption('midnight');
+  await page.locator('[data-express-target="nuvio"]').click();
+  await page.locator('#expressGo').click();
+  await expect(page.locator('#aioResult')).toContainText('Nuvio template ready');
+  const card = page.locator('#aioResult .nv-badges');
+  await expect(card.locator('.jf-lbl')).toHaveText('Core Neon · AIO Enhanced');
+  await expect(card.locator('.jf-val')).toHaveText(/core-neon-enhanced\.json$/);
+  const ov = Object.values(JSON.parse(uploaded).config.formatter.definitions.overrides)[0];
+  expect(`${ov.name}${ov.description}`).toContain('⁠');
+});
