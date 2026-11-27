@@ -227,6 +227,10 @@ a.core-tool-door:focus-visible{outline:2px solid #67e8f9;outline-offset:3px}
 .jf-val{flex:1;min-width:0;overflow-wrap:anywhere;font:600 .78rem ui-monospace,Menlo,monospace;color:var(--th-tx,#e6edf3);background:rgba(255,255,255,.05);padding:5px 8px;border-radius:6px}
 [data-theme="light"] .jf-val{background:rgba(0,0,0,.05);color:#1c2128}
 
+/* Nuvio badge card (v3.53) */
+.nv-steps{margin:0;padding-left:20px;font-size:.78rem;line-height:1.6;color:var(--th-tx2,#c9d1d9)}
+.nv-badges .community-link{font-size:.78rem;align-self:flex-start}
+
 /* Full stack options in Quick install (v3.51) */
 .fs-opts{display:flex;flex-direction:column;gap:6px;margin:4px 0 8px 30px}
 .fs-opts[hidden]{display:none}

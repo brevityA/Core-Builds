@@ -64,8 +64,36 @@ for (const service of ['p2p', 'torbox-pro']) {
     expect(invalidSortCriteria(template.config.sortCriteria)).toEqual([]);
     expect(validateConfigOptions(template.config).ok).toBe(true);
     await expect(page.locator('#aioResult')).toContainText(/import.*AIOStreams/i);
+    // Badges are offered as a Nuvio-side link; the uploaded config carries none.
+    const card = page.locator('#aioResult .nv-badges');
+    await expect(card).toContainText('Optional: add stream badges in Nuvio');
+    await expect(card.locator('.jf-val')).toHaveText('https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/published/core-neon-universal.json');
+    await expect(card.locator('a.community-link')).toHaveAttribute('href', '../tools/badges/');
+    expect(uploadedTemplate).not.toContain('tools/badges');
   });
 }
+
+test('a device without Dolby Vision is offered the No DV badge pack, also when the upload fails', async ({ page }) => {
+  await page.route('**/*', route => {
+    const url = new URL(route.request().url());
+    return ['127.0.0.1', 'localhost'].includes(url.hostname) ? route.continue() : route.fulfill({ status: 503, body: 'Unavailable' });
+  });
+  await page.goto('/?cb-e2e=1');
+  await page.evaluate(() => { localStorage.clear(); localStorage.setItem('cb_tut_seen', '1'); });
+  await page.reload();
+  await page.waitForFunction(() => Boolean(window.__coreBuilds));
+  await page.evaluate(() => window.__coreBuilds.generate({ service: 'torbox-pro', multiServices: ['torbox-pro'], device: 'samsung', resolution: '4k', content: 'all', creds: { torbox: 'LOCAL-TORBOX-KEY' } }));
+  await page.locator('[data-action="open-express-lane"]').click();
+  await page.locator('#expressHost').selectOption('midnight');
+  await expect(page.locator('[data-express-device="samsung"]')).toHaveAttribute('aria-checked', 'true');
+  await page.locator('[data-express-target="nuvio"]').click();
+  await page.locator('#expressGo').click();
+  await expect(page.getByRole('button', { name: 'Export Nuvio JSON' })).toBeVisible();
+  const card = page.locator('#aioResult .nv-badges');
+  await expect(card.locator('.jf-lbl')).toHaveText('Core Neon · No DV');
+  await expect(card.locator('.jf-val')).toHaveText(/core-nodv-universal\.json$/);
+  await expect(card).toContainText("can't play Dolby Vision");
+});
 
 test('Nuvio paste failure offers the actual Nuvio JSON instead of the previous wizard config', async ({ page }) => {
   await page.route('**/*', route => {
