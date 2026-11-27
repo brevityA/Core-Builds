@@ -1,4 +1,10 @@
 export const CHANGELOG = [
+  { v:'3.53', date:'Nov 27 2026', items:[
+    'Stream badges after a Nuvio install — when you install to Nuvio, Quick install and the Nuvio tab now offer the Core Neon badge pack: one Copy button and the menu steps (Settings → Streams → Fusion badge URLs, or Settings → Layout → Streams on Android TV). Badges label each stream with resolution, HDR, audio and codec.',
+    'No DV pack for screens without Dolby Vision — Samsung, TCL, Hisense and low-RAM Fire Stick picks are offered the No DV pack; every other device gets Universal. Both work with whichever stream-card style you chose.',
+    'Customise your badges — a link from the same card opens the Core Badge Builder to choose your own badges, colours and order.',
+    'Generated output unchanged — every reference config is byte-for-byte what 3.52 produced apart from the version stamp. Badges are imported into Nuvio from a link and stored there; they are not part of the AIOStreams config.',
+  ]},
   { v:'3.52', date:'Nov 26 2026', items:[
     'Main page shows the tools people use most — Account Tools (install, copy and back up addons on Stremio and Nuvio), the Troubleshooter and the Speed Test now sit on the main page next to Core Builds, Start Here and the Template Inspector.',
     'Nuvio Stack Genie and Core Badge Builder moved to All Core Tools — both are still one tap away under All Core Tools.',

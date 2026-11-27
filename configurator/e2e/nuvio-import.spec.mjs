@@ -64,8 +64,36 @@ for (const service of ['p2p', 'torbox-pro']) {
     expect(invalidSortCriteria(template.config.sortCriteria)).toEqual([]);
     expect(validateConfigOptions(template.config).ok).toBe(true);
     await expect(page.locator('#aioResult')).toContainText(/import.*AIOStreams/i);
+    // Badges are offered as a Nuvio-side link; the uploaded config carries none.
+    const card = page.locator('#aioResult .nv-badges');
+    await expect(card).toContainText('Optional: add stream badges in Nuvio');
+    await expect(card.locator('.jf-val')).toHaveText('https://raw.githubusercontent.com/brevityA/Core-Builds/refs/heads/main/tools/badges/published/core-neon-universal.json');
+    await expect(card.locator('a.community-link')).toHaveAttribute('href', '../tools/badges/');
+    expect(uploadedTemplate).not.toContain('tools/badges');
   });
 }
+
+test('a device without Dolby Vision is offered the No DV badge pack, also when the upload fails', async ({ page }) => {
+  await page.route('**/*', route => {
+    const url = new URL(route.request().url());
+    return ['127.0.0.1', 'localhost'].includes(url.hostname) ? route.continue() : route.fulfill({ status: 503, body: 'Unavailable' });
+  });
+  await page.goto('/?cb-e2e=1');
+  await page.evaluate(() => { localStorage.clear(); localStorage.setItem('cb_tut_seen', '1'); });
+  await page.reload();
+  await page.waitForFunction(() => Boolean(window.__coreBuilds));
+  await page.evaluate(() => window.__coreBuilds.generate({ service: 'torbox-pro', multiServices: ['torbox-pro'], device: 'samsung', resolution: '4k', content: 'all', creds: { torbox: 'LOCAL-TORBOX-KEY' } }));
+  await page.locator('[data-action="open-express-lane"]').click();
+  await page.locator('#expressHost').selectOption('midnight');
+  await expect(page.locator('[data-express-device="samsung"]')).toHaveAttribute('aria-checked', 'true');
+  await page.locator('[data-express-target="nuvio"]').click();
+  await page.locator('#expressGo').click();
+  await expect(page.getByRole('button', { name: 'Export Nuvio JSON' })).toBeVisible();
+  const card = page.locator('#aioResult .nv-badges');
+  await expect(card.locator('.jf-lbl')).toHaveText('Core Neon · No DV');
+  await expect(card.locator('.jf-val')).toHaveText(/core-nodv-universal\.json$/);
+  await expect(card).toContainText("can't play Dolby Vision");
+});
 
 test('Nuvio paste failure offers the actual Nuvio JSON instead of the previous wizard config', async ({ page }) => {
   await page.route('**/*', route => {
@@ -94,4 +122,40 @@ test('Nuvio paste failure offers the actual Nuvio JSON instead of the previous w
   expect(template.config.preferredStreamTypes).toEqual(['p2p']);
   expect(template.config.presets.find(p => p.type === 'stremthruTorz').options.includeP2P).toBe(true);
   expect(json).not.toContain('LOCAL-TORBOX-KEY');
+});
+
+test('Open Nuvio keeps a badge link the user just copied', async ({ page, context }) => {
+  await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+  await page.route('**/*', route => {
+    const url = new URL(route.request().url());
+    return ['127.0.0.1', 'localhost'].includes(url.hostname) ? route.continue() : route.fulfill({ status: 200, body: '' });
+  });
+  await page.goto('/?cb-e2e=1');
+  await page.evaluate(() => { localStorage.clear(); localStorage.setItem('cb_tut_seen', '1'); });
+  await page.reload();
+  await page.waitForFunction(() => Boolean(window.__coreBuilds));
+  const manifest = 'https://aiostreams.example.com/stremio/11111111-2222-4333-8444-555555555555/sample/manifest.json';
+  await page.evaluate(([url]) => { window.__coreBuilds.setState({ device: 'shield' }); window.__coreBuilds.openManifestModal(url, 'nuvio'); }, [manifest]);
+  const card = page.locator('#manifestModal .nv-badges');
+  await expect(card.locator('.jf-lbl')).toHaveText('Core Neon · Universal');
+  const clip = () => page.evaluate(() => navigator.clipboard.readText());
+  await expect.poll(clip).toBe(manifest);
+  await card.getByRole('button', { name: 'Copy' }).click();
+  await expect.poll(clip).toMatch(/core-neon-universal\.json$/);
+  const popup = context.waitForEvent('page');
+  await page.locator('#mActionBtn').click();
+  await (await popup).close();
+  await expect(page.locator('#toast')).toContainText('paste the badge link you copied');
+  expect(await clip()).toMatch(/core-neon-universal\.json$/);
+
+  // Copying the manifest after the badge link: Open Nuvio copies the manifest again, as before.
+  await card.getByRole('button', { name: 'Copy' }).click();
+  await expect.poll(clip).toMatch(/core-neon-universal\.json$/);
+  await page.locator('#mCopyUrl').click();
+  await expect.poll(clip).toBe(manifest);
+  const popup2 = context.waitForEvent('page');
+  await page.locator('#mActionBtn').click();
+  await (await popup2).close();
+  await expect(page.locator('#toast')).toContainText('Manifest URL copied');
+  expect(await clip()).toBe(manifest);
 });

@@ -45,6 +45,7 @@ import { inspectTemplateComplexity, findFeatureConflicts, validateOutputProfileB
 import { buildFeedbackReport } from '../core/feedback-report-policy.js';
 import { preflightFindings, hasBlockers, summarise, findingsAsMessages } from '../core/preflight-policy.js';
 import { verifyAddonInstall } from '../core/install-transaction-policy.js';
+import { nuvioBadgePack, BADGE_BUILDER_PATH } from '../core/nuvio-badges.js';
 import { isCinemeta, isConfiguredAioMetadata, isBareAioMetadata, patchCinemetaInCollection, resetCinemetaInCollection, aioMetadataDefaultConfig, sanitizeCinemetaPatches, DEFAULT_CINEMETA_PATCHES, AIOMETADATA_BASE, CINEMETA_MANIFEST_URL } from '../core/cinemeta-patch.js';
 import { unknownConfigKeys } from '../config/generated/aiostreams-config-schema.js';
 import '../../../tools/core-nav.js'; // classic script: defines window.CoreNav
@@ -56,7 +57,7 @@ const STEPS = 6;
 // workflow) the raw x.y here expands to x.y.0 in package.json / versions.json and
 // the release tag; the built badge drops the trailing .0. At the 2026-09-06
 // audit the release tag was v3.7.0 while this said 3.1 — they must move together.
-const CONFIGURATOR_VERSION = '3.52';
+const CONFIGURATOR_VERSION = '3.53';
 // Set to a collector endpoint to enable the opt-in anonymous usage ping (service+device+resolution only).
 // Leave empty to keep the feature fully disabled and hidden.
 const USAGE_BEACON_URL = '';
@@ -4056,8 +4057,11 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch(err) {}
       }
 
+      const modalEl = btn.closest?.('#manifestModal');
       navigator.clipboard.writeText(url).then(() => {
-        showToast(isUrl ? 'Manifest URL copied' : 'Copied to clipboard');
+        // Only a badge copy that succeeded marks the manifest window (see Open Nuvio).
+        if (modalEl && btn.closest('.nv-badges')) modalEl.dataset.badgeCopied = '1';
+        showToast(btn.dataset.toast || (isUrl ? 'Manifest URL copied' : 'Copied to clipboard'));
         if (btn && btn.tagName === 'BUTTON') {
           const origHtml = btn.innerHTML;
           const origBg = btn.style.background;
@@ -6804,6 +6808,24 @@ function jellyfinSignInHtml(host, uuid, pwd, hostLabel) {
   </div>`;
 }
 
+// Nuvio stream badges (v3.53): offered after a Nuvio install. They are imported into
+// Nuvio from a URL and stored there, so this hands over the link and changes no config.
+function nuvioBadgeCardHtml(deviceId) {
+  const pack = nuvioBadgePack(deviceId);
+  return `<div class="u-mt12 jf-signin nv-badges" role="note">
+    <strong class="u-tx">Optional: add stream badges in Nuvio</strong>
+    <div class="u-note">Badges label each stream: resolution, HDR, audio, codec and more. They live in Nuvio, not in your AIOStreams setup, so adding them changes nothing here.</div>
+    <div class="jf-row"><span class="jf-lbl">${escHtml(pack.label)}</span><code class="jf-val" data-no-i18n>${escHtml(pack.url)}</code><button type="button" class="copy-btn" data-action="copy-manifest" data-url="${escHtml(pack.url)}" data-toast="Badge link copied — paste it into Nuvio">Copy</button></div>
+    ${pack.id === 'noDv' ? '<div class="u-hint">No DV pack, because this device can\'t play Dolby Vision.</div>' : ''}
+    <ol class="nv-steps">
+      <li>Copy the link.</li>
+      <li>In Nuvio, open Settings → Streams → Fusion badge URLs. On Android TV: Settings → Layout → Streams → Fusion badge URLs.</li>
+      <li>Paste it and choose Import.</li>
+    </ol>
+    <a class="community-link" href="${BADGE_BUILDER_PATH}" target="_blank" rel="noopener noreferrer">Choose your own badges, colours and order</a>
+  </div>`;
+}
+
 function showManifestModal(manifestUrl, password, hostLabel, initialTab) {
   const ex = document.getElementById('manifestModal');
   if (ex) ex.remove();
@@ -6832,6 +6854,11 @@ function showManifestModal(manifestUrl, password, hostLabel, initialTab) {
   const overlay = document.createElement('div');
   overlay.id = 'manifestModal';
   overlay.className = 'modal-overlay';
+  // Any copy in this window replaces what is on the clipboard: forget the badge copy
+  // first; the badge Copy sets the flag again once its write has succeeded.
+  overlay.addEventListener('click', e => {
+    if (e.target.closest?.('.copy-btn, [data-action^="copy"]')) delete overlay.dataset.badgeCopied;
+  }, true);
   overlay.innerHTML = `
     <div class="modal-box" role="dialog" aria-modal="true" aria-label="Manifest Ready">
       <button class="modal-close" id="mClose" aria-label="Close">×</button>
@@ -6965,6 +6992,7 @@ function showManifestModal(manifestUrl, password, hostLabel, initialTab) {
     if (qrImg) qrImg.src = qrSrc(url);
     // Auto-copy URL on every tab switch
     const copyBtn = document.getElementById('mCopyUrl');
+    delete document.getElementById('manifestModal')?.dataset.badgeCopied;
     navigator.clipboard.writeText(url).then(() => {
       if (copyBtn) { copyBtn.innerHTML = ICO.check(12,'currentColor'); copyBtn.classList.add('copied'); setTimeout(() => { copyBtn.textContent = 'Copy'; copyBtn.classList.remove('copied'); }, 2200); }
     }).catch(() => {});
@@ -6980,6 +7008,8 @@ function showManifestModal(manifestUrl, password, hostLabel, initialTab) {
       actionBtn.href = f.configUrl;
       actionBtn.target = '_blank';
       actionBtn.onclick = () => {
+        // The Nuvio badge card's Copy put the badge link on the clipboard: keep it.
+        if (document.getElementById('manifestModal')?.dataset.badgeCopied) { showToast(`Opening ${f.label} — paste the badge link you copied`); return; }
         navigator.clipboard.writeText(url).catch(() => {});
         showToast(`Manifest URL copied — opening ${f.label}…`);
       };
@@ -7008,7 +7038,7 @@ function showManifestModal(manifestUrl, password, hostLabel, initialTab) {
     } else if (key === 'nuvio') {
       helpEl.style.display = '';
       document.getElementById('mAppHelpTitle').textContent = 'Nuvio Setup';
-      document.getElementById('mAppHelpBody').innerHTML = '<strong class="u-tx">1.</strong> Manifest URL is <strong class="u-green">already copied</strong> to your clipboard<br><strong class="u-tx">2.</strong> Tap <strong class="u-purple">Open Nuvio</strong> below (or go to Nuvio → Account → Addons)<br><strong class="u-tx">3.</strong> Paste the URL in the addon field';
+      document.getElementById('mAppHelpBody').innerHTML = '<strong class="u-tx">1.</strong> Manifest URL is <strong class="u-green">already copied</strong> to your clipboard<br><strong class="u-tx">2.</strong> Tap <strong class="u-purple">Open Nuvio</strong> below (or go to Nuvio → Account → Addons)<br><strong class="u-tx">3.</strong> Paste the URL in the addon field' + nuvioBadgeCardHtml(S.device || 'generic');
       if (qrWrap) qrWrap.style.display = 'none';
       if (qrHint) qrHint.style.display = 'none';
     } else if (key === 'chillio') {
@@ -8768,9 +8798,9 @@ async function runExpressInstall(p) {
       if (importUrl) {
         saveLastGen();
         const configureUrl = HOST_BASE_URLS[nuvioHost.id] + '/stremio/configure?template=' + encodeURIComponent(importUrl);
-        result.innerHTML = `<div class="u-mt12 import-success"><strong>Nuvio template ready — host: ${escHtml(nuvioHost.label || HOST_LABEL_MAP[nuvioHost.id] || nuvioHost.id)}</strong><div style="font-size:.78rem;margin:8px 0;line-height:1.6">Connect TorBox in <strong>Nuvio → Connected Services</strong>, not with a key in AIOStreams.<br>Import this template into AIOStreams, set a password and save. Then copy its <strong>manifest URL</strong> into Nuvio. The link below is a public template import link, not a manifest; credentials including TMDB are removed.</div><div class="inst-chips"><a href="${escH(configureUrl)}" target="_blank" rel="noopener noreferrer" class="inst-chip inst-chip-import">▶ ${escHtml(HOST_LABEL_MAP[nuvioHost.id] || nuvioHost.id)}</a></div><div class="manifest-url" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.72rem;padding:8px 10px;cursor:pointer" data-action="copy-manifest" data-url="${escH(importUrl)}">${escHtml(importUrl)}</div></div>`;
+        result.innerHTML = `<div class="u-mt12 import-success"><strong>Nuvio template ready — host: ${escHtml(nuvioHost.label || HOST_LABEL_MAP[nuvioHost.id] || nuvioHost.id)}</strong><div style="font-size:.78rem;margin:8px 0;line-height:1.6">Connect TorBox in <strong>Nuvio → Connected Services</strong>, not with a key in AIOStreams.<br>Import this template into AIOStreams, set a password and save. Then copy its <strong>manifest URL</strong> into Nuvio. The link below is a public template import link, not a manifest; credentials including TMDB are removed.</div><div class="inst-chips"><a href="${escH(configureUrl)}" target="_blank" rel="noopener noreferrer" class="inst-chip inst-chip-import">▶ ${escHtml(HOST_LABEL_MAP[nuvioHost.id] || nuvioHost.id)}</a></div><div class="manifest-url" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.72rem;padding:8px 10px;cursor:pointer" data-action="copy-manifest" data-url="${escH(importUrl)}">${escHtml(importUrl)}</div></div>${nuvioBadgeCardHtml(p.device || 'generic')}`;
       } else {
-        result.innerHTML = '<div class="u-mt12 import-success import-error"><strong>Could not create a Nuvio import link</strong><div style="font-size:.78rem;margin:6px 0">Download this Nuvio template and import it manually into AIOStreams.</div><button type="button" id="downloadNuvioJson" class="df-btn df-btn-secondary">Export Nuvio JSON</button></div>';
+        result.innerHTML = '<div class="u-mt12 import-success import-error"><strong>Could not create a Nuvio import link</strong><div style="font-size:.78rem;margin:6px 0">Download this Nuvio template and import it manually into AIOStreams.</div><button type="button" id="downloadNuvioJson" class="df-btn df-btn-secondary">Export Nuvio JSON</button></div>' + nuvioBadgeCardHtml(p.device || 'generic');
         document.getElementById('downloadNuvioJson')?.addEventListener('click', () => downloadJsonFile(tmpl, 'core-nuvio-torbox-instant.json'));
       }
     } catch (err) {
@@ -9842,6 +9872,10 @@ if (new URLSearchParams(location.search).get('cb-e2e') === '1') {
     },
     openTestDrive() {
       showTestDriveModal();
+      return true;
+    },
+    openManifestModal(url, tab) {
+      showManifestModal(url, null, null, tab);
       return true;
     },
     coreScore(stream, ctx) {
