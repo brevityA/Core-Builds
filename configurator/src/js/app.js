@@ -4057,6 +4057,8 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch(err) {}
       }
 
+      const modalEl = btn.closest?.('#manifestModal');
+      if (modalEl && btn.closest('.nv-badges')) modalEl.dataset.badgeCopied = '1';
       navigator.clipboard.writeText(url).then(() => {
         showToast(btn.dataset.toast || (isUrl ? 'Manifest URL copied' : 'Copied to clipboard'));
         if (btn && btn.tagName === 'BUTTON') {
@@ -6984,6 +6986,7 @@ function showManifestModal(manifestUrl, password, hostLabel, initialTab) {
     if (qrImg) qrImg.src = qrSrc(url);
     // Auto-copy URL on every tab switch
     const copyBtn = document.getElementById('mCopyUrl');
+    delete document.getElementById('manifestModal')?.dataset.badgeCopied;
     navigator.clipboard.writeText(url).then(() => {
       if (copyBtn) { copyBtn.innerHTML = ICO.check(12,'currentColor'); copyBtn.classList.add('copied'); setTimeout(() => { copyBtn.textContent = 'Copy'; copyBtn.classList.remove('copied'); }, 2200); }
     }).catch(() => {});
@@ -6999,6 +7002,8 @@ function showManifestModal(manifestUrl, password, hostLabel, initialTab) {
       actionBtn.href = f.configUrl;
       actionBtn.target = '_blank';
       actionBtn.onclick = () => {
+        // The Nuvio badge card's Copy put the badge link on the clipboard: keep it.
+        if (document.getElementById('manifestModal')?.dataset.badgeCopied) { showToast(`Opening ${f.label} — your badge link is still copied`); return; }
         navigator.clipboard.writeText(url).catch(() => {});
         showToast(`Manifest URL copied — opening ${f.label}…`);
       };
@@ -9861,6 +9866,10 @@ if (new URLSearchParams(location.search).get('cb-e2e') === '1') {
     },
     openTestDrive() {
       showTestDriveModal();
+      return true;
+    },
+    openManifestModal(url, tab) {
+      showManifestModal(url, null, null, tab);
       return true;
     },
     coreScore(stream, ctx) {

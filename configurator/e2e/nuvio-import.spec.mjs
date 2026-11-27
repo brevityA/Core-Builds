@@ -123,3 +123,28 @@ test('Nuvio paste failure offers the actual Nuvio JSON instead of the previous w
   expect(template.config.presets.find(p => p.type === 'stremthruTorz').options.includeP2P).toBe(true);
   expect(json).not.toContain('LOCAL-TORBOX-KEY');
 });
+
+test('Open Nuvio keeps a badge link the user just copied', async ({ page, context }) => {
+  await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+  await page.route('**/*', route => {
+    const url = new URL(route.request().url());
+    return ['127.0.0.1', 'localhost'].includes(url.hostname) ? route.continue() : route.fulfill({ status: 200, body: '' });
+  });
+  await page.goto('/?cb-e2e=1');
+  await page.evaluate(() => { localStorage.clear(); localStorage.setItem('cb_tut_seen', '1'); });
+  await page.reload();
+  await page.waitForFunction(() => Boolean(window.__coreBuilds));
+  const manifest = 'https://aiostreams.example.com/stremio/11111111-2222-4333-8444-555555555555/sample/manifest.json';
+  await page.evaluate(([url]) => { window.__coreBuilds.setState({ device: 'shield' }); window.__coreBuilds.openManifestModal(url, 'nuvio'); }, [manifest]);
+  const card = page.locator('#manifestModal .nv-badges');
+  await expect(card.locator('.jf-lbl')).toHaveText('Core Neon · Universal');
+  const clip = () => page.evaluate(() => navigator.clipboard.readText());
+  await expect.poll(clip).toBe(manifest);
+  await card.getByRole('button', { name: 'Copy' }).click();
+  await expect.poll(clip).toMatch(/core-neon-universal\.json$/);
+  const popup = context.waitForEvent('page');
+  await page.locator('#mActionBtn').click();
+  await (await popup).close();
+  await expect(page.locator('#toast')).toContainText('badge link is still copied');
+  expect(await clip()).toMatch(/core-neon-universal\.json$/);
+});
