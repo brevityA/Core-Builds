@@ -145,6 +145,17 @@ test('Open Nuvio keeps a badge link the user just copied', async ({ page, contex
   const popup = context.waitForEvent('page');
   await page.locator('#mActionBtn').click();
   await (await popup).close();
-  await expect(page.locator('#toast')).toContainText('badge link is still copied');
+  await expect(page.locator('#toast')).toContainText('paste the badge link you copied');
   expect(await clip()).toMatch(/core-neon-universal\.json$/);
+
+  // Copying the manifest after the badge link: Open Nuvio copies the manifest again, as before.
+  await card.getByRole('button', { name: 'Copy' }).click();
+  await expect.poll(clip).toMatch(/core-neon-universal\.json$/);
+  await page.locator('#mCopyUrl').click();
+  await expect.poll(clip).toBe(manifest);
+  const popup2 = context.waitForEvent('page');
+  await page.locator('#mActionBtn').click();
+  await (await popup2).close();
+  await expect(page.locator('#toast')).toContainText('Manifest URL copied');
+  expect(await clip()).toBe(manifest);
 });

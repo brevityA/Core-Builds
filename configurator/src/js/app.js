@@ -4058,8 +4058,9 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       const modalEl = btn.closest?.('#manifestModal');
-      if (modalEl && btn.closest('.nv-badges')) modalEl.dataset.badgeCopied = '1';
       navigator.clipboard.writeText(url).then(() => {
+        // Only a badge copy that succeeded marks the manifest window (see Open Nuvio).
+        if (modalEl && btn.closest('.nv-badges')) modalEl.dataset.badgeCopied = '1';
         showToast(btn.dataset.toast || (isUrl ? 'Manifest URL copied' : 'Copied to clipboard'));
         if (btn && btn.tagName === 'BUTTON') {
           const origHtml = btn.innerHTML;
@@ -6853,6 +6854,11 @@ function showManifestModal(manifestUrl, password, hostLabel, initialTab) {
   const overlay = document.createElement('div');
   overlay.id = 'manifestModal';
   overlay.className = 'modal-overlay';
+  // Any copy in this window replaces what is on the clipboard: forget the badge copy
+  // first; the badge Copy sets the flag again once its write has succeeded.
+  overlay.addEventListener('click', e => {
+    if (e.target.closest?.('.copy-btn, [data-action^="copy"]')) delete overlay.dataset.badgeCopied;
+  }, true);
   overlay.innerHTML = `
     <div class="modal-box" role="dialog" aria-modal="true" aria-label="Manifest Ready">
       <button class="modal-close" id="mClose" aria-label="Close">×</button>
@@ -7003,7 +7009,7 @@ function showManifestModal(manifestUrl, password, hostLabel, initialTab) {
       actionBtn.target = '_blank';
       actionBtn.onclick = () => {
         // The Nuvio badge card's Copy put the badge link on the clipboard: keep it.
-        if (document.getElementById('manifestModal')?.dataset.badgeCopied) { showToast(`Opening ${f.label} — your badge link is still copied`); return; }
+        if (document.getElementById('manifestModal')?.dataset.badgeCopied) { showToast(`Opening ${f.label} — paste the badge link you copied`); return; }
         navigator.clipboard.writeText(url).catch(() => {});
         showToast(`Manifest URL copied — opening ${f.label}…`);
       };
