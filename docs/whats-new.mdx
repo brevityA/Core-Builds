@@ -1,14 +1,33 @@
 ---
-title: "What's New — Configurator v3.53"
+title: "What's New — Configurator v3.54"
 sidebarTitle: "What's New"
-description: "Latest Core Builds Configurator releases (v3.53 and earlier), auto-generated from the in-app changelog."
+description: "Latest Core Builds Configurator releases (v3.54 and earlier), auto-generated from the in-app changelog."
 ---
 
 # What's New in the Configurator
 
-This page is regenerated from `configurator/src/data/changelog.js` by `scripts/sync-docs.py`, so it always reflects the latest shipped configurator version (currently **v3.53**).
+This page is regenerated from `configurator/src/data/changelog.js` by `scripts/sync-docs.py`, so it always reflects the latest shipped configurator version (currently **v3.54**).
 
 For the template-suite release log, see the [Changelog](https://core-builds.mintlify.app/changelog).
+
+## Configurator v3.54 (Nov 27 2026)
+
+<CardGroup cols={2}>
+  <Card title="Sharper Nuvio badges (AIO Enhanced)" icon="sparkles">
+    a new switch in Fine-Tune → Stream cards adds invisible markers to your stream cards. The Core Neon · AIO Enhanced badge pack in Nuvio reads them, so badges show the resolution, HDR and audio AIOStreams parsed instead of guessing from the file name. Off unless you turn it on.
+  </Card>
+  <Card title="Your card style stays the same" icon="bolt">
+    the markers go in front of whichever style you picked and render as nothing. Checked with AIOStreams 2.38.1's own formatter engine on all 22 built-in styles (28 counting the Core score modes): the visible card is identical, and the 4K and Dolby Vision badges fire on a 4K DV stream and not on a 1080p SDR one.
+  </Card>
+  <Card title="The badge card offers the Enhanced pack when your setup carries the markers" icon="shield-check">
+    after a Nuvio install, or in the manifest window's Nuvio tab. Re-importing a config with the markers turns the switch back on and recognises your style.
+  </Card>
+  <Card title="Only for Nuvio" icon="sliders">
+    the markers are in the stream text for every app on that AIOStreams install. They are zero-width characters, but some TV apps draw them as small boxes, so leave the switch off if you also watch in Stremio on a TV.
+  </Card>
+</CardGroup>
+
+---
 
 ## Configurator v3.53 (Nov 27 2026)
 
@@ -62,24 +81,5 @@ For the template-suite release log, see the [Changelog](https://core-builds.mint
   </Card>
   <Card title="Generated output unchanged" icon="gauge">
     every reference config is byte-for-byte what 3.50 produced apart from the version stamp. These changes are to what Full stack does on your Stremio account and in AIOMetadata.
-  </Card>
-</CardGroup>
-
----
-
-## Configurator v3.50 (Nov 26 2026)
-
-<CardGroup cols={2}>
-  <Card title="Install to Jellyfin" icon="sparkles">
-    Quick install has a Jellyfin target. AIOStreams can act as a Jellyfin server, so after saving you get a server address, a username (your config ID) and your config password to sign in with from a Jellyfin app.
-  </Card>
-  <Card title="Jellyfin picks a host that has it turned on" icon="bolt">
-    ElfHosted has AIOStreams' Jellyfin server switched off, so a Jellyfin install goes to a public host that has it on (checked on every host on Nov 26). A custom host is used as you set it.
-  </Card>
-  <Card title="Hide HDR" icon="shield-check">
-    a new Fine-Tune toggle under Video Preferences for screens that only show SDR. It hides HDR10, HDR10+, HLG and Dolby Vision streams; SDR and untagged streams stay. It works on every output profile and survives a re-import.
-  </Card>
-  <Card title="Generated output unchanged" icon="sliders">
-    every reference config is byte-for-byte what 3.49 produced apart from the version stamp. Hide HDR is off unless you turn it on, and Jellyfin uses the same config as any other target.
   </Card>
 </CardGroup>

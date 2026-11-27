@@ -39,6 +39,7 @@ const BASE = {
   foreignLangKill: true,
   exclude4K: false,
   excludeDV: false,
+  nuvioBadgeMarkers: false,
   langs: ['English'],
   langExclusive: false,
   sizeLimit: 'unlimited',
@@ -75,6 +76,8 @@ const MATRIX = [
   { name: 'torbox-mixed-apex-mixed', state: { resolution: 'mixed', pseArch: 'apex-mixed' } },
   { name: 'torbox-ultrawide', state: { resolution: 'ultrawide', device: 'windows' } },
   { name: 'torbox-4k-samsung', state: { resolution: '4k', device: 'samsung' } },
+  // v3.54: the AIO Enhanced Nuvio badge markers sit in front of the default style's fields.
+  { name: 'torbox-1080p-nuvio-badges', state: { resolution: '1080p', nuvioBadgeMarkers: true } },
   { name: 'alldebrid-1080p', state: { service: 'alldebrid', multiServices: ['alldebrid'], resolution: '1080p' } },
   { name: 'easynews-1080p', state: { service: 'easynews', multiServices: ['easynews'], resolution: '1080p' } },
   // ElfHosted disables P2P and HTTP streams, so the free lanes are pinned to a

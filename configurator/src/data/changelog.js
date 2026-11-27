@@ -1,4 +1,10 @@
 export const CHANGELOG = [
+  { v:'3.54', date:'Nov 27 2026', items:[
+    'Sharper Nuvio badges (AIO Enhanced) — a new switch in Fine-Tune → Stream cards adds invisible markers to your stream cards. The Core Neon · AIO Enhanced badge pack in Nuvio reads them, so badges show the resolution, HDR and audio AIOStreams parsed instead of guessing from the file name. Off unless you turn it on.',
+    'Your card style stays the same — the markers go in front of whichever style you picked and render as nothing. Checked with AIOStreams 2.38.1\'s own formatter engine on all 22 built-in styles (28 counting the Core score modes): the visible card is identical, and the 4K and Dolby Vision badges fire on a 4K DV stream and not on a 1080p SDR one.',
+    'The badge card offers the Enhanced pack when your setup carries the markers — after a Nuvio install, or in the manifest window\'s Nuvio tab. Re-importing a config with the markers turns the switch back on and recognises your style.',
+    'Only for Nuvio — the markers are in the stream text for every app on that AIOStreams install. They are zero-width characters, but some TV apps draw them as small boxes, so leave the switch off if you also watch in Stremio on a TV.',
+  ]},
   { v:'3.53', date:'Nov 27 2026', items:[
     'Stream badges after a Nuvio install — when you install to Nuvio, Quick install and the Nuvio tab now offer the Core Neon badge pack: one Copy button and the menu steps (Settings → Streams → Fusion badge URLs, or Settings → Layout → Streams on Android TV). Badges label each stream with resolution, HDR, audio and codec.',
     'No DV pack for screens without Dolby Vision — Samsung, TCL, Hisense and low-RAM Fire Stick picks are offered the No DV pack; every other device gets Universal. Both work with whichever stream-card style you chose.',

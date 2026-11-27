@@ -46,6 +46,7 @@ import { buildFeedbackReport } from '../core/feedback-report-policy.js';
 import { preflightFindings, hasBlockers, summarise, findingsAsMessages } from '../core/preflight-policy.js';
 import { verifyAddonInstall } from '../core/install-transaction-policy.js';
 import { nuvioBadgePack, BADGE_BUILDER_PATH } from '../core/nuvio-badges.js';
+import { withNuvioBadgeMarkers, stripNuvioBadgeMarkers, applyNuvioBadgeMarkers } from '../core/nuvio-badge-markers.js';
 import { isCinemeta, isConfiguredAioMetadata, isBareAioMetadata, patchCinemetaInCollection, resetCinemetaInCollection, aioMetadataDefaultConfig, sanitizeCinemetaPatches, DEFAULT_CINEMETA_PATCHES, AIOMETADATA_BASE, CINEMETA_MANIFEST_URL } from '../core/cinemeta-patch.js';
 import { unknownConfigKeys } from '../config/generated/aiostreams-config-schema.js';
 import '../../../tools/core-nav.js'; // classic script: defines window.CoreNav
@@ -57,7 +58,7 @@ const STEPS = 6;
 // workflow) the raw x.y here expands to x.y.0 in package.json / versions.json and
 // the release tag; the built badge drops the trailing .0. At the 2026-09-06
 // audit the release tag was v3.7.0 while this said 3.1 — they must move together.
-const CONFIGURATOR_VERSION = '3.53';
+const CONFIGURATOR_VERSION = '3.54';
 // Set to a collector endpoint to enable the opt-in anonymous usage ping (service+device+resolution only).
 // Leave empty to keep the feature fully disabled and hidden.
 const USAGE_BEACON_URL = '';
@@ -494,7 +495,7 @@ async function selectHealthyHost(timeout=4000, opts={}) {
 // Cloudflare Worker CORS proxy — see cloudflare-worker/README.md for deployment.
 // Set to '' to disable and fall back to direct-only fetches.
 const CORS_PROXY = 'https://core-builds-cors-proxy.tlorenzato26.workers.dev';
-const S = { service:null, device:null, resolution:null, audio:'limited', bandwidthMbps:0, content:null, name:'', multiServices:[], sizeLimit:'unlimited', formatter:'family-v4', fmtScore:DEFAULT_CORE_SCORE_MODE, p2pEnabled:false, qualityFirst:false, resolutionFirst:false, foreignLangKill:true, matchMode:'balanced', exclude4K:false, excludeDV:false, excludeHDR:false, tmdbToken:'', tmdbApiKey:'', creds:{torbox:'',realdebrid:'',alldebrid:'',premiumize:'',debridlink:'',offcloud:'',easynews:'',easynewsPass:'',nzbgeek:'',debridio:'',debrider:'',nzbnoob:'',althub:'',usenetcrawler:'',drunkenslug:'',nzbfinder:'',jackett:'',prowlarr:'',subdl:'',penguplay:''}, instanceHost:'elfhosted', instanceUrl:'', instanceUuid:'', instancePassword:'', baseUuid:'', basePassword:'', quickStart:false, langs: ['English'], langsSet: false, langExclusive: false, cacheMode: 'mixed', streamPool: 'normal', pseArch: 'standard', telemetryOk: false, simpleMode: false, outputProfile:'auto', aiostreamsVersion:DEFAULT_AIOSTREAMS_VERSION, installMode: 'direct', stremioEmail: '', stremioPassword: '', subtitleLangs: ['en'], subtitleAddons: ['opensubtitles-v3-plus'], streamProxy: { ...DEFAULT_STREAM_PROXY, proxiedServices: [], proxiedAddons: [] }, streamProxyPassword: '', catalogs: ['tmdb-addon'], dedupMerge: false, optionalScrapers: [], cleanInstall: false, quickProfile: 'balanced', quickCacheChosen: false, preloadEnabled:true, autoPlayMethod:'matchingFile', addonTimeout:6000, patchCinemeta:false, installAIOMeta:false, cinemetaPatches:[...DEFAULT_CINEMETA_PATCHES], metaKeys:{ mdblist:'', rpdb:'' }, libraryBoost:'default', nzbFailover:false, nzbFailoverPosition:'after-torrents', maxFailoverNzbs:3, addonServices:[] };
+const S = { service:null, device:null, resolution:null, audio:'limited', bandwidthMbps:0, content:null, name:'', multiServices:[], sizeLimit:'unlimited', formatter:'family-v4', fmtScore:DEFAULT_CORE_SCORE_MODE, p2pEnabled:false, qualityFirst:false, resolutionFirst:false, foreignLangKill:true, matchMode:'balanced', exclude4K:false, excludeDV:false, excludeHDR:false, nuvioBadgeMarkers:false, tmdbToken:'', tmdbApiKey:'', creds:{torbox:'',realdebrid:'',alldebrid:'',premiumize:'',debridlink:'',offcloud:'',easynews:'',easynewsPass:'',nzbgeek:'',debridio:'',debrider:'',nzbnoob:'',althub:'',usenetcrawler:'',drunkenslug:'',nzbfinder:'',jackett:'',prowlarr:'',subdl:'',penguplay:''}, instanceHost:'elfhosted', instanceUrl:'', instanceUuid:'', instancePassword:'', baseUuid:'', basePassword:'', quickStart:false, langs: ['English'], langsSet: false, langExclusive: false, cacheMode: 'mixed', streamPool: 'normal', pseArch: 'standard', telemetryOk: false, simpleMode: false, outputProfile:'auto', aiostreamsVersion:DEFAULT_AIOSTREAMS_VERSION, installMode: 'direct', stremioEmail: '', stremioPassword: '', subtitleLangs: ['en'], subtitleAddons: ['opensubtitles-v3-plus'], streamProxy: { ...DEFAULT_STREAM_PROXY, proxiedServices: [], proxiedAddons: [] }, streamProxyPassword: '', catalogs: ['tmdb-addon'], dedupMerge: false, optionalScrapers: [], cleanInstall: false, quickProfile: 'balanced', quickCacheChosen: false, preloadEnabled:true, autoPlayMethod:'matchingFile', addonTimeout:6000, patchCinemeta:false, installAIOMeta:false, cinemetaPatches:[...DEFAULT_CINEMETA_PATCHES], metaKeys:{ mdblist:'', rpdb:'' }, libraryBoost:'default', nzbFailover:false, nzbFailoverPosition:'after-torrents', maxFailoverNzbs:3, addonServices:[] };
 // A clean template update must not inherit unrelated wizard/experimental flags.
 const INITIAL_STATE = cloneUpdateValue(S);
 function replaceState(nextState) {
@@ -533,6 +534,7 @@ function releaseMigrationForControl(action, element) {
   if (action === 'toggle-pref') {
     if (['exclude4K', 'excludeDV', 'foreignLangKill', 'p2pEnabled'].includes(key)) releaseMigrationFields(['excludedStreamExpressions']);
     if (key === 'excludeHDR' || key === 'excludeDV') releaseMigrationFields(['excludedVisualTags']);
+    if (key === 'nuvioBadgeMarkers') releaseMigrationFields(['formatter']);
     if (key === 'dedupMerge') releaseMigrationFields(['deduplicator']);
     if (key === 'preloadEnabled') releaseMigrationFields(['preloadStreams']);
   }
@@ -740,7 +742,7 @@ function sanitizeCustomFormatter(value) {
   return { name, d:description, label };
 }
 // Only wizard selections are shareable — never credentials, tokens, UUIDs, or passwords
-const SHARE_KEYS = ['device','resolution','audio','content','name','multiServices','sizeLimit','formatter','fmtScore','p2pEnabled','qualityFirst','resolutionFirst','foreignLangKill','matchMode','exclude4K','excludeDV','excludeHDR','quickStart','langs','langsSet','langExclusive','cacheMode','streamPool','instanceHost','simpleMode','outputProfile','aiostreamsVersion','pseArch','subtitleLangs','subtitleAddons','catalogs','dedupMerge','optionalScrapers','preloadEnabled','autoPlayMethod','addonTimeout','bandwidthMbps','patchCinemeta','installAIOMeta','libraryBoost','nzbFailover','nzbFailoverPosition','maxFailoverNzbs'];
+const SHARE_KEYS = ['device','resolution','audio','content','name','multiServices','sizeLimit','formatter','fmtScore','p2pEnabled','qualityFirst','resolutionFirst','foreignLangKill','matchMode','exclude4K','excludeDV','excludeHDR','nuvioBadgeMarkers','quickStart','langs','langsSet','langExclusive','cacheMode','streamPool','instanceHost','simpleMode','outputProfile','aiostreamsVersion','pseArch','subtitleLangs','subtitleAddons','catalogs','dedupMerge','optionalScrapers','preloadEnabled','autoPlayMethod','addonTimeout','bandwidthMbps','patchCinemeta','installAIOMeta','libraryBoost','nzbFailover','nzbFailoverPosition','maxFailoverNzbs'];
 /** A QR code for a URL as an SVG data URL, or '' when the URL is too long for one. */
 function qrDataUrl(u) {
   try {
@@ -805,7 +807,7 @@ function sanitizeSharedConfig(d) {
   // Saved and shared, but until 3.41 never read back: every reload reset the cap to 0.
   pick('bandwidthMbps', v => Number.isInteger(v) && v >= 0 && v <= 10000);
   pick('instanceHost', v => v === 'auto' || v === 'custom' || Object.prototype.hasOwnProperty.call(HOST_BASE_URLS, v));
-  ['p2pEnabled','qualityFirst','resolutionFirst','foreignLangKill','exclude4K','excludeDV','excludeHDR','quickStart','langExclusive','langsSet','simpleMode','dedupMerge','preloadEnabled','patchCinemeta','installAIOMeta','nzbFailover'].forEach(k => pick(k, v => typeof v === 'boolean'));
+  ['p2pEnabled','qualityFirst','resolutionFirst','foreignLangKill','exclude4K','excludeDV','excludeHDR','nuvioBadgeMarkers','quickStart','langExclusive','langsSet','simpleMode','dedupMerge','preloadEnabled','patchCinemeta','installAIOMeta','nzbFailover'].forEach(k => pick(k, v => typeof v === 'boolean'));
   pick('autoPlayMethod', v => ['matchingFile','matchingIndex','firstFile'].includes(v));
   pick('addonTimeout', v => [4000,6000,8000,10000].includes(Number(v)));
   if (Array.isArray(d.multiServices)) out.multiServices = d.multiServices.filter(v => SVC_IDS.includes(v));
@@ -2127,6 +2129,8 @@ function renderAdvancedPanel() {
         <div class="ft-head" id="ft-layout">${ICO.palette(16,'#a78bfa')} Stream cards <span class="ft-head-alt">(formatter)</span> ${ftTip('Controls how streams appear in Stremio. The <strong>formatter</strong> defines the layout of each stream result &mdash; what info is shown (codec, resolution, size, etc.) and how it&apos;s arranged. You can import custom formatters for different visual styles.')}</div>
         ${fmtDropdownHtml()}
         <button data-action="import-formatter" style="margin-top:10px;width:100%;padding:10px;border-radius:8px;border:1.5px dashed rgba(167,139,250,.3);background:transparent;color:#a78bfa;font-size:.78rem;font-weight:600;cursor:pointer;transition:.15s;transition-property:var(--ui-tp)" onmouseover="this.style.borderColor='rgba(167,139,250,.6)'" onmouseout="this.style.borderColor='rgba(167,139,250,.3)'">${S.customFormatter ? '⟳ Replace Custom Formatter' : ICO.folder(14,'#a78bfa')+' Import Custom Formatter'}</button>
+        <div class="u-mt12">${prefCard('nuvioBadgeMarkers','Sharper Nuvio badges (AIO Enhanced)','Adds invisible markers to your stream cards, so the Core Neon · AIO Enhanced badge pack in Nuvio reads resolution, HDR and audio from AIOStreams instead of guessing from the file name. Your card style stays the same. Turn it on only if you watch in Nuvio: some TV apps show the markers as small boxes.')}
+        ${S.nuvioBadgeMarkers && !withNuvioBadgeMarkers(selectedFormatterDefinition()).ok ? '<div class="u-hint" role="note">These markers don\'t fit beside this stream-card style, so they are left out. Pick another style to use them.</div>' : ''}</div>
       </div>
 
       <div>
@@ -5606,6 +5610,7 @@ function hostGateHtml() {
   return `<div class="hc-row"><span class="hc-name">${escHtml(caps.label)}</span><span class="hc-status" style="color:${caps.probed ? '#34d399' : '#fbbf24'}">${caps.probed ? `probed &middot; v${escHtml(caps.version || '?')}` : 'not probed'}</span></div>${gateLines ? `<div class="hc-detail">${gateLines}</div>` : ''}${warningLines}${removalLines}`;
 }
 
+let _lastBadgeMarkersFit = true;
 function buildFinal() {
   try {
     const tpl = build();
@@ -5617,6 +5622,8 @@ function buildFinal() {
       migrationRemove: S._migrationRemove,
     });
     const profiled = applyOutputProfile(assembled, activeOutputProfile(), outputProfileContext());
+    // AIO Enhanced Nuvio badges go on the card the profile settled on (Stable uses its own).
+    _lastBadgeMarkersFit = S.nuvioBadgeMarkers ? applyNuvioBadgeMarkers(profiled) : true;
     // Last stop before anything leaves the app: strip every key, preset and
     // pattern the selected host would reject or silently drop, so exported and
     // directly-installed JSON are identical to what the host will store.
@@ -5671,7 +5678,7 @@ function buildNuvioTemplate(host, device = 'generic', resolution = '1080p') {
     ...cloneUpdateValue(INITIAL_STATE),
     service: 'p2p', multiServices: ['p2p'], p2pEnabled: true, _nuvioInstant: true,
     device, resolution, audio: DEVICE_AUDIO_DEFAULTS[device] || 'limited', content: 'all',
-    name: 'Core Builds — Nuvio TorBox Instant', instanceHost: host.id,
+    name: 'Core Builds — Nuvio TorBox Instant', instanceHost: host.id, nuvioBadgeMarkers: Boolean(S.nuvioBadgeMarkers),
     outputProfile: 'advanced', aiostreamsVersion: S.aiostreamsVersion,
     langs: [...(S.langs || ['English'])], foreignLangKill: S.foreignLangKill !== false,
     tmdbToken: S.tmdbToken || '', tmdbApiKey: S.tmdbApiKey || '',
@@ -5998,7 +6005,7 @@ function parseTemplateToState(tpl) {
     service: null, device: 'generic', resolution: null, audio: 'limited', content: 'all',
     name: '', multiServices: [], sizeLimit: 'unlimited', formatter: 'family-v4',
     p2pEnabled: false, qualityFirst: false, resolutionFirst: false, foreignLangKill: true, matchMode: 'balanced',
-    exclude4K: false, excludeDV: false, excludeHDR: false, langs: ['English'], langExclusive: false,
+    exclude4K: false, excludeDV: false, excludeHDR: false, nuvioBadgeMarkers: false, langs: ['English'], langExclusive: false,
     cacheMode: 'mixed', streamPool: 'normal', simpleMode: false, outputProfile: 'auto', aiostreamsVersion: DEFAULT_AIOSTREAMS_VERSION
   };
   if (OUTPUT_PROFILES.includes(tpl?.metadata?.coreBuildsProfile)) st.outputProfile = tpl.metadata.coreBuildsProfile;
@@ -6124,8 +6131,11 @@ function parseTemplateToState(tpl) {
 
   // Formatter
   if (c.formatter && c.formatter.definitions && c.formatter.definitions.overrides) {
-    const ov = c.formatter.definitions.overrides[Object.keys(c.formatter.definitions.overrides)[0]];
+    let ov = c.formatter.definitions.overrides[Object.keys(c.formatter.definitions.overrides)[0]];
     if (ov) {
+      // AIO Enhanced Nuvio badge markers ride on the style; recognise the style without them.
+      const unmarked = stripNuvioBadgeMarkers(ov);
+      if (unmarked.found) { st.nuvioBadgeMarkers = true; ov = { ...ov, name: unmarked.name, description: unmarked.description }; }
       const coreMatch = FORMATTERS.filter(f => isCoreFormatter(f.id)).flatMap(f => CORE_SCORE_MODES.map(score => ({ id: f.id, score, ...buildCoreFormatter(f.id, { score }) })))
         .find(v => v.name === ov.name && v.d === ov.description);
       const match = coreMatch || FORMATTERS.find(f => f.name === ov.name || f.d === ov.description);
@@ -6810,13 +6820,19 @@ function jellyfinSignInHtml(host, uuid, pwd, hostLabel) {
 
 // Nuvio stream badges (v3.53): offered after a Nuvio install. They are imported into
 // Nuvio from a URL and stored there, so this hands over the link and changes no config.
-function nuvioBadgeCardHtml(deviceId) {
-  const pack = nuvioBadgePack(deviceId);
+function templateHasBadgeMarkers(tmpl) {
+  const ov = Object.values(tmpl?.config?.formatter?.definitions?.overrides || {})[0];
+  return Boolean(ov) && stripNuvioBadgeMarkers(ov).found;
+}
+
+function nuvioBadgeCardHtml(deviceId, enhanced = false) {
+  const pack = nuvioBadgePack(deviceId, { enhanced });
   return `<div class="u-mt12 jf-signin nv-badges" role="note">
     <strong class="u-tx">Optional: add stream badges in Nuvio</strong>
     <div class="u-note">Badges label each stream: resolution, HDR, audio, codec and more. They live in Nuvio, not in your AIOStreams setup, so adding them changes nothing here.</div>
     <div class="jf-row"><span class="jf-lbl">${escHtml(pack.label)}</span><code class="jf-val" data-no-i18n>${escHtml(pack.url)}</code><button type="button" class="copy-btn" data-action="copy-manifest" data-url="${escHtml(pack.url)}" data-toast="Badge link copied — paste it into Nuvio">Copy</button></div>
     ${pack.id === 'noDv' ? '<div class="u-hint">No DV pack, because this device can\'t play Dolby Vision.</div>' : ''}
+    ${pack.id === 'enhanced' ? '<div class="u-hint">AIO Enhanced pack, because this setup carries the badge markers (Fine-Tune → Stream cards).</div>' : ''}
     <ol class="nv-steps">
       <li>Copy the link.</li>
       <li>In Nuvio, open Settings → Streams → Fusion badge URLs. On Android TV: Settings → Layout → Streams → Fusion badge URLs.</li>
@@ -7038,7 +7054,7 @@ function showManifestModal(manifestUrl, password, hostLabel, initialTab) {
     } else if (key === 'nuvio') {
       helpEl.style.display = '';
       document.getElementById('mAppHelpTitle').textContent = 'Nuvio Setup';
-      document.getElementById('mAppHelpBody').innerHTML = '<strong class="u-tx">1.</strong> Manifest URL is <strong class="u-green">already copied</strong> to your clipboard<br><strong class="u-tx">2.</strong> Tap <strong class="u-purple">Open Nuvio</strong> below (or go to Nuvio → Account → Addons)<br><strong class="u-tx">3.</strong> Paste the URL in the addon field' + nuvioBadgeCardHtml(S.device || 'generic');
+      document.getElementById('mAppHelpBody').innerHTML = '<strong class="u-tx">1.</strong> Manifest URL is <strong class="u-green">already copied</strong> to your clipboard<br><strong class="u-tx">2.</strong> Tap <strong class="u-purple">Open Nuvio</strong> below (or go to Nuvio → Account → Addons)<br><strong class="u-tx">3.</strong> Paste the URL in the addon field' + nuvioBadgeCardHtml(S.device || 'generic', Boolean(S.nuvioBadgeMarkers) && templateHasBadgeMarkers(_cachedBuildResult));
       if (qrWrap) qrWrap.style.display = 'none';
       if (qrHint) qrHint.style.display = 'none';
     } else if (key === 'chillio') {
@@ -8798,9 +8814,9 @@ async function runExpressInstall(p) {
       if (importUrl) {
         saveLastGen();
         const configureUrl = HOST_BASE_URLS[nuvioHost.id] + '/stremio/configure?template=' + encodeURIComponent(importUrl);
-        result.innerHTML = `<div class="u-mt12 import-success"><strong>Nuvio template ready — host: ${escHtml(nuvioHost.label || HOST_LABEL_MAP[nuvioHost.id] || nuvioHost.id)}</strong><div style="font-size:.78rem;margin:8px 0;line-height:1.6">Connect TorBox in <strong>Nuvio → Connected Services</strong>, not with a key in AIOStreams.<br>Import this template into AIOStreams, set a password and save. Then copy its <strong>manifest URL</strong> into Nuvio. The link below is a public template import link, not a manifest; credentials including TMDB are removed.</div><div class="inst-chips"><a href="${escH(configureUrl)}" target="_blank" rel="noopener noreferrer" class="inst-chip inst-chip-import">▶ ${escHtml(HOST_LABEL_MAP[nuvioHost.id] || nuvioHost.id)}</a></div><div class="manifest-url" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.72rem;padding:8px 10px;cursor:pointer" data-action="copy-manifest" data-url="${escH(importUrl)}">${escHtml(importUrl)}</div></div>${nuvioBadgeCardHtml(p.device || 'generic')}`;
+        result.innerHTML = `<div class="u-mt12 import-success"><strong>Nuvio template ready — host: ${escHtml(nuvioHost.label || HOST_LABEL_MAP[nuvioHost.id] || nuvioHost.id)}</strong><div style="font-size:.78rem;margin:8px 0;line-height:1.6">Connect TorBox in <strong>Nuvio → Connected Services</strong>, not with a key in AIOStreams.<br>Import this template into AIOStreams, set a password and save. Then copy its <strong>manifest URL</strong> into Nuvio. The link below is a public template import link, not a manifest; credentials including TMDB are removed.</div><div class="inst-chips"><a href="${escH(configureUrl)}" target="_blank" rel="noopener noreferrer" class="inst-chip inst-chip-import">▶ ${escHtml(HOST_LABEL_MAP[nuvioHost.id] || nuvioHost.id)}</a></div><div class="manifest-url" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.72rem;padding:8px 10px;cursor:pointer" data-action="copy-manifest" data-url="${escH(importUrl)}">${escHtml(importUrl)}</div></div>${nuvioBadgeCardHtml(p.device || 'generic', templateHasBadgeMarkers(tmpl))}`;
       } else {
-        result.innerHTML = '<div class="u-mt12 import-success import-error"><strong>Could not create a Nuvio import link</strong><div style="font-size:.78rem;margin:6px 0">Download this Nuvio template and import it manually into AIOStreams.</div><button type="button" id="downloadNuvioJson" class="df-btn df-btn-secondary">Export Nuvio JSON</button></div>' + nuvioBadgeCardHtml(p.device || 'generic');
+        result.innerHTML = '<div class="u-mt12 import-success import-error"><strong>Could not create a Nuvio import link</strong><div style="font-size:.78rem;margin:6px 0">Download this Nuvio template and import it manually into AIOStreams.</div><button type="button" id="downloadNuvioJson" class="df-btn df-btn-secondary">Export Nuvio JSON</button></div>' + nuvioBadgeCardHtml(p.device || 'generic', templateHasBadgeMarkers(tmpl));
         document.getElementById('downloadNuvioJson')?.addEventListener('click', () => downloadJsonFile(tmpl, 'core-nuvio-torbox-instant.json'));
       }
     } catch (err) {

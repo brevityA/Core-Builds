@@ -221,27 +221,45 @@ const BASE_FORMATTER = Object.freeze({
   description: '{stream.size::exists["💾 {stream.size::sbytes}  "||""]}{stream.bitrate::exists["⚡ {stream.bitrate::sbitrate}  "||""]}{stream.seeders::exists["🌱 {stream.seeders}  "||""]}{stream.releaseGroup::exists["🏷 {stream.releaseGroup}"||""]}{tools.newLine}{addon.name::exists["{addon.name}"||"AIOStreams"]}{stream.indexer::exists[" · {stream.indexer}"||""]}',
 });
 
-export function buildCompanionFormatter(input = {}) {
+/** The invisible AIO Enhanced marker expressions for a builder state, in badge order. */
+export function badgeMarkerExpressions(input = {}) {
   const state = normalizeBuilderState({ ...input, allowEmpty:true });
+  if (state.mode !== 'enhanced') return [];
   const selected = new Set(state.selectedIds);
   const rank = new Map(state.badgeOrder.map((id, index) => [id, index]));
-  const markers = state.mode === 'enhanced'
-    ? BADGES.filter((badge) => selected.has(badge.id)).sort((a, b) => (rank.get(a.id) ?? 0) - (rank.get(b.id) ?? 0)).map(markerExpression)
-    : [];
+  return BADGES.filter((badge) => selected.has(badge.id)).sort((a, b) => (rank.get(a.id) ?? 0) - (rank.get(b.id) ?? 0)).map(markerExpression);
+}
 
-  const fields = { name:BASE_FORMATTER.name, description:BASE_FORMATTER.description };
+/**
+ * Adds marker expressions to an existing {name, description} formatter, each to
+ * whichever field is shorter at that moment, within the per-field safety limit.
+ * `position: 'start'` puts them before the field's first line instead of after its
+ * last: a style whose last line renders empty (and is dropped) would otherwise keep
+ * that line, now holding only invisible markers. Throws a RangeError when they do not fit.
+ */
+export function addBadgeMarkers(formatter, markers, { position = 'end' } = {}) {
+  const base = { name:String(formatter?.name || ''), description:String(formatter?.description || '') };
+  const added = { name:'', description:'' };
+  const size = (field) => base[field].length + added[field].length;
   for (const expression of markers) {
-    const candidates = ['name','description'].sort((a, b) => fields[a].length - fields[b].length);
-    const target = candidates.find((field) => fields[field].length + expression.length <= FORMATTER_FIELD_LIMIT);
+    const candidates = ['name','description'].sort((a, b) => size(a) - size(b));
+    const target = candidates.find((field) => size(field) + expression.length <= FORMATTER_FIELD_LIMIT);
     if (!target) {
       throw new RangeError(`The selected enhanced badge set cannot fit within AIOStreams' ${FORMATTER_FIELD_LIMIT}-character safety limit per formatter field. Disable some advanced badges.`);
     }
-    fields[target] += expression;
+    added[target] += expression;
   }
+  const fields = {};
+  for (const field of ['name','description']) {
+    fields[field] = position === 'start' ? added[field] + base[field] : base[field] + added[field];
+    if (fields[field].length > FORMATTER_FIELD_LIMIT) throw new RangeError(`Formatter ${field} exceeds the safe limit.`);
+  }
+  return fields;
+}
 
-  for (const [field, value] of Object.entries(fields)) {
-    if (value.length > FORMATTER_FIELD_LIMIT) throw new RangeError(`Formatter ${field} exceeds the safe limit.`);
-  }
+export function buildCompanionFormatter(input = {}) {
+  const state = normalizeBuilderState({ ...input, allowEmpty:true });
+  const fields = addBadgeMarkers(BASE_FORMATTER, badgeMarkerExpressions(state));
   return {
     _label: state.mode === 'enhanced' ? 'Core Badge Companion — Enhanced' : 'Core Badge Companion — Universal',
     name: fields.name,
